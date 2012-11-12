@@ -1,0 +1,28 @@
+HERCs Prolog Syntax
+
+<command> ::=	<list> | <atom> <list>
+<program> ::=	{import ( <atom> | <text> ) }
+		program <atom> [ #machine := <text> ] ( #auto | <atoms> )
+		{ (
+			<machine> |
+			<clause> | auto := <clause> |
+			<preprocessor> |
+			protect <atoms> |
+			private <atoms>
+		) }
+		end [ := <clause> ] .
+<atom>		 ::=	( "_" | <letter> ) { ( "_" | <letter> | <cipher> ) }
+<atoms>		 ::=	"[" { <atom> } "]"
+<positive>	 ::=	<cipher> { <cipher> }
+<number>	 ::=	[ "-" ] <positive>
+<float>		 ::=	<number> . <positive>
+<text>		 ::=	"\"" { <anything> } "\""
+<variable>	 ::=	"*" { ( "_" | <letter> | <cipher> ) }
+<element>	 ::=	<atom> | <number> | <float> | <text> |
+			/ | fail | <list> | <variable>
+<tail>		 ::=	{ <element> } [ : <element> ] "]"
+<list>		 ::=	"[" <element> <tail>
+<clause>	 ::=	"[[" <atom> <tail> <tail>
+<machine>	 ::=	#machine <atom> := <text>
+<preprocessor>	 ::=	preprocessor := ( <atom> | "[" "]" )
+
