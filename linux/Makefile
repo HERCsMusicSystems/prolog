@@ -268,7 +268,7 @@ midi_command_prompt.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)midi
 prc.o: $(pc)linux_midi.h $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)hercs_prolog_sdk.h $(pc)prolog_hercs_console.h \
 	$(pc)prolog_midi_command.h $(pc)prolog_windows_console.h $(pc)prolog_studio.h $(pc)midi_command_prompt.h \
 	$(pc)prc.cpp
-	g++ -I. -I$(pc) $(pc)prc.cpp -c -o prc.o -lreadline
+	g++ -Wno-write-strings -I. -I$(pc) $(pc)prc.cpp -c -o prc.o -lreadline
 
 
 /usr/lib/prolog_mysql.so: prolog_mysql.o
