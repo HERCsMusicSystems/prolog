@@ -280,9 +280,9 @@ prc.o: $(pc)linux_midi.h $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)he
 
 mysql: /usr/lib/prolog_mysql.so ~/bin/mysql.prc
 
-studio: linux_midi.o encoder.o $(objects) prolog_resources.o $(prc_objects) prc.o neural.o
-	g++ -lpthread -ldl -Wl,--export-dynamic encoder.o prolog_resources.o neural.o $(objects) prc.o -o studio -lreadline
+~/bin/studio: linux_midi.o encoder.o $(objects) prolog_resources.o $(prc_objects) prc.o neural.o
+	g++ -lpthread -ldl -Wl,--export-dynamic encoder.o prolog_resources.o neural.o $(objects) prc.o -o ~/bin/studio -lreadline
 
-bin_studio: studio
-	cp studio ~/bin/studio
+studio: ~/bin/studio
+	cp ~/bin/studio studio
 
