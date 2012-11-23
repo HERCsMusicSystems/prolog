@@ -85,15 +85,25 @@ void PrologLinuxConsole :: configure (void) {
 	strcpy (prompt, "");
 }
 
+#ifdef MAC_OPERATING_SYSTEM
+AREA previous_line = "";
+#endif
+
 bool PrologLinuxConsole :: empty (void) {
 	bool is_empty = PrologCommand :: empty ();
 	if (threadable || ! is_empty) return is_empty;
 	char * area = readline (prompt);
 	if (strlen (area) > 2) {
+#ifndef MAC_OPERATING_SYSTEM
 		HIST_ENTRY * * histories = history_list ();
 		if (histories != NULL && history_length > 0) {
 			if (strcmp (area, histories [history_length - 1] -> line) != 0) add_history (area);
 		} else add_history (area);
+#else
+        if (strcmp (area, previous_line) != 0) add_history (area);
+		area_cat (previous_line, 0, area);
+		
+#endif
 	}
 	insert (area);
 	insert ("\n");
