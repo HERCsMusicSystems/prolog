@@ -46,7 +46,7 @@
 #ifdef LINUX_OPERATING_SYSTEM
 #ifdef MAC_OPERATING_SYSTEM
 #include "mac_midi.h"
-mac_midi_service midi_service;
+mac_midi_service midi_service ("STUDIO");
 #else
 #include "linux_midi.h"
 linux_midi_service midi_service;

@@ -36,8 +36,9 @@ private:
 	dx_midi_transmit_out_messages_class2 * t2;
 	int input_index;
 	int output_index;
+	buffered_midi_stream * own_reader_line;
 public:
-	midi_stream * line;
+	midi_stream * reader_line;
 	midi_reader * reader;
 	bool reading_system_exclusive;
 public:
@@ -52,7 +53,7 @@ public:
 	virtual midi_stream * getTransmissionLine (void);
 	virtual midi_stream * getReceptionLine (void);
 	void set_reader (midi_reader * reader);
-	mac_midi_service (void);
+	mac_midi_service (char * virtual_port_name);
 	~ mac_midi_service (void);
 public:
 	virtual void changeManufacturersId (void);
