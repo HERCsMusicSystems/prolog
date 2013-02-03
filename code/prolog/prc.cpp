@@ -201,7 +201,8 @@ int main (int args, char * argv []) {
 		if (strcmp (argv [ind], "*gt") == 0) threads_type = 0;
 		else if (strcmp (argv [ind], "*ot") == 0) threads_type = 1;
 		else if (strcmp (argv [ind], "*nt") == 0) threads_type = 2;
-		else strcpy (name, argv [ind]);
+		else if (strlen (name) < 1) strcpy (name, argv [ind]);
+		else root -> addArg (argv [ind]);
 	}
 	//*
 	switch (threads_type) {

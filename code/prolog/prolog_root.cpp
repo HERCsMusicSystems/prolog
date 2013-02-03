@@ -44,6 +44,7 @@ PrologRoot :: PrologRoot (void) TRACKING (5) {
 	strcpy (key, "");
 	strcpy (root_directory, "");
 	search_directories = NULL;
+	args = NULL;
 	volume_id = 0;
 	serial_shift = 0;
 	current_foreground = 65280;
@@ -72,6 +73,7 @@ PrologRoot :: PrologRoot (PrologTransportPool * transport) TRACKING (5) {
 	strcpy (key, "");
 	strcpy (root_directory, "");
 	search_directories = NULL;
+	args = NULL;
 	volume_id = 0;
 	serial_shift = 0;
 	current_foreground = 65280;
@@ -100,6 +102,7 @@ PrologRoot :: PrologRoot (PrologTransportPool * transport, PrologResolutionPool 
 	strcpy (key, "");
 	strcpy (root_directory, "");
 	search_directories = NULL;
+	args = NULL;
 	volume_id = 0;
 	serial_shift = 0;
 	current_foreground = 65280;
@@ -116,6 +119,7 @@ PrologRoot :: ~ PrologRoot (void) {
 	deleteSearchDirectories ();
 	if (preprocessor != NULL) preprocessor -> removeAtom ();
 	delete root;
+	if (args != NULL) delete args; args = NULL;
 }
 
 int PrologRoot :: captionId (void) {return caption_id;}
@@ -444,6 +448,14 @@ bool PrologRoot :: searchDirectoryNotFound (char * directory) {
 		search_directory = search_directory -> next;
 	}
 	return true;
+}
+
+void PrologRoot :: addArg (char * arg) {
+	PrologString * sp = new PrologString (arg, NULL);
+	if (args == NULL) {args = sp; return;}
+	PrologString * ap = args;
+	while (ap -> next != NULL) ap = ap -> next;
+	ap -> next = sp;
 }
 
 void PrologRoot :: opaqueThreads (void) {transport_pool = new PrologTransportPool ();}

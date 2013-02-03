@@ -277,6 +277,7 @@ class PrologRoot TRACK {
 public:
 	PROLOG_STRING root_directory;
 	PrologString * search_directories;
+	PrologString * args;
 	PrologDirectory * root;
 	PrologTransportPool * transport_pool;
 	PrologTransport * root_transport;
@@ -363,6 +364,7 @@ public:
 	void get_search_directories_from_environment (char * text);
 	void addSearchDirectory (char * directory);
 	void deleteSearchDirectories (void);
+	void addArg (char * arg);
 	void opaqueThreads (void);
 	void opaqueThreads (int horizontal);
 	void opaqueThreads (int horizontal, int seconds);

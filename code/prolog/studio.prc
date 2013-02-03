@@ -15,7 +15,7 @@ program studio #machine := "prolog.studio"
 		file_writer import load consult batch file_reader reload
 		remove_module create_module set_machine
 		add_search_directory search_directories root_directory crd
-		cd dir DIR edit execute make_file make_directory erase erase_directory move copy
+		cd dir DIR ARGS args args_tail edit execute make_file make_directory erase erase_directory move copy
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl overwrite let
 		create_atom search_atom preprocessor prompt
 		add_strings add sub mult div mod and or xor sum times less less_eq greater greater_eq
@@ -143,6 +143,7 @@ program studio #machine := "prolog.studio"
 #machine search_directories := "search_directories"
 #machine cd := "cd"
 #machine DIR := "DIR"
+#machine ARGS := "ARGS"
 #machine edit := "edit"
 #machine make_directory := "make_directory"
 #machine erase := "erase"
@@ -504,6 +505,10 @@ program studio #machine := "prolog.studio"
 	[dir *files]
 	]
 
+[[args : *args] [ARGS : *texts] / [args_tail *texts *args]]
+[[args_tail [] []] /]
+[[args_tail [*t1 : *t] *a] [text_term *t1 : *b] [APPEND *b *c *a] / [args_tail *t *c]]
+
 ; demo
 [[noteon *key] [keyon 0 *key 100]]
 [[noteoff *key] [keyoff 0 *key]]
@@ -650,7 +655,7 @@ protect [
 	APPEND REVERSE LENGTH ONLIST NODUP
 	sort divide
 	]
-private [inner inner_addcl inner_call random_cl explode divide]
+private [inner inner_addcl inner_call random_cl explode divide args_tail]
 
 
 end.

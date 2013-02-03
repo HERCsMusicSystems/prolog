@@ -2233,6 +2233,19 @@ public:
 	DIR (PrologRoot * root) {this -> root = root;}
 };
 
+class ARGS : public PrologNativeCode {
+private:
+	PrologRoot * root;
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (root -> args == NULL) {parameters -> setEarth (); return true;}
+		PrologString * sp = root -> args;
+		while (sp != NULL) {parameters -> setPair (); parameters -> getLeft () -> setText (sp -> text); parameters = parameters -> getRight (); sp = sp -> next;}
+		return true;
+	}
+	ARGS (PrologRoot * root) {this -> root = root;}
+};
+
 class edit : public PrologNativeCode {
 private:
 	PrologRoot * root;
@@ -4406,6 +4419,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "search_directories") == 0) return new search_directories (root);
 	if (strcmp (name, "cd") == 0) return new cd (root);
 	if (strcmp (name, "DIR") == 0) return new DIR (root);
+	if (strcmp (name, "ARGS") == 0) return new ARGS (root);
 	if (strcmp (name, "edit") == 0) return new edit (root);
 	if (strcmp (name, "execute") == 0) return new execute (root);
 	if (strcmp (name, "make_directory") == 0) return new make_directory (root);
