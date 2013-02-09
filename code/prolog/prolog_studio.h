@@ -95,6 +95,19 @@ private:
 	PrologTransport * t;
 	PrologResolutionPool * pool;
 public:
+	PrologDirectory * dir;
+	PrologAtom * c, * cb, * cbb, * cx, * cxx;
+	PrologAtom * d, * db, * dbb, * dx, * dxx;
+	PrologAtom * e, * eb, * ebb, * ex, * exx;
+	PrologAtom * f, * fb, * fbb, * fx, * fxx;
+	PrologAtom * g, * gb, * gbb, * gx, * gxx;
+	PrologAtom * a, * ab, * abb, * ax, * axx;
+	PrologAtom * b, * bb, * bbb, * bx, * bxx;
+	void set_atoms (void);
+	int diatonic (PrologAtom * atom);
+	int chromatic (PrologAtom * atom);
+	PrologAtom * note (int diatonic, int chromatic);
+public:
 	virtual void init (PrologRoot * root);
 	virtual PrologNativeCode * getNativeCode (char * name);
 	virtual ~ PrologStudio (void);

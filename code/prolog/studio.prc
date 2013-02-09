@@ -48,6 +48,16 @@ program studio #machine := "prolog.studio"
 		midi_info midi_port midi midi_in_info midi_out_info midi_in_port midi_out_port midi_short_msg MIDI_SHORT_MSG midi_long_msg
 		midi_manufacturers_id midi_product_id midi_product_version
 		egcopy egcopy_freq egcopy_amp egcopy_index egcopy_pan
+		
+		C C# Cx Cb Cbb
+		D D# Dx Db Dbb
+		E E# Ex Eb Ebb
+		F F# Fx Fb Fbb
+		G G# Gx Gb Gbb
+		A A# Ax Ab Abb
+		B B# Bx Bb Bbb
+		octave notestep
+		INTERVAL
 	]
 
 #machine sum := "sum"
@@ -181,6 +191,7 @@ program studio #machine := "prolog.studio"
 #machine midi_out_port := "midi_out_port"
 
 #machine DCMOD := "DCMOD"
+#machine INTERVAL := "INTERVAL"
 
 #machine midi_short_msg := "midi_short_msg"
 #machine MIDI_SHORT_MSG := "MIDI_SHORT_MSG"
@@ -647,6 +658,59 @@ program studio #machine := "prolog.studio"
 [[midi_port *in *out] [midi_in_port *in] [midi_out_port *out]]
 [[midi] [midi_info]]
 [[midi *in *out] [midi_port *in *out] [midi_info]]
+
+; musical definitions
+
+[[octave 0 28 48]]
+[[octave -1 21 36]]
+[[octave 1 35 60]]
+[[octave -2 14 24]] ; grand piano lowest a = 21
+[[octave 2 42 72]]
+[[octave -3 7 12]]
+[[octave 3 49 84]]
+[[octave -4 0 0]]
+[[octave 4 56 96]]
+[[octave 5 63 108]] ; grand piano highest c = 108
+[[octave 6 70 120]]
+
+[[notestep C 0 0]]
+[[notestep D 1 2]]
+[[notestep E 2 4]]
+[[notestep F 3 5]]
+[[notestep G 4 7]]
+[[notestep A 5 9]]
+[[notestep B 6 11]]
+
+[[notestep F# 3 6]]
+[[notestep Bb 6 10]]
+[[notestep C# 0 1]]
+[[notestep Eb 2 3]]
+[[notestep G# 4 8]]
+[[notestep Ab 5 8]]
+[[notestep D# 1 3]]
+[[notestep Db 1 1]]
+[[notestep A# 5 10]]
+[[notestep Gb 4 6]]
+[[notestep E# 2 5]]
+[[notestep Cb 0 -1]]
+[[notestep B# 6 12]]
+[[notestep Fb 3 4]]
+
+[[notestep Fx 3 7]]
+[[notestep Bbb 6 9]]
+[[notestep Cx 0 2]]
+[[notestep Ebb 2 2]]
+[[notestep Gx 4 9]]
+[[notestep Abb 5 7]]
+[[notestep Dx 1 4]]
+[[notestep Dbb 1 0]]
+[[notestep Ax 5 11]]
+[[notestep Gbb 4 5]]
+[[notestep Ex 2 6]]
+[[notestep Cbb 0 -2]]
+[[notestep Bx 6 13]]
+[[notestep Fbb 3 3]]
+
 
 
 protect [

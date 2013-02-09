@@ -5,13 +5,6 @@ import help
 program notes #machine := "notes"
 	[
 		INTERVAL
-		C C# Cx Cb Cbb
-		D D# Dx Db Dbb
-		E E# Ex Eb Ebb
-		F F# Fx Fb Fbb
-		G G# Gx Gb Gbb
-		A A# Ax Ab Abb
-		B B# Bx Bb Bbb
 		major minor major7 major7m minor7 minor7m major6 major6m minor6 minor6m sus4
 		octave notestep
 		notevalue notekeys
@@ -33,51 +26,6 @@ program notes #machine := "notes"
 preprocessor := f1
 
 #machine INTERVAL := "INTERVAL"
-
-[[octave -2 14 24]]
-[[octave -1 21 36]]
-[[octave 0 28 48]]
-[[octave 1 35 60]]
-[[octave 2 42 72]]
-[[octave 3 49 84]]
-
-[[notestep C 0 0]]
-[[notestep D 1 2]]
-[[notestep E 2 4]]
-[[notestep F 3 5]]
-[[notestep G 4 7]]
-[[notestep A 5 9]]
-[[notestep B 6 11]]
-
-[[notestep F# 3 6]]
-[[notestep Bb 6 10]]
-[[notestep C# 0 1]]
-[[notestep Eb 2 3]]
-[[notestep G# 4 8]]
-[[notestep Ab 5 8]]
-[[notestep D# 1 3]]
-[[notestep Db 1 1]]
-[[notestep A# 5 10]]
-[[notestep Gb 4 6]]
-[[notestep E# 2 5]]
-[[notestep Cb 0 -1]]
-[[notestep B# 6 12]]
-[[notestep Fb 3 4]]
-
-[[notestep Fx 3 7]]
-[[notestep Bbb 6 9]]
-[[notestep Cx 0 2]]
-[[notestep Ebb 2 2]]
-[[notestep Gx 4 9]]
-[[notestep Abb 5 7]]
-[[notestep Dx 1 4]]
-[[notestep Dbb 1 0]]
-[[notestep Ax 5 11]]
-[[notestep Gbb 4 5]]
-[[notestep Ex 2 6]]
-[[notestep Cbb 0 -2]]
-[[notestep Bx 6 13]]
-[[notestep Fbb 3 3]]
 
 [[perfect_consonance [0 0]]]
 [[perfect_consonance [4 7]]]
