@@ -174,7 +174,7 @@ class service_class_loader_class : public PrologServiceClassLoader {
 public:
 	PrologServiceClass * load (char * name) {
 		if (strcmp (name, "neural") == 0) return new neural_service ();
-		if (strcmp (name, "notes") == 0) return new NotesServiceClass ();
+		//if (strcmp (name, "notes") == 0) return new NotesServiceClass ();
 //#ifdef LINUX_OPERATING_SYSTEM
 //#ifndef MAC_OPERATING_SYSTEM
 //		if (strcmp (name, "prolog_mysql") == 0) return new MySQLServiceClass ();

@@ -56,8 +56,8 @@ program studio #machine := "prolog.studio"
 		G G# Gx Gb Gbb
 		A A# Ax Ab Abb
 		B B# Bx Bb Bbb
-		octave notestep
-		INTERVAL
+		octave notestep notevalue notekeys note_less note_less_eq
+		INTERVAL interval
 	]
 
 #machine sum := "sum"
@@ -711,7 +711,30 @@ program studio #machine := "prolog.studio"
 [[notestep Bx 6 13]]
 [[notestep Fbb 3 3]]
 
+[[notevalue [*note *octave : *] *diatonic *chromatic]
+	[octave *octave *octave_diatonic *octave_chromatic]
+	[notestep *note *note_diatonic *note_chromatic]
+	[sum *octave_diatonic *note_diatonic *diatonic]
+	[sum *octave_chromatic *note_chromatic *chromatic]
+]
 
+[[interval [*from_step *from_octave : *t] [*to_step *to_octave : *t] [*diatonic *chromatic]]
+	[notestep *from_step *from_d *from_ch]
+	[DCMOD *from_d *from_ch *from_octave *diatonic *chromatic *d *c *to_octave]
+	[notestep *to_step *d *c]/
+]
+[[interval [*from_step *from_octave : *t] [*to_step *to_octave : *t] [*diatonic *chromatic]]
+	[notevalue [*from_step *from_octave] *from_d *from_ch]
+	[notevalue [*to_step *to_octave] *to_d *to_ch]
+	[sum *from_d *diatonic *to_d]
+	[sum *from_ch *chromatic *to_ch]
+]
+
+[[notekeys [] []]/]
+[[notekeys [*note : *notes] [*key : *keys]] [notevalue *note * *key] / [notekeys *notes *keys]]
+
+[[note_less : *notes] [notekeys *notes *keys] / [less : *keys]]
+[[note_less_eq : *notes] [notekeys *notes *keys] / [less_eq : *keys]]
 
 protect [
 	not

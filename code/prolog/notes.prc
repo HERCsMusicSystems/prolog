@@ -38,30 +38,6 @@ preprocessor := f1
 [[consonance [5 9]]]
 [[consonance [*d *h]] [less 6 *d] [sum 7 *d1 *d] [sum 12 *h1 *h] / [consonance [*d1 *h1]]]
 
-[[notevalue [*note *octave : *] *diatonic *chromatic]
-	[octave *octave *octave_diatonic *octave_chromatic]
-	[notestep *note *note_diatonic *note_chromatic]
-	[sum *octave_diatonic *note_diatonic *diatonic]
-	[sum *octave_chromatic *note_chromatic *chromatic]
-]
-
-[[notekeys [] []]/]
-[[notekeys [*note : *notes] [*key : *keys]] [notevalue *note * *key] / [notekeys *notes *keys]]
-
-[[note_less : *notes] [notekeys *notes *keys] / [less : *keys]]
-[[note_less_eq : *notes] [notekeys *notes *keys] / [less_eq : *keys]]
-
-[[interval [*from_step *from_octave : *t] [*to_step *to_octave : *t] [*diatonic *chromatic]]
-	[notestep *from_step *from_d *from_ch]
-	[DCMOD *from_d *from_ch *from_octave *diatonic *chromatic *d *c *to_octave]
-	[notestep *to_step *d *c]/
-]
-[[interval [*from_step *from_octave : *t] [*to_step *to_octave : *t] [*diatonic *chromatic]]
-	[notevalue [*from_step *from_octave] *from_d *from_ch]
-	[notevalue [*to_step *to_octave] *to_d *to_ch]
-	[sum *from_d *diatonic *to_d]
-	[sum *from_ch *chromatic *to_ch]
-]
 [[absolute_interval *from *to *interval] [note_less *from *to] / [interval *from *to *interval]]
 [[absolute_interval *from *to *interval] [interval *to *from *interval]]
 [[logical_interval *from *to *interval] [note_less *from *to] / [interval *from *to *interval]]
