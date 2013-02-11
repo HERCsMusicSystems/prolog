@@ -93,7 +93,7 @@ LOCAL_LIBS =
 LIBS = $(LIBRUBYARG_SHARED)  -lpthread -lrt -ldl -lcrypt -lm `mysql_config --libs` -lc -lreadline
 # MODIFICATION Source code locations added in the beginning of every source code
 SRCS = $(pc)object_tracker.cpp $(pc)prolog_midi_command.cpp $(pc)prolog_reader.cpp $(pc)midi_stream.cpp $(pc)prolog_directory.cpp $(pc)prolog_service_class.cpp $(pc)prolog_dll_loader.cpp $(pc)linux_midi.cpp $(pc)prolog_query.cpp $(pc)hercs_gem.cpp $(pc)prolog_loader.cpp $(pc)prolog_match.cpp $(pc)prolog_element.cpp $(pc)prolog_transport.cpp $(pc)prolog_command.cpp $(pc)midi_command_prompt.cpp $(pc)prolog_native_code.cpp $(pc)neural.cpp $(pc)prolog_transport_pool.cpp $(pc)encoder.cpp $(pc)prolog_root.cpp $(pc)prolog_resolution.cpp $(pc)prolog_variable.cpp $(pc)prolog_resources.cpp $(pc)prolog_resolution_pool.cpp $(pc)prolog_linux_console.cpp $(pc)prolog_studio.cpp $(pc)prolog_atom.cpp
-OBJS = object_tracker.o prolog_midi_command.o prolog_reader.o midi_stream.o prolog_directory.o prolog_service_class.o prolog_dll_loader.o linux_midi.o prolog_query.o hercs_gem.o prolog_loader.o prolog_match.o prolog_element.o prolog_transport.o prolog_command.o midi_command_prompt.o prolog_native_code.o neural.o prolog_transport_pool.o encoder.o prolog_root.o prolog_resolution.o prolog_variable.o prolog_resources.o prolog_resolution_pool.o prolog_linux_console.o prolog_studio.o prolog_atom.o notes.o
+OBJS = object_tracker.o prolog_midi_command.o prolog_reader.o midi_stream.o prolog_directory.o prolog_service_class.o prolog_dll_loader.o linux_midi.o prolog_query.o hercs_gem.o prolog_loader.o prolog_match.o prolog_element.o prolog_transport.o prolog_command.o midi_command_prompt.o prolog_native_code.o neural.o prolog_transport_pool.o encoder.o prolog_root.o prolog_resolution.o prolog_variable.o prolog_resources.o prolog_resolution_pool.o prolog_linux_console.o prolog_studio.o prolog_atom.o
 TARGET = HERCs
 DLLIB = $(TARGET).so
 EXTSTATIC = 
@@ -175,7 +175,6 @@ prc_objects = \
 	$(pc)record.prc\
 	$(pc)neural.prc\
 	$(pc)keyboard.prc\
-	$(pc)notes.prc\
 	$(pc)sql.prc
 
 objects = \
@@ -189,7 +188,6 @@ objects = \
 	$(pi)prolog_transport_pool.o $(pi)prolog_variable.o \
 	$(pi)prolog_linux_console.o\
 	$(pi)midi_command_prompt.o\
-	$(pi)notes.o\
 	$(pi)mac_midi.o
 
 resource_maker.exe: $(pc)resource_maker.cpp
@@ -236,8 +234,6 @@ prolog_service_class.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)pro
 	g++ -Wno-write-strings -I. $(pc)prolog_service_class.cpp -c -o prolog_service_class.o
 prolog_studio.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_studio.h $(pc)prolog_studio.cpp
 	g++ -Wno-write-strings -I. $(pc)prolog_studio.cpp -Wno-write-strings -c -o prolog_studio.o
-notes.o: $(pc)prolog.h $(pc)encoder.h $(pc)prolog_studio.h $(pc)notes.cpp $(pc)notes.h
-	g++ -Wno-write-strings -I. $(pc)notes.cpp -c -o notes.o
 prolog_transport.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_transport.cpp
 	g++ -Wno-write-strings -I. $(pc)prolog_transport.cpp -c -o prolog_transport.o
 prolog_transport_pool.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_transport_pool.cpp
