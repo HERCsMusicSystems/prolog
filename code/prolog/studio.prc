@@ -712,8 +712,8 @@ program studio #machine := "prolog.studio"
 [[notestep Fbb 3 3]]
 
 [[notevalue [*note *octave : *] *diatonic *chromatic]
-	[octave *octave *octave_diatonic *octave_chromatic]
 	[notestep *note *note_diatonic *note_chromatic]
+	[octave *octave *octave_diatonic *octave_chromatic]
 	[sum *octave_diatonic *note_diatonic *diatonic]
 	[sum *octave_chromatic *note_chromatic *chromatic]
 ]
