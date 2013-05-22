@@ -2,7 +2,7 @@
 program http #machine := "prolog.http"
 
 	[
-		webserver full_text param params method http_route
+		webserver FULL_HEADER_TEXT param params METHOD HTTP_URI HTTP_PROTOCOL HTTP_HEADER
 		GET POST PUT PATCH DELETE COPY HEAD OPTIONS LINK UNLINK PURGE
 	]
 
