@@ -89,6 +89,36 @@ public:
 		skip_line ();
 		return true;
 	}
+	char extract_hex (char c1, char c2) {
+		char ret;
+		if ('0' <= c1 && c1 <= '9') ret = 16 * (c1 - '0');
+		if ('A' <= c1 && c1 <= 'F') ret = 16 * (c1 - 'A' + 10);
+		if ('a' <= c1 && c1 <= 'f') ret = 16 * (c1 - 'a' + 10);
+		if ('0' <= c2 && c2 <= '9') ret += c2 - '0';
+		if ('A' <= c2 && c2 <= 'F') ret += c2 - 'A' + 10;
+		if ('a' <= c2 && c2 <= 'f') ret += c2 - 'a' + 10;
+		return ret;
+	}
+	void copy_char (char * * to, char * * from) {
+		char c1, c2;
+		switch (* * from) {
+		case '+': * (* to)++ = ' '; (* from)++; break;
+		case '%': (* from)++; c1 = * (* from)++; c2 = * (* from)++; * (* to)++ = extract_hex (c1, c2); break;
+		default: * (* to)++ = * (* from)++; break;
+		}
+	}
+	bool get_param (void) {
+		if (* command <= 32) {skip_line (); return false;}
+		char * cp = key;
+		while (* command > 32 && * command != '=') copy_char (& cp, & command);
+		* cp = '\0';
+		if (* command == '=') command++;
+		cp = area;
+		while (* command > 32 && * command != '&') copy_char (& cp, & command);
+		* cp = '\0';
+		if (* command == '&') command++;
+		return true;
+	}
 	PrologAtom * get_method (void) {
 		get_word ();
 		if (strcmp (area, service -> get_atom -> name ()) == 0) return service -> get_atom;
@@ -215,6 +245,11 @@ while (analyser . get_header_line ()) {
 	content = root -> pair (root -> text (analyser . key), root -> pair (root -> text (analyser . area), root -> earth ()));
 	clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> header_atom), content)), root -> earth ());
 }
+// PARAMS
+while (analyser . get_param ()) {
+	content = root -> pair (root -> text (analyser . key), root -> pair (root -> text (analyser . area), root -> earth ()));
+	clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> param_atom), content)), root -> earth ());
+}
 				request -> firstClause = clausa;
 
 				clausa = root -> pair (root -> atom (router -> getAtom ()), root -> pair (root -> atom (request), root -> pair (root -> atom (response), root -> earth ())));
@@ -239,7 +274,7 @@ while (analyser . get_header_line ()) {
 void PrologHttp :: init (PrologRoot * root) {
 	this -> root = root;
 	http_directory = 0;
-	full_text_atom = method_atom = route_atom = protocol_atom = header_atom = 0;
+	full_text_atom = method_atom = route_atom = protocol_atom = header_atom = param_atom = 0;
 	get_atom = post_atom = put_atom = patch_atom = delete_atom = copy_atom = 0;
 	head_atom = options_atom = link_atom = unlink_atom = purge_atom = 0;
 }
@@ -253,6 +288,7 @@ void PrologHttp :: set_atoms (void) {
 	route_atom = http_directory -> searchAtom ("HTTP_URI");
 	protocol_atom = http_directory -> searchAtom ("HTTP_PROTOCOL");
 	header_atom = http_directory -> searchAtom ("HTTP_HEADER");
+	param_atom = http_directory -> searchAtom ("param");
 	get_atom = http_directory -> searchAtom ("GET");
 	post_atom = http_directory -> searchAtom ("POST");
 	put_atom = http_directory -> searchAtom ("PUT");
