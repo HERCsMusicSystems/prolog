@@ -227,16 +227,16 @@ RequestAnalyser analyser (service, command);
 PrologElement * clausa = root -> pair (root -> pair (root -> head (0), root -> pair (root -> atom (service -> full_text_atom), root -> pair (root -> text (command), root -> earth ()))), root -> earth ());
 // METHOD
 PrologAtom * method_atom = analyser . get_method ();
-clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> method_atom), root -> pair (method_atom != 0 ? root -> atom (method_atom) : root -> text (analyser . area), root -> earth ()))), root -> earth ());
+//clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> method_atom), root -> pair (method_atom != 0 ? root -> atom (method_atom) : root -> text (analyser . area), root -> earth ()))), root -> earth ());
 // URI
-PrologElement * content = root -> pair (root -> atom (service -> route_atom), root -> earth ());
+PrologElement * content = root -> pair (method_atom != 0 ? root -> atom (method_atom) : root -> text (analyser . area), root -> earth ());
 PrologElement * cp = content -> getRight ();
 PrologElement * partial = 0;
 while ((partial = analyser . get_partial_request ()) != 0) {
 	cp -> setPair (partial, root -> earth ());
 	cp = cp -> getRight ();
 }
-clausa = root -> pair (root -> pair (root -> head (clausa), content), root -> earth ());
+clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> route_atom), content)), root -> earth ());
 // PROTOCOL
 analyser . get_protocol ();
 clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> protocol_atom), root -> pair (root -> text (analyser . area), root -> earth ()))), root -> earth ());
@@ -274,7 +274,7 @@ while (analyser . get_param ()) {
 void PrologHttp :: init (PrologRoot * root) {
 	this -> root = root;
 	http_directory = 0;
-	full_text_atom = method_atom = route_atom = protocol_atom = header_atom = param_atom = 0;
+	full_text_atom = route_atom = protocol_atom = header_atom = param_atom = 0;
 	get_atom = post_atom = put_atom = patch_atom = delete_atom = copy_atom = 0;
 	head_atom = options_atom = link_atom = unlink_atom = purge_atom = 0;
 }
@@ -284,7 +284,6 @@ void PrologHttp :: set_atoms (void) {
 	http_directory = root -> searchDirectory ("http");
 	if (http_directory == 0) return;
 	full_text_atom = http_directory -> searchAtom ("FULL_HEADER_TEXT");
-	method_atom = http_directory -> searchAtom ("METHOD");
 	route_atom = http_directory -> searchAtom ("HTTP_URI");
 	protocol_atom = http_directory -> searchAtom ("HTTP_PROTOCOL");
 	header_atom = http_directory -> searchAtom ("HTTP_HEADER");
