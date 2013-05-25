@@ -33,18 +33,18 @@
 
 
 [[view_list_all *res]
-	[*res "<form action=\"/capitol/insert\" method=\"post\">"]
+	[FORM *res POST capitol insert] [*res "\n"]
 	[*res "<table>\n"]
 	[*res "<tr><td><h1>COUNTRY</h3></td><td><h3>CAPITOL</h1></td></tr>\n"]
 	[ALL
 		[capitol *country *city]
 		[*res "<tr><td>" *country "</td><td>" *city "</td>"]
-		;[*res "<td><a href=\"/capitol/delete/" *country "\">delete</a></td></tr>\n"]
 		[*res "<td>"] [GET *res capitol delete *country delete] [*res "</td></tr>\n"]
 	]
-	[*res "<tr><td><input type=text name=country /></td><td><input type=text name=city /></td><td><input type=submit value=NEW name=insert /></td></tr>\n"]
+	[*res "<tr><td>"] [param *res country] [*res "</td><td>"] [param *res city] [*res "</td><td>"] [param *res submit button NEW] [*res "</td></tr>\n"]
 	[*res "</table>\n"]
-	[*res "</form>\n"]
+	[FORM *res]
+	[*res "\n"]
 ]
 
 [[router *req *res]
