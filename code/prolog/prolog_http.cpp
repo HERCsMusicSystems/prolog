@@ -52,6 +52,24 @@ public:
 	}
 	void skip_whitespaces (void) {while (* command <= 32) command++;}
 	void skip_line (void) {while (* command != 10 && * command > 0) command++; if (* command == 10) command++;}
+	char extract_hex (char c1, char c2) {
+		char ret;
+		if ('0' <= c1 && c1 <= '9') ret = 16 * (c1 - '0');
+		if ('A' <= c1 && c1 <= 'F') ret = 16 * (c1 - 'A' + 10);
+		if ('a' <= c1 && c1 <= 'f') ret = 16 * (c1 - 'a' + 10);
+		if ('0' <= c2 && c2 <= '9') ret += c2 - '0';
+		if ('A' <= c2 && c2 <= 'F') ret += c2 - 'A' + 10;
+		if ('a' <= c2 && c2 <= 'f') ret += c2 - 'a' + 10;
+		return ret;
+	}
+	void copy_char (char * * to, char * * from) {
+		char c1, c2;
+		switch (* * from) {
+		case '+': * (* to)++ = ' '; (* from)++; break;
+		case '%': (* from)++; c1 = * (* from)++; c2 = * (* from)++; * (* to)++ = extract_hex (c1, c2); break;
+		default: * (* to)++ = * (* from)++; break;
+		}
+	}
 	PrologElement * interpret (void) {
 		PrologAtom * atom = service -> root -> search (area);
 		if (atom != 0) return service -> root -> atom (atom);
@@ -68,7 +86,10 @@ public:
 		if (* command != '/') return 0;
 		command++;
 		int ap = 0; area [0] = '\0';
-		while (* command != '/' && * command > 32) ap = area_cat (area, ap, * command++);
+		char * cp = area;
+		//while (* command != '/' && * command > 32) ap = area_cat (area, ap, * command++);
+		while (* command != '/' && * command > 32) copy_char (& cp, & command);
+		* cp = '\0';
 		return interpret ();
 	}
 	void get_protocol (void) {
@@ -88,24 +109,6 @@ public:
 		while (* command >= 32) ap = area_cat (area, ap, * command++);
 		skip_line ();
 		return true;
-	}
-	char extract_hex (char c1, char c2) {
-		char ret;
-		if ('0' <= c1 && c1 <= '9') ret = 16 * (c1 - '0');
-		if ('A' <= c1 && c1 <= 'F') ret = 16 * (c1 - 'A' + 10);
-		if ('a' <= c1 && c1 <= 'f') ret = 16 * (c1 - 'a' + 10);
-		if ('0' <= c2 && c2 <= '9') ret += c2 - '0';
-		if ('A' <= c2 && c2 <= 'F') ret += c2 - 'A' + 10;
-		if ('a' <= c2 && c2 <= 'f') ret += c2 - 'a' + 10;
-		return ret;
-	}
-	void copy_char (char * * to, char * * from) {
-		char c1, c2;
-		switch (* * from) {
-		case '+': * (* to)++ = ' '; (* from)++; break;
-		case '%': (* from)++; c1 = * (* from)++; c2 = * (* from)++; * (* to)++ = extract_hex (c1, c2); break;
-		default: * (* to)++ = * (* from)++; break;
-		}
 	}
 	bool get_param (void) {
 		if (* command <= 32) {skip_line (); return false;}
@@ -205,7 +208,7 @@ public:
 		struct sockaddr_storage their_addr;
 		int new_fd;
 		char s [INET6_ADDRSTRLEN];
-		for (int sub = 0; sub < 4; sub++) {
+		for (int sub = 0; sub < 12; sub++) {
 //		while (1) {
 			sin_size = sizeof (their_addr);
 			new_fd = accept (sockfd, (struct sockaddr *) & their_addr, & sin_size);

@@ -24,10 +24,10 @@ program studio #machine := "prolog.studio"
 		is_atom is_integer is_double is_number is_var is_head is_text has_machine
 		text_list text_term e32 query_stack object_counter
 		exit command inner inner_addcl inner_call minimise maximise
-		res not eq sres rres ures lazy random_cl explode TRY ONE PROBE SELECT APPEND LENGTH REVERSE ONLIST INLIST NODUP MAP
+		res not eq rres ures lazy random_cl explode TRY ONE PROBE SELECT APPEND LENGTH REVERSE ONLIST INLIST NODUP MAP
 		sort divide
-		WHILE FOR FOREVER IF
-		CONSTANT VARIABLE ACCUMULATOR CLOSURE ARRAY var inc dec closure call BLOCK ISALL isall isallr
+		WHILE FOR FOREVER forever IF
+		CONSTANT VARIABLE ACCUMULATOR CLOSURE ARRAY var inc dec closure call BLOCK ALL ISALL isall isallr
 		rnd rnd_control grnd series
 		crack wait timeout enter semaphore conductor accept select critical_section monitor task
 		start pause stop wt beat bar signal signal_beat signal_bar reset tempo division metrum accel rit atempo
@@ -229,6 +229,8 @@ program studio #machine := "prolog.studio"
 [[not :*x]]
 [[res :*x]:*x]
 [[ONE :*o][res :*o]/]
+[[ALL :*o][res : *o] fail]
+[[ALL :*]]
 [[TRY :*o]:*o]
 [[TRY :*o]]
 [[PROBE :*o][ONE :*o] fail]
@@ -256,6 +258,7 @@ program studio #machine := "prolog.studio"
 [[WHILE *condition : *call] [not not : *condition] / [PROBE : *call] / [WHILE *condition : *call]]
 [[WHILE : *]]
 [[FOREVER : *instructions] [PROBE : *instructions] / [FOREVER : *instructions]]
+[[forever : *instructions] [res : *instructions] / [forever : *instructions]]
 [[FOR *index *index *index *step : *call] [TRY : *call]/]
 [[FOR *index *index *to *step : *call] [ONE : *call] fail]
 [[FOR *index *from *to *step : *call]
@@ -319,13 +322,12 @@ program studio #machine := "prolog.studio"
 	*command
 	[lazy : *next]
 ]
-[[sres : *command] *command]
-[[rres *atom : *parameters]
+[[rres [*atom : *parameters]]
 	[CL *atom *clauses]
 	[series 0 *clauses 1 *serie]
 	/ [random_cl *serie *atom : *parameters]
 ]
-[[ures *atom : *parameters]
+[[ures [*atom : *parameters]]
 	[isall *probabilities *ind [cl [[*atom *ind :*] :*]]]
 	[LENGTH *probabilities *length]
 	[sub *length 1 *next]
@@ -496,6 +498,7 @@ program studio #machine := "prolog.studio"
 [[batch [exit] *reader][*reader]]
 [[batch *x *reader][*reader *head]/[batch *x *reader *head]] ;[*reader *tail][*head :*tail] / [batch [*head :*tail] *reader]]
 [[batch *x *reader][*reader] / fail]
+[[batch *x *reader *head] [eq *head [[* : *] : *]] / [inner_addcl *head] / [batch *head *reader]]
 [[batch *x *reader *head] [is_atom *head] / [*reader *tail] [inner_call [*head : *tail]] / [batch [*head : *tail] *reader]]
 [[batch *x *reader *head] / [inner_call *head] [batch *head *reader]]
 
