@@ -232,7 +232,7 @@ int main (int args, char * argv []) {
 	root -> insertCommander (console);
 	if (strlen (name) == 0) root -> resolution ();
 	else {
-		if (strstr (name, ".prc") == NULL) strcat (name, ".prc");
+		if (strstr (name, ".prc") == NULL && strstr (name, ".prb") == NULL) strcat (name, ".prc");
 		root -> resolution (name);
 	}
 	midi_service . setOutputPort (-1);

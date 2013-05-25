@@ -958,6 +958,15 @@ int PrologRoot :: resolution (PrologElement * query) {
 }
 
 bool PrologRoot :: resolutionHead (char * directory) {
+	if (strstr (directory, ".prb") != 0) {
+		PrologLoader loader (this);
+		if (! loader . load ("studio.prc")) return false;
+		if (main_query != 0) removeMainQuery ();
+		auto_atoms = true;
+		main_query = pair (pair (atom ("batch"), pair (text (directory), earth ())), earth ());
+		main_query = pair (head (0), main_query);
+		return true;
+	}
 	if (strcmp (directory, "") == 0) return resolutionHead ();
 	PrologLoader * loader = new PrologLoader (this);
 	bool ret = loader -> load (directory);

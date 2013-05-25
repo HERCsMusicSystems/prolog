@@ -1,5 +1,4 @@
 
-[auto_atoms]
 [import "http"]
 
 [[capitol "Australia" "Canberra"]]
@@ -22,21 +21,33 @@
 	[*res "</body>"]
 ]
 
+[[controller_insert *req *res]
+	[*req param "country" *country]
+	[*req param "city" *city]
+	[*res "HTTP/1.1 200 OK\n\n<body>\n"]
+	[*res "INSERTING " *country " " *city "<br/><br/>\n"]
+	[addcl [[capitol *country *city]]]
+	[view_list_all *res]
+	[*res "</body>"]
+]
+
 
 [[view_list_all *res]
+	[*res "<form action=\"/capitol/insert\" method=\"post\">"]
 	[*res "<table>\n"]
-	[*res "<tr><td><h1>COUNTRY</h1></td><td><h1>CAPITOL</h1></td></tr>\n"]
+	[*res "<tr><td><h1>COUNTRY</h3></td><td><h3>CAPITOL</h1></td></tr>\n"]
 	[ALL
 		[capitol *country *city]
 		[*res "<tr><td>" *country "</td><td>" *city "</td>"]
-		[*res "<td><a href=\"http://localhost:3008/capitol/delete/" *country "\">delete</a></td></tr>\n"]
+		;[*res "<td><a href=\"/capitol/delete/" *country "\">delete</a></td></tr>\n"]
+		[*res "<td>"] [GET *res capitol delete *country delete] [*res "</td></tr>\n"]
 	]
+	[*res "<tr><td><input type=text name=country /></td><td><input type=text name=city /></td><td><input type=submit value=NEW name=insert /></td></tr>\n"]
 	[*res "</table>\n"]
+	[*res "</form>\n"]
 ]
 
 [[router *req *res]
-	[*req FULL_HEADER_TEXT : *x]
-	[show *x]
 	[*req HTTP_URI : *route]
 	[show [route *req *res : *route]]
 	[route *req *res : *route]
@@ -44,11 +55,14 @@
 
 [[route *req *res GET capitol] [controller_index *req *res]]
 [[route *req *res GET capitol delete *country] [controller_delete *req *res *country]]
+[[route *req *res POST capitol insert] [controller_insert *req *res]]
+[[route *req *res : *] [*res "HTTP/1.1 401 Not found\n\n"]]
 
 
 [show "ready"]
 
-[crack [webserver 3008 router] [show "Done...."]]
+[webserver 3008 router]
+[show "Done...."]
 
 [exit]
 

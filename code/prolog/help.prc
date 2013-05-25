@@ -103,13 +103,11 @@ program help [help helper commands tutorials syntax syntax_helper remove_demo co
 	[write "	addcl	addcl0	delcl	delallcl		auto_atoms\n"]
 	[write "	create_atom	search_atom	scripted_atoms	prompt	preprocessor\n"]
 
-
 	[set_colors 16777215 255]
 	[write "Term checks and manipulation:"]
 	[set_colors 16777215 0] [nl]
 	[write "	is_atom	is_var	is_text	is_head	is_number	is_integer\n"]
 	[write "	text_list	text_term	is_double	e23	has_machine\n"]
-
 
 	[set_colors 16777215 255]
 	[write "Real Time:"]
@@ -122,14 +120,14 @@ program help [help helper commands tutorials syntax syntax_helper remove_demo co
 	[set_colors 16777215 255]
 	[write "Methalogical:"]
 	[set_colors 16777215 0] [nl]
-	[write "	res	crack	not	eq	TRY	ONE	PROBE	inc	dec\n"]
+	[write "	res	crack	not	eq	TRY	ONE	ALL	PROBE	inc	dec\n"]
 	[write "	FOR	IF	SELECT	APPEND	ISALL	isall	isallr	var	command\n"]
 	[write "	WHILE	FOREVER	CONSTANT	VARIABLE	CLOSURE	ACCUMULATOR\n"]
-	[write "	ARRAY	LENGTH	REVERSE	MAP	closure	call	BLOCK	exit	maximise\n"]
-	[write "	NODUP	ONLIST	INLIST	lazy	sres	rres	ures	sort	minimise\n"]
+	[write "	ARRAY	LENGTH	REVERSE	MAP	lazy	call	BLOCK	exit	maximise\n"]
+	[write "	NODUP	ONLIST	INLIST	closure		rres	ures	sort	minimise\n"]
 
 	[set_colors *foreground *background]
-	]
+]
 
 [[help midi]
 	[set_colors *foreground *background]
@@ -165,7 +163,7 @@ program help [help helper commands tutorials syntax syntax_helper remove_demo co
 
 
 	[set_colors *foreground *background]
-	]
+]
 
 [[help remove_demo]
 	[set_colors *foreground *background]
@@ -181,7 +179,7 @@ program help [help helper commands tutorials syntax syntax_helper remove_demo co
 	[write "4. Remove this line completely.\n"]
 	[write "5. Save and close the \"config.txt\" file.\n"]
 	[set_colors *foreground *background]
-	]
+]
 
 ; commands
 
@@ -1015,7 +1013,7 @@ program help [help helper commands tutorials syntax syntax_helper remove_demo co
 ]
 
 [[help rres]
-	[command_helper "[rres : *command]"]
+	[command_helper "[rres *command]"]
 	[write "Matches clauses with *command in random order.\n"]
 	[write "Similar to res but accepts only one call,\n"]
 	[write "which is executed using clauses in random order.\n"]
@@ -1023,15 +1021,8 @@ program help [help helper commands tutorials syntax syntax_helper remove_demo co
 	[list rres]
 ]
 
-[[help sres]
-	[command_helper "[sres : *command]"]
-	[write "Calls its parameter.\n"]
-	[write "Macrodefinition:\n"]
-	[list sres]
-]
-
 [[help ures]
-	[command_helper "[ures *command * : *parameters]"]
+	[command_helper "[ures [*command * : *parameters]]"]
 	[write "Executes clauses in random order with specified probability.\n"]
 	[write "Matches clauses with [*command * : *parameters] in random order.\n"]
 	[write "Similar to rres but the second parameter specifies probability.\n"]
@@ -1154,6 +1145,14 @@ program help [help helper commands tutorials syntax syntax_helper remove_demo co
 	[write "Similar to res and /.\n"]
 	[write "Macrodefinition:\n"]
 	[list ONE]
+]
+
+[[help ALL]
+	[command_helper "[ALL : *commands]"]
+	[write "Explores all possible solutions.\n"]
+	[write "Similar to res with fail.\n"]
+	[write "Macrodefinition:\n"]
+	[list ALL]
 ]
 
 [[help PROBE]

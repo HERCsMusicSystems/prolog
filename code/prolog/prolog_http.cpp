@@ -26,6 +26,7 @@ public:
 		while (parameters -> isPair ()) {
 			PrologElement * el = parameters -> getLeft ();
 			if (el -> isText ()) {char * cp = el -> getText (); send (fd, cp, strlen (cp), 0);}
+			if (el -> isAtom ()) {char * cp = el -> getAtom () -> name (); send (fd, cp, strlen (cp), 0);}
 			if (el -> isInteger ()) {sprintf (area, "%c", el -> getInteger ()); send (fd, area, 1, 0);}
 			while (el -> isPair ()) {
 				int length = root -> getValue (el -> getLeft (), area, 0);
