@@ -96,7 +96,6 @@ void beginthread (runner_procedure runner, int value, PrologRoot * root) {
 
 #ifdef INTERNAL_RESOURCES
 #include "neural.h"
-#include "notes.h"
 //#ifdef LINUX_OPERATING_SYSTEM
 //#include "prolog_mysql.h"
 //#endif
@@ -114,7 +113,6 @@ public:
 		if (strcmp (name, "scala_reader") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (SCALA_READER_PRC), RT_RCDATA);
 		if (strcmp (name, "neural") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (NEURAL_PRC), RT_RCDATA);
 		if (strcmp (name, "f1") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (F1_PRC), RT_RCDATA);
-		if (strcmp (name, "notes") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (NOTES_PRC), RT_RCDATA);
 		if (strcmp (name, "sql") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (SQL_PRC), RT_RCDATA);
 		if (strcmp (name, "studio.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (STUDIO_PRC), RT_RCDATA);
 		if (strcmp (name, "store.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (STORE_PRC), RT_RCDATA);
@@ -124,7 +122,6 @@ public:
 		if (strcmp (name, "scala_reader.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (SCALA_READER_PRC), RT_RCDATA);
 		if (strcmp (name, "neural.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (NEURAL_PRC), RT_RCDATA);
 		if (strcmp (name, "f1.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (F1_PRC), RT_RCDATA);
-		if (strcmp (name, "notes.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (NOTES_PRC), RT_RCDATA);
 		if (strcmp (name, "sql.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (SQL_PRC), RT_RCDATA);
 		if (! resource) return NULL;
 		HGLOBAL loader = LoadResource (NULL, resource);
