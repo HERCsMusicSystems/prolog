@@ -25,6 +25,16 @@ create table if not exists clauses (
 	body_id int not null
 );
 
+drop table if exists text_clauses;
+
+create table if not exists text_clauses (
+	id int not null primary key auto_increment,
+	module_id int not null,
+	atom_id int not null,
+	ordering int not null,
+	text text not null
+);
+
 drop table if exists elements;
 
 create table if not exists elements (
