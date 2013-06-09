@@ -31,9 +31,24 @@ public:
 	double value;
 };
 
+class mysql_term_reader : public PrologReader {
+public:
+	char * text;
+	virtual void message (char * text) {}
+	virtual int move_z (void) {
+		if (* text == '\0') return -1;
+		return * text++;
+	}
+	mysql_term_reader (PrologRoot * root, char * text) {
+		this -> text = text;
+		setRoot (root);
+	}
+};
+
 class conn : public PrologNativeCode {
 public:
 	PrologRoot * root;
+	bool fast;
 	PrologAtom * atom;
 	MYSQL * connection;
 	MYSQL_ROW row;
@@ -46,10 +61,12 @@ public:
 	PrologAtom * dbdelcl_atom;
 	PrologAtom * dbcg_atom;
 	void collect_garbage_atoms (void) {
-		mysql_query (connection, "delete from atoms where (select count(*) from clauses where atom_id = atoms . id) < 1 and (select count(*) from elements where reference = atoms . id) < 1");
+		if (fast) mysql_query (connection, "delete from atoms where (select count(*) from text_clauses where atom_id = atoms . id) < 1 and (select count(*) from elements where reference = atoms . id) < 1");
+		else mysql_query (connection, "delete from atoms where (select count(*) from clauses where atom_id = atoms . id) < 1 and (select count(*) from elements where reference = atoms . id) < 1");
 	}
 	void collect_garbage_modules (void) {
-		mysql_query (connection, "delete from modules where (select count(*) from atoms where module_id = modules . id) < 1 and (select count(*) from elements where module_id = modules . id) < 1 and (select count(*) from clauses where module_id = modules . id) < 1");
+		if (fast) mysql_query (connection, "delete from modules where (select count(*) from atoms where module_id = modules . id) < 1 and (select count(*) from elements where module_id = modules . id) < 1 and (select count(*) from text_clauses where module_id = modules . id) < 1");
+		else mysql_query (connection, "delete from modules where (select count(*) from atoms where module_id = modules . id) < 1 and (select count(*) from elements where module_id = modules . id) < 1 and (select count(*) from clauses where module_id = modules . id) < 1");
 	}
 	void collect_garbage (void) {
 		collect_garbage_atoms ();
@@ -127,6 +144,21 @@ public:
 		return last_insert_id ();
 	}
 	bool find_clause (char * question, int module_id, int atom_id, int ordering, db_clause * clause) {
+		if (fast) {
+			sprintf (question, "select id, text from text_clauses where module_id = %i and atom_id = %i and ordering = %i", module_id, atom_id, ordering);
+			if (mysql_query (connection, question) != 0) return false;
+			MYSQL_RES * text_result = mysql_use_result (connection);
+			if (text_result != NULL) {
+				if (mysql_num_fields (text_result) > 1) {
+					MYSQL_ROW text_row;
+					if ((text_row = mysql_fetch_row (text_result)) != 0) {
+						sprintf (question, "%s", text_row [1]);
+					}
+				}
+				mysql_free_result (text_result);
+			}
+			return true;
+		}
 		sprintf (question, "select id, parameters_id, body_id from clauses where module_id = %i and atom_id = %i and ordering = %i", module_id, atom_id, ordering);
 		if (mysql_query (connection, question) != 0) return false;
 		MYSQL_RES * result = mysql_use_result (connection);
@@ -284,6 +316,16 @@ public:
 		if (atom == NULL) return false;
 		db_clause clause;
 		if (! find_clause (area, module_id, atom_id, ordering, & clause)) return false;
+		if (fast) {
+			mysql_term_reader trd (root, area);
+			PrologElement * trdx = trd . readElement ();
+			if (trdx != 0) {
+				root -> getValue (trdx, area, 0);
+				parameters -> setPair (trdx, root -> earth ());
+				return true;
+			}
+			return false;
+		}
 		parameters -> setPair ();
 		parameters = parameters -> getLeft ();
 		parameters -> setPair ();
@@ -304,7 +346,8 @@ public:
 		if (module_id < 0) {parameters -> setInteger (0); return true;}
 		int atom_id = find_atom_id (area, module_id, atom_name);
 		if (atom_id < 0) {parameters -> setInteger (0); return true;}
-		sprintf (area, "select 1+max(ordering) from clauses where module_id = %i and atom_id = %i", module_id, atom_id);
+		if (fast) sprintf (area, "select 1+max(ordering) from text_clauses where module_id = %i and atom_id = %i", module_id, atom_id);
+		else sprintf (area, "select 1+max(ordering) from clauses where module_id = %i and atom_id = %i", module_id, atom_id);
 		if (mysql_query (connection, area) != 0) return false;
 		MYSQL_RES * result = mysql_use_result (connection);
 		if (result == NULL) return false;
@@ -389,6 +432,8 @@ public:
 		if (control_atom == adbcl_atom || control_atom == adbcl0_atom) {
 			if (! parameters -> isPair ()) return false;
 			parameters = parameters -> getLeft ();
+			AREA drop;
+			if (fast) root -> getValue (parameters, drop, 0);
 			if (! parameters -> isPair ()) return false;
 			PrologElement * head = parameters -> getLeft ();
 			if (! head -> isPair ()) return false;
@@ -403,7 +448,8 @@ public:
 			// now get the clause ordering
 			int ordering = 0;
 			if (control_atom == adbcl_atom) {
-				sprintf (question, "select max(ordering) + 1 from clauses where module_id = %i and atom_id = %i", module_id, atom_id);
+				if (fast) sprintf (question, "select max(ordering) + 1 from text_clauses where module_id = %i and atom_id = %i", module_id, atom_id);
+				else sprintf (question, "select max(ordering) + 1 from clauses where module_id = %i and atom_id = %i", module_id, atom_id);
 				if (mysql_query (connection, question) != 0) return false;
 				result = mysql_use_result (connection);
 				if (result == NULL) return false;
@@ -412,10 +458,16 @@ public:
 				if (row [0] != NULL) ordering = atoi (row [0]);
 				mysql_free_result (result);
 			} else {
-				sprintf (question, "update clauses set ordering = ordering + 1 where atom_id = %i", atom_id);
+				if (fast) sprintf (question, "update text_clauses set ordering = ordering + 1 where atom_id = %i", atom_id);
+				else sprintf (question, "update clauses set ordering = ordering + 1 where atom_id = %i", atom_id);
 				if (mysql_query (connection, question) != 0) return false;
 			}
 			// insert clause and get clause id
+			if (fast) {
+				sprintf (question, "insert into text_clauses (module_id, atom_id, ordering, text) values (%i, %i, %i, '%s')", module_id, atom_id, ordering, drop);
+				if (mysql_query (connection, question) != 0) {printf ("failed at text clause\n");}
+				return true;
+			}
 			sprintf (question, "insert into clauses (module_id, atom_id, ordering, parameters_id, body_id) values (%i, %i, %i, 0, 0)", module_id, atom_id, ordering);
 			if (mysql_query (connection, question) != 0) return false;
 			int clause_id = last_insert_id();
@@ -497,7 +549,8 @@ public:
 				if (mysql_query (connection, question) != 0) return false;
 				sprintf (question, "delete from texts where atom_id = %i", atom_id);
 				if (mysql_query (connection, question) != 0) return false;
-				sprintf (question, "delete from clauses where atom_id = %i", atom_id);
+				if (fast) sprintf (question, "delete from text_clauses where atom_id = %i", atom_id);
+				else sprintf (question, "delete from clauses where atom_id = %i", atom_id);
 				if (mysql_query (connection, question) != 0) return false;
 				collect_garbage ();
 				return true;
@@ -505,13 +558,17 @@ public:
 			if (! parameters -> isPair ()) return false;
 			PrologElement * ordering = parameters -> getLeft ();
 			if (! ordering -> isInteger ()) return false;
-			sprintf (question, "delete from elements where atom_id = %i and clause_id = (select id from clauses where atom_id = %i and ordering = %i)", atom_id, atom_id, ordering -> getInteger ());
+			if (fast) sprintf (question, "delete from elements where atom_id = %i and clause_id = (select id from text_clauses where atom_id = %i and ordering = %i)", atom_id, atom_id, ordering -> getInteger ());
+			else sprintf (question, "delete from elements where atom_id = %i and clause_id = (select id from clauses where atom_id = %i and ordering = %i)", atom_id, atom_id, ordering -> getInteger ());
 			if (mysql_query (connection, question) != 0) return false;
-			sprintf (question, "delete from texts where atom_id = %i and clause_id = (select id from clauses where atom_id = %i and ordering = %i)", atom_id, atom_id, ordering -> getInteger ());
+			if (fast) sprintf (question, "delete from texts where atom_id = %i and clause_id = (select id from text_clauses where atom_id = %i and ordering = %i)", atom_id, atom_id, ordering -> getInteger ());
+			else sprintf (question, "delete from texts where atom_id = %i and clause_id = (select id from clauses where atom_id = %i and ordering = %i)", atom_id, atom_id, ordering -> getInteger ());
 			if (mysql_query (connection, question) != 0) return false;
-			sprintf (question, "delete from clauses where atom_id = %i and ordering = %i", atom_id, ordering -> getInteger ());
+			if (fast) sprintf (question, "delete from text_clauses where atom_id = %i and ordering = %i", atom_id, ordering -> getInteger ());
+			else sprintf (question, "delete from clauses where atom_id = %i and ordering = %i", atom_id, ordering -> getInteger ());
 			if (mysql_query (connection, question) != 0) return false;
-			sprintf (question, "update clauses set ordering = ordering - 1 where atom_id = %i and ordering > %i", atom_id, ordering -> getInteger ());
+			if (fast) sprintf (question, "update text_clauses set ordering = ordering - 1 where atom_id = %i and ordering > %i", atom_id, ordering -> getInteger ());
+			else sprintf (question, "update clauses set ordering = ordering - 1 where atom_id = %i and ordering > %i", atom_id, ordering -> getInteger ());
 			if (mysql_query (connection, question) != 0) return false;
 			collect_garbage ();
 			return true;
@@ -519,8 +576,9 @@ public:
 		if (control_atom == dbcg_atom) {collect_garbage (); return true;}
 		return false;
 	}
-	conn (PrologRoot * root, PrologAtom * atom, char * server, char * user, char * password, char * database) {
+	conn (PrologRoot * root, bool fast, PrologAtom * atom, char * server, char * user, char * password, char * database) {
 		this -> root = root;
+		this -> fast = fast;
 		this -> atom = atom;
 		//this -> select_atom = this -> insert_atom = this -> delete_atom = this -> update_atom = 0;
 		this -> sql_atom = this -> adbcl_atom = this -> adbcl0_atom = this -> dbcl_atom = this -> dblist_atom = this -> dbdelcl_atom = this -> dbcg_atom = 0;
@@ -553,6 +611,7 @@ public:
 class mysql : public PrologNativeCode {
 public:
 	PrologRoot * root;
+	bool fast;
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
 		PrologElement * atom = parameters -> getLeft ();
@@ -577,7 +636,7 @@ public:
 		if (atom -> isAtom ()) conn_atom = atom -> getAtom ();
 		if (atom -> isVar ()) {conn_atom = new PrologAtom (); atom -> setAtom (conn_atom);}
 		if (conn_atom == NULL) return false;
-		conn * c = new conn (root, conn_atom,
+		conn * c = new conn (root, fast, conn_atom,
 					server -> isText () ? server -> getText () : server -> getAtom () -> name (),
 					user -> isText () ? user -> getText () : user -> getAtom () -> name (),
 					password -> isText () ? password -> getText () : password -> getAtom () -> name (),
@@ -587,12 +646,13 @@ public:
 		delete c;
 		return false;
 	}
-	mysql (PrologRoot * root) {this -> root = root;}
+	mysql (PrologRoot * root, bool fast = false) {this -> root = root; this -> fast = fast;}
 };
 
 void MySQLServiceClass :: init (PrologRoot * root) {this -> root = root;}
 PrologNativeCode * MySQLServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "mysql") == 0) return new mysql (root);
+	if (strcmp (name, "mysql_fast") == 0) return new mysql (root, true);
 	return NULL;
 }
 
