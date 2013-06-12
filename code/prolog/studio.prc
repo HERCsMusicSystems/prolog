@@ -16,7 +16,7 @@ program studio #machine := "prolog.studio"
 		remove_module create_module set_machine
 		add_search_directory search_directories root_directory crd
 		cd dir DIR ARGS args args_tail edit execute make_file make_directory erase erase_directory move copy
-		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl overwrite let
+		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
 		create_atom search_atom preprocessor prompt
 		add_strings add sub mult div mod and or xor sum times less less_eq greater greater_eq
 		abs cos degrad e exp log2 log10 ln log pi pow sin tan trunc
@@ -371,6 +371,8 @@ program studio #machine := "prolog.studio"
 [[cl *x *y [[*a:*b]:*c]][add *x 1 *x2]/[CL *x2 *a *X]
 	[cl *x2 *y [[*a:*b]:*c]]]
 
+[[lambda *atom *parameters : *body] [create_atom *atom] [addcl [[*atom : *parameters] : *body]]]
+[[lambda *atom *parameters : *body] [addcl [[*atom : *parameters] : *body]]]
 
 [[delcl [[*a:*b]:*c]][cl *x [[*a:*b]:*c]][DELCL *x *a]]
 

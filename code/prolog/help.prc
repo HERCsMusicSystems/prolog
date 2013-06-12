@@ -100,7 +100,7 @@ program help [help helper commands tutorials syntax syntax_helper remove_demo co
 	[write "Clause and Atome manipulation:"]
 	[set_colors 16777215 0] [nl]
 	[write "	CL	DELCL	cl	let	OVERWRITE	overwrite\n"]
-	[write "	addcl	addcl0	delcl	delallcl		auto_atoms\n"]
+	[write "	addcl	addcl0	lambda	delcl	delallcl	auto_atoms\n"]
 	[write "	create_atom	search_atom	scripted_atoms	prompt	preprocessor\n"]
 
 	[set_colors 16777215 255]
@@ -683,6 +683,18 @@ program help [help helper commands tutorials syntax syntax_helper remove_demo co
 [[help addcl0]
 	[command_helper "addcl0 [*clause]"]
 	[write "Adds a new clause as the first clause of the relation.\n"]
+]
+
+[[help lambda]
+	[command_helper "lambda [*atom *parameters : *body]"]
+	[write "Creates a clause attached to *atom with *parameters and *body.\n"]
+	[write "*atom can be a variable.\n"]
+	[write "Very good for constructing clauses for anonymous relations.\n"]
+	[write "Warning!\n"]
+	[write "Referencing *atom inside *body or *parameters will cause\n"]
+	[write "garbage collector to leak *atom and the entitre clause.\n"]
+	[write "Macrodefinition:\n"]
+	[list lambda]
 ]
 
 [[help delcl]

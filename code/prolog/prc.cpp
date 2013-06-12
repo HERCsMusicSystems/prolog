@@ -227,7 +227,7 @@ int main (int args, char * argv []) {
 
 	console -> open ();
 	root -> insertCommander (console);
-	if (strlen (name) == 0) root -> resolution ();
+	if (strlen (name) == 0) {root -> auto_atoms = true; root -> resolution ();}
 	else {
 		if (strstr (name, ".prc") == NULL && strstr (name, ".prb") == NULL) strcat (name, ".prc");
 		root -> resolution (name);
