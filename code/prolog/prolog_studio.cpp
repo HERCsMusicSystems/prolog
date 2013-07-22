@@ -3742,9 +3742,10 @@ public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
 		parameters = parameters -> getLeft ();
-		if (! parameters -> isInteger ()) return false;
 		PrologMidiPortServiceClass * service = root -> getMidiPortServiceClass ();
 		if (service == NULL) return true;
+		if (parameters -> isText ()) return service -> setInputPort (parameters -> getText ());
+		if (! parameters -> isInteger ()) return false;
 		return service -> setInputPort (parameters -> getInteger ());
 	}
 	midi_in_port (PrologRoot * root) {this -> root = root;}
@@ -3756,9 +3757,10 @@ public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
 		parameters = parameters -> getLeft ();
-		if (! parameters -> isInteger ()) return false;
 		PrologMidiPortServiceClass * service = root -> getMidiPortServiceClass ();
 		if (service == NULL) return true;
+		if (parameters -> isText ()) return service -> setOutputPort (parameters -> getText ());
+		if (! parameters -> isInteger ()) return false;
 		return service -> setOutputPort (parameters -> getInteger ());
 	}
 	midi_out_port (PrologRoot * root) {this -> root = root;}

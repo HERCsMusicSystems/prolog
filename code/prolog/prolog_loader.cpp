@@ -520,7 +520,9 @@ char * PrologMidiPortServiceClass :: getOutputInfo (int ind) {return NULL;}
 int PrologMidiPortServiceClass :: getInputPort (void) {return -1;}
 int PrologMidiPortServiceClass :: getOutputPort (void) {return -1;}
 bool PrologMidiPortServiceClass :: setInputPort (int ind) {return false;}
+bool PrologMidiPortServiceClass :: setInputPort (char * location) {return false;}
 bool PrologMidiPortServiceClass :: setOutputPort (int ind) {return false;}
+bool PrologMidiPortServiceClass :: setOutputPort (char * location) {return false;}
 midi_stream * PrologMidiPortServiceClass :: getTransmissionLine (void) {return NULL;}
 midi_stream * PrologMidiPortServiceClass :: getReceptionLine (void) {return NULL;}
 void PrologMidiPortServiceClass :: changeManufacturersId (void) {}
@@ -528,3 +530,4 @@ void PrologMidiPortServiceClass :: changeManufacturersId (int ind) {}
 void PrologMidiPortServiceClass :: changeManufacturersId (int ind, int sub) {}
 void PrologMidiPortServiceClass :: changeProductId (char id1, char id2, char id3, char id4) {}
 void PrologMidiPortServiceClass :: changeProductVersion (char id1, char id2, char id3, char id4) {}
+

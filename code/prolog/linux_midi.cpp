@@ -39,7 +39,6 @@ static void beginthread (runner_procedure runner, int value, linux_midi_service 
 	pthread_attr_destroy (& attr);
 }
 
-static int midi_input_id = -1;
 static void * linux_midi_runner (void * parameter) {
 	linux_midi_service * servo = (linux_midi_service *) parameter;
 	unsigned char command = 0;
@@ -47,48 +46,47 @@ static void * linux_midi_runner (void * parameter) {
 	unsigned char v1, v2;
 	int res;
 	while (true) {
-		if (midi_input_id < 0) usleep (10000);
+		if (servo -> midi_input_id < 0) usleep (10000);
 		else {
-			res = read (midi_input_id, & v1, 1);
+			if (res = read (servo -> midi_input_id, & v1, 1) < 1) {usleep (10000); continue;}
 			if (servo -> reader_line == NULL) continue;
 			if (v1 < 128) {
 				if ((command >= 0x80 && command < 0xc0) || (command >= 0xe0 && command < 0xf0)) {
-					res = read (midi_input_id, & v2, 1);
+					res = read (servo -> midi_input_id, & v2, 1);
 					servo -> reader_line -> insert (command, v1, v2);
 				} else {servo -> reader_line -> insert (command, v1);}
 			} else {
 				command = v1; channel = command & 0xf;
 				if ((command >= 0x80 && command < 0xc0) || (command >= 0xe0 && command < 0xf0)) {
-					res = read (midi_input_id, & v1, 1);
-					res = read (midi_input_id, & v2, 1);
+					res = read (servo -> midi_input_id, & v1, 1);
+					res = read (servo -> midi_input_id, & v2, 1);
 					servo -> reader_line -> insert (command, v1, v2);
 				} else {
 					if (command < 0xf0) {
-						res = read (midi_input_id, & v1, 1);
+						res = read (servo -> midi_input_id, & v1, 1);
 						servo -> reader_line -> insert (command, v1);
 					} else {
 						switch (command) {
 						case 0xf0:
 							servo -> reader_line -> open_generic_system_exclusive ();
-							res = read (midi_input_id, & v1, 1);
+							res = read (servo -> midi_input_id, & v1, 1);
 							while (v1 != 0xf7) {
 								servo -> reader_line -> insert (v1);
-								res = read (midi_input_id, & v1, 1);
+								res = read (servo -> midi_input_id, & v1, 1);
 							}
 							servo -> reader_line -> close_system_exclusive ();
 							break;
 						case 0xf1:
-							res = read (midi_input_id, & v1, 1);
+							res = read (servo -> midi_input_id, & v1, 1);
 							servo -> reader_line -> insert (command, v1);
 							break;
 						case 0xf3:
-							res = read (midi_input_id, & v1, 1);
+							res = read (servo -> midi_input_id, & v1, 1);
 							servo -> reader_line -> insert (command, v1);
-//							printf ("Changing channel extension to %02x\n", v1);
 							break;
 						case 0xf2:
-							res = read (midi_input_id, & v1, 1);
-							res = read (midi_input_id, & v2, 1);
+							res = read (servo -> midi_input_id, & v1, 1);
+							res = read (servo -> midi_input_id, & v2, 1);
 							servo -> reader_line -> insert (command, v1, v2);
 							break;
 						default: servo -> reader_line -> insert (command); break;
@@ -97,7 +95,6 @@ static void * linux_midi_runner (void * parameter) {
 				}
 			}
 			if (servo -> reader != NULL && servo -> reader -> is_ready ()) servo -> reader -> read (servo -> reader_line);
-//			if (servo -> reader != NULL && servo -> reader_not_surpressed && servo -> reader -> is_ready ()) servo -> reader -> read (servo -> reader_line);
 		}
 	}
 	return 0;
@@ -148,7 +145,7 @@ int linux_midi_service :: getNumberOfOutputs (void) {return 10;}
 
 int linux_midi_service :: getInputPort (void) {return selected_input_device;}
 int linux_midi_service :: getOutputPort (void) {return selected_output_device;}
-bool linux_midi_service :: setInputPort (int ind) {//return setOutputPort (ind);}
+bool linux_midi_service :: setInputPort (int ind) {
 	if (ind > 9) return false;
 	if (midi_input_id >= 0) close (midi_input_id);
 	midi_input_id = selected_input_device = -1;
@@ -158,8 +155,16 @@ bool linux_midi_service :: setInputPort (int ind) {//return setOutputPort (ind);
 	selected_input_device = ind;
 	return true;
 }
+bool linux_midi_service :: setInputPort (char * location) {
+	if (midi_input_id >= 0) close (midi_input_id);
+	midi_input_id = selected_input_device = -1;
+	midi_input_id = open (location, O_RDONLY);
+	if (midi_input_id < 0) {midi_input_id = selected_input_device = -1; return false;}
+	selected_input_device = 10;
+	return true;
+}
 bool linux_midi_service :: setOutputPort (int ind) {
-	if (transmitter == NULL)  return false;
+	if (transmitter == NULL) return false;
 	if (ind > 9) return false;
 	if (transmitter -> stream_id >= 0) close (transmitter -> stream_id);
 	transmitter -> stream_id = -1;
@@ -170,13 +175,22 @@ bool linux_midi_service :: setOutputPort (int ind) {
 	selected_output_device = ind;
 	return true;
 }
+bool linux_midi_service :: setOutputPort (char * location) {
+	if (transmitter == NULL) return false;
+	if (transmitter -> stream_id >= 0) close (transmitter -> stream_id);
+	transmitter -> stream_id = selected_output_device = -1;
+	transmitter -> stream_id = open (location, O_WRONLY);
+	if (transmitter -> stream_id < 0) {transmitter -> stream_id = selected_output_device = -1; return false;}
+	selected_output_device = 10;
+	return true;
+}
 
 midi_stream * linux_midi_service :: getTransmissionLine (void) {return transmitter;}
 midi_stream * linux_midi_service :: getReceptionLine (void) {return reader_line;}
 void linux_midi_service :: set_reader (midi_reader * reader) {this -> reader = reader;}
 
 linux_midi_service :: linux_midi_service (void) {
-	selected_input_device = selected_output_device = -1;
+	midi_input_id = selected_input_device = selected_output_device = -1;
 	transmitter = new linux_midi_transmitter_class ();
 	reader = NULL;
 	own_reader_line = reader_line = new buffered_midi_stream (8192);
@@ -184,7 +198,7 @@ linux_midi_service :: linux_midi_service (void) {
 }
 
 linux_midi_service :: linux_midi_service (buffered_midi_stream * line) {
-	selected_input_device = selected_output_device = -1;
+	midi_input_id = selected_input_device = selected_output_device = -1;
 	transmitter = new linux_midi_transmitter_class ();
 	reader = NULL;
 	own_reader_line = NULL;

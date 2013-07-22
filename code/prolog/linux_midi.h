@@ -37,6 +37,7 @@ private:
 public:
 	buffered_midi_stream * reader_line;
 	midi_reader * reader;
+	int midi_input_id;
 public:
 	virtual int getNumberOfInputs (void);
 	virtual int getNumberOfOutputs (void);
@@ -45,7 +46,9 @@ public:
 	virtual int getInputPort (void);
 	virtual int getOutputPort (void);
 	virtual bool setInputPort (int ind);
+	virtual bool setInputPort (char * location);
 	virtual bool setOutputPort (int ind);
+	virtual bool setOutputPort (char * location);
 	virtual midi_stream * getTransmissionLine (void);
 	virtual midi_stream * getReceptionLine (void);
 	void set_reader (midi_reader * reader);
@@ -61,3 +64,4 @@ public:
 };
 
 #endif
+
