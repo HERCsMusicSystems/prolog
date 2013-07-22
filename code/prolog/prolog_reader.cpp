@@ -163,6 +163,7 @@ void PrologReader :: get_symbol (void) {
 	int ind;
 	int int_multiplier;
 	int int_shift;
+	if (act_znak < 0) act_znak = move_z ();
 	while (act_znak < 33 || indexOf (root -> comment_caption, (char) act_znak) >= 0) {
 		if (indexOf (root -> comment_caption, (char) act_znak) >= 0) {
 			while (act_znak != 10 && act_znak != 13 && act_znak >= 0) act_znak = move_z ();
@@ -502,6 +503,7 @@ PrologElement * PrologReader :: readElement (void) {
 		left = readElement ();
 		if (left == NULL) return NULL;
 		return readRightSide (left, false);
+	case 9: return NULL;
 	default: break;
 	}
 	message ("Syntax error (unknown syntax).");
