@@ -193,16 +193,7 @@ linux_midi_service :: linux_midi_service (void) {
 	midi_input_id = selected_input_device = selected_output_device = -1;
 	transmitter = new linux_midi_transmitter_class ();
 	reader = NULL;
-	own_reader_line = reader_line = new buffered_midi_stream (8192);
-	beginthread (linux_midi_runner, 0, this);
-}
-
-linux_midi_service :: linux_midi_service (buffered_midi_stream * line) {
-	midi_input_id = selected_input_device = selected_output_device = -1;
-	transmitter = new linux_midi_transmitter_class ();
-	reader = NULL;
-	own_reader_line = NULL;
-	reader_line = new buffered_midi_stream (8192);
+	reader_line = NULL;
 	beginthread (linux_midi_runner, 0, this);
 }
 
@@ -214,7 +205,6 @@ linux_midi_service :: ~ linux_midi_service (void) {
 		}
 		delete transmitter;
 	}
-	if (own_reader_line != NULL) delete own_reader_line; own_reader_line = NULL;
 }
 
 void linux_midi_service :: changeManufacturersId (void) {if (reader_line == NULL) return; reader_line -> set_manufacturers_id ();}

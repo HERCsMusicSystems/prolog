@@ -33,7 +33,6 @@ private:
 	linux_midi_transmitter_class * transmitter;
 	int selected_input_device;
 	int selected_output_device;
-	buffered_midi_stream * own_reader_line;
 public:
 	buffered_midi_stream * reader_line;
 	midi_reader * reader;
@@ -53,7 +52,6 @@ public:
 	virtual midi_stream * getReceptionLine (void);
 	void set_reader (midi_reader * reader);
 	linux_midi_service (void);
-	linux_midi_service (buffered_midi_stream * line);
 	~ linux_midi_service (void);
 public:
 	virtual void changeManufacturersId (void);

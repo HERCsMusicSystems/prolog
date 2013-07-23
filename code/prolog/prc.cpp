@@ -217,6 +217,8 @@ int main (int args, char * argv []) {
 	PrologWindowsConsole * console = new PrologWindowsConsole (10);
 	#endif
 
+	buffered_midi_stream in_line (8192);
+	midi_service . reader_line = & in_line;
 	root -> setMidi (midi_service . getReceptionLine (), midi_service . getTransmissionLine ());
 	root -> setMidiPortServiceClass (& midi_service);
 
