@@ -32,28 +32,9 @@ PrologResolution :: PrologResolution (PrologRoot * root) TRACKING (7) {
 	var_root = NULL;
 	var_counter = 0;
 	next = this;
-	pool = NULL;
 	call_again = NULL;
 	this -> timeout = 0;
 	this -> timeout_query = NULL;
-}
-
-PrologResolution :: PrologResolution (PrologRoot * root, PrologResolutionPool * pool, PrologResolution * insert_point) TRACKING (7) {
-	this -> root = root;
-	q_root = NULL;
-	external_query_pointer = NULL;
-	root_actual = NULL;
-	root_formal = NULL;
-	var_root = NULL;
-	var_counter = 0;
-	next = this;
-	this -> pool = pool;
-	call_again = NULL;
-	this -> timeout = 0;
-	this -> timeout_query = NULL;
-	if (insert_point == NULL) return;
-	next = insert_point -> next;
-	insert_point -> next = this;
 }
 
 PrologResolution :: ~ PrologResolution (void) {
@@ -80,8 +61,6 @@ bool PrologResolution :: callAgain (void) {
 }
 
 PrologQuery * PrologResolution :: getQuery (void) {return q_root;}
-
-PrologResolutionPool * PrologResolution :: getResolutionPool (void) {return pool;}
 
 void PrologResolution :: reset (void) {
 	if (root_actual != NULL) delete root_actual;
@@ -444,53 +423,6 @@ int PrologResolution :: resolution (PrologElement * query) {
 					query -> right = match_product (q_root -> query -> right, true);
 					drop_stack (q_root, NULL);
 //					delete q_root;
-					q_root = NULL;
-					reset ();
-					return 1;
-				}
-			}
-	} while (ctrl != 5);
-	delete q_root;
-	reset ();
-	return 0;
-}
-
-int PrologResolution :: move (void) {
-	// returns: 0 = fail, 1 = success, 2 = no space left, 3 = wrong query or not present,
-	//          4 = continue
-	if (external_query_pointer == NULL) return 3;
-	int ctrl;
-	do {
-		if (timeout > 0) {
-			if (root -> get_system_time () > timeout) {
-				drop_stack (q_root, NULL); q_root = NULL;
-				reset ();
-				if (timeout_query != NULL) {
-					if (pool != NULL) {
-						PrologResolution * head = new PrologResolution (root, pool, this);
-						head -> query (root -> pair (root -> head (NULL), timeout_query -> duplicate ()));
-						if (pool -> main_thread == this) {
-							pool -> main_thread = head;
-							root -> main_query = head -> external_query_pointer;
-						}
-					}
-				}
-				return 2;
-			}
-		}
-		ctrl = res_forward ();
-		while (ctrl == 0) ctrl = res_fail_back ();
-		if (call_again != NULL) return 4;
-		if (ctrl == 2)
-			while (ctrl != 0) {
-				ctrl = res_back_back ();
-				if (ctrl == 2) {
-					reset ();
-					delete external_query_pointer -> left;
-					delete external_query_pointer -> right;
-					external_query_pointer -> left = match_product (q_root -> query -> left, true);
-					external_query_pointer -> right = match_product (q_root -> query -> right, true);
-					drop_stack (q_root, NULL);
 					q_root = NULL;
 					reset ();
 					return 1;

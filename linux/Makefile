@@ -92,8 +92,8 @@ target_prefix =
 LOCAL_LIBS = 
 LIBS = $(LIBRUBYARG_SHARED)  -lpthread -lrt -ldl -lcrypt -lm `mysql_config --libs` -lc -lreadline
 # MODIFICATION Source code locations added in the beginning of every source code
-SRCS = $(pc)object_tracker.cpp $(pc)prolog_midi_command.cpp $(pc)prolog_reader.cpp $(pc)midi_stream.cpp $(pc)prolog_directory.cpp $(pc)prolog_service_class.cpp $(pc)prolog_dll_loader.cpp $(pc)linux_midi.cpp $(pc)prolog_query.cpp $(pc)hercs_gem.cpp $(pc)prolog_loader.cpp $(pc)prolog_match.cpp $(pc)prolog_element.cpp $(pc)prolog_transport.cpp $(pc)prolog_command.cpp $(pc)midi_command_prompt.cpp $(pc)prolog_native_code.cpp $(pc)neural.cpp $(pc)prolog_transport_pool.cpp $(pc)encoder.cpp $(pc)prolog_root.cpp $(pc)prolog_resolution.cpp $(pc)prolog_variable.cpp $(pc)prolog_resources.cpp $(pc)prolog_resolution_pool.cpp $(pc)prolog_linux_console.cpp $(pc)prolog_studio.cpp $(pc)prolog_http.cpp $(pc)prolog_atom.cpp
-OBJS = object_tracker.o prolog_midi_command.o prolog_reader.o midi_stream.o prolog_directory.o prolog_service_class.o prolog_dll_loader.o linux_midi.o prolog_query.o hercs_gem.o prolog_loader.o prolog_match.o prolog_element.o prolog_transport.o prolog_command.o midi_command_prompt.o prolog_native_code.o neural.o prolog_transport_pool.o encoder.o prolog_root.o prolog_resolution.o prolog_variable.o prolog_resources.o prolog_resolution_pool.o prolog_linux_console.o prolog_studio.o prolog_http.o prolog_atom.o
+SRCS = $(pc)object_tracker.cpp $(pc)prolog_midi_command.cpp $(pc)prolog_reader.cpp $(pc)midi_stream.cpp $(pc)prolog_directory.cpp $(pc)prolog_service_class.cpp $(pc)prolog_dll_loader.cpp $(pc)linux_midi.cpp $(pc)prolog_query.cpp $(pc)hercs_gem.cpp $(pc)prolog_loader.cpp $(pc)prolog_match.cpp $(pc)prolog_element.cpp $(pc)prolog_transport.cpp $(pc)prolog_command.cpp $(pc)midi_command_prompt.cpp $(pc)prolog_native_code.cpp $(pc)neural.cpp $(pc)prolog_transport_pool.cpp $(pc)encoder.cpp $(pc)prolog_root.cpp $(pc)prolog_resolution.cpp $(pc)prolog_variable.cpp $(pc)prolog_resources.cpp $(pc)prolog_linux_console.cpp $(pc)prolog_studio.cpp $(pc)prolog_http.cpp $(pc)prolog_atom.cpp
+OBJS = object_tracker.o prolog_midi_command.o prolog_reader.o midi_stream.o prolog_directory.o prolog_service_class.o prolog_dll_loader.o linux_midi.o prolog_query.o hercs_gem.o prolog_loader.o prolog_match.o prolog_element.o prolog_transport.o prolog_command.o midi_command_prompt.o prolog_native_code.o neural.o prolog_transport_pool.o encoder.o prolog_root.o prolog_resolution.o prolog_variable.o prolog_resources.o prolog_linux_console.o prolog_studio.o prolog_http.o prolog_atom.o
 TARGET = HERCs
 DLLIB = $(TARGET).so
 EXTSTATIC = 
@@ -183,7 +183,7 @@ objects = \
 	$(pi)midi_stream.o $(pi)object_tracker.o $(pi)prolog_atom.o $(pi)prolog_command.o $(pi)prolog_directory.o \
 	$(pi)prolog_element.o $(pi)prolog_loader.o $(pi)prolog_match.o $(pi)prolog_midi_command.o \
 	$(pi)prolog_native_code.o $(pi)prolog_query.o $(pi)prolog_reader.o $(pi)prolog_resolution.o \
-	$(pi)prolog_resolution_pool.o $(pi)prolog_root.o $(pi)prolog_service_class.o \
+	$(pi)prolog_root.o $(pi)prolog_service_class.o \
 	$(pi)prolog_studio.o $(pi)prolog_http.o \
 	$(pi)prolog_transport.o \
 	$(pi)prolog_transport_pool.o $(pi)prolog_variable.o \
@@ -227,8 +227,6 @@ prolog_reader.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_rea
 	g++ -Wno-write-strings -I. $(pc)prolog_reader.cpp -c -o prolog_reader.o
 prolog_resolution.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_resolution.cpp
 	g++ -Wno-write-strings -I. $(pc)prolog_resolution.cpp -c -o prolog_resolution.o
-prolog_resolution_pool.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_resolution_pool.cpp
-	g++ -Wno-write-strings -I. $(pc)prolog_resolution_pool.cpp -c -o prolog_resolution_pool.o
 prolog_root.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_root.cpp
 	g++ -Wno-write-strings -I. $(pc)prolog_root.cpp -c -o prolog_root.o
 prolog_service_class.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_service_class.cpp

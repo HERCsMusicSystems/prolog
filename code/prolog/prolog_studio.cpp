@@ -2985,23 +2985,6 @@ public:
 	crack (PrologRoot * root) {this -> root = root;}
 };
 
-class green_crack : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	PrologResolutionPool * pool;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) return true;
-		if (resolution -> callAgain ()) return true;
-		pool -> insert (root -> pair (root -> head (NULL), parameters -> duplicate ()));
-		resolution -> callAgain (parameters);
-		return true;
-	}
-	green_crack (PrologRoot * root, PrologResolutionPool * pool) {
-		this -> root = root;
-		this -> pool = pool;
-	}
-};
-
 class semaphore : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -3088,7 +3071,6 @@ public:
 class semaphore_maker : public PrologNativeCode {
 public:
 	PrologRoot * root;
-	PrologResolutionPool * pool;
 	PrologAtom * wait_atom;
 	PrologAtom * enter_atom;
 	PrologAtom * signal_atom;
@@ -3112,20 +3094,13 @@ public:
 			ind = parameters -> getInteger ();
 			if (ind < 0) return false;
 		}
-		if (pool != NULL) {
-			green_semaphore * s = new green_semaphore (atom, wait_atom, enter_atom, signal_atom, ind);
-			if (atom -> setMachine (s)) return true;
-			delete s;
-			return false;
-		}
 		semaphore * s = new semaphore (root, atom, wait_atom, enter_atom, signal_atom, ind);
 		if (atom -> setMachine (s)) return true;
 		delete s;
 		return false;
 	}
-	semaphore_maker (PrologRoot * root, PrologResolutionPool * pool) {
+	semaphore_maker (PrologRoot * root) {
 		this -> root = root;
-		this -> pool = pool;
 		PrologDirectory * dir = root -> searchDirectory ("studio");
 		wait_atom = dir -> searchAtom ("wait");
 		enter_atom = dir -> searchAtom ("enter");
@@ -3530,7 +3505,6 @@ class conductor : public PrologNativeCode {
 public:
 	PrologRoot * root;
 	PrologAtom * atom;
-	bool green;
 	PrologTransport * transport;
 	PrologAtom * wt_atom;
 	PrologAtom * beat_atom;
@@ -3562,16 +3536,16 @@ public:
 		PrologAtom * a = atom -> getAtom ();
 		PrologElement * original = parameters;
 		parameters = parameters -> getRight ();
-		if (a == start_atom) {if (green) return transport -> green_start (); else return transport -> start ();}
+		if (a == start_atom) return transport -> start ();
 		if (a == pause_atom) return transport -> pause ();
 		if (a == stop_atom) return transport -> stop ();
 		if (a == reset_atom) {transport -> reset (); return true;}
 		if (a == signal_atom) return signal_function (parameters, transport);
 		if (a == signal_beat_atom) return signal_beat_function (parameters, transport);
 		if (a == signal_bar_atom) return signal_bar_function (parameters, transport);
-		if (a == wt_atom) {if (green) return green_wt_function (original, parameters, resolution, transport); else return wt_function (parameters, transport);}
-		if (a == beat_atom) {if (green) return green_beat_function (original, parameters, resolution, transport); else return beat_function (parameters, transport);}
-		if (a == bar_atom) {if (green) return green_bar_function (original, parameters, resolution, transport); else return bar_function (parameters, transport);}
+		if (a == wt_atom) return wt_function (parameters, transport);
+		if (a == beat_atom) return beat_function (parameters, transport);
+		if (a == bar_atom) return bar_function (parameters, transport);
 		if (a == tempo_atom) return tempo_function (parameters, transport);
 		if (a == atempo_atom) return atempo_function (transport);
 		if (a == accel_atom) return accel_function (parameters, transport);
@@ -3583,7 +3557,6 @@ public:
 	conductor (PrologRoot * root, PrologAtom * atom, PrologTransport * transport, PrologAtom * wt_atom, PrologAtom * beat_atom, PrologAtom * bar_atom, PrologAtom * signal_atom, PrologAtom * signal_beat_atom, PrologAtom * signal_bar_atom, PrologAtom * reset_atom, PrologAtom * tempo_atom, PrologAtom * atempo_atom, PrologAtom * accel_atom, PrologAtom * rit_atom, PrologAtom * metrum_atom, PrologAtom * division_atom, PrologAtom * start_atom, PrologAtom * pause_atom, PrologAtom * stop_atom) {
 		this -> root = root;
 		this -> atom = atom;
-		green = root -> getResolutionPool () != NULL;
 		this -> transport = transport;
 		this -> wt_atom = wt_atom;
 		this -> beat_atom = beat_atom;
@@ -4112,9 +4085,8 @@ void prolog_midi_reader :: call (PrologElement * query) {
 	query = root -> pair (root -> atom (income_midi_atom), query);
 	query = root -> pair (query, root -> earth ());
 	query = root -> pair (root -> head (NULL), query);
-	PrologResolutionPool * pool = root -> getResolutionPool ();
-	if (pool) pool -> insert (query);
-	else {root -> resolution (query); delete query;}
+	root -> resolution (query);
+	delete query;
 }
 PrologElement * prolog_midi_reader :: build_call (PrologAtom * atom, int channel, int ind) {
 	return root -> pair (root -> atom (atom), root -> pair (root -> integer (channel + (midi_channel_extension != 0x7f ? midi_channel_extension << 4 : 0)), root -> pair (root -> integer (ind), root -> earth ())));
@@ -4513,7 +4485,6 @@ void PrologStudio :: init (PrologRoot * root) {
 	transport = root -> getTransportPool ();
 	t = root -> getRootTransport ();
 	if (t == NULL) t = root -> insertTransport ();
-	pool = root -> getResolutionPool ();
 	c = cb = cbb = cx = cxx = NULL;
 	d = db = dbb = dx = dxx = NULL;
 	e = eb = ebb = ex = exx = NULL;
@@ -4616,17 +4587,13 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "prompt") == 0) return new prompt (root);
 	if (strcmp (name, "query_stack") == 0) return new query_stack (root);
 	if (strcmp (name, "object_counter") == 0) return new object_counter_class ();
-	if (strcmp (name, "crack") == 0) {
-		if (pool == NULL) return new crack (root);
-		return new green_crack (root, pool);
-	}
+	if (strcmp (name, "crack") == 0) return new crack (root);
 	if (strcmp (name, "wait") == 0) {
 		if (transport == NULL) return new wait (root);
-		if (pool != NULL) return new green_wait (transport);
 		return new opaque_wait (root, transport);
 	}
 	if (strcmp (name, "timeout") == 0) return new timeout_class (root);
-	if (strcmp (name, "semaphore") == 0) return new semaphore_maker (root, pool);
+	if (strcmp (name, "semaphore") == 0) return new semaphore_maker (root);
 	if (strcmp (name, "conductor") == 0) return new conductor_maker (root);
 	if (strcmp (name, "file_writer") == 0) return new file_writer (root);
 	if (strcmp (name, "file_reader") == 0) return new file_reader (root);
@@ -4668,18 +4635,9 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	}
 	if (strcmp (name, "pause") == 0) return new pause (t);
 	if (strcmp (name, "stop") == 0) return new stop (t);
-	if (strcmp (name, "wt") == 0) {
-		if (pool == NULL) return new wt (t);
-		return new green_wt (t);
-	}
-	if (strcmp (name, "beat") == 0) {
-		if (pool == NULL) return new beat (t);
-		return new green_beat (t);
-	}
-	if (strcmp (name, "bar") == 0) {
-		if (pool == NULL) return new bar (t);
-		return new green_bar (t);
-	}
+	if (strcmp (name, "wt") == 0) return new wt (t);
+	if (strcmp (name, "beat") == 0) return new beat (t);
+	if (strcmp (name, "bar") == 0) return new bar (t);
 	if (strcmp (name, "signal") == 0) return new signal (t);
 	if (strcmp (name, "signal_beat") == 0) return new signal_beat (t);
 	if (strcmp (name, "signal_bar") == 0) return new signal_bar (t);
@@ -4701,7 +4659,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "midi_product_id") == 0) return new midi_product_id (root);
 	if (strcmp (name, "midi_product_version") == 0) return new midi_product_version (root);
 	midi_stream * line = root -> getMidiOutput ();
-	if (pool == NULL) {midi_semaphore = root -> create_system_semaphore (1); midi_root = root;}
+	midi_semaphore = root -> create_system_semaphore (1); midi_root = root;
 	if (line) {
 		if (strcmp (name, "midi_short_msg") == 0) return new midi_short_msg (line, this);
 		if (strcmp (name, "MIDI_SHORT_MSG") == 0) return new MIDI_SHORT_MSG (line);

@@ -93,7 +93,6 @@ private:
 	PrologNoise * n;
 	PrologTransportPool * transport;
 	PrologTransport * t;
-	PrologResolutionPool * pool;
 public:
 	PrologDirectory * dir;
 	PrologAtom * c, * cb, * cbb, * cx, * cxx;
@@ -114,3 +113,4 @@ public:
 };
 
 #endif
+

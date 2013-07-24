@@ -40,7 +40,6 @@ class HERCs_PROLOG_SDK_EXPORT PrologRoot;
 class HERCs_PROLOG_SDK_EXPORT PrologTransport;
 class HERCs_PROLOG_SDK_EXPORT PrologTransportPool;
 class HERCs_PROLOG_SDK_EXPORT PrologResolution;
-class HERCs_PROLOG_SDK_EXPORT PrologResolutionPool;
 class HERCs_PROLOG_SDK_EXPORT PrologReader;
 class HERCs_PROLOG_SDK_EXPORT PrologLoader;
 class HERCs_PROLOG_SDK_EXPORT PrologResourceLoader;
@@ -283,7 +282,6 @@ public:
 	PrologDirectory * root;
 	PrologTransportPool * transport_pool;
 	PrologTransport * root_transport;
-	PrologResolutionPool * pool;
 	PrologCommand * command;
 	PrologResourceLoader * resource_loader;
 	PrologServiceClassLoader * service_loader;
@@ -338,7 +336,6 @@ public:
 	int native_threads_delay;
 	PrologRoot (void);
 	PrologRoot (PrologTransportPool * transport);
-	PrologRoot (PrologTransportPool * transport, PrologResolutionPool * pool);
 	~ PrologRoot (void);
 	int captionId (void);
 	bool autoAtoms (void);
@@ -370,9 +367,6 @@ public:
 	void opaqueThreads (void);
 	void opaqueThreads (int horizontal);
 	void opaqueThreads (int horizontal, int seconds);
-	void greenThreads (void);
-	void greenThreads (int horizontal);
-	void greenThreads (int horizontal, int seconds);
 	void nativeThreads (int horizontal);
 	void nativeThreads (int horizontal, int seconds);
 	void removeThreads (void);
@@ -498,14 +492,8 @@ public:
 	int getTransportTicksPerBeat (void);
 	PrologTransportPool * getTransportPool (void);
 	PrologTransport * getRootTransport (void);
-	PrologResolutionPool * getResolutionPool (void);
 	PrologTransport * insertTransport (void);
 	bool dropTransport (PrologTransport * transport);
-
-	void setQuery (void);
-	void setQuery (PrologElement * query);
-	int move (void);
-
 };
 
 class var_voc TRACK {
@@ -581,13 +569,11 @@ public:
 	PrologVariable * var_root;
 	int var_counter;
 	PrologResolution * next;
-	PrologResolutionPool * pool;
 	PrologElement * call_again;
 	unsigned long int timeout;
 	PrologElement * timeout_query;
 
 	PrologResolution (PrologRoot * root);
-	PrologResolution (PrologRoot * root, PrologResolutionPool * pool, PrologResolution * insert_point);
 	~ PrologResolution (void);
 
 	PrologVariable * newVariable (void);
@@ -596,7 +582,6 @@ public:
 	void callAgain (PrologElement * parameters);
 	bool callAgain (void);
 	PrologQuery * getQuery (void);
-	PrologResolutionPool * getResolutionPool (void);
 	void reset (void);
 	bool match (PrologElement * actual, bool ac, PrologElement * formal, bool fc);
 	PrologElement * match_product (PrologElement * actual, bool ac);
@@ -606,27 +591,9 @@ public:
 	int res_fail_back (void);
 	int resolution (PrologElement * query);
 
-	int move (void);
 	bool query (PrologElement * query);
 	PrologElement * query (void);
 	void removeQuery (void);
-};
-
-class PrologResolutionPool TRACK {
-public:
-	PrologRoot * root;
-	PrologResolution * head;
-	PrologResolution * main_thread;
-	midi_stream * signal_line;
-	int signals;
-	PrologResolutionPool (PrologRoot * root);
-	~ PrologResolutionPool (void);
-	void drop_resolutions (void);
-	void insert (PrologElement * query);
-	void insertMain (PrologElement * query);
-	void shift (void);
-	void main_shift (void);
-	int move (void);
 };
 
 class PrologTransport TRACK {
@@ -745,3 +712,4 @@ public:
 
 
 #endif
+

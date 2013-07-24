@@ -204,7 +204,6 @@ int main (int args, char * argv []) {
 	}
 	//*
 	switch (threads_type) {
-	case 0: root -> greenThreads (50); break;
 	case 1: root -> opaqueThreads (50); break;
 	case 2: root -> nativeThreads (50); break;
 	default: break;
@@ -225,7 +224,7 @@ int main (int args, char * argv []) {
 	if (threads_type == 1) beginthread (transport_runner, 0, root);
 	midi_reader = new prolog_midi_reader (root);
 	root -> setMidiReader (midi_reader);
-	if (root -> pool == NULL) midi_service . set_reader (midi_reader);
+	midi_service . set_reader (midi_reader);
 
 	console -> open ();
 	root -> insertCommander (console);
@@ -263,3 +262,4 @@ int main (int args, char * argv []) {
 	#endif
 	return 0;
 }
+

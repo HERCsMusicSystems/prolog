@@ -34,7 +34,6 @@ PrologRoot :: PrologRoot (void) TRACKING (5) {
 	root = new PrologDirectory ("user!", NULL);
 	transport_pool = NULL;
 	root_transport = NULL;
-	pool = NULL;
 	set_standard_captions ();
 	auto_atoms = false;
 	transport_removed = false;
@@ -63,36 +62,6 @@ PrologRoot :: PrologRoot (PrologTransportPool * transport) TRACKING (5) {
 	root = new PrologDirectory ("user!", NULL);
 	this -> transport_pool = transport;
 	root_transport = NULL;
-	pool = NULL;
-	set_standard_captions ();
-	auto_atoms = false;
-	transport_removed = false;
-	preprocessor = NULL;
-	command = NULL;
-	strcpy (serial_number, "");
-	strcpy (key, "");
-	strcpy (root_directory, "");
-	search_directories = NULL;
-	args = NULL;
-	volume_id = 0;
-	serial_shift = 0;
-	current_foreground = 65280;
-	current_background = 0;
-	native_threads_delay = 20;
-}
-
-PrologRoot :: PrologRoot (PrologTransportPool * transport, PrologResolutionPool * pool) TRACKING (5) {
-	midi_in = NULL;
-	midi_out = NULL;
-	resource_loader = NULL;
-	service_loader = NULL;
-	midi_service_class = NULL;
-	line_reader = NULL;
-	main_query = NULL;
-	root = new PrologDirectory ("user!", NULL);
-	this -> transport_pool = transport;
-	root_transport = NULL;
-	this -> pool = pool;
 	set_standard_captions ();
 	auto_atoms = false;
 	transport_removed = false;
@@ -462,27 +431,10 @@ void PrologRoot :: opaqueThreads (void) {transport_pool = new PrologTransportPoo
 void PrologRoot :: opaqueThreads (int horizontal) {transport_pool = new PrologTransportPool (horizontal);}
 void PrologRoot :: opaqueThreads (int horizontal, int seconds) {transport_pool = new PrologTransportPool (horizontal, seconds);}
 
-void PrologRoot :: greenThreads (void) {
-	transport_pool = new PrologTransportPool ();
-	pool = new PrologResolutionPool (this);
-}
-
-void PrologRoot :: greenThreads (int horizontal) {
-	transport_pool = new PrologTransportPool (horizontal);
-	pool = new PrologResolutionPool (this);
-}
-
-void PrologRoot :: greenThreads (int horizontal, int seconds) {
-	transport_pool = new PrologTransportPool (horizontal, seconds);
-	pool = new PrologResolutionPool (this);
-}
-
 void PrologRoot :: nativeThreads (int horizontal) {if (horizontal < 1) horizontal = 1; native_threads_delay = 1000 / horizontal;}
 void PrologRoot :: nativeThreads (int horizontal, int seconds) {if (horizontal < 1) horizontal = 1; native_threads_delay = seconds * 1000 / horizontal;}
 
 void PrologRoot :: removeThreads (void) {
-	if (pool) delete pool;
-	pool = NULL;
 	if (transport_pool) {delete transport_pool; transport_removed = true;}
 	transport_pool = NULL;
 }
@@ -940,21 +892,8 @@ int PrologRoot :: resolution (PrologElement * query) {
 //		print (new_line_caption);
 //		return 4;
 //	}
-	int ctrl;
-	if (pool != NULL) {
-		setQuery (query);
-		ctrl = move ();
-		while (ctrl == 4) {
-			if (line_reader != NULL && midi_in != NULL && line_reader -> is_ready ()) line_reader -> read (midi_in);
-			ctrl = move ();
-			if (transport_pool) wait (transport_pool -> getCurrentDelay ());
-		}
-		return ctrl;
-	}
-	PrologResolution * resolution = new PrologResolution (this);
-	ctrl = resolution -> resolution (query);
-	delete resolution;
-	return ctrl;
+	PrologResolution resolution (this);
+	return resolution . resolution (query);
 }
 
 bool PrologRoot :: resolutionHead (char * directory) {
@@ -1011,7 +950,6 @@ void PrologRoot :: removeMainQuery (void) {
 int PrologRoot :: moveTransport (void) {return transport_pool -> move ();}
 bool PrologRoot :: startTransport (void) {
 	if (root_transport == NULL) return false;
-	if (pool) return root_transport -> green_start ();
 	return root_transport -> start ();
 }
 bool PrologRoot :: pauseTransport (void) {
@@ -1075,7 +1013,6 @@ int PrologRoot :: getTransportTicksPerBeat (void) {
 
 PrologTransportPool * PrologRoot :: getTransportPool (void) {return transport_pool;}
 PrologTransport * PrologRoot :: getRootTransport (void) {return root_transport;}
-PrologResolutionPool * PrologRoot :: getResolutionPool (void) {return pool;}
 
 PrologTransport * PrologRoot :: insertTransport (void) {
 	PrologTransport * t;
@@ -1094,12 +1031,4 @@ bool PrologRoot :: dropTransport (PrologTransport * transport) {
 	}
 	return transport_pool -> drop (transport);
 }
-
-void PrologRoot :: setQuery (PrologElement * query) {
-	if (pool) pool -> insertMain (query);
-}
-
-void PrologRoot :: setQuery (void) {setQuery (main_query);}
-
-int PrologRoot :: move (void) {return pool -> move ();}
 
