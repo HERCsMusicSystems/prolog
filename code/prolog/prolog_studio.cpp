@@ -87,7 +87,6 @@ public:
 void standard_in_reader :: message (char * text) {root -> print (text); root -> print (root -> new_line_caption);}
 void standard_in_reader :: message_v (char * text, char * variable) {root -> message (text, variable);}
 int standard_in_reader :: move_z (void) {return root -> get_character ();}
-standard_in_reader :: standard_in_reader (PrologRoot * root) {setRoot (root);}
 
 class read : public PrologNativeCode {
 public:
@@ -3070,24 +3069,6 @@ public:
 // TRANSPORT //
 ///////////////
 
-static bool green_wt_function (PrologElement * original, PrologElement * parameters, PrologResolution * resolution, PrologTransport * transport) {
-	if (resolution -> callAgain ()) {
-		if (! transport -> isActive ()) return false;
-		if (parameters -> getInteger () > transport -> getTick ()) {resolution -> callAgain (original); return true;}
-		original -> setVar (0);
-		return true;
-	}
-	if (parameters -> isEarth ()) {parameters -> setInteger (transport -> getTick () + 1); resolution -> callAgain (original); return true;}
-	if (parameters -> isVar ()) {parameters -> setInteger (transport -> getTick ()); return true;}
-	if (! parameters -> isPair ()) return false;
-	PrologElement * el = parameters -> getLeft ();
-	if (el -> isVar ()) {el -> setInteger (transport -> getTick ()); return true;}
-	if (! el -> isInteger ()) return false;
-	parameters -> setInteger (el -> getInteger () + transport -> getTick ());
-	resolution -> callAgain (original);
-	return true;
-}
-
 static bool wt_function (PrologElement * parameters, PrologTransport * transport) {
 	if (parameters -> isEarth ()) return transport -> wt (1);
 	if (parameters -> isVar ()) {parameters -> setInteger (transport -> getTick ()); return true;}
@@ -3096,34 +3077,6 @@ static bool wt_function (PrologElement * parameters, PrologTransport * transport
 	if (parameters -> isVar ()) {parameters -> setInteger (transport -> getTick ()); return true;}
 	if (! parameters -> isInteger ()) return false;
 	return transport -> wt (parameters -> getInteger ());
-}
-
-static bool green_beat_function (PrologElement * original, PrologElement * parameters, PrologResolution * resolution, PrologTransport * t) {
-	if (resolution -> callAgain ()) {
-		if (! t -> isActive ()) return false;
-		if (parameters -> isDouble ()) {
-			if ((int) parameters -> getDouble () > t -> getTick ()) {resolution -> callAgain (original); return true;}
-			parameters -> setVar (0);
-			return true;
-		}
-		if (parameters -> getInteger () > t -> getBeat ()) {resolution -> callAgain (original); return true;}
-		parameters -> setVar (0);
-		return true;
-	}
-	if (parameters -> isEarth ()) {parameters -> setInteger (t -> getBeat () + 1); resolution -> callAgain (original); return true;}
-	if (parameters -> isVar ()) {parameters -> setInteger (t -> getBeat ()); return true;}
-	if (! parameters -> isPair ()) return false;
-	PrologElement * el = parameters -> getLeft ();
-	if (el -> isVar ()) {el -> setInteger (t -> getBeat ()); return true;}
-	if (! el -> isInteger ()) {
-		if (! el -> isDouble ()) return false;
-		parameters -> setDouble (el -> getDouble () * (double) t -> get_ticks_per_beat () + (double) t -> getTick ());
-		resolution -> callAgain (original);
-		return true;
-	}
-	parameters -> setInteger (el -> getInteger () + t -> getBeat ());
-	resolution -> callAgain (original);
-	return true;
 }
 
 static bool beat_function (PrologElement * parameters, PrologTransport * t) {
@@ -3137,24 +3090,6 @@ static bool beat_function (PrologElement * parameters, PrologTransport * t) {
 		return t -> wt ((int) ((double) t -> get_ticks_per_beat () * parameters -> getDouble ()));
 	}
 	return t -> Beat (parameters -> getInteger ());
-}
-
-static bool green_bar_function (PrologElement * original, PrologElement * parameters, PrologResolution * resolution, PrologTransport * t) {
-	if (resolution -> callAgain ()) {
-		if (! t -> isActive ()) return false;
-		if (parameters -> getInteger () > t -> getBar ()) {resolution -> callAgain (original); return true;}
-		parameters -> setVar (0);
-		return true;
-	}
-	if (parameters -> isEarth ()) {parameters -> setInteger (t -> getBar () + 1); resolution -> callAgain (original); return true;}
-	if (parameters -> isVar ()) {parameters -> setInteger (t -> getBar ()); return true;}
-	if (! parameters -> isPair ()) return false;
-	PrologElement * el = parameters -> getLeft ();
-	if (el -> isVar ()) {el -> setInteger (t -> getBar ()); return true;}
-	if (! el -> isInteger ()) return false;
-	parameters -> setInteger (el -> getInteger () + t -> getBar ());
-	resolution -> callAgain (original);
-	return true;
 }
 
 static bool bar_function (PrologElement * parameters, PrologTransport * t) {
@@ -3343,13 +3278,6 @@ public:
 	stop (PrologTransport * t) {this -> t = t;}
 };
 
-class green_wt : public PrologNativeCode {
-public:
-	PrologTransport * t;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {return green_wt_function (parameters, parameters, resolution, t);}
-	green_wt (PrologTransport * t) {this -> t = t;}
-};
-
 class wt : public PrologNativeCode {
 public:
 	PrologTransport * t;
@@ -3357,25 +3285,11 @@ public:
 	wt (PrologTransport * t) {this -> t = t;}
 };
 
-class green_beat : public PrologNativeCode {
-public:
-	PrologTransport * t;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {return green_beat_function (parameters, parameters, resolution, t);}
-	green_beat (PrologTransport * t) {this -> t = t;}
-};
-
 class beat : public PrologNativeCode {
 public:
 	PrologTransport * t;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {return beat_function (parameters, t);}
 	beat (PrologTransport * t) {this -> t = t;}
-};
-
-class green_bar : public PrologNativeCode {
-public:
-	PrologTransport * t;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {return green_bar_function (parameters, parameters, resolution, t);}
-	green_bar (PrologTransport * t) {this -> t = t;}
 };
 
 class bar : public PrologNativeCode {
@@ -4436,9 +4350,7 @@ PrologAtom * PrologStudio :: note (int diatonic, int chromatic) {
 
 void PrologStudio :: init (PrologRoot * root) {
 	this -> root = root;
-	n = new PrologNoise ();
-	stdr = new standard_in_reader (root);
-	t = new PrologTransport ();
+	stdr . setRoot (root);
 	c = cb = cbb = cx = cxx = NULL;
 	d = db = dbb = dx = dxx = NULL;
 	e = eb = ebb = ex = exx = NULL;
@@ -4462,9 +4374,6 @@ void PrologStudio :: set_atoms (void) {
 }
 
 PrologStudio :: ~ PrologStudio (void) {
-	delete t;
-	delete n;
-	delete stdr;
 	if (midi_semaphore != NULL) midi_root -> destroy_system_semaphore (midi_semaphore);
 	midi_semaphore = NULL;
 }
@@ -4522,9 +4431,9 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "set_functional_captions") == 0) return new set_functional_captions (root);
 	if (strcmp (name, "auto_atoms") == 0) return new auto_atoms (root);
 	if (strcmp (name, "scripted_atoms") == 0) return new scripted_atoms (root);
-	if (strcmp (name, "pr") == 0) return new pr (stdr);
-	if (strcmp (name, "read") == 0) return new read (stdr);
-	if (strcmp (name, "readln") == 0) return new readln (stdr);
+	if (strcmp (name, "pr") == 0) return new pr (& stdr);
+	if (strcmp (name, "read") == 0) return new read (& stdr);
+	if (strcmp (name, "readln") == 0) return new readln (& stdr);
 	if (strcmp (name, "pp") == 0) return new pp (root);
 	if (strcmp (name, "pt") == 0) return new pt (root);
 	if (strcmp (name, "write") == 0) return new write (root);
@@ -4569,9 +4478,9 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "move") == 0) return new move_file (root);
 	if (strcmp (name, "copy") == 0) return new copy_file (root);
 
-	if (strcmp (name, "rnd") == 0) return new rnd (n);
-	if (strcmp (name, "rnd_control") == 0) return new rnd_control (n);
-	if (strcmp (name, "series") == 0) return new series (n);
+	if (strcmp (name, "rnd") == 0) return new rnd (& n);
+	if (strcmp (name, "rnd_control") == 0) return new rnd_control (& n);
+	if (strcmp (name, "series") == 0) return new series (& n);
 
 	if (strcmp (name, "CONSTANT") == 0) return new CONSTANT ();
 	if (strcmp (name, "VARIABLE") == 0) return new VARIABLE ();
@@ -4579,22 +4488,22 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "CLOSURE") == 0) return new CLOSURE ();
 	if (strcmp (name, "ARRAY") == 0) return new ARRAY ();
 
-	if (strcmp (name, "start") == 0) return new start (root, t);
-	if (strcmp (name, "pause") == 0) return new pause (t);
-	if (strcmp (name, "stop") == 0) return new stop (t);
-	if (strcmp (name, "wt") == 0) return new wt (t);
-	if (strcmp (name, "beat") == 0) return new beat (t);
-	if (strcmp (name, "bar") == 0) return new bar (t);
-	if (strcmp (name, "signal") == 0) return new signal (t);
-	if (strcmp (name, "signal_beat") == 0) return new signal_beat (t);
-	if (strcmp (name, "signal_bar") == 0) return new signal_bar (t);
-	if (strcmp (name, "reset") == 0) return new reset (t);
-	if (strcmp (name, "tempo") == 0) return new tempo (t);
-	if (strcmp (name, "atempo") == 0) return new atempo (t);
-	if (strcmp (name, "accel") == 0) return new accel (t);
-	if (strcmp (name, "rit") == 0) return new rit (t);
-	if (strcmp (name, "tempo_division") == 0) return new tempo_division (t);
-	if (strcmp (name, "metrum") == 0) return new metrum (t);
+	if (strcmp (name, "start") == 0) return new start (root, & t);
+	if (strcmp (name, "pause") == 0) return new pause (& t);
+	if (strcmp (name, "stop") == 0) return new stop (& t);
+	if (strcmp (name, "wt") == 0) return new wt (& t);
+	if (strcmp (name, "beat") == 0) return new beat (& t);
+	if (strcmp (name, "bar") == 0) return new bar (& t);
+	if (strcmp (name, "signal") == 0) return new signal (& t);
+	if (strcmp (name, "signal_beat") == 0) return new signal_beat (& t);
+	if (strcmp (name, "signal_bar") == 0) return new signal_bar (& t);
+	if (strcmp (name, "reset") == 0) return new reset (& t);
+	if (strcmp (name, "tempo") == 0) return new tempo (& t);
+	if (strcmp (name, "atempo") == 0) return new atempo (& t);
+	if (strcmp (name, "accel") == 0) return new accel (& t);
+	if (strcmp (name, "rit") == 0) return new rit (& t);
+	if (strcmp (name, "tempo_division") == 0) return new tempo_division (& t);
+	if (strcmp (name, "metrum") == 0) return new metrum (& t);
 
 	if (strcmp (name, "midi_in_info") == 0) return new midi_in_info (root);
 	if (strcmp (name, "midi_out_info") == 0) return new midi_out_info (root);

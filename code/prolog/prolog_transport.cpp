@@ -40,33 +40,6 @@ PrologTransport :: PrologTransport (void) TRACKING (3) {
 	accelerator_current_tick = accelerator_ticks = 1;
 	accelerator_step = 0;
 	accelerator_sentinel = atempo_beats_per_seconds;
-	next = NULL;
-	int dx = 1000 * seconds;
-	int dy = beats_per_seconds * 24;//ticks_per_beat;
-	d2 = dy + dy;
-	d = d2 - dx;
-	d1 = d - dx;
-}
-
-PrologTransport :: PrologTransport (PrologTransport * next) TRACKING (3) {
-	miliseconds = 0;
-	tick = 0;
-	beat = 0;
-	bar = 0;
-	active = false;
-	synchro = true;
-	green_synchro = true;
-	sub_tick = 0;
-	sub_beat = 0;
-	ticks_per_beat = 24;
-	beats_per_bar = 4;
-	delay = 20;
-	atempo_beats_per_seconds = beats_per_seconds = 140;
-	atempo_seconds = seconds = 60;
-	accelerator_current_tick = accelerator_ticks = 1;
-	accelerator_step = 0;
-	accelerator_sentinel = atempo_beats_per_seconds;
-	this -> next = next;
 	int dx = 1000 * seconds;
 	int dy = beats_per_seconds * 24;//ticks_per_beat;
 	d2 = dy + dy;
@@ -76,7 +49,6 @@ PrologTransport :: PrologTransport (PrologTransport * next) TRACKING (3) {
 
 PrologTransport :: ~ PrologTransport (void) {
 	this -> stop ();
-	if (next != NULL) delete next;
 }
 
 void PrologTransport :: reset (void) {tick = 0; beat = 0; bar = 0;}
@@ -136,8 +108,7 @@ int PrologTransport :: move (int delta) {
 		if (green_synchro) synchro = true;
 		else green_synchro = true;
 	}
-	if (next == NULL) return signals;
-	return next -> move (delta);
+	return signals;
 }
 
 bool PrologTransport :: green_start (void) {

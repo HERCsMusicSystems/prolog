@@ -32,8 +32,6 @@ protected:
 	void message (char * text);
 	void message_v (char * text, char * variable);
 	int move_z (void);
-public:
-	standard_in_reader (PrologRoot * root);
 };
 
 class PrologNoise TRACK {
@@ -89,9 +87,9 @@ public:
 class PrologStudio : public PrologServiceClass {
 private:
 	PrologRoot * root;
-	standard_in_reader * stdr;
-	PrologNoise * n;
-	PrologTransport * t;
+	standard_in_reader stdr;
+	PrologNoise n;
+	PrologTransport t;
 public:
 	PrologDirectory * dir;
 	PrologAtom * c, * cb, * cbb, * cx, * cxx;

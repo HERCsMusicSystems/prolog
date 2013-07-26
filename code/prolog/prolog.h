@@ -589,9 +589,7 @@ public:
 	int accelerator_current_tick;
 	int accelerator_step;
 	int accelerator_sentinel;
-	PrologTransport * next;
 	PrologTransport (void);
-	PrologTransport (PrologTransport * next);
 	~ PrologTransport (void);
 	void reset (void);
 	void signal (void);
