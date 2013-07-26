@@ -61,22 +61,6 @@ windows_midi_service midi_service;
 
 prolog_midi_reader * midi_reader = NULL;
 
-volatile bool running = false;
-RUNNER_RETURN transport_runner (RUNNER_PARAMETER root) {
-	running = true;
-	while (running) {
-		((PrologRoot *) root) -> moveTransport ();
-		#ifdef WINDOWS_OPERATING_SYSTEM
-		Sleep (20);
-		#endif
-		#ifdef LINUX_OPERATING_SYSTEM
-		usleep (20000);
-		#endif
-	}
-	running = true;
-	RETURN
-}
-
 #ifdef LINUX_OPERATING_SYSTEM
 typedef void * (* runner_procedure) (RUNNER_PARAMETER);
 void beginthread (runner_procedure runner, int value, PrologRoot * root) {
@@ -196,18 +180,10 @@ int main (int args, char * argv []) {
 	PROLOG_STRING name;
 	strcpy (name, "");
 	for (int ind = 1; ind < args; ind++) {
-		if (strcmp (argv [ind], "*gt") == 0) threads_type = 0;
-		else if (strcmp (argv [ind], "*ot") == 0) threads_type = 1;
-		else if (strcmp (argv [ind], "*nt") == 0) threads_type = 2;
-		else if (strlen (name) < 1) strcpy (name, argv [ind]);
+		if (strlen (name) < 1) strcpy (name, argv [ind]);
 		else root -> addArg (argv [ind]);
 	}
-	//*
-	switch (threads_type) {
-	case 1: root -> opaqueThreads (50); break;
-	case 2: root -> nativeThreads (50); break;
-	default: break;
-	}
+	root -> nativeThreads (50);
 
 	#ifdef LINUX_OPERATING_SYSTEM
 	PrologLinuxConsole * console = threads_type == 2 ? new PrologLinuxConsole () : new PrologLinuxConsole (10);
@@ -221,7 +197,6 @@ int main (int args, char * argv []) {
 	root -> setMidi (midi_service . getReceptionLine (), midi_service . getTransmissionLine ());
 	root -> setMidiPortServiceClass (& midi_service);
 
-	if (threads_type == 1) beginthread (transport_runner, 0, root);
 	midi_reader = new prolog_midi_reader (root);
 	root -> setMidiReader (midi_reader);
 	midi_service . set_reader (midi_reader);
@@ -238,20 +213,6 @@ int main (int args, char * argv []) {
 	//*
 	console -> stop ();
 
-	if (running) {
-		running = false;
-		while (! running) {
-		#ifdef WINDOWS_OPERATING_SYSTEM
-			Sleep (20);
-		#endif
-		#ifdef LINUX_OPERATING_SYSTEM
-			usleep (20000);
-		#endif
-		}
-		running = false;
-	}
-
-	root -> removeThreads ();
 	if (root -> getCommander () != NULL) delete root -> getCommander ();
 	if (midi_reader != NULL) delete midi_reader;
 	delete root;

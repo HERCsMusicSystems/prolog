@@ -2889,48 +2889,6 @@ public:
 	wait (PrologRoot * root) {this -> root = root;}
 };
 
-class opaque_wait : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	PrologTransportPool * transport;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isVar ()) {parameters -> setInteger (transport -> getMiliseconds ()); return true;}
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (parameters -> isVar ()) {parameters -> setInteger (transport -> getMiliseconds ()); return true;}
-		if (! parameters -> isInteger ()) return false;
-		int sentinel = transport -> getMiliseconds () + parameters -> getInteger ();
-		while (sentinel > transport -> getMiliseconds ()) root -> wait (0);
-		return true;
-	}
-	opaque_wait (PrologRoot * root, PrologTransportPool * transport) {
-		this -> root = root;
-		this -> transport = transport;
-	}
-};
-
-class green_wait : public PrologNativeCode {
-public:
-	PrologTransportPool * transport;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (resolution -> callAgain ()) {
-			if (parameters -> getInteger () > transport -> getMiliseconds ()) {resolution -> callAgain (parameters); return true;}
-			parameters -> setVar (0);
-			return true;
-		}
-		if (parameters -> isVar ()) {parameters -> setInteger (transport -> getMiliseconds ()); return true;}
-		if (! parameters -> isPair ()) return false;
-		PrologElement * query = parameters;
-		parameters = parameters -> getLeft ();
-		if (parameters -> isVar ()) {parameters -> setInteger (transport -> getMiliseconds ()); return true;}
-		if (! parameters -> isInteger ()) return false;
-		query -> setInteger (parameters -> getInteger () + transport -> getMiliseconds ());
-		resolution -> callAgain (query);
-		return true;
-	}
-	green_wait (PrologTransportPool * transport) {this -> transport = transport;}
-};
-
 class timeout_class : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -3505,7 +3463,7 @@ class conductor : public PrologNativeCode {
 public:
 	PrologRoot * root;
 	PrologAtom * atom;
-	PrologTransport * transport;
+	PrologTransport transport;
 	PrologAtom * wt_atom;
 	PrologAtom * beat_atom;
 	PrologAtom * bar_atom;
@@ -3536,28 +3494,27 @@ public:
 		PrologAtom * a = atom -> getAtom ();
 		PrologElement * original = parameters;
 		parameters = parameters -> getRight ();
-		if (a == start_atom) return transport -> start ();
-		if (a == pause_atom) return transport -> pause ();
-		if (a == stop_atom) return transport -> stop ();
-		if (a == reset_atom) {transport -> reset (); return true;}
-		if (a == signal_atom) return signal_function (parameters, transport);
-		if (a == signal_beat_atom) return signal_beat_function (parameters, transport);
-		if (a == signal_bar_atom) return signal_bar_function (parameters, transport);
-		if (a == wt_atom) return wt_function (parameters, transport);
-		if (a == beat_atom) return beat_function (parameters, transport);
-		if (a == bar_atom) return bar_function (parameters, transport);
-		if (a == tempo_atom) return tempo_function (parameters, transport);
-		if (a == atempo_atom) return atempo_function (transport);
-		if (a == accel_atom) return accel_function (parameters, transport);
-		if (a == rit_atom) return rit_function (parameters, transport);
-		if (a == division_atom) return tempo_division_function (parameters, transport);
-		if (a == metrum_atom) return metrum_function (parameters, transport);
+		if (a == start_atom) return transport . start ();
+		if (a == pause_atom) return transport . pause ();
+		if (a == stop_atom) return transport . stop ();
+		if (a == reset_atom) {transport . reset (); return true;}
+		if (a == signal_atom) return signal_function (parameters, & transport);
+		if (a == signal_beat_atom) return signal_beat_function (parameters, & transport);
+		if (a == signal_bar_atom) return signal_bar_function (parameters, & transport);
+		if (a == wt_atom) return wt_function (parameters, & transport);
+		if (a == beat_atom) return beat_function (parameters, & transport);
+		if (a == bar_atom) return bar_function (parameters, & transport);
+		if (a == tempo_atom) return tempo_function (parameters, & transport);
+		if (a == atempo_atom) return atempo_function (& transport);
+		if (a == accel_atom) return accel_function (parameters, & transport);
+		if (a == rit_atom) return rit_function (parameters, & transport);
+		if (a == division_atom) return tempo_division_function (parameters, & transport);
+		if (a == metrum_atom) return metrum_function (parameters, & transport);
 		return false;
 	}
-	conductor (PrologRoot * root, PrologAtom * atom, PrologTransport * transport, PrologAtom * wt_atom, PrologAtom * beat_atom, PrologAtom * bar_atom, PrologAtom * signal_atom, PrologAtom * signal_beat_atom, PrologAtom * signal_bar_atom, PrologAtom * reset_atom, PrologAtom * tempo_atom, PrologAtom * atempo_atom, PrologAtom * accel_atom, PrologAtom * rit_atom, PrologAtom * metrum_atom, PrologAtom * division_atom, PrologAtom * start_atom, PrologAtom * pause_atom, PrologAtom * stop_atom) {
+	conductor (PrologRoot * root, PrologAtom * atom, PrologAtom * wt_atom, PrologAtom * beat_atom, PrologAtom * bar_atom, PrologAtom * signal_atom, PrologAtom * signal_beat_atom, PrologAtom * signal_bar_atom, PrologAtom * reset_atom, PrologAtom * tempo_atom, PrologAtom * atempo_atom, PrologAtom * accel_atom, PrologAtom * rit_atom, PrologAtom * metrum_atom, PrologAtom * division_atom, PrologAtom * start_atom, PrologAtom * pause_atom, PrologAtom * stop_atom) {
 		this -> root = root;
 		this -> atom = atom;
-		this -> transport = transport;
 		this -> wt_atom = wt_atom;
 		this -> beat_atom = beat_atom;
 		this -> bar_atom = bar_atom;
@@ -3575,7 +3532,6 @@ public:
 		this -> pause_atom = pause_atom;
 		this -> stop_atom = stop_atom;
 	}
-	~ conductor (void) {root -> dropTransport (transport);}
 };
 
 class conductor_maker : public PrologNativeCode {
@@ -3614,7 +3570,7 @@ public:
 			if (! ea -> isAtom ()) return false;
 			atom = ea -> getAtom ();
 		}
-		conductor * c = new conductor (root, atom, root -> insertTransport (), wt_atom, beat_atom, bar_atom, signal_atom, signal_beat_atom, signal_bar_atom, reset_atom, tempo_atom, atempo_atom, accel_atom, rit_atom, metrum_atom, division_atom, start_atom, pause_atom, stop_atom);
+		conductor * c = new conductor (root, atom, wt_atom, beat_atom, bar_atom, signal_atom, signal_beat_atom, signal_bar_atom, reset_atom, tempo_atom, atempo_atom, accel_atom, rit_atom, metrum_atom, division_atom, start_atom, pause_atom, stop_atom);
 		if (atom -> setMachine (c)) return true;
 		delete c;
 		return false;
@@ -4482,9 +4438,7 @@ void PrologStudio :: init (PrologRoot * root) {
 	this -> root = root;
 	n = new PrologNoise ();
 	stdr = new standard_in_reader (root);
-	transport = root -> getTransportPool ();
-	t = root -> getRootTransport ();
-	if (t == NULL) t = root -> insertTransport ();
+	t = new PrologTransport ();
 	c = cb = cbb = cx = cxx = NULL;
 	d = db = dbb = dx = dxx = NULL;
 	e = eb = ebb = ex = exx = NULL;
@@ -4508,7 +4462,7 @@ void PrologStudio :: set_atoms (void) {
 }
 
 PrologStudio :: ~ PrologStudio (void) {
-	if (transport == NULL) delete t;
+	delete t;
 	delete n;
 	delete stdr;
 	if (midi_semaphore != NULL) midi_root -> destroy_system_semaphore (midi_semaphore);
@@ -4588,10 +4542,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "query_stack") == 0) return new query_stack (root);
 	if (strcmp (name, "object_counter") == 0) return new object_counter_class ();
 	if (strcmp (name, "crack") == 0) return new crack (root);
-	if (strcmp (name, "wait") == 0) {
-		if (transport == NULL) return new wait (root);
-		return new opaque_wait (root, transport);
-	}
+	if (strcmp (name, "wait") == 0) return new wait (root);
 	if (strcmp (name, "timeout") == 0) return new timeout_class (root);
 	if (strcmp (name, "semaphore") == 0) return new semaphore_maker (root);
 	if (strcmp (name, "conductor") == 0) return new conductor_maker (root);
@@ -4628,11 +4579,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "CLOSURE") == 0) return new CLOSURE ();
 	if (strcmp (name, "ARRAY") == 0) return new ARRAY ();
 
-	if (strcmp (name, "start") == 0) {
-		if (transport == NULL) return new start (root, t);
-		return new green_start (t);
-
-	}
+	if (strcmp (name, "start") == 0) return new start (root, t);
 	if (strcmp (name, "pause") == 0) return new pause (t);
 	if (strcmp (name, "stop") == 0) return new stop (t);
 	if (strcmp (name, "wt") == 0) return new wt (t);

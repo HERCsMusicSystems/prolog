@@ -32,39 +32,8 @@ PrologRoot :: PrologRoot (void) TRACKING (5) {
 	line_reader = NULL;
 	main_query = NULL;
 	root = new PrologDirectory ("user!", NULL);
-	transport_pool = NULL;
-	root_transport = NULL;
 	set_standard_captions ();
 	auto_atoms = false;
-	transport_removed = false;
-	preprocessor = NULL;
-	command = NULL;
-	strcpy (serial_number, "");
-	strcpy (key, "");
-	strcpy (root_directory, "");
-	search_directories = NULL;
-	args = NULL;
-	volume_id = 0;
-	serial_shift = 0;
-	current_foreground = 65280;
-	current_background = 0;
-	native_threads_delay = 20;
-}
-
-PrologRoot :: PrologRoot (PrologTransportPool * transport) TRACKING (5) {
-	midi_in = NULL;
-	midi_out = NULL;
-	resource_loader = NULL;
-	service_loader = NULL;
-	midi_service_class = NULL;
-	line_reader = NULL;
-	main_query = NULL;
-	root = new PrologDirectory ("user!", NULL);
-	this -> transport_pool = transport;
-	root_transport = NULL;
-	set_standard_captions ();
-	auto_atoms = false;
-	transport_removed = false;
 	preprocessor = NULL;
 	command = NULL;
 	strcpy (serial_number, "");
@@ -427,17 +396,8 @@ void PrologRoot :: addArg (char * arg) {
 	ap -> next = sp;
 }
 
-void PrologRoot :: opaqueThreads (void) {transport_pool = new PrologTransportPool ();}
-void PrologRoot :: opaqueThreads (int horizontal) {transport_pool = new PrologTransportPool (horizontal);}
-void PrologRoot :: opaqueThreads (int horizontal, int seconds) {transport_pool = new PrologTransportPool (horizontal, seconds);}
-
 void PrologRoot :: nativeThreads (int horizontal) {if (horizontal < 1) horizontal = 1; native_threads_delay = 1000 / horizontal;}
 void PrologRoot :: nativeThreads (int horizontal, int seconds) {if (horizontal < 1) horizontal = 1; native_threads_delay = seconds * 1000 / horizontal;}
-
-void PrologRoot :: removeThreads (void) {
-	if (transport_pool) {delete transport_pool; transport_removed = true;}
-	transport_pool = NULL;
-}
 
 void PrologRoot :: insertCommander (PrologCommand * command) {this -> command = command;}
 
@@ -945,90 +905,5 @@ int PrologRoot :: resolution (void) {
 void PrologRoot :: removeMainQuery (void) {
 	if (main_query != NULL) delete main_query;
 	main_query = NULL;
-}
-
-int PrologRoot :: moveTransport (void) {return transport_pool -> move ();}
-bool PrologRoot :: startTransport (void) {
-	if (root_transport == NULL) return false;
-	return root_transport -> start ();
-}
-bool PrologRoot :: pauseTransport (void) {
-	if (root_transport == NULL) return false;
-	return root_transport -> pause ();
-}
-bool PrologRoot :: stopTransport (void) {
-	if (root_transport == NULL) return false;
-	return root_transport -> stop ();
-}
-
-void PrologRoot :: transportTempo (int beats_per_minute) {
-	if (root_transport == NULL) return;
-	root_transport -> tempo (beats_per_minute);
-}
-
-void PrologRoot :: transportTempo (int beats_per_seconds, int seconds) {
-	if (root_transport == NULL) return;
-	root_transport -> tempo (beats_per_seconds, seconds);
-}
-
-void PrologRoot :: transportDivision (int beats_per_bar) {
-	if (root_transport == NULL) return;
-	root_transport -> division (beats_per_bar);
-}
-
-void PrologRoot :: transportDivision (int beats_per_bar, int ticks_per_beat) {
-	if (root_transport == NULL) return;
-	root_transport -> division (beats_per_bar, ticks_per_beat);
-}
-
-void PrologRoot :: transportTickDivision (int ticks_per_beat) {
-	if (root_transport == NULL) return;
-	root_transport -> tick_division (ticks_per_beat);
-}
-
-void PrologRoot :: transportMetrum (int top, int bottom) {
-	if (root_transport == NULL) return;
-	root_transport -> metrum (top, bottom);
-}
-
-int PrologRoot :: getTransportBeatsPerSeconds (void) {
-	if (root_transport == NULL) return 0;
-	return root_transport -> get_beats_per_seconds ();
-}
-
-int PrologRoot :: getTransportSeconds (void) {
-	if (root_transport == NULL) return 0;
-	return root_transport -> get_seconds ();
-}
-
-int PrologRoot :: getTransportBeatsPerBar (void) {
-	if (root_transport == NULL) return 0;
-	return root_transport -> get_beats_per_bar ();
-}
-
-int PrologRoot :: getTransportTicksPerBeat (void) {
-	if (root_transport == NULL) return 0;
-	return root_transport -> get_ticks_per_beat ();
-}
-
-PrologTransportPool * PrologRoot :: getTransportPool (void) {return transport_pool;}
-PrologTransport * PrologRoot :: getRootTransport (void) {return root_transport;}
-
-PrologTransport * PrologRoot :: insertTransport (void) {
-	PrologTransport * t;
-	if (transport_pool == NULL) t = new PrologTransport ();
-	else t = transport_pool -> insert ();
-	if (root_transport == NULL) root_transport = t;
-	return t;
-}
-
-bool PrologRoot :: dropTransport (PrologTransport * transport) {
-	if (transport_removed) return true;
-	if (root_transport == transport) return false;
-	if (transport_pool == NULL) {
-		delete transport;
-		return true;
-	}
-	return transport_pool -> drop (transport);
 }
 

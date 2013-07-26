@@ -38,7 +38,6 @@ class HERCs_PROLOG_SDK_EXPORT PrologServiceClass;
 class HERCs_PROLOG_SDK_EXPORT PrologDirectory;
 class HERCs_PROLOG_SDK_EXPORT PrologRoot;
 class HERCs_PROLOG_SDK_EXPORT PrologTransport;
-class HERCs_PROLOG_SDK_EXPORT PrologTransportPool;
 class HERCs_PROLOG_SDK_EXPORT PrologResolution;
 class HERCs_PROLOG_SDK_EXPORT PrologReader;
 class HERCs_PROLOG_SDK_EXPORT PrologLoader;
@@ -280,8 +279,6 @@ public:
 	PrologString * search_directories;
 	PrologString * args;
 	PrologDirectory * root;
-	PrologTransportPool * transport_pool;
-	PrologTransport * root_transport;
 	PrologCommand * command;
 	PrologResourceLoader * resource_loader;
 	PrologServiceClassLoader * service_loader;
@@ -292,7 +289,6 @@ public:
 	PrologElement * main_query;
 	PrologAtom * preprocessor;
 	bool auto_atoms;
-	bool transport_removed;
 	int caption_id; // 0 = uap32, 1 = standard, 2 = edinburg, 3 = marseille, 4 = functional
 	PROLOG_STRING left_caption;
 	PROLOG_STRING right_caption;
@@ -335,7 +331,6 @@ public:
 	int current_background;
 	int native_threads_delay;
 	PrologRoot (void);
-	PrologRoot (PrologTransportPool * transport);
 	~ PrologRoot (void);
 	int captionId (void);
 	bool autoAtoms (void);
@@ -364,12 +359,8 @@ public:
 	void addSearchDirectory (char * directory);
 	void deleteSearchDirectories (void);
 	void addArg (char * arg);
-	void opaqueThreads (void);
-	void opaqueThreads (int horizontal);
-	void opaqueThreads (int horizontal, int seconds);
 	void nativeThreads (int horizontal);
 	void nativeThreads (int horizontal, int seconds);
-	void removeThreads (void);
 	void insertCommander (PrologCommand * command);
 	PrologCommand * getCommander (void);
 	void insertCommand (char * text);
@@ -473,27 +464,6 @@ public:
 	int resolution (char * directory);
 		// returns: 0 = fail, 1 = success, 2 = no space left, 3 = wrong query, 4 = file not found
 	void removeMainQuery (void);
-	int moveTransport (void);
-		// never call moveTransport ();
-		// unless you run opaque threads
-		// it is called automatically by move ();
-	bool startTransport (void);
-	bool pauseTransport (void);
-	bool stopTransport (void);
-	void transportTempo (int beats_per_minute);
-	void transportTempo (int beats_per_seconds, int seconds);
-	void transportDivision (int beats_per_bar);
-	void transportDivision (int beats_per_bar, int ticks_per_beat);
-	void transportTickDivision (int ticks_per_beat);
-	void transportMetrum (int top, int bottom);
-	int getTransportBeatsPerSeconds (void);
-	int getTransportSeconds (void);
-	int getTransportBeatsPerBar (void);
-	int getTransportTicksPerBeat (void);
-	PrologTransportPool * getTransportPool (void);
-	PrologTransport * getRootTransport (void);
-	PrologTransport * insertTransport (void);
-	bool dropTransport (PrologTransport * transport);
 };
 
 class var_voc TRACK {
@@ -660,27 +630,6 @@ public:
 	int get_seconds (void);
 	int get_beats_per_bar (void);
 	int get_ticks_per_beat (void);
-};
-
-class PrologTransportPool TRACK {
-public:
-	int seconds;
-	int horizontal;
-	int miliseconds;
-	int delta_miliseconds_1, delta_miliseconds_2;
-	int d, d1, d2;
-	bool active;
-	PrologTransport * transport;
-	PrologTransportPool (void);
-	PrologTransportPool (int horizontal);
-	PrologTransportPool (int horizontal, int seconds);
-	~ PrologTransportPool (void);
-	PrologTransport * insert (void);
-	bool drop (PrologTransport * t);
-	int move (void);
-	int getCurrentDelay (void);
-	int getMiliseconds (void);
-	void tempo (void);
 };
 
 class PrologCommand TRACK {
