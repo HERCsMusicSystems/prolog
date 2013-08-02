@@ -5,7 +5,7 @@
 
 import studio
 
-program neural #machine := "neural"
+program neural #machine := "prolog.neural"
 
 
 	[

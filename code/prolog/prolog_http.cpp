@@ -42,7 +42,7 @@ public:
 
 class RequestAnalyser {
 public:
-	PrologHttp * service;
+	PrologHttpServiceClass * service;
 	char * command;
 	AREA area;
 	char key [256];
@@ -138,12 +138,12 @@ public:
 		if (strcmp (area, service -> purge_atom -> name ()) == 0) return service -> purge_atom;
 		return 0;
 	}
-	RequestAnalyser (PrologHttp * service, char * command) {this -> service = service; this -> command = command;}
+	RequestAnalyser (PrologHttpServiceClass * service, char * command) {this -> service = service; this -> command = command;}
 };
 
 class webserver : public PrologNativeCode {
 public:
-	PrologHttp * service;
+	PrologHttpServiceClass * service;
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
 		PrologElement * port = parameters -> getLeft ();
@@ -272,10 +272,10 @@ while (analyser . get_param ()) {
 		close (sockfd);
 		return true;
 	}
-	webserver (PrologHttp * service) {this -> service = service;}
+	webserver (PrologHttpServiceClass * service) {this -> service = service;}
 };
 
-void PrologHttp :: init (PrologRoot * root) {
+void PrologHttpServiceClass :: init (PrologRoot * root) {
 	this -> root = root;
 	http_directory = 0;
 	full_text_atom = route_atom = protocol_atom = header_atom = param_atom = 0;
@@ -283,7 +283,7 @@ void PrologHttp :: init (PrologRoot * root) {
 	head_atom = options_atom = link_atom = unlink_atom = purge_atom = 0;
 }
 
-void PrologHttp :: set_atoms (void) {
+void PrologHttpServiceClass :: set_atoms (void) {
 	if (http_directory != 0) return;
 	http_directory = root -> searchDirectory ("http");
 	if (http_directory == 0) return;
@@ -305,7 +305,7 @@ void PrologHttp :: set_atoms (void) {
 	purge_atom = http_directory -> searchAtom ("PURGE");
 }
 
-PrologNativeCode * PrologHttp :: getNativeCode (char * name) {
+PrologNativeCode * PrologHttpServiceClass :: getNativeCode (char * name) {
 	set_atoms ();
 	if (strcmp (name, "webserver") == 0) return new webserver (this);
 	return 0;

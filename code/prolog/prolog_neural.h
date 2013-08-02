@@ -20,21 +20,20 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-#ifndef _NEURAL_SERVICE_CLASS_
-#define _NEURAL_SERVICE_CLASS_
+#ifndef _PROLOG_NEURAL_SERVICE_CLASS_
+#define _PROLOG_NEURAL_SERVICE_CLASS_
 
 #include "hercs_prolog_sdk.h"
 
-class neural_service : public PrologServiceClass {
+class PrologNeuralServiceClass : public PrologServiceClass {
 private:
 	PrologRoot * root;
 public:
 	virtual void init (PrologRoot * root);
 	virtual PrologNativeCode * getNativeCode (char * name);
-	neural_service (void);
-	~ neural_service (void);
+	PrologNeuralServiceClass (void);
+	~ PrologNeuralServiceClass (void);
 };
 
-extern PrologServiceClass * create_neural_service_class (void);
-
 #endif
+

@@ -20,12 +20,12 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-#ifndef _PROLOG_HTTP_
-#define _PROLOG_HTTP_
+#ifndef _PROLOG_HTTP_SERVICE_CLASS_
+#define _PROLOG_HTTP_SERVICE_CLASS_
 
 #include "prolog.h"
 
-class PrologHttp : public PrologServiceClass {
+class PrologHttpServiceClass : public PrologServiceClass {
 public:
 	PrologRoot * root;
 	PrologDirectory * http_directory;

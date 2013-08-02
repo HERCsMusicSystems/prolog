@@ -20,7 +20,7 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-#include "neural.h"
+#include "prolog_neural.h"
 #include <string.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -417,17 +417,14 @@ public:
 	PrologNeuralLayerBuilder (int type = NEURAL) {this -> type = type;}
 };
 
-PrologNativeCode * neural_service :: getNativeCode (char * name) {
+PrologNativeCode * PrologNeuralServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "NEURAL_LAYER") == 0) return new PrologNeuralLayerBuilder ();
 	if (strcmp (name, "NORMALISED_LAYER") == 0) return new PrologNeuralLayerBuilder (NORMALISED);
 	if (strcmp (name, "KOHONEN_LAYER") == 0) return new PrologNeuralLayerBuilder (KOHONEN);
 	return NULL;
 }
 
-void neural_service :: init (PrologRoot * root) {this -> root = root;}
-neural_service :: neural_service (void) {root = NULL;}
-neural_service :: ~ neural_service (void) {}
-
-
-PrologServiceClass * create_neural_service_class (void) {return new neural_service ();}
+void PrologNeuralServiceClass :: init (PrologRoot * root) {this -> root = root;}
+PrologNeuralServiceClass :: PrologNeuralServiceClass (void) {root = NULL;}
+PrologNeuralServiceClass :: ~ PrologNeuralServiceClass (void) {}
 

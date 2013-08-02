@@ -79,7 +79,9 @@ void beginthread (runner_procedure runner, int value, PrologRoot * root) {
 
 
 #ifdef INTERNAL_RESOURCES
-#include "neural.h"
+#include "prolog_neural.h"
+#include "prolog_conductor.h"
+#include "prolog_midi.h"
 //#ifdef LINUX_OPERATING_SYSTEM
 //#include "prolog_mysql.h"
 //#endif
@@ -125,28 +127,34 @@ extern char resource_5 [];
 extern char resource_6 [];
 extern char resource_7 [];
 extern char resource_8 [];
+extern char resource_9 [];
+extern char resource_10 [];
 class resource_loader_class : public PrologResourceLoader {
 public:
 	char * load (char * name) {
 		char * ret = NULL;
 		if (strcmp (name, "studio") == 0) ret = resource_0;
-		if (strcmp (name, "http") == 0) ret = resource_1;
-		if (strcmp (name, "store") == 0) ret = resource_2;
-		if (strcmp (name, "f1") == 0) ret = resource_3;
-		if (strcmp (name, "help") == 0) ret = resource_4;
-		if (strcmp (name, "record") == 0) ret = resource_5;
-		if (strcmp (name, "neural") == 0) ret = resource_6;
-		if (strcmp (name, "keyboard") == 0) ret = resource_7;
-		if (strcmp (name, "sql") == 0) ret = resource_8;
+		if (strcmp (name, "conductor") == 0) ret = resource_1;
+		if (strcmp (name, "midi") == 0) ret = resource_2;
+		if (strcmp (name, "http") == 0) ret = resource_3;
+		if (strcmp (name, "store") == 0) ret = resource_4;
+		if (strcmp (name, "f1") == 0) ret = resource_5;
+		if (strcmp (name, "help") == 0) ret = resource_6;
+		if (strcmp (name, "record") == 0) ret = resource_7;
+		if (strcmp (name, "neural") == 0) ret = resource_8;
+		if (strcmp (name, "keyboard") == 0) ret = resource_9;
+		if (strcmp (name, "sql") == 0) ret = resource_10;
 		if (strcmp (name, "studio.prc") == 0) ret = resource_0;
-		if (strcmp (name, "http.prc") == 0) ret = resource_1;
-		if (strcmp (name, "store.prc") == 0) ret = resource_2;
-		if (strcmp (name, "f1.prc") == 0) ret = resource_3;
-		if (strcmp (name, "help.prc") == 0) ret = resource_4;
-		if (strcmp (name, "record.prc") == 0) ret = resource_5;
-		if (strcmp (name, "neural.prc") == 0) ret = resource_6;
-		if (strcmp (name, "keyboard.prc") == 0) ret = resource_7;
-		if (strcmp (name, "sql.prc") == 0) ret = resource_8;
+		if (strcmp (name, "conductor.prc") == 0) ret = resource_1;
+		if (strcmp (name, "midi.prc") == 0) ret = resource_2;
+		if (strcmp (name, "http.prc") == 0) ret = resource_3;
+		if (strcmp (name, "store.prc") == 0) ret = resource_4;
+		if (strcmp (name, "f1.prc") == 0) ret = resource_5;
+		if (strcmp (name, "help.prc") == 0) ret = resource_6;
+		if (strcmp (name, "record.prc") == 0) ret = resource_7;
+		if (strcmp (name, "neural.prc") == 0) ret = resource_8;
+		if (strcmp (name, "keyboard.prc") == 0) ret = resource_9;
+		if (strcmp (name, "sql.prc") == 0) ret = resource_10;
 		return ret;
 	}
 } resource_loader;
@@ -155,13 +163,10 @@ public:
 class service_class_loader_class : public PrologServiceClassLoader {
 public:
 	PrologServiceClass * load (char * name) {
-		if (strcmp (name, "neural") == 0) return new neural_service ();
-		if (strcmp (name, "prolog.http") == 0) return new PrologHttp ();
-//#ifdef LINUX_OPERATING_SYSTEM
-//#ifndef MAC_OPERATING_SYSTEM
-//		if (strcmp (name, "prolog_mysql") == 0) return new MySQLServiceClass ();
-//#endif
-//#endif
+		if (strcmp (name, "prolog.conductor") == 0) return new PrologConductorServiceClass ();
+		if (strcmp (name, "prolog.midi") == 0) return new PrologMidiServiceClass ();
+		if (strcmp (name, "prolog.http") == 0) return new PrologHttpServiceClass ();
+		if (strcmp (name, "prolog.neural") == 0) return new PrologNeuralServiceClass ();
 		return NULL;
 	}
 } service_class_loader;

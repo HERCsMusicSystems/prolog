@@ -20,8 +20,8 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-#ifndef _PROLOG_STUDIO_
-#define _PROLOG_STUDIO_
+#ifndef _PROLOG_STUDIO_SERVICE_CLASS_
+#define _PROLOG_STUDIO_SERVICE_CLASS_
 
 #include "prolog.h"
 
