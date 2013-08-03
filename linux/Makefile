@@ -93,7 +93,7 @@ LOCAL_LIBS =
 LIBS = $(LIBRUBYARG_SHARED)  -lpthread -lrt -ldl -lcrypt -lm `mysql_config --libs` -lc -lreadline
 # MODIFICATION Source code locations added in the beginning of every source code
 SRCS = $(pc)object_tracker.cpp $(pc)prolog_midi_command.cpp $(pc)prolog_reader.cpp $(pc)midi_stream.cpp $(pc)prolog_directory.cpp $(pc)prolog_service_class.cpp $(pc)prolog_dll_loader.cpp $(pc)linux_midi.cpp $(pc)prolog_query.cpp $(pc)hercs_gem.cpp $(pc)prolog_loader.cpp $(pc)prolog_match.cpp $(pc)prolog_element.cpp $(pc)prolog_transport.cpp $(pc)prolog_command.cpp $(pc)midi_command_prompt.cpp $(pc)prolog_native_code.cpp $(pc)prolog_neural.cpp $(pc)encoder.cpp $(pc)prolog_root.cpp $(pc)prolog_resolution.cpp $(pc)prolog_variable.cpp $(pc)prolog_resources.cpp $(pc)prolog_linux_console.cpp $(pc)prolog_studio.cpp $(pc)prolog_conductor.cpp $(pc)prolog_midi.cpp $(pc)prolog_http.cpp $(pc)prolog_atom.cpp
-OBJS = object_tracker.o prolog_midi_command.o prolog_reader.o midi_stream.o prolog_directory.o prolog_service_class.o prolog_dll_loader.o linux_midi.o prolog_query.o hercs_gem.o prolog_loader.o prolog_match.o prolog_element.o prolog_transport.o prolog_command.o midi_command_prompt.o prolog_native_code.o prolog_neural.o encoder.o prolog_root.o prolog_resolution.o prolog_variable.o prolog_resources.o prolog_linux_console.o prolog_studio.o prolog_conductor.o prolog_midi.o prolog_http.o prolog_atom.o
+OBJS = object_tracker.o prolog_midi_command.o prolog_reader.o midi_stream.o prolog_directory.o prolog_service_class.o prolog_dll_loader.o linux_midi.o prolog_query.o hercs_gem.o prolog_loader.o prolog_match.o prolog_element.o prolog_transport.o prolog_command.o midi_command_prompt.o prolog_native_code.o prolog_neural.o encoder.o prolog_root.o prolog_resolution.o prolog_variable.o prolog_resources.o prolog_linux_console.o prolog_studio.o prolog_conductor.o prolog_midi.o prolog_http.o prolog_neural.o prolog_atom.o
 TARGET = HERCs
 DLLIB = $(TARGET).so
 EXTSTATIC = 
@@ -186,7 +186,7 @@ objects = \
 	$(pi)prolog_element.o $(pi)prolog_loader.o $(pi)prolog_match.o $(pi)prolog_midi_command.o \
 	$(pi)prolog_native_code.o $(pi)prolog_query.o $(pi)prolog_reader.o $(pi)prolog_resolution.o \
 	$(pi)prolog_root.o $(pi)prolog_service_class.o \
-	$(pi)prolog_studio.o $(pi)prolog_conductor.o $(pi)prolog_midi.o $(pi)prolog_http.o \
+	$(pi)prolog_studio.o $(pi)prolog_conductor.o $(pi)prolog_midi.o $(pi)prolog_neural.o $(pi)prolog_http.o \
 	$(pi)prolog_transport.o \
 	$(pi)prolog_variable.o \
 	$(pi)prolog_linux_console.o\
@@ -283,7 +283,7 @@ prc.o: $(pc)linux_midi.h $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)he
 mysql: /usr/lib/prolog_mysql.so ~/bin/mysql.prc
 
 ~/bin/studio: linux_midi.o encoder.o $(objects) prolog_resources.o $(prc_objects) prc.o prolog_neural.o prolog_conductor.o prolog_midi.o
-	g++ -Wl,--export-dynamic encoder.o prolog_resources.o prolog_conductor.o prolog_midi.o prolog_neural.o $(objects) prc.o \
+	g++ -Wl,--export-dynamic encoder.o prolog_resources.o $(objects) prc.o \
 	-o ~/bin/studio -lreadline -lpthread -ldl
 
 studio: ~/bin/studio

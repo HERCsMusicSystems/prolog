@@ -29,8 +29,7 @@ program studio #machine := "prolog.studio"
 		WHILE FOR FOREVER forever IF
 		CONSTANT VARIABLE ACCUMULATOR CLOSURE ARRAY var inc dec closure call BLOCK ALL ISALL isall isallr
 		rnd rnd_control grnd series
-		crack wait timeout enter semaphore conductor accept select critical_section monitor task
-		start pause stop wt beat bar signal signal_beat signal_bar reset tempo division metrum accel rit atempo
+		crack wait timeout enter signal semaphore accept select critical_section monitor task
 		set_colors OPEN_EDITOR open_editor close_editor
 		screen_coordinates
 		open_keyboard open_oscilloscope
@@ -134,7 +133,6 @@ program studio #machine := "prolog.studio"
 #machine wait := "wait"
 #machine timeout := "timeout"
 #machine semaphore := "semaphore"
-#machine conductor := "conductor"
 #machine rnd := "rnd"
 #machine rnd_control := "rnd_control"
 #machine series := "series"
@@ -167,23 +165,6 @@ program studio #machine := "prolog.studio"
 #machine ACCUMULATOR := "ACCUMULATOR"
 #machine CLOSURE := "CLOSURE"
 #machine ARRAY := "ARRAY"
-
-#machine start := "start"
-#machine pause := "pause"
-#machine stop := "stop"
-#machine wt := "wt"
-#machine beat := "beat"
-#machine bar := "bar"
-#machine signal := "signal"
-#machine signal_beat := "signal_beat"
-#machine signal_bar := "signal_bar"
-#machine reset := "reset"
-#machine tempo := "tempo"
-#machine accel := "accel"
-#machine rit := "rit"
-#machine atempo := "atempo"
-#machine division := "tempo_division"
-#machine metrum := "metrum"
 
 #machine midi_in_info := "midi_in_info"
 #machine midi_out_info := "midi_out_info"

@@ -89,7 +89,6 @@ private:
 	PrologRoot * root;
 	standard_in_reader stdr;
 	PrologNoise n;
-	PrologTransport t;
 public:
 	PrologDirectory * dir;
 	PrologAtom * c, * cb, * cbb, * cx, * cxx;
