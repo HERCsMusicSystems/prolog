@@ -45,7 +45,6 @@ PrologRoot :: PrologRoot (void) TRACKING (5) {
 	serial_shift = 0;
 	current_foreground = 65280;
 	current_background = 0;
-	native_threads_delay = 20;
 }
 
 void PrologRoot :: deleteSearchDirectories (void) {
@@ -395,9 +394,6 @@ void PrologRoot :: addArg (char * arg) {
 	while (ap -> next != NULL) ap = ap -> next;
 	ap -> next = sp;
 }
-
-void PrologRoot :: nativeThreads (int horizontal) {if (horizontal < 1) horizontal = 1; native_threads_delay = 1000 / horizontal;}
-void PrologRoot :: nativeThreads (int horizontal, int seconds) {if (horizontal < 1) horizontal = 1; native_threads_delay = seconds * 1000 / horizontal;}
 
 void PrologRoot :: insertCommander (PrologCommand * command) {this -> command = command;}
 

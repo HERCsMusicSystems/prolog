@@ -188,7 +188,6 @@ int main (int args, char * argv []) {
 		if (strlen (name) < 1) strcpy (name, argv [ind]);
 		else root -> addArg (argv [ind]);
 	}
-	root -> nativeThreads (50);
 
 	#ifdef LINUX_OPERATING_SYSTEM
 	PrologLinuxConsole * console = threads_type == 2 ? new PrologLinuxConsole () : new PrologLinuxConsole (10);

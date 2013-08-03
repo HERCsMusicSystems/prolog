@@ -329,7 +329,6 @@ public:
 	int serial_shift;
 	int current_foreground;
 	int current_background;
-	int native_threads_delay;
 	PrologRoot (void);
 	~ PrologRoot (void);
 	int captionId (void);
@@ -359,8 +358,6 @@ public:
 	void addSearchDirectory (char * directory);
 	void deleteSearchDirectories (void);
 	void addArg (char * arg);
-	void nativeThreads (int horizontal);
-	void nativeThreads (int horizontal, int seconds);
 	void insertCommander (PrologCommand * command);
 	PrologCommand * getCommander (void);
 	void insertCommand (char * text);
