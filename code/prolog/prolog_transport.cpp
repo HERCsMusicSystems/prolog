@@ -84,7 +84,6 @@ bool PrologTransport :: waitBar (int bars) {
 PrologTransport :: PrologTransport (void) TRACKING (3) {
 	waiters = 0;
 	processRunning = processPaused = processStopping = false;
-	sub_tick = sub_beat = 0;
 	ticks_per_beat = 3;
 	beats_per_bar = 4;
 	reset ();
@@ -95,10 +94,10 @@ PrologTransport :: PrologTransport (void) TRACKING (3) {
 
 PrologTransport :: ~ PrologTransport (void) {stop (); pthread_mutex_destroy (& lock);}
 
-void PrologTransport :: reset (void) {tick = 0; beat = 0; bar = 0;}
-void PrologTransport :: reset (int beats) {tick = 0; beat = beats; bar = 0;}
-void PrologTransport :: reset (int beats, int ticks) {tick = ticks; beat = beats; bar = 0;}
-void PrologTransport :: reset (double beats) {tick = (int) ((beats - (double) ((int) beats)) * (double) ticks_per_beat); this -> beat = (int) beats; bar = 0;}
+void PrologTransport :: reset (void) {sub_tick = tick = 0; sub_beat = beat = 0; bar = 0;}
+void PrologTransport :: reset (int beats) {tick = 0; beat = 0; sub_beat = beats; bar = 0;}
+void PrologTransport :: reset (int beats, int ticks) {tick = 0; sub_tick = ticks; beat = 0; sub_beat = beats; bar = 0;}
+void PrologTransport :: reset (double beats) {tick = 0; sub_tick = (int) ((beats - (double) ((int) beats)) * (double) ticks_per_beat); beat = 0; sub_beat = (int) beats; bar = 0;}
 
 bool PrologTransport :: start (void) {
 	pthread_mutex_lock (& lock);
