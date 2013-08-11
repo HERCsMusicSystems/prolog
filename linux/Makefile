@@ -242,7 +242,7 @@ prolog_midi.o: $(pc)prolog.h $(pc)prolog_midi.h $(pc)prolog_midi.cpp
 prolog_http.o: $(pc)prolog.h $(pc)prolog_http.h $(pc)prolog_http.cpp
 	g++ -Wno-write-strings -I. $(pc)prolog_http.cpp -c -o prolog_http.o
 prolog_transport.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_transport.cpp
-	g++ -Wno-write-strings -I. $(pc)prolog_transport.cpp -c -o prolog_transport.o
+	g++ -Wno-write-strings -std=c++11 -I. $(pc)prolog_transport.cpp -c -o prolog_transport.o
 prolog_variable.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_variable.cpp
 	g++ -Wno-write-strings -I. $(pc)prolog_variable.cpp -c -o prolog_variable.o
 prolog_neural.o: $(pc)prolog_neural.h $(pc)prolog_neural.cpp

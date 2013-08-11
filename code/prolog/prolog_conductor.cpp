@@ -28,36 +28,36 @@
 ///////////////
 
 static bool wt_function (PrologElement * parameters, PrologTransport * transport) {
-	if (parameters -> isEarth ()) return transport -> wt (1);
+	if (parameters -> isEarth ()) return transport -> wait (1);
 	if (parameters -> isVar ()) {parameters -> setInteger (transport -> getTick ()); return true;}
 	if (! parameters -> isPair ()) return false;
 	parameters = parameters -> getLeft ();
 	if (parameters -> isVar ()) {parameters -> setInteger (transport -> getTick ()); return true;}
 	if (! parameters -> isInteger ()) return false;
-	return transport -> wt (parameters -> getInteger ());
+	return transport -> wait (parameters -> getInteger ());
 }
 
 static bool beat_function (PrologElement * parameters, PrologTransport * t) {
-	if (parameters -> isEarth ()) return t -> Beat (1);
+	if (parameters -> isEarth ()) return t -> waitBeat (1);
 	if (parameters -> isVar ()) {parameters -> setInteger (t -> getBeat ()); return true;}
 	if (! parameters -> isPair ()) return false;
 	parameters = parameters -> getLeft ();
 	if (parameters -> isVar ()) {parameters -> setInteger (t -> getBeat ()); return true;}
 	if (! parameters -> isInteger ()) {
 		if (! parameters -> isDouble ()) return false;
-		return t -> wt ((int) ((double) t -> get_ticks_per_beat () * parameters -> getDouble ()));
+		return t -> waitBeat (parameters -> getDouble ());
 	}
-	return t -> Beat (parameters -> getInteger ());
+	return t -> waitBeat (parameters -> getInteger ());
 }
 
 static bool bar_function (PrologElement * parameters, PrologTransport * t) {
-	if (parameters -> isEarth ()) return t -> Bar (1);
+	if (parameters -> isEarth ()) return t -> waitBar (1);
 	if (parameters -> isVar ()) {parameters -> setInteger (t -> getBar ()); return true;}
 	if (! parameters -> isPair ()) return false;
 	parameters = parameters -> getLeft ();
 	if (parameters -> isVar ()) {parameters -> setInteger (t -> getBar ()); return true;}
 	if (! parameters -> isInteger ()) return false;
-	return t -> Bar (parameters -> getInteger ());
+	return t -> waitBar (parameters -> getInteger ());
 }
 
 static bool signal_tick_function (PrologElement * parameters, PrologTransport * transport) {
@@ -71,69 +71,43 @@ static bool signal_tick_function (PrologElement * parameters, PrologTransport * 
 }
 
 static bool signal_beat_function (PrologElement * parameters, PrologTransport * transport) {
-	if (parameters -> isEarth ()) {transport -> signal_beat (); return true;}
+	if (parameters -> isEarth ()) {transport -> signalBeat (); return true;}
 	if (! parameters -> isPair ()) return false;
 	parameters = parameters -> getLeft ();
 	if (! parameters -> isInteger ()) return false;
 	int sentinel = parameters -> getInteger ();
-	for (int ind = 0; ind < sentinel; ind++) transport -> signal_beat ();
+	for (int ind = 0; ind < sentinel; ind++) transport -> signalBeat ();
 	return true;
 }
 
 static bool signal_bar_function (PrologElement * parameters, PrologTransport * transport) {
-	if (parameters -> isEarth ()) {transport -> signal_bar (); return true;}
+	if (parameters -> isEarth ()) {transport -> signalBar (); return true;}
 	if (! parameters -> isPair ()) return false;
 	parameters = parameters -> getLeft ();
 	if (! parameters -> isInteger ()) return false;
 	int sentinel = parameters -> getInteger ();
-	for (int ind = 0; ind < sentinel; ind++) transport -> signal_bar ();
+	for (int ind = 0; ind < sentinel; ind++) transport -> signalBar ();
 	return true;
 }
 
 static bool tempo_function (PrologElement * parameters, PrologTransport * transport) {
-	if (parameters -> isVar ()) {
-		int seconds = transport -> get_seconds ();
-		if (seconds < 1) seconds = 1;
-		parameters -> setInteger (transport -> get_beats_per_seconds () * 60 / seconds);
-		return true;
-	}
-	if (! parameters -> isPair ()) return false;
-	PrologElement * beats = parameters -> getLeft ();
-	if (beats -> isVar ()) {
-		parameters = parameters -> getRight ();
-		if (parameters -> isEarth ()) {
-			int seconds = transport -> get_seconds ();
-			if (seconds < 1) seconds = 1;
-			beats -> setInteger (transport -> get_beats_per_seconds () * 60 / seconds);
-			return true;
-		}
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (! parameters -> isVar ()) return false;
-		beats -> setInteger (transport -> get_beats_per_seconds ());
-		parameters -> setInteger (transport -> get_seconds ());
-		return true;
-	}
-	if (! beats -> isInteger ()) return false;
-	parameters = parameters -> getRight ();
-	if (parameters -> isEarth ()) {transport -> tempo (beats -> getInteger ()); return true;}
-	if (! parameters -> isPair ()) return false;
-	parameters = parameters -> getLeft ();
-	if (! parameters -> isInteger ()) return false;
-	transport -> tempo (beats -> getInteger (), parameters -> getInteger ());
-	return true;
+	if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+	if (parameters -> isVar ()) {parameters -> setDouble (transport -> getBeatsPerMinute ()); return true;}
+	if (parameters -> isInteger ()) {transport -> tempo (parameters -> getInteger ()); return true;}
+	if (parameters -> isDouble ()) {transport -> tempo (parameters -> getDouble ()); return true;}
+	return false;
 }
 
 static bool tempo_division_function (PrologElement * parameters, PrologTransport * t) {
 	if (! parameters -> isPair ()) return false;
 	PrologElement * beats = parameters -> getLeft ();
 	if (beats -> isVar ()) {
-		beats -> setInteger (t -> get_beats_per_bar ());
+		beats -> setInteger (t -> getBeatsPerBar ());
 		parameters = parameters -> getRight ();
 		if (parameters -> isEarth ()) return true;
 		parameters = parameters -> getLeft ();
 		if (! parameters -> isVar ()) return false;
-		parameters -> setInteger (t -> get_ticks_per_beat ());
+		parameters -> setInteger (t -> getTicksPerBeat ());
 		return true;
 	}
 	if (! beats -> isInteger ()) return false;
@@ -190,12 +164,14 @@ static bool metrum_function (PrologElement * parameters, PrologTransport * t) {
 	if (! parameters -> isPair ()) return false;
 	PrologElement * top = parameters -> getLeft ();
 	if (top -> isVar ()) {
-		top -> setInteger (t -> get_beats_per_bar ());
+		top -> setInteger (t -> getBeatsPerBar ());
 		parameters = parameters -> getRight ();
 		if (! parameters -> isPair ()) return false;
 		parameters = parameters -> getLeft ();
 		if (! parameters -> isVar ()) return false;
-		parameters -> setInteger (96 / t -> get_ticks_per_beat ());
+		int div = t -> getTicksPerBeat ();
+		if (div != 0) div = 96 / div;
+		parameters -> setInteger (div);
 		return true;
 	}
 	if (! top -> isInteger ()) return false;
@@ -207,10 +183,29 @@ static bool metrum_function (PrologElement * parameters, PrologTransport * t) {
 	return true;
 }
 
+static bool reset_function (PrologElement * parameters, PrologTransport * t) {
+	if (parameters -> isPair ()) {
+		PrologElement * beats = parameters -> getLeft ();
+		parameters = parameters -> getRight ();
+		if (parameters -> isPair ()) {
+			if (! beats -> isInteger ()) return false;
+			PrologElement * ticks = parameters -> getLeft ();
+			if (! ticks -> isInteger ()) return false;
+			t -> reset (beats -> getInteger (), ticks -> getInteger ());
+			return true;
+		}
+		if (beats -> isDouble ()) {t -> reset (beats -> getDouble ()); return true;}
+		if (beats -> isInteger ()) {t -> reset (beats -> getInteger ()); return true;}
+		return false;
+	}
+	t -> reset ();
+	return true;
+};
+
 class start : public PrologNativeCode {
 public:
 	PrologTransport * t;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {t -> delay = 20; return t -> start ();}
+	bool code (PrologElement * parameters, PrologResolution * resolution) {return t -> start ();}
 	start (PrologTransport * t) {this -> t = t;}
 };
 
@@ -273,7 +268,7 @@ public:
 class reset : public PrologNativeCode {
 public:
 	PrologTransport * t;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {t -> reset (); return true;}
+	bool code (PrologElement * parameters, PrologResolution * reoslution) {return reset_function (parameters, t);}
 	reset (PrologTransport * t) {this -> t = t;}
 };
 
@@ -360,7 +355,7 @@ public:
 		if (a == start_atom) return transport . start ();
 		if (a == pause_atom) return transport . pause ();
 		if (a == stop_atom) return transport . stop ();
-		if (a == reset_atom) {transport . reset (); return true;}
+		if (a == reset_atom) return reset_function (parameters, & transport);
 		if (a == signal_atom) return signal_tick_function (parameters, & transport);
 		if (a == signal_beat_atom) return signal_beat_function (parameters, & transport);
 		if (a == signal_bar_atom) return signal_bar_function (parameters, & transport);
@@ -441,7 +436,7 @@ public:
 		wt_atom = dir -> searchAtom ("wt");
 		beat_atom = dir -> searchAtom ("beat");
 		bar_atom = dir -> searchAtom ("bar");
-		signal_atom = dir -> searchAtom ("signal");
+		signal_atom = dir -> searchAtom ("signal_tick");
 		signal_beat_atom = dir -> searchAtom ("signal_beat");
 		signal_bar_atom = dir -> searchAtom ("signal_bar");
 		reset_atom = dir -> searchAtom ("reset");
