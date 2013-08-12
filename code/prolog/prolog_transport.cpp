@@ -28,7 +28,7 @@ void * transportRunner (void * parameters) {
 	PrologTransport * transport = (PrologTransport *) parameters;
 	while (transport -> processRunning) {
 		if (! transport -> processPaused) transport -> signal ();
-		usleep ((int) transport -> delay * 1000);
+		usleep ((int) transport -> delay);
 	}
 	transport -> broadcastStop ();
 	transport -> processRunning = true;
@@ -106,10 +106,9 @@ bool PrologTransport :: waitBar (int bars) {
 PrologTransport :: PrologTransport (void) TRACKING (3) {
 	waiters = 0;
 	processRunning = processPaused = processStopping = false;
-	ticks_per_beat = 3;
-	beats_per_bar = 4;
+	metrum (4, 4);
 	reset ();
-	delay = 200.0;
+	tempo (140);
 	beats_per_minute = 140.0;
 	lock = PTHREAD_MUTEX_INITIALIZER;
 }
@@ -146,7 +145,7 @@ bool PrologTransport :: stop (void) {
 	if (! processRunning) {pthread_mutex_unlock (& lock); return false;}
 	processRunning = false;
 	pthread_mutex_unlock (& lock);
-	while (! processRunning) {usleep (10 * 1000);}
+	while (! processRunning) {usleep (10000);}
 	processRunning = false;
 	return true;
 }
@@ -183,7 +182,11 @@ int PrologTransport :: getBar (void) {return bar;}
 int PrologTransport :: getBeatsPerBar (void) {return beats_per_bar;}
 int PrologTransport :: getTicksPerBeat (void) {return ticks_per_beat;}
 double PrologTransport :: getBeatsPerMinute (void) {return beats_per_minute;}
-void PrologTransport :: tempo (double beatsPerMinute) {beats_per_minute = beatsPerMinute;}
+void PrologTransport :: tempo (double beatsPerMinute) {
+	if (beatsPerMinute <= 0.0) beatsPerMinute = 1.0;
+	beats_per_minute = beatsPerMinute;
+	delay = 60000000.0 / (beats_per_minute * (double) ticks_per_beat);
+}
 void PrologTransport :: division (int beatsPerBar) {
 	if (sub_beat > 0) sub_beat += beatsPerBar - beats_per_bar;
 	beats_per_bar = beatsPerBar;
@@ -204,7 +207,7 @@ void PrologTransport :: accelerando (void) {}
 void PrologTransport :: accelerando (int steps) {}
 void PrologTransport :: accelerando (int steps, int ticks) {}
 void PrologTransport :: accelerando (int steps, int ticks, int sentinel) {}
-void PrologTransport :: atempo (void) {}
+void PrologTransport :: atempo (void) {tempo (beats_per_minute);}
 
 void PrologTransport :: ritardando (void) {accelerando ();}
 void PrologTransport :: ritardando (int steps) {accelerando (- steps);}
