@@ -234,14 +234,14 @@ prolog_root.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_root.
 prolog_service_class.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_service_class.cpp
 	g++ -Wno-write-strings -I. $(pc)prolog_service_class.cpp -c -o prolog_service_class.o
 prolog_studio.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_studio.h $(pc)prolog_studio.cpp
-	g++ -Wno-write-strings -I. $(pc)prolog_studio.cpp -Wno-write-strings -c -o prolog_studio.o
-prolog_conductor.o: $(pc)prolog.h $(pc)prolog_conductor.h $(pc)prolog_conductor.cpp
+	g++ -Wno-write-strings -std=c++11 -I. $(pc)prolog_studio.cpp -Wno-write-strings -c -o prolog_studio.o
+prolog_conductor.o: $(pc)prolog.h $(pc)prolog_conductor.h $(pc)prolog_conductor.cpp $(pc)prolog_transport.h
 	g++ -Wno-write-strings -I. $(pc)prolog_conductor.cpp -c -o prolog_conductor.o
 prolog_midi.o: $(pc)prolog.h $(pc)prolog_midi.h $(pc)prolog_midi.cpp
 	g++ -Wno-write-strings -I. $(pc)prolog_midi.cpp -c -o prolog_midi.o
 prolog_http.o: $(pc)prolog.h $(pc)prolog_http.h $(pc)prolog_http.cpp
 	g++ -Wno-write-strings -I. $(pc)prolog_http.cpp -c -o prolog_http.o
-prolog_transport.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_transport.cpp
+prolog_transport.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_transport.h $(pc)prolog_transport.cpp
 	g++ -Wno-write-strings -std=c++11 -I. $(pc)prolog_transport.cpp -c -o prolog_transport.o
 prolog_variable.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_variable.cpp
 	g++ -Wno-write-strings -I. $(pc)prolog_variable.cpp -c -o prolog_variable.o

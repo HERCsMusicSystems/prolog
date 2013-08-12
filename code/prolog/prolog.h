@@ -37,7 +37,6 @@ class HERCs_PROLOG_SDK_EXPORT PrologMatch;
 class HERCs_PROLOG_SDK_EXPORT PrologServiceClass;
 class HERCs_PROLOG_SDK_EXPORT PrologDirectory;
 class HERCs_PROLOG_SDK_EXPORT PrologRoot;
-class HERCs_PROLOG_SDK_EXPORT PrologTransport;
 class HERCs_PROLOG_SDK_EXPORT PrologResolution;
 class HERCs_PROLOG_SDK_EXPORT PrologReader;
 class HERCs_PROLOG_SDK_EXPORT PrologLoader;
@@ -561,62 +560,6 @@ public:
 	bool query (PrologElement * query);
 	PrologElement * query (void);
 	void removeQuery (void);
-};
-
-class WaitFor;
-
-class PrologTransport TRACK {
-private:
-	WaitFor * waiters;
-	pthread_t myselfRunning;
-	pthread_mutex_t lock;
-	friend void * transportRunner (void * parameter);
-	bool processRunning, processStopping, processPaused;
-	int tick, beat, bar;
-	int sub_tick, sub_beat;
-	int ticks_per_beat, beats_per_bar;
-	double delay;
-	double beats_per_minute;
-	void broadcast (WaitFor * * waiter);
-	void broadcastStop (void);
-public:
-	PrologTransport (void);
-	~ PrologTransport (void);
-	void reset (void);
-	void reset (int beats);
-	void reset (int beats, int ticks);
-	void reset (double beats);
-	void signal (void);
-	void signalBeat (void);
-	void signalBar (void);
-	bool start (void);
-	bool stop (void);
-	bool pause (void);
-	bool wait (int ticks = 1);
-	bool waitBeat (int beats = 1);
-	bool waitBeat (double beats);
-	bool waitBar (int bars = 1);
-	int getTick (void);
-	int getBeat (void);
-	int getBar (void);
-	bool isActive (void);
-	void tempo (double beatsPerMinute);
-	void accelerando (void);
-	void accelerando (int steps);
-	void accelerando (int steps, int ticks);
-	void accelerando (int steps, int ticks, int sentinel);
-	void ritardando (void);
-	void ritardando (int steps);
-	void ritardando (int steps, int ticks);
-	void ritardando (int steps, int ticks, int sentinel);
-	void atempo (void);
-	void division (int beatsPerBar);
-	void division (int beatsPerBar, int ticksPerBeat);
-	void tickDivision (int ticksPerBeat);
-	void metrum (int top, int bottom);
-	double getBeatsPerMinute (void);
-	int getBeatsPerBar (void);
-	int getTicksPerBeat (void);
 };
 
 class PrologCommand TRACK {

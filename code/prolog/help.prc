@@ -4,6 +4,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 import studio
+import conductor
 
 program help [help helper commands tutorials syntax syntax_helper remove_demo command_helper midi_helper orakle_help MIDI_HELPER]
 
@@ -112,7 +113,7 @@ program help [help helper commands tutorials syntax syntax_helper remove_demo co
 	[set_colors 16777215 255]
 	[write "Real Time:"]
 	[set_colors 16777215 0] [nl]
-	[write "	tempo	atempo	accel	rit		timeout		timestamp\n"]
+	[write "	tempo	atempo	accel	rit	mutex	timeout		timestamp\n"]
 	[write "	wait	wt	beat	bar	metrum	division	conductor\n"]
 	[write "	start	pause	stop	reset	signal	signal_bar	signal_beat\n"]
 	[write "	enter	accept	select	task	monitor	semaphore	critical_section\n"]
@@ -945,16 +946,29 @@ program help [help helper commands tutorials syntax syntax_helper remove_demo co
 
 [[help semaphore]
 	[command_helper "semaphore [*atom]	semaphore [*atom *initial_count]"]
-	[write "Creates a semaphore (if variable the a new atom is created).\n"]
+	[write "Creates a semaphore (if variable then a new atom is created).\n"]
 	[write "Second parameter indicates initial value of semaphore (default 1).\n"]
 	[write "A semaphore accepts three atoms: wait enter signal.\n"]
-	[write "Calling a new semaphore without parameters delete the semaphore.\n"]
+	[write "Calling a new semaphore without parameters deletes the semaphore.\n"]
 	[write "Example:\n"]
 	[write "	semaphore [s]\n"]
 	[write "	s [wait]   ; to wait until signalled\n"]
 	[write "	s [enter]  ; to enter immediately or fail\n"]
 	[write "	s [signal] ; to signal\n"]
 	[write "	s []       ; to close the semaphore\n"]
+]
+
+[[help mutex]
+	[command_helper "mutex [*atom]"]
+	[write "Creates a mutex (if variable then a new atom is created).\n"]
+	[write "A mutex accepts three atoms: wait enter signal.\n"]
+	[write "Calling a new mutex without parameters deletes the mutex.\n"]
+	[write "Example:\n"]
+	[write "	mutex [m]\n"]
+	[write "	m [wait]   ; to wait until signalled\n"]
+	[write "	m [enter]  ; to enter immediately or fail\n"]
+	[write "	m [signal] ; to signal\n"]
+	[write "	m []       ; to close the mutex\n"]
 ]
 
 [[help monitor]

@@ -2978,53 +2978,6 @@ public:
 	~ semaphore (void) {root -> destroy_system_semaphore (system_semaphore);}
 };
 
-class green_semaphore : public PrologNativeCode {
-public:
-	PrologAtom * atom;
-	PrologAtom * wait_atom;
-	PrologAtom * enter_atom;
-	PrologAtom * signal_atom;
-	int ind;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (resolution -> callAgain ()) {
-			if (ind < 1) {resolution -> callAgain (parameters); return true;}
-			ind--;
-			return true;
-		}
-		PrologElement * query = parameters;
-		if (parameters -> isEarth ()) {
-			atom -> unProtect ();
-			atom -> setMachine (NULL);
-			atom -> unProtect ();
-			delete this;
-			return true;
-		}
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (! parameters -> isAtom ()) return false;
-		PrologAtom * atom = parameters -> getAtom ();
-		if (atom == signal_atom) {ind++; return true;}
-		if (atom == wait_atom) {
-			if (ind > 0) {ind--; return true;}
-			resolution -> callAgain (query);
-			return true;
-		}
-		if (atom == enter_atom) {
-			if (ind < 1) return false;
-			ind--;
-			return true;
-		}
-		return false;
-	}
-	green_semaphore (PrologAtom * atom, PrologAtom * wait_atom, PrologAtom * enter_atom, PrologAtom * signal_atom, int ind) {
-		this -> atom = atom;
-		this -> wait_atom = wait_atom;
-		this -> enter_atom = enter_atom;
-		this -> signal_atom = signal_atom;
-		this -> ind = ind;
-	}
-};
-
 class semaphore_maker : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -3062,6 +3015,65 @@ public:
 		wait_atom = dir -> searchAtom ("wait");
 		enter_atom = dir -> searchAtom ("enter");
 		signal_atom = dir -> searchAtom ("signal");
+	}
+};
+
+///////////
+// MUTEX //
+///////////
+
+#include <pthread.h>
+
+class PrologMutex : public PrologNativeCode {
+public:
+	PrologAtom * atom;
+	PrologAtom * waitAtom;
+	PrologAtom * enterAtom;
+	PrologAtom * signalAtom;
+	pthread_mutex_t mutex;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isEarth ()) {atom -> unProtect (); atom -> setMachine (0); atom -> unProtect (); delete this; return true;}
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (! parameters -> isAtom ()) return false;
+		PrologAtom * ctrl = parameters -> getAtom ();
+		if (ctrl == signalAtom) {pthread_mutex_unlock (& mutex); return true;}
+		if (ctrl == waitAtom) {pthread_mutex_lock (& mutex); return true;}
+		if (ctrl == enterAtom) {return pthread_mutex_trylock (& mutex) == 0;}
+		return false;
+	}
+	PrologMutex (PrologAtom * atom, PrologAtom * waitAtom, PrologAtom * enterAtom, PrologAtom * signalAtom) {
+		this -> atom = atom;
+		this -> waitAtom = waitAtom;
+		this -> enterAtom = enterAtom;
+		this -> signalAtom = signalAtom;
+		mutex = PTHREAD_MUTEX_INITIALIZER;
+	}
+	~ PrologMutex (void) {pthread_mutex_destroy (& mutex);}
+};
+
+class MutexMaker : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	PrologAtom * waitAtom;
+	PrologAtom * enterAtom;
+	PrologAtom * signalAtom;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (waitAtom == 0 || enterAtom == 0 || signalAtom == 0) return false;
+		if (! parameters -> isPair ()) return false;
+		PrologElement * ae = parameters -> getLeft ();
+		PrologAtom * atom = 0;
+		if (ae -> isVar ()) {atom = new PrologAtom (); ae -> setAtom (new PrologAtom ());}
+		else {if (! ae -> isAtom ()) return false; atom = ae -> getAtom ();}
+		PrologMutex * mutex = new PrologMutex (atom, waitAtom, enterAtom, signalAtom);
+		if (atom -> setMachine (mutex)) return true;
+		delete mutex;
+		return false;
+	}
+	MutexMaker (PrologRoot * root) {
+		PrologDirectory * dir = root -> searchDirectory ("studio");
+		waitAtom = dir -> searchAtom ("wait");
+		enterAtom = dir -> searchAtom ("enter");
+		signalAtom = dir -> searchAtom ("signal");
 	}
 };
 
@@ -4008,6 +4020,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "wait") == 0) return new wait (root);
 	if (strcmp (name, "timeout") == 0) return new timeout_class (root);
 	if (strcmp (name, "semaphore") == 0) return new semaphore_maker (root);
+	if (strcmp (name, "mutex") == 0) return new MutexMaker (root);
 	if (strcmp (name, "file_writer") == 0) return new file_writer (root);
 	if (strcmp (name, "file_reader") == 0) return new file_reader (root);
 	if (strcmp (name, "import_loader") == 0) return new import_loader (root);
