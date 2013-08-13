@@ -272,38 +272,3 @@ void PrologRoot :: start (PrologElement * parameters) {
 	#endif
 }
 
-#ifdef LINUX_OPERATING_SYSTEM
-//void * PrologRoot :: create_system_semaphore (int ind) {return (void *) new Semaphore (1);}
-//void PrologRoot :: destroy_system_semaphore (void * semaphore) {Semaphore * s = (Semaphore *) semaphore; delete s;}
-//void PrologRoot :: wait_system_semaphore (void * semaphore) {Semaphore * s = (Semaphore *) semaphore; s -> wait ();}
-//void PrologRoot :: signal_system_semaphore (void * semaphore) {Semaphore * s = (Semaphore *) semaphore; s -> post ();}
-//bool PrologRoot :: enter_system_semaphore (void * semaphore) {Semaphore * s = (Semaphore *) semaphore; return s -> tryWait ();}
-#include <fcntl.h>
-#include <semaphore.h>
-//#include <errno.h>
-//#ifndef EAGAIN
-//#define EAGAIN 0xffff
-//#endif
-void * PrologRoot :: create_system_semaphore (int ind) {
-	sem_t * s;
-	s = sem_open ("prolog", O_CREAT, 0000777, ind);
-	sem_unlink ("prolog");
-	return (void *) s;
-}
-void PrologRoot :: destroy_system_semaphore (void * semaphore) {sem_t * s = (sem_t *) semaphore; sem_close (s);}
-void PrologRoot :: wait_system_semaphore (void * semaphore) {
-	sem_t * s = (sem_t *) semaphore;
-	sem_wait (s);
-}
-void PrologRoot :: signal_system_semaphore (void * semaphore) {sem_t * s = (sem_t *) semaphore; sem_post (s);}
-bool PrologRoot :: enter_system_semaphore (void * semaphore) {sem_t * s = (sem_t *) semaphore; return sem_trywait (s) == 0;}
-#endif
-
-#ifdef WINDOWS_OPERATING_SYSTEM
-void * PrologRoot :: create_system_semaphore (int ind) {return CreateSemaphore (NULL, ind, 30000, NULL);}
-void PrologRoot :: destroy_system_semaphore (void * semaphore) {CloseHandle (semaphore);}
-void PrologRoot :: wait_system_semaphore (void * semaphore) {WaitForSingleObject (semaphore, INFINITE);}
-void PrologRoot :: signal_system_semaphore (void * semaphore) {ReleaseSemaphore (semaphore, 1, NULL);}
-bool PrologRoot :: enter_system_semaphore (void * semaphore) {return WaitForSingleObject (semaphore, 0) == WAIT_OBJECT_0;}
-#endif
-

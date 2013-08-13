@@ -427,11 +427,6 @@ public:
 	void microwait (void);
 	int get_system_time (void);
 	void start (PrologElement * parameters);
-	void * create_system_semaphore (int ind);
-	void destroy_system_semaphore (void * semaphore);
-	void wait_system_semaphore (void * semaphore);
-	void signal_system_semaphore (void * semaphore);
-	bool enter_system_semaphore (void * semaphore);
 	int get_character (void);
 	void setResourceLoader (PrologResourceLoader * resource_loader);
 

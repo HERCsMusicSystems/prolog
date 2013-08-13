@@ -3175,10 +3175,9 @@ public:
 	void_midi_message (PrologRoot * root) {this -> root = root;}
 };
 
-static void * midi_semaphore = NULL;
-static PrologRoot * midi_root = NULL;
-void midi_wait (void) {if (midi_root == NULL) return; midi_root -> wait_system_semaphore (midi_semaphore);}
-void midi_signal (void) {if (midi_root == NULL) return; midi_root -> signal_system_semaphore (midi_semaphore);}
+static pthread_mutex_t midi_mutex;
+static void midi_wait (void) {pthread_mutex_lock (& midi_mutex);}
+static void midi_signal (void) {pthread_mutex_unlock (& midi_mutex);}
 
 class midi_short_msg : public PrologNativeCode {
 public:
@@ -3909,6 +3908,7 @@ void PrologStudio :: init (PrologRoot * root) {
 	g = gb = gbb = gx = gxx = NULL;
 	a = ab = abb = ax = axx = NULL;
 	b = bb = bbb = bx = bxx = NULL;
+	midi_mutex = PTHREAD_MUTEX_INITIALIZER;
 }
 
 void PrologStudio :: set_atoms (void) {
@@ -3925,8 +3925,7 @@ void PrologStudio :: set_atoms (void) {
 }
 
 PrologStudio :: ~ PrologStudio (void) {
-	if (midi_semaphore != NULL) midi_root -> destroy_system_semaphore (midi_semaphore);
-	midi_semaphore = NULL;
+	pthread_mutex_destroy (& midi_mutex);
 }
 
 PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
@@ -4049,7 +4048,6 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "midi_product_id") == 0) return new midi_product_id (root);
 	if (strcmp (name, "midi_product_version") == 0) return new midi_product_version (root);
 	midi_stream * line = root -> getMidiOutput ();
-	midi_semaphore = root -> create_system_semaphore (1); midi_root = root;
 	if (line) {
 		if (strcmp (name, "midi_short_msg") == 0) return new midi_short_msg (line, this);
 		if (strcmp (name, "MIDI_SHORT_MSG") == 0) return new MIDI_SHORT_MSG (line);
