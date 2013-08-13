@@ -1818,10 +1818,8 @@ public:
 		PrologElement * el;
 		if (parameters -> isEarth ()) {
 			fclose (fw);
-			fw = NULL;
-			atom -> unProtect ();
-			atom -> setMachine (NULL);
-			atom -> unProtect ();
+			fw = 0;
+			atom -> setMachine (0);
 			delete this;
 			return true;
 		}
@@ -1895,18 +1893,14 @@ public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (fi == NULL) {
 			if (! parameters -> isEarth ()) return false;
-			atom -> unProtect ();
-			atom -> setMachine (NULL);
-			atom -> unProtect ();
+			atom -> setMachine (0);
 			delete this;
 			return true;
 		}
 		if (parameters -> isEarth ()) {
 			fclose (fi);
 			fi = NULL;
-			atom -> unProtect ();
-			atom -> setMachine (NULL);
-			atom -> unProtect ();
+			atom -> setMachine (0);
 			delete this;
 			return true;
 		}
@@ -2067,15 +2061,6 @@ public:
 		PrologElement * ea = parameters -> getLeft ();
 		if (! ea -> isAtom ()) return false;
 		parameters = parameters -> getRight ();
-//		if (parameters -> isEarth ()) {
-//			PrologAtom * a = ea -> getAtom ();
-//			a -> unProtect ();
-//			native = a -> getMachine ();
-//			ret = a -> setMachine (NULL);
-//			a -> unProtect ();
-//			if (ret) delete native;
-//			return ret;
-//		}
 		if (! parameters -> isPair ()) return false;
 		PrologElement * et = parameters -> getLeft ();
 		parameters = parameters -> getRight ();
@@ -2425,9 +2410,7 @@ public:
 			return true;
 		}
 		if (parameters -> isEarth ()) {
-			atom -> unProtect ();
-			atom -> setMachine (NULL);
-			atom -> unProtect ();
+			atom -> setMachine (0);
 			delete this;
 			return true;
 		}
@@ -2486,9 +2469,7 @@ public:
 			return true;
 		}
 		if (parameters -> isEarth ()) {
-			atom -> unProtect ();
-			atom -> setMachine (NULL);
-			atom -> unProtect ();
+			atom -> setMachine (0);
 			delete this;
 			return true;
 		}
@@ -2654,9 +2635,7 @@ public:
 	}
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (parameters -> isEarth ()) {
-			atom -> unProtect ();
-			atom -> setMachine (NULL);
-			atom -> unProtect ();
+			atom -> setMachine (0);
 			delete this;
 			return true;
 		}
@@ -2944,48 +2923,56 @@ public:
 
 class semaphore : public PrologNativeCode {
 public:
-	PrologRoot * root;
 	PrologAtom * atom;
-	PrologAtom * wait_atom;
-	PrologAtom * enter_atom;
-	PrologAtom * signal_atom;
-	void * system_semaphore;
+	PrologAtom * waitAtom, * enterAtom, * signalAtom;
+	pthread_mutex_t mutex;
+	pthread_cond_t conditional;
+	int state;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {
-			atom -> unProtect ();
-			atom -> setMachine (NULL);
-			atom -> unProtect ();
-			delete this;
+		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (! parameters -> isAtom ()) return false;
+		PrologAtom * ctrl = parameters -> getAtom ();
+		if (ctrl == signalAtom) {
+			pthread_mutex_lock (& mutex);
+			if (++state > 0) pthread_cond_broadcast (& conditional);
+			pthread_mutex_unlock (& mutex);
 			return true;
 		}
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (! parameters -> isAtom ()) return false;
-		PrologAtom * atom = parameters -> getAtom ();
-		if (atom == signal_atom) {root -> signal_system_semaphore (system_semaphore); return true;}
-		if (atom == wait_atom) {root -> wait_system_semaphore (system_semaphore); return true;}
-		if (atom == enter_atom) {return root -> enter_system_semaphore (system_semaphore);}
+		if (ctrl == waitAtom) {
+			pthread_mutex_lock (& mutex);
+			while (state <= 0) pthread_cond_wait (& conditional, & mutex);
+			state--;
+			pthread_mutex_unlock (& mutex);
+			return true;
+		}
+		if (ctrl == enterAtom) {
+			pthread_mutex_lock (& mutex);
+			if (state <= 0) {pthread_mutex_unlock (& mutex); return false;}
+			state--;
+			pthread_mutex_unlock (& mutex);
+			return true;
+		}
 		return false;
 	}
-	semaphore (PrologRoot * root, PrologAtom * atom, PrologAtom * wait_atom, PrologAtom * enter_atom, PrologAtom * signal_atom, int ind) {
-		this -> root = root;
+	semaphore (PrologAtom * atom, PrologAtom * waitAtom, PrologAtom * enterAtom, PrologAtom * signalAtom, int ind) {
 		this -> atom = atom;
-		this -> wait_atom = wait_atom;
-		this -> enter_atom = enter_atom;
-		this -> signal_atom = signal_atom;
-		system_semaphore = root -> create_system_semaphore (ind);
+		this -> waitAtom = waitAtom;
+		this -> enterAtom = enterAtom;
+		this -> signalAtom = signalAtom;
+		state = ind;
+		mutex = PTHREAD_MUTEX_INITIALIZER;
+		conditional = PTHREAD_COND_INITIALIZER;
 	}
-	~ semaphore (void) {root -> destroy_system_semaphore (system_semaphore);}
+	~ semaphore (void) {pthread_mutex_destroy (& mutex); pthread_cond_destroy (& conditional);}
 };
 
 class semaphore_maker : public PrologNativeCode {
 public:
 	PrologRoot * root;
-	PrologAtom * wait_atom;
-	PrologAtom * enter_atom;
-	PrologAtom * signal_atom;
+	PrologAtom * waitAtom, * enterAtom, * signalAtom;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (wait_atom == NULL || enter_atom == NULL || signal_atom == NULL) return false;
+		if (waitAtom == NULL || enterAtom == NULL || signalAtom == NULL) return false;
 		if (! parameters -> isPair ()) return false;
 		PrologElement * ea = parameters -> getLeft ();
 		PrologAtom * atom = NULL;
@@ -3004,7 +2991,7 @@ public:
 			ind = parameters -> getInteger ();
 			if (ind < 0) return false;
 		}
-		semaphore * s = new semaphore (root, atom, wait_atom, enter_atom, signal_atom, ind);
+		semaphore * s = new semaphore (atom, waitAtom, enterAtom, signalAtom, ind);
 		if (atom -> setMachine (s)) return true;
 		delete s;
 		return false;
@@ -3012,9 +2999,9 @@ public:
 	semaphore_maker (PrologRoot * root) {
 		this -> root = root;
 		PrologDirectory * dir = root -> searchDirectory ("studio");
-		wait_atom = dir -> searchAtom ("wait");
-		enter_atom = dir -> searchAtom ("enter");
-		signal_atom = dir -> searchAtom ("signal");
+		waitAtom = dir -> searchAtom ("wait");
+		enterAtom = dir -> searchAtom ("enter");
+		signalAtom = dir -> searchAtom ("signal");
 	}
 };
 
@@ -3027,12 +3014,10 @@ public:
 class PrologMutex : public PrologNativeCode {
 public:
 	PrologAtom * atom;
-	PrologAtom * waitAtom;
-	PrologAtom * enterAtom;
-	PrologAtom * signalAtom;
+	PrologAtom * waitAtom, * enterAtom, * signalAtom;
 	pthread_mutex_t mutex;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {atom -> unProtect (); atom -> setMachine (0); atom -> unProtect (); delete this; return true;}
+		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
 		if (! parameters -> isAtom ()) return false;
 		PrologAtom * ctrl = parameters -> getAtom ();
