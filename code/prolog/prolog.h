@@ -394,7 +394,6 @@ public:
 	void print (char * text);
 	void print_character (int i);
 	void wait (int delay);
-	void microwait (void);
 	unsigned long int get_system_time (void);
 	void start (PrologElement * parameters);
 	int get_character (void);
@@ -490,7 +489,6 @@ public:
 	PrologVariable * var_root;
 	int var_counter;
 	PrologResolution * next;
-	PrologElement * call_again;
 	unsigned long int timeout;
 	PrologElement * timeout_query;
 
@@ -500,8 +498,6 @@ public:
 	PrologVariable * newVariable (void);
 	PrologVariable * newVariable (PrologElement * term, bool location);
 
-	void callAgain (PrologElement * parameters);
-	bool callAgain (void);
 	PrologQuery * getQuery (void);
 	void reset (void);
 	bool match (PrologElement * actual, bool ac, PrologElement * formal, bool fc);

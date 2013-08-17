@@ -93,15 +93,13 @@ public:
 	standard_in_reader * stdr;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (stdr -> root -> command) {
-			if (stdr -> root -> command -> empty ()) {resolution -> callAgain (parameters); return true;}
-			resolution -> callAgain ();
+			if (stdr -> root -> command -> empty ()) return true;
 		}
 		if (! parameters -> isPair ()) return false;
 		AREA area;
 		if (stdr -> getString (area, 0) < 0) {
 			if (stdr -> root -> command) {
 				stdr -> act_znak = 0;
-				resolution -> callAgain (parameters);
 				return true;
 			}
 			return false;
@@ -117,8 +115,7 @@ public:
 	standard_in_reader * stdr;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (stdr -> root -> command) {
-			if (stdr -> root -> command -> empty ()) {resolution -> callAgain (parameters); return true;}
-			resolution -> callAgain ();
+			if (stdr -> root -> command -> empty ()) return true;
 		}
 		if (! parameters -> isPair ()) return false;
 		AREA area;
@@ -136,15 +133,12 @@ public:
 		if (stdr -> root -> command) {
 			if (stdr -> root -> command -> empty ()) {
 				stdr -> act_znak = 0;
-				resolution -> callAgain (parameters);
 				return true;
 			}
 			if (stdr -> prefetch_whites ()) {
 				stdr -> act_znak = 0;
-				resolution -> callAgain (parameters);
 				return true;
 			}
-			resolution -> callAgain ();
 		}
 		if (! parameters -> isPair ()) return false;
 		if (stdr -> act_znak < 0) stdr -> act_znak = 0;

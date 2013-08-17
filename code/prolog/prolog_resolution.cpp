@@ -32,13 +32,11 @@ PrologResolution :: PrologResolution (PrologRoot * root) TRACKING (7) {
 	var_root = NULL;
 	var_counter = 0;
 	next = this;
-	call_again = NULL;
 	this -> timeout = 0;
 	this -> timeout_query = NULL;
 }
 
 PrologResolution :: ~ PrologResolution (void) {
-	if (call_again) delete call_again;
 	if (timeout_query) delete timeout_query;
 }
 
@@ -50,14 +48,6 @@ PrologVariable * PrologResolution :: newVariable (void) {
 PrologVariable * PrologResolution :: newVariable (PrologElement * term, bool location) {
 	var_root = new PrologVariable (term, location, var_root);
 	return var_root;
-}
-
-void PrologResolution :: callAgain (PrologElement * parameters) {call_again = parameters;}
-
-bool PrologResolution :: callAgain (void) {
-	bool ret = (call_again != NULL);
-	call_again = NULL;
-	return ret;
 }
 
 PrologQuery * PrologResolution :: getQuery (void) {return q_root;}
@@ -280,9 +270,8 @@ int PrologResolution :: res_forward (void) {
 	if (m != NULL) {
 		//	Machine goes here
 		reset ();
-		PrologElement * parameters = (call_again == NULL ? match_product (term -> right, true) : call_again);
+		PrologElement * parameters = match_product (term -> right, true);
 		if (! m -> code (parameters, this)) {delete parameters; return 0;}
-		if (call_again != NULL) return 1;
 		reset ();
 		if (match (term -> right, true, parameters, false)) {
 			PrologElement * new_head = match_product (q_root -> query -> left, true);
@@ -411,7 +400,6 @@ int PrologResolution :: resolution (PrologElement * query) {
 		}
 		ctrl = res_forward ();
 		while (ctrl == 0) ctrl = res_fail_back ();
-		if (call_again != NULL) root -> microwait ();
 		if (ctrl == 2)
 			while (ctrl != 0) {
 				ctrl = res_back_back ();

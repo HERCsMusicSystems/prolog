@@ -222,7 +222,6 @@ bool PrologRoot :: copy_file (char * from, char * to) {return CopyFile (from, to
 //////////////////////////////////
 
 void PrologRoot :: wait (int delay) {SYSTEM_DELAY (delay);}
-void PrologRoot :: microwait (void) {SYSTEM_DELAY (1);}
 
 #ifdef LINUX_OPERATING_SYSTEM
 	unsigned long int PrologRoot :: get_system_time (void) {
