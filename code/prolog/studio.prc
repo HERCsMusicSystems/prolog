@@ -14,8 +14,8 @@ program studio #machine := "prolog.studio"
 		write nl pp pt list
 		file_writer import load consult batch file_reader reload
 		remove_module create_module set_machine
-		add_search_directory search_directories root_directory crd
-		cd dir DIR ARGS args args_tail edit execute make_file make_directory erase erase_directory move copy
+		add_search_directory search_directories
+		cd dir ls DIR ARGS args args_tail edit execute make_file make_directory erase erase_directory move copy
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
 		create_atom search_atom preprocessor prompt
 		add_strings add sub mult div mod and or xor sum times less less_eq greater greater_eq
@@ -125,8 +125,6 @@ program studio #machine := "prolog.studio"
 #machine remove_module := "remove_module"
 #machine create_module := "create_module"
 #machine set_machine := "set_machine"
-#machine root_directory := "root_directory"
-#machine crd := "crd"
 #machine add_search_directory := "add_search_directory"
 #machine search_directories := "search_directories"
 #machine cd := "cd"
@@ -462,6 +460,7 @@ program studio #machine := "prolog.studio"
 	[write "Files:\n"]
 	[dir *files]
 	]
+[[ls : *command] / [dir : *command]]
 
 [[args : *args] [ARGS : *texts] / [args_tail *texts *args]]
 [[args_tail [] []] /]

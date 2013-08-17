@@ -250,7 +250,6 @@ public:
 
 class PrologRoot TRACK {
 public:
-	PROLOG_STRING root_directory;
 	PrologString * search_directories;
 	PrologString * args;
 	PrologDirectory * root;
@@ -323,7 +322,6 @@ public:
 	int getTrueValue (PrologElement * el, char * area, int ind);
 	void setPreprocessor (PrologAtom * atom);
 	PrologAtom * getPreprocessor (void);
-	void setRootDirectory (char * directory);
 	bool searchDirectoryNotFound (char * name);
 	void get_search_directories_from_environment (char * text);
 	void addSearchDirectory (char * directory);
@@ -401,7 +399,6 @@ public:
 	void start (PrologElement * parameters);
 	int get_character (void);
 	void setResourceLoader (PrologResourceLoader * resource_loader);
-
 	void setServiceClassLoader (PrologServiceClassLoader * service_loader);
 	int resolution (PrologElement * query);
 		// returns: 0 = fail, 1 = success, 2 = no space left, 3 = wrong query

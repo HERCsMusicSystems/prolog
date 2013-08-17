@@ -1839,9 +1839,7 @@ public:
 	file_write (PrologAtom * atom, PrologRoot * root, char * file_name) {
 		this -> atom = atom;
 		this -> root = root;
-		PROLOG_STRING command;
-		sprintf (command, "%s%s", root -> root_directory, file_name);
-		fw = fopen (command, "wb");
+		fw = fopen (file_name, "wb");
 	}
 	~ file_write (void) {if (fw != NULL) fclose (fw);}
 };
@@ -1928,9 +1926,7 @@ public:
 			|| file_name [0] == '/'
 			) fi = fopen (file_name, "rb");
 		else {
-			PROLOG_STRING command;
-			sprintf (command, "%s%s", root -> root_directory, file_name);
-			fi = fopen (command, "rb");
+			fi = fopen (file_name, "rb");
 		}
 		sr . init (root, fi);
 	}
@@ -2157,60 +2153,16 @@ public:
 	cd (PrologRoot * root) {this -> root = root;}
 };
 
-class root_directory : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {printf ("ROOT DIRECTORY = [%s]\n", root -> root_directory); return true;}
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (parameters -> isVar ()) {parameters -> setText (root -> root_directory); return true;}
-		if (parameters -> isText ()) {prolog_string_copy (root -> root_directory, parameters -> getText ()); return true;}
-		return false;
-	}
-	root_directory (PrologRoot * root) {this -> root = root;}
-};
-
-class crd : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {
-			int ind = (int) strlen (root -> root_directory) - 2;
-			if (ind < 0) ind = 0;
-			while (ind > 0) {
-				if (root -> root_directory [ind] == '/') {
-					ind++;
-					root -> root_directory [ind] = '\0';
-					return true;
-				}
-				ind--;
-			}
-			root -> root_directory [ind] = '\0';
-			return true;
-		}
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (parameters -> isVar ()) {parameters -> setText (root -> root_directory); return true;}
-		if (! parameters -> isText ()) return false;
-		prolog_string_cat (root -> root_directory, parameters -> getText ());
-		prolog_string_cat (root -> root_directory, "/");
-		return true;
-	}
-	crd (PrologRoot * root) {this -> root = root;}
-};
-
 class DIR : public PrologNativeCode {
 private:
 	PrologRoot * root;
 public:
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		AREA location;
-		int ind = area_cat (location, 0, root -> root_directory);
 		if (! parameters -> isPair ()) return false;
 		PrologElement * left = parameters -> getLeft ();
 		if (! left -> isText ()) return false;
-		area_cat (location, ind, left -> getText ());
-		PrologElement * el = root -> dir (location);
-		if (el == NULL) return false;
+		PrologElement * el = root -> dir (left -> getText ());
+		if (el == 0) return false;
 		parameters -> setRight (el);
 		return true;
 	}
@@ -2238,10 +2190,7 @@ public:
 		if (! parameters -> isPair ()) return false;
 		parameters = parameters -> getLeft ();
 		if (! parameters -> isText ()) return false;
-		AREA location;
-		int ind = area_cat (location, 0, root -> root_directory);
-		area_cat (location, ind, parameters -> getText ());
-		return root -> edit (location);
+		return root -> edit (parameters -> getText ());
 	}
 	edit (PrologRoot * root) {this -> root = root;}
 };
@@ -2267,10 +2216,7 @@ public:
 		if (! parameters -> isPair ()) return false;
 		parameters = parameters -> getLeft ();
 		if (! parameters -> isText ()) return false;
-		AREA location;
-		int ind = area_cat (location, 0, root -> root_directory);
-		area_cat (location, ind, parameters -> getText ());
-		return root -> make_directory (location);
+		return root -> make_directory (parameters -> getText ());
 	}
 	make_directory (PrologRoot * root) {this -> root = root;}
 };
@@ -2283,10 +2229,7 @@ public:
 		if (! parameters -> isPair ()) return false;
 		parameters = parameters -> getLeft ();
 		if (! parameters -> isText ()) return false;
-		AREA location;
-		int ind = area_cat (location, 0, root -> root_directory);
-		area_cat (location, ind, parameters -> getText ());
-		return root -> erase_file (location);
+		return root -> erase_file (parameters -> getText ());
 	}
 	erase_file (PrologRoot * root) {this -> root = root;}
 };
@@ -2299,10 +2242,7 @@ public:
 		if (! parameters -> isPair ()) return false;
 		parameters = parameters -> getLeft ();
 		if (! parameters -> isText ()) return false;
-		AREA location;
-		int ind = area_cat (location, 0, root -> root_directory);
-		area_cat (location, ind, parameters -> getText ());
-		return root -> erase_directory (location);
+		return root -> erase_directory (parameters -> getText ());
 	}
 	erase_directory (PrologRoot * root) {this -> root = root;}
 };
@@ -2320,14 +2260,7 @@ public:
 		if (! parameters -> isPair ()) return false;
 		parameters = parameters -> getLeft ();
 		if (! parameters -> isText ()) return false;
-		int ind;
-		AREA from_area;
-		AREA to_area;
-		ind = area_cat (from_area, 0, root -> root_directory);
-		area_cat (from_area, ind, from -> getText ());
-		ind = area_cat (to_area, 0, root -> root_directory);
-		area_cat (to_area, ind, parameters -> getText ());
-		return root -> move_file (from_area, to_area);
+		return root -> move_file (from -> getText (), parameters -> getText ());
 	}
 	move_file (PrologRoot * root) {this -> root = root;}
 };
@@ -2344,14 +2277,7 @@ public:
 		if (! parameters -> isPair ()) return false;
 		parameters = parameters -> getLeft ();
 		if (! parameters -> isText ()) return false;
-		int ind;
-		AREA from_area;
-		AREA to_area;
-		ind = area_cat (from_area, 0, root -> root_directory);
-		area_cat (from_area, ind, from -> getText ());
-		ind = area_cat (to_area, 0, root -> root_directory);
-		area_cat (to_area, ind, parameters -> getText ());
-		return root -> copy_file (from_area, to_area);
+		return root -> copy_file (from -> getText (), parameters -> getText ());
 	}
 	copy_file (PrologRoot * root) {this -> root = root;}
 };
@@ -3273,8 +3199,6 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "remove_module") == 0) return new remove_module (root);
 	if (strcmp (name, "set_machine") == 0) return new set_machine (root);
 	if (strcmp (name, "create_module") == 0) return new create_module (root);
-	if (strcmp (name, "crd") == 0) return new crd (root);
-	if (strcmp (name, "root_directory") == 0) return new root_directory (root);
 	if (strcmp (name, "add_search_directory") == 0) return new add_search_directory (root);
 	if (strcmp (name, "search_directories") == 0) return new search_directories (root);
 	if (strcmp (name, "cd") == 0) return new cd (root);

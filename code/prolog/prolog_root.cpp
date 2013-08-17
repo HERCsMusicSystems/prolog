@@ -34,7 +34,6 @@ PrologRoot :: PrologRoot (void) TRACKING (5) {
 	command = NULL;
 	strcpy (serial_number, "");
 	strcpy (key, "");
-	strcpy (root_directory, "");
 	search_directories = NULL;
 	args = NULL;
 	volume_id = 0;
@@ -365,10 +364,6 @@ void PrologRoot :: setPreprocessor (PrologAtom * atom) {
 }
 
 PrologAtom * PrologRoot :: getPreprocessor (void) {return preprocessor;}
-
-void PrologRoot :: setRootDirectory (char * directory) {
-	prolog_string_copy (root_directory, directory);
-}
 
 void PrologRoot :: addSearchDirectory (char * directory) {
 	search_directories = new PrologString (directory, search_directories);
@@ -761,13 +756,13 @@ PrologServiceClass * PrologRoot :: loadServiceClass (char * name) {
 	PrologServiceClass * service_class = NULL;
 	if (strcmp (name, "prolog.studio") == 0) service_class = new PrologStudio ();
 	if (service_loader != NULL && service_class == NULL) service_class = service_loader -> load (name);
-	if (service_class == NULL) service_class = load_plugin_service_class (root_directory, name);
+	if (service_class == NULL) service_class = load_plugin_service_class ("", name);
 	PrologString * search_directory = search_directories;
 	while (search_directory != NULL && service_class == NULL) {
 		service_class = load_plugin_service_class (search_directory -> text, name);
 		search_directory = search_directory -> next;
 	}
-	if (service_class == NULL) service_class = load_plugin_service_class ("", name);
+	//if (service_class == NULL) service_class = load_plugin_service_class ("", name);
 	if (service_class != NULL) service_class -> init (this);
 	return service_class;
 }
