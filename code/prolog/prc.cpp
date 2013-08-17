@@ -21,8 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "prolog.h"
-#include "prolog_studio.h"
-#include "prolog_http.h"
+//#include "prolog_studio.h"
 
 #include <string.h>
 
@@ -44,6 +43,7 @@
 #define RETURN return 0;
 #endif
 
+/*
 #ifdef LINUX_OPERATING_SYSTEM
 #ifdef MAC_OPERATING_SYSTEM
 #include "mac_midi.h"
@@ -60,6 +60,7 @@ windows_midi_service midi_service;
 #endif
 
 prolog_midi_reader * midi_reader = NULL;
+*/
 
 #ifdef LINUX_OPERATING_SYSTEM
 typedef void * (* runner_procedure) (RUNNER_PARAMETER);
@@ -81,7 +82,7 @@ void beginthread (runner_procedure runner, int value, PrologRoot * root) {
 #ifdef INTERNAL_RESOURCES
 #include "prolog_neural.h"
 #include "prolog_conductor.h"
-#include "prolog_midi.h"
+//#include "prolog_midi.h"
 //#ifdef LINUX_OPERATING_SYSTEM
 //#include "prolog_mysql.h"
 //#endif
@@ -92,22 +93,26 @@ public:
 	char * load (char * name) {
 		HRSRC resource = NULL;
 		if (strcmp (name, "studio") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (STUDIO_PRC), RT_RCDATA);
+		if (strcmp (name, "conductor") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (CONDUCTOR_PRC), RT_RCDATA);
+		if (strcmp (name, "midi") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (MIDI_PRC), RT_RCDATA);
+		if (strcmp (name, "http") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (HTTP_PRC), RT_RCDATA);
 		if (strcmp (name, "store") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (STORE_PRC), RT_RCDATA);
-		if (strcmp (name, "help") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (HELP_PRC), RT_RCDATA);
-		if (strcmp (name, "keyboard") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (KEYBOARD_PRC), RT_RCDATA);
-		if (strcmp (name, "record") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (RECORD_PRC), RT_RCDATA);
-		if (strcmp (name, "scala_reader") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (SCALA_READER_PRC), RT_RCDATA);
-		if (strcmp (name, "neural") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (NEURAL_PRC), RT_RCDATA);
 		if (strcmp (name, "f1") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (F1_PRC), RT_RCDATA);
+		if (strcmp (name, "help") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (HELP_PRC), RT_RCDATA);
+		if (strcmp (name, "record") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (RECORD_PRC), RT_RCDATA);
+		if (strcmp (name, "neural") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (NEURAL_PRC), RT_RCDATA);
+		if (strcmp (name, "keyboard") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (KEYBOARD_PRC), RT_RCDATA);
 		if (strcmp (name, "sql") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (SQL_PRC), RT_RCDATA);
 		if (strcmp (name, "studio.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (STUDIO_PRC), RT_RCDATA);
+		if (strcmp (name, "conductor.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (CONDUCTOR_PRC), RT_RCDATA);
+		if (strcmp (name, "midi.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (MIDI_PRC), RT_RCDATA);
+		if (strcmp (name, "http.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (HTTP_PRC), RT_RCDATA);
 		if (strcmp (name, "store.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (STORE_PRC), RT_RCDATA);
-		if (strcmp (name, "help.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (HELP_PRC), RT_RCDATA);
-		if (strcmp (name, "keyboard.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (KEYBOARD_PRC), RT_RCDATA);
-		if (strcmp (name, "record.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (RECORD_PRC), RT_RCDATA);
-		if (strcmp (name, "scala_reader.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (SCALA_READER_PRC), RT_RCDATA);
-		if (strcmp (name, "neural.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (NEURAL_PRC), RT_RCDATA);
 		if (strcmp (name, "f1.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (F1_PRC), RT_RCDATA);
+		if (strcmp (name, "help.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (HELP_PRC), RT_RCDATA);
+		if (strcmp (name, "record.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (RECORD_PRC), RT_RCDATA);
+		if (strcmp (name, "neural.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (NEURAL_PRC), RT_RCDATA);
+		if (strcmp (name, "keyboard.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (KEYBOARD_PRC), RT_RCDATA);
 		if (strcmp (name, "sql.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (SQL_PRC), RT_RCDATA);
 		if (! resource) return NULL;
 		HGLOBAL loader = LoadResource (NULL, resource);
@@ -164,13 +169,21 @@ class service_class_loader_class : public PrologServiceClassLoader {
 public:
 	PrologServiceClass * load (char * name) {
 		if (strcmp (name, "prolog.conductor") == 0) return new PrologConductorServiceClass ();
-		if (strcmp (name, "prolog.midi") == 0) return new PrologMidiServiceClass ();
-		if (strcmp (name, "prolog.http") == 0) return new PrologHttpServiceClass ();
+//		if (strcmp (name, "prolog.midi") == 0) return new PrologMidiServiceClass ();
+//		if (strcmp (name, "prolog.http") == 0) return new PrologHttpServiceClass ();
 		if (strcmp (name, "prolog.neural") == 0) return new PrologNeuralServiceClass ();
 		return NULL;
 	}
 } service_class_loader;
 
+#endif
+
+#ifdef WINDOWS_OPERATING_SYSTEM
+#include "prolog_windows_console.h"
+#endif
+
+#ifdef LINUX_OPERATING_SYSTEM
+#include "prolog_linux_console.h"
 #endif
 
 int main (int args, char * argv []) {
@@ -196,15 +209,6 @@ int main (int args, char * argv []) {
 	PrologWindowsConsole * console = new PrologWindowsConsole (10);
 	#endif
 
-	buffered_midi_stream in_line (8192);
-	midi_service . reader_line = & in_line;
-	root -> setMidi (midi_service . getReceptionLine (), midi_service . getTransmissionLine ());
-	root -> setMidiPortServiceClass (& midi_service);
-
-	midi_reader = new prolog_midi_reader (root);
-	root -> setMidiReader (midi_reader);
-	midi_service . set_reader (midi_reader);
-
 	console -> open ();
 	root -> insertCommander (console);
 	if (strlen (name) == 0) {root -> auto_atoms = true; root -> resolution ();}
@@ -212,13 +216,10 @@ int main (int args, char * argv []) {
 		if (strstr (name, ".prc") == NULL && strstr (name, ".prb") == NULL) strcat (name, ".prc");
 		root -> resolution (name);
 	}
-	midi_service . setOutputPort (-1);
-	midi_service . setInputPort (-1);
 	//*
 	console -> stop ();
 
 	if (root -> getCommander () != NULL) delete root -> getCommander ();
-	if (midi_reader != NULL) delete midi_reader;
 	delete root;
 //	if (object_left ())
 		drop_object_counter ();

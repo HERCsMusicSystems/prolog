@@ -23,10 +23,6 @@
 #ifndef _ENCODER_
 #define _ENCODER_
 
-#include "prolog_export_definitions.h"
-
-class HERCs_PROLOG_SDK_EXPORT encoder;
-
 class encoder {
 private:
 	int rnd_value;

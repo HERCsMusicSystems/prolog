@@ -26,8 +26,6 @@
 #include "prolog.h"
 #include <pthread.h>
 
-class HERCs_PROLOG_SDK_EXPORT PrologLinuxConsole;
-
 class PrologLinuxConsole : public PrologCommand {
 private:
 	pthread_t thread;

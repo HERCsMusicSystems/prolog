@@ -23,50 +23,48 @@
 #ifndef _PROLOG_
 #define _PROLOG_
 
-#include "midi_stream.h"
-#include "encoder.h"
 #include <stdio.h>
+#include "object_tracker.h"
 
-class HERCs_PROLOG_SDK_EXPORT PrologString;
-class HERCs_PROLOG_SDK_EXPORT PrologAtom;
-class HERCs_PROLOG_SDK_EXPORT PrologElement;
-class HERCs_PROLOG_SDK_EXPORT PrologNativeCode;
-class HERCs_PROLOG_SDK_EXPORT PrologQuery;
-class HERCs_PROLOG_SDK_EXPORT PrologVariable;
-class HERCs_PROLOG_SDK_EXPORT PrologMatch;
-class HERCs_PROLOG_SDK_EXPORT PrologServiceClass;
-class HERCs_PROLOG_SDK_EXPORT PrologDirectory;
-class HERCs_PROLOG_SDK_EXPORT PrologRoot;
-class HERCs_PROLOG_SDK_EXPORT PrologResolution;
-class HERCs_PROLOG_SDK_EXPORT PrologReader;
-class HERCs_PROLOG_SDK_EXPORT PrologLoader;
-class HERCs_PROLOG_SDK_EXPORT PrologResourceLoader;
-class HERCs_PROLOG_SDK_EXPORT PrologServiceClassLoader;
-class HERCs_PROLOG_SDK_EXPORT PrologMidiPortServiceClass;
-class HERCs_PROLOG_SDK_EXPORT PrologCommand;
-class HERCs_PROLOG_SDK_EXPORT object_tracker;
+class PrologString;
+class PrologAtom;
+class PrologElement;
+class PrologNativeCode;
+class PrologQuery;
+class PrologVariable;
+class PrologMatch;
+class PrologServiceClass;
+class PrologDirectory;
+class PrologRoot;
+class PrologResolution;
+class PrologReader;
+class PrologLoader;
+class PrologResourceLoader;
+class PrologServiceClassLoader;
+class PrologCommand;
+class object_tracker;
 
 #define PROLOG_STRING_SIZE 96
 #define PROLOG_STRING_SIZE_1 95
 #define PROLOG_PRINTABLE_FLOAT "%.80g"
 typedef char PROLOG_STRING [PROLOG_STRING_SIZE];
-HERCs_PROLOG_SDK_EXPORT extern void prolog_string_copy (char * to, char * from);
-HERCs_PROLOG_SDK_EXPORT extern void prolog_string_cat (char * to, char * from);
+extern void prolog_string_copy (char * to, char * from);
+extern void prolog_string_cat (char * to, char * from);
 
 #define AREA_SIZE 2048
 #define AREA_SIZE_1 2047
 typedef char AREA [AREA_SIZE];
-HERCs_PROLOG_SDK_EXPORT extern int area_cat (char * area, char * from);
-HERCs_PROLOG_SDK_EXPORT extern int area_cat (char * area, int ind, char * from);
-HERCs_PROLOG_SDK_EXPORT extern int area_cat (char * area, int ind, char c);
-HERCs_PROLOG_SDK_EXPORT extern int area_cat_number (char * area, int ind, int sub);
-HERCs_PROLOG_SDK_EXPORT extern int area_cat_number (char * area, int ind, double db);
-HERCs_PROLOG_SDK_EXPORT extern int indexOf (char * text, char c);
-HERCs_PROLOG_SDK_EXPORT extern void drop_stack (PrologQuery * from, PrologQuery * to);
+extern int area_cat (char * area, char * from);
+extern int area_cat (char * area, int ind, char * from);
+extern int area_cat (char * area, int ind, char c);
+extern int area_cat_number (char * area, int ind, int sub);
+extern int area_cat_number (char * area, int ind, double db);
+extern int indexOf (char * text, char c);
+extern void drop_stack (PrologQuery * from, PrologQuery * to);
 
 
-HERCs_PROLOG_SDK_EXPORT extern char * create_text (char * text);
-HERCs_PROLOG_SDK_EXPORT extern void delete_text (char * text);
+extern char * create_text (char * text);
+extern void delete_text (char * text);
 
 class PrologString {
 public:
@@ -78,35 +76,13 @@ public:
 
 class PrologResourceLoader {public: virtual char * load (char * name);};
 class PrologServiceClassLoader {public: virtual PrologServiceClass * load (char * name);};
-class PrologMidiPortServiceClass {
-public:
-	virtual int getNumberOfInputs (void);
-	virtual int getNumberOfOutputs (void);
-	virtual char * getInputInfo (int ind);
-	virtual char * getOutputInfo (int ind);
-	virtual int getInputPort (void);
-	virtual int getOutputPort (void);
-	virtual bool setInputPort (int ind);
-	virtual bool setInputPort (char * location);
-	virtual bool setOutputPort (int ind);
-	virtual bool setOutputPort (char * location);
-	virtual midi_stream * getTransmissionLine (void);
-	virtual midi_stream * getReceptionLine (void);
-	virtual void changeManufacturersId (void);
-	virtual void changeManufacturersId (int ind);
-	virtual void changeManufacturersId (int ind, int sub);
-	virtual void changeProductId (char id1, char id2, char id3, char id4);
-	virtual void changeProductVersion (char id1, char id2, char id3, char id4);
-};
 
-HERCs_PROLOG_SDK_EXPORT void drop_object_counter (void);
-HERCs_PROLOG_SDK_EXPORT void drop_object_counter (char * head);
-HERCs_PROLOG_SDK_EXPORT void drop_object_counter (int selector);
-HERCs_PROLOG_SDK_EXPORT void drop_object_counters (char * area);
-HERCs_PROLOG_SDK_EXPORT bool object_left (void);
-HERCs_PROLOG_SDK_EXPORT void drop_element (PrologRoot * root, PrologElement * el);
-
-#include "object_tracker.h"
+void drop_object_counter (void);
+void drop_object_counter (char * head);
+void drop_object_counter (int selector);
+void drop_object_counters (char * area);
+bool object_left (void);
+void drop_element (PrologRoot * root, PrologElement * el);
 
 class PrologAtom TRACK {
 public:
@@ -281,10 +257,6 @@ public:
 	PrologCommand * command;
 	PrologResourceLoader * resource_loader;
 	PrologServiceClassLoader * service_loader;
-	PrologMidiPortServiceClass * midi_service_class;
-	midi_reader * line_reader;
-	midi_stream * midi_out;
-	midi_stream * midi_in;
 	PrologElement * main_query;
 	PrologAtom * preprocessor;
 	bool auto_atoms;
@@ -425,21 +397,12 @@ public:
 	void print_character (int i);
 	void wait (int delay);
 	void microwait (void);
-	int get_system_time (void);
+	unsigned long int get_system_time (void);
 	void start (PrologElement * parameters);
 	int get_character (void);
 	void setResourceLoader (PrologResourceLoader * resource_loader);
 
 	void setServiceClassLoader (PrologServiceClassLoader * service_loader);
-	void setMidiPortServiceClass (PrologMidiPortServiceClass * midi_serice_class);
-	PrologMidiPortServiceClass * getMidiPortServiceClass (void);
-	void setMidiReader (midi_reader * reader);
-	midi_reader * getMidiReader (void);
-	void setMidiInput (midi_stream * in);
-	void setMidiOutput (midi_stream * out);
-	void setMidi (midi_stream * in, midi_stream * out);
-	midi_stream * getMidiInput (void);
-	midi_stream * getMidiOutput (void);
 	int resolution (PrologElement * query);
 		// returns: 0 = fail, 1 = success, 2 = no space left, 3 = wrong query
 		// query is a clause, which is a list anyway

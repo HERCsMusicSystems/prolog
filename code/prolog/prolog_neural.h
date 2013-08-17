@@ -23,7 +23,7 @@
 #ifndef _PROLOG_NEURAL_SERVICE_CLASS_
 #define _PROLOG_NEURAL_SERVICE_CLASS_
 
-#include "hercs_prolog_sdk.h"
+#include "prolog.h"
 
 class PrologNeuralServiceClass : public PrologServiceClass {
 private:

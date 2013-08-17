@@ -26,8 +26,6 @@
 #ifndef _PROLOG_WINDOWS_CONSOLE_
 #define _PROLOG_WINDOWS_CONSOLE_
 
-class HERCs_PROLOG_SDK_EXPORT PrologWindowsConsole;
-
 class PrologWindowsConsole : public PrologCommand {
 private:
 	HANDLE output;

@@ -25,8 +25,6 @@
 
 #include "prolog.h"
 
-class HERCs_PROLOG_SDK_EXPORT prolog_midi_reader;
-
 class standard_in_reader : public PrologReader {
 protected:
 	void message (char * text);
@@ -45,67 +43,14 @@ public:
 	PrologNoise (void);
 };
 
-class prolog_midi_reader : public midi_reader {
-public:
-	PrologDirectory * studio_dir;
-	PrologRoot * root;
-	PrologAtom * income_midi_atom;
-	PrologAtom * keyoff_atom;
-	PrologAtom * keyon_atom;
-	PrologAtom * polyaftertouch_atom;
-	PrologAtom * control_atom;
-	PrologAtom * programchange_atom;
-	PrologAtom * aftertouch_atom;
-	PrologAtom * pitch_atom;
-	PrologAtom * sysex_atom;
-	PrologAtom * SYSEX_atom;
-	PrologAtom * timingclock_atom;
-	PrologAtom * start_atom;
-	PrologAtom * continue_atom;
-	PrologAtom * stop_atom;
-	PrologAtom * activesensing_atom;
-	void call (PrologElement * query);
-	PrologElement * build_call (PrologAtom * atom, int channel, int ind);
-	PrologElement * build_call (PrologAtom * atom, int channel, int ind, int sub);
-	virtual void midi_keyoff (int channel, int key);
-	virtual void midi_keyon (int channel, int key, int velocity);
-	virtual void midi_pat (int channel, int key, int value);
-	virtual void midi_control (int channel, int controller, int value);
-	virtual void midi_programchange (int channel, int program);
-	virtual void midi_cat (int channel, int value);
-	virtual void midi_pitchbend (int channel, int v1, int v2);
-	virtual void midi_system_exclusive (midi_stream * line);
-	virtual void midi_timing_clock (void);
-	virtual void midi_start (void);
-	virtual void midi_continue (void);
-	virtual void midi_stop (void);
-	virtual void midi_active_sensing (void);
-	virtual bool is_ready (void);
-	prolog_midi_reader (PrologRoot * root);
-};
-
 class PrologStudio : public PrologServiceClass {
 private:
 	PrologRoot * root;
 	standard_in_reader stdr;
 	PrologNoise n;
 public:
-	PrologDirectory * dir;
-	PrologAtom * c, * cb, * cbb, * cx, * cxx;
-	PrologAtom * d, * db, * dbb, * dx, * dxx;
-	PrologAtom * e, * eb, * ebb, * ex, * exx;
-	PrologAtom * f, * fb, * fbb, * fx, * fxx;
-	PrologAtom * g, * gb, * gbb, * gx, * gxx;
-	PrologAtom * a, * ab, * abb, * ax, * axx;
-	PrologAtom * b, * bb, * bbb, * bx, * bxx;
-	void set_atoms (void);
-	int diatonic (PrologAtom * atom);
-	int chromatic (PrologAtom * atom);
-	PrologAtom * note (int diatonic, int chromatic);
-public:
 	virtual void init (PrologRoot * root);
 	virtual PrologNativeCode * getNativeCode (char * name);
-	virtual ~ PrologStudio (void);
 };
 
 #endif

@@ -22,7 +22,14 @@
 
 #include "prolog.h"
 #include "prolog_transport.h"
+
+#ifdef WINDOWS_OPERATING_SYSTEM
+#define usleep(delay) Sleep(delay / 1000);
+#endif
+
+#ifdef LINUX_OPERATING_SYSTEM
 #include <unistd.h>
+#endif
 
 void * transportRunner (void * parameters) {
 	PrologTransport * transport = (PrologTransport *) parameters;

@@ -23,7 +23,7 @@
 #ifndef _PROLOG_CONDUCTOR_SERVICE_CLASS_
 #define _PROLOG_CONDUCTOR_SERVICE_CLASS_
 
-#include "hercs_prolog_sdk.h"
+#include "prolog.h"
 #include "prolog_transport.h"
 
 class PrologConductorServiceClass : public PrologServiceClass {

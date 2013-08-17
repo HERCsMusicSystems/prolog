@@ -20,6 +20,8 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
+#include "operating_system.h"
+
 #ifdef MULTICORE_MULTIPROCESSING
 
 #ifdef WINDOWS_OPERATING_SYSTEM
@@ -32,6 +34,7 @@
 #endif
 #include <windows.h>
 #include <winbase.h>
+#include <pthread.h>
 
 #define COLLECTOR_RESET(index) reference_counter = index; InitializeCriticalSectionAndSpinCount (& critical_section, 0x4000);
 #define COLLECTOR int reference_counter; CRITICAL_SECTION critical_section;\

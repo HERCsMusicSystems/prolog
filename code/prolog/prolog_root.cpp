@@ -24,12 +24,8 @@
 #include <string.h>
 
 PrologRoot :: PrologRoot (void) TRACKING (5) {
-	midi_in = NULL;
-	midi_out = NULL;
 	resource_loader = NULL;
 	service_loader = NULL;
-	midi_service_class = NULL;
-	line_reader = NULL;
 	main_query = NULL;
 	root = new PrologDirectory ("user!", NULL);
 	set_standard_captions ();
@@ -821,15 +817,6 @@ int PrologRoot :: get_character (void) {
 
 void PrologRoot :: setResourceLoader (PrologResourceLoader * resource_loader) {this -> resource_loader = resource_loader;}
 void PrologRoot :: setServiceClassLoader (PrologServiceClassLoader * service_loader) {this -> service_loader = service_loader;}
-void PrologRoot :: setMidiPortServiceClass (PrologMidiPortServiceClass * midi_service_class) {this -> midi_service_class = midi_service_class;}
-PrologMidiPortServiceClass * PrologRoot :: getMidiPortServiceClass (void) {return midi_service_class;}
-void PrologRoot :: setMidiReader (midi_reader * reader) {this -> line_reader = reader;}
-midi_reader * PrologRoot :: getMidiReader (void) {return line_reader;}
-void PrologRoot :: setMidiInput (midi_stream * in) {midi_in = in;}
-void PrologRoot :: setMidiOutput (midi_stream * out) {midi_out = out;}
-void PrologRoot :: setMidi (midi_stream * in, midi_stream * out) {midi_in = in; midi_out = out;}
-midi_stream * PrologRoot :: getMidiInput (void) {return midi_in;}
-midi_stream * PrologRoot :: getMidiOutput (void) {return midi_out;}
 
 int PrologRoot :: resolution (PrologElement * query) {
 	// returns: 0 = fail, 1 = success, 2 = no space left, 3 = wrong query

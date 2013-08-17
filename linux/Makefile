@@ -186,12 +186,10 @@ objects = \
 	$(pi)prolog_element.o $(pi)prolog_loader.o $(pi)prolog_match.o $(pi)prolog_midi_command.o \
 	$(pi)prolog_native_code.o $(pi)prolog_query.o $(pi)prolog_reader.o $(pi)prolog_resolution.o \
 	$(pi)prolog_root.o $(pi)prolog_service_class.o \
-	$(pi)prolog_studio.o $(pi)prolog_conductor.o $(pi)prolog_midi.o $(pi)prolog_neural.o $(pi)prolog_http.o \
+	$(pi)prolog_studio.o $(pi)prolog_conductor.o $(pi)prolog_neural.o $(pi)prolog_http.o \
 	$(pi)prolog_transport.o \
 	$(pi)prolog_variable.o \
-	$(pi)prolog_linux_console.o\
-	$(pi)midi_command_prompt.o\
-	$(pi)linux_midi.o
+	$(pi)prolog_linux_console.o
 
 resource_maker.exe: $(pc)resource_maker.cpp
 	g++ $(pc)resource_maker.cpp -o resource_maker.exe
@@ -266,7 +264,7 @@ linux_midi.o: $(pc)prolog.h $(pc)linux_midi.h $(pc)linux_midi.cpp
 midi_command_prompt.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)midi_command_prompt.cpp $(pc)midi_command_prompt.h
 	g++ -Wno-write-strings -I. $(pc)midi_command_prompt.cpp -c -o midi_command_prompt.o
 
-prc.o: $(pc)linux_midi.h $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)hercs_prolog_sdk.h $(pc)prolog_hercs_console.h \
+prc.o: $(pc)linux_midi.h $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_hercs_console.h \
 	$(pc)prolog_midi_command.h $(pc)prolog_windows_console.h \
 	$(pc)prolog_studio.h $(pc)prolog_conductor.h $(pc)prolog_midi.h $(pc)prolog_http.h $(pc)midi_command_prompt.h \
 	$(pc)prc.cpp
@@ -282,7 +280,7 @@ prc.o: $(pc)linux_midi.h $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)he
 
 mysql: /usr/lib/prolog_mysql.so ~/bin/mysql.prc
 
-~/bin/studio: linux_midi.o encoder.o $(objects) prolog_resources.o $(prc_objects) prc.o prolog_neural.o prolog_conductor.o prolog_midi.o
+~/bin/studio: encoder.o $(objects) prolog_resources.o $(prc_objects) prc.o prolog_neural.o prolog_conductor.o
 	g++ -Wl,--export-dynamic encoder.o prolog_resources.o $(objects) prc.o \
 	-o ~/bin/studio -lreadline -lpthread -ldl
 

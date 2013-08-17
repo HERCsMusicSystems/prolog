@@ -165,6 +165,12 @@ bool PrologRoot :: copy_file (char * from, char * to) {
 
 #ifdef WINDOWS_OPERATING_SYSTEM
 
+void PrologRoot :: get_search_directories_from_environment (char * text) {
+}
+
+char * PrologRoot :: getCWD (void) {return "";}
+bool PrologRoot :: change_directory (char * directory) {return false;}
+
 PrologElement * PrologRoot :: dir (char * location) {
 	WIN32_FIND_DATA find_data;
 	HANDLE handle = FindFirstFile (location, & find_data);
@@ -219,7 +225,7 @@ void PrologRoot :: wait (int delay) {SYSTEM_DELAY (delay);}
 void PrologRoot :: microwait (void) {SYSTEM_DELAY (1);}
 
 #ifdef LINUX_OPERATING_SYSTEM
-	int PrologRoot :: get_system_time (void) {
+	unsigned long int PrologRoot :: get_system_time (void) {
 		timeval tv;
 		gettimeofday (& tv, NULL);
 		double time = (double) tv . tv_sec - time_started;
@@ -230,7 +236,7 @@ void PrologRoot :: microwait (void) {SYSTEM_DELAY (1);}
 #endif
 
 #ifdef WINDOWS_OPERATING_SYSTEM
-	int PrologRoot :: get_system_time (void) {return (int) GetTickCount ();}
+	unsigned long int PrologRoot :: get_system_time (void) {return (int) GetTickCount ();}
 #endif
 
 class starter TRACK {
