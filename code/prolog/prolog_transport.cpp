@@ -99,7 +99,12 @@ bool PrologTransport :: waitBeat (int beats) {
 	return ! ret;
 }
 
-bool PrologTransport :: waitBeat (double beats) {return wait (ticks_per_beat * beats);}
+bool PrologTransport :: waitBeat (double beats) {
+	int integral = (int) beats;
+	double fractional = beats - (double) integral;
+	if (! waitBeat (integral)) return false;
+	return wait ((int) (fractional * (double) ticks_per_beat));
+}
 
 bool PrologTransport :: waitBar (int bars) {
 	pthread_mutex_lock (& lock);
