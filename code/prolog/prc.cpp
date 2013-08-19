@@ -194,7 +194,6 @@ int main (int args, char * argv []) {
 	root -> setServiceClassLoader (& service_class_loader);
 	#endif
 	root -> set_uap32_captions ();
-	int threads_type = 2;
 	PROLOG_STRING name;
 	strcpy (name, "");
 	for (int ind = 1; ind < args; ind++) {
@@ -203,21 +202,18 @@ int main (int args, char * argv []) {
 	}
 
 	#ifdef LINUX_OPERATING_SYSTEM
-	PrologLinuxConsole * console = threads_type == 2 ? new PrologLinuxConsole () : new PrologLinuxConsole (10);
+	PrologCommand * console = new PrologLinuxConsole ();
 	#endif
 	#ifdef WINDOWS_OPERATING_SYSTEM
-	PrologWindowsConsole * console = new PrologWindowsConsole (10);
+	PrologCommand * console = new PrologWindowsConsole (10);
 	#endif
 
-	console -> open ();
 	root -> insertCommander (console);
 	if (strlen (name) == 0) {root -> auto_atoms = true; root -> resolution ();}
 	else {
 		if (strstr (name, ".prc") == NULL && strstr (name, ".prb") == NULL) strcat (name, ".prc");
 		root -> resolution (name);
 	}
-	//*
-	console -> stop ();
 
 	if (root -> getCommander () != NULL) delete root -> getCommander ();
 	delete root;

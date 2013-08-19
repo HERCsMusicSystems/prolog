@@ -521,10 +521,8 @@ private:
 public:
 	virtual void insert (char * text);
 	virtual int get (void);
-	virtual bool empty (void);
 	virtual void print (char * text);
-	virtual void open (void);
-	virtual void close (void);
+	virtual void read (void);
 	virtual void setColors (int foreground, int background);
 	virtual void openEditor1 (void);
 	virtual void openEditor2 (int selector);
@@ -536,7 +534,7 @@ public:
 	virtual char * getPrompt ();
 	virtual void setPrompt (char * prompt);
 	PrologCommand (void);
-	~ PrologCommand (void);
+	virtual ~ PrologCommand (void);
 };
 
 

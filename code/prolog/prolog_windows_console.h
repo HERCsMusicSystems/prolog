@@ -38,9 +38,8 @@ public:
 	virtual void print (char * text);
 	virtual void open (void);
 	virtual void close (void);
+	virtual void read (void);
 	virtual void setColors (int foreground, int background);
-	void run (void);
-	void stop (void);
 	PrologWindowsConsole (int horizontal);
 	PrologWindowsConsole (int horizontal, int seconds);
 	~ PrologWindowsConsole (void);

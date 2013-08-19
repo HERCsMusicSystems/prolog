@@ -29,8 +29,6 @@ PrologCommand :: PrologCommand (void) TRACKING (19) {
 
 PrologCommand :: ~ PrologCommand (void) {}
 
-bool PrologCommand :: empty (void) {return from == to;}
-
 void PrologCommand :: insert (char * text) {
 	int t = to;
 	while (* text != '\0') {//> 31) {
@@ -49,8 +47,7 @@ int PrologCommand :: get (void) {
 
 void PrologCommand :: print (char * text) {printf ("%s", text);}
 
-void PrologCommand :: open (void) {}
-void PrologCommand :: close (void) {}
+void PrologCommand :: read (void) {}
 
 void PrologCommand :: setColors (int foreground, int background) {}
 void PrologCommand :: openEditor1 (void) {}

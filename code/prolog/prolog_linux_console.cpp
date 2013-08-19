@@ -26,126 +26,47 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-static void * command_runner (void * parameter) {
-	while (true) {
-		((PrologLinuxConsole *) parameter) -> run ();
-	}
-	return 0;
-}
-
-void PrologLinuxConsole :: print (char * text) {
-	printf ("%s", text);
-}
-
-void PrologLinuxConsole :: run (void) {
-	int ind = 0;
-	int ch = getchar ();
-	while (ch >= ' ') {
-		ind = area_cat (area, ind, ch);
-		ch = getchar ();
-	}
-	area_cat (area, ind, "\n");
-	insert (area);
-	usleep (delay);
-}
-
 #include <readline/readline.h>
 #include <readline/history.h>
 
-//void PrologLinuxConsole :: run (void) {
-//	char * area = readline (prompt);
-//	if (strlen (area) > 2) add_history (area);
-//	insert (area);
-//	usleep (delay);
-//}
-
 PrologLinuxConsole :: PrologLinuxConsole (void) {
-	threadable = false;
-	configure ();
-}
-
-PrologLinuxConsole :: PrologLinuxConsole (int horizontal) {
-	threadable = true;
-	if (horizontal < 1) horizontal = 1;
-	delay = 1000000 / horizontal;
-	configure ();
-}
-
-PrologLinuxConsole :: PrologLinuxConsole (int horizontal, int seconds) {
-	threadable = true;
-	if (seconds < 1) seconds = 1;
-	if (horizontal < 1) horizontal = 1;
-	seconds *= 1000000;
-	delay = seconds / horizontal;
-	configure ();
-}
-
-void PrologLinuxConsole :: configure (void) {
-	thread = 0;
 	strcpy (prompt, "");
-}
-
-#ifdef MAC_OPERATING_SYSTEM
-AREA previous_line = "";
-#endif
-
-bool PrologLinuxConsole :: empty (void) {
-	bool is_empty = PrologCommand :: empty ();
-	if (threadable || ! is_empty) return is_empty;
-	char * area = readline (prompt);
-	if (strlen (area) > 2) {
-#ifndef MAC_OPERATING_SYSTEM
-		HIST_ENTRY * * histories = history_list ();
-		if (histories != NULL && history_length > 0) {
-			if (strcmp (area, histories [history_length - 1] -> line) != 0) add_history (area);
-		} else add_history (area);
-#else
-        if (strcmp (area, previous_line) != 0) add_history (area);
-		area_cat (previous_line, 0, area);
-		
-#endif
-	}
-	insert (area);
-	insert ("\n");
-	return PrologCommand :: empty ();
-}
-
-char * PrologLinuxConsole :: getPrompt (void) {return prompt;}
-void PrologLinuxConsole :: setPrompt (char * prompt) {prolog_string_copy (this -> prompt, prompt);}
-
-void PrologLinuxConsole :: open (void) {
-	if (threadable) {
-		if (thread != 0) return;
-		pthread_attr_t attr;
-		pthread_attr_init (& attr);
-		pthread_attr_setstacksize (& attr, 120 * 1024);
-		pthread_attr_setdetachstate (& attr, PTHREAD_CREATE_DETACHED);
-		pthread_create (& thread, & attr, command_runner, this);
-		pthread_attr_destroy (& attr);
-		return;
-	}
 	char command [256];
 	sprintf (command, "%s/.prc_history", getenv ("HOME"));
 	stifle_history (128);
 	read_history (command);
 }
 
-void PrologLinuxConsole :: close (void) {
-	if (thread == 0) return;
-	pthread_cancel (thread);
+PrologLinuxConsole :: ~ PrologLinuxConsole (void) {
+	insert (area);
+	insert ("\n");
+	char command [256];
+	sprintf (command, "%s/.prc_history", getenv ("HOME"));
+	write_history (command);
 }
 
-void PrologLinuxConsole :: stop (void) {
-	if (! threadable) {
-		char command [256];
-		sprintf (command, "%s/.prc_history", getenv ("HOME"));
-		write_history (command);
+void PrologLinuxConsole :: print (char * text) {
+	printf ("%s", text);
+}
+
+#ifdef MAC_OPERATING_SYSTEM
+AREA previous_line = "";
+#endif
+
+void PrologLinuxConsole :: read (void) {
+	char * area = readline (prompt);
+	if (strlen (area) > 2) {
+		HIST_ENTRY * * histories = history_list ();
+		if (histories != 0 && history_length > 0) {
+			if (strcmp (area, histories [history_length - 1] -> line) != 0) add_history (area);
+		} else add_history (area);
 	}
-	if (thread == 0) return;
-	pthread_cancel (thread);
+	insert (area);
+	insert ("\n");
 }
 
-PrologLinuxConsole :: ~ PrologLinuxConsole (void) {}
+char * PrologLinuxConsole :: getPrompt (void) {return prompt;}
+void PrologLinuxConsole :: setPrompt (char * prompt) {prolog_string_copy (this -> prompt, prompt);}
 
 void PrologLinuxConsole :: setColors (int foreground, int background) {
 	int foreground_red = (foreground >> 16) & 0xff;
