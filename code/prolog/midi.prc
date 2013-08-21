@@ -17,6 +17,7 @@ program midi #machine := "prolog.midi"
 		CONTROL ATTACK RELEASE CUTOFF RESONANCE PORTATIME
 		VOLUME REVERB CHORUS FOOT BREATH PAN MODULATION
 		nrpn rpn NRPN RPN hit DCMOD
+		createLine
 		midi_info midi_port midi midi_in_info midi_out_info midi_in_port midi_out_port midi_short_msg MIDI_SHORT_MSG midi_long_msg
 		midi_manufacturers_id midi_product_id midi_product_version
 		egcopy egcopy_freq egcopy_amp egcopy_index egcopy_pan
@@ -32,24 +33,26 @@ program midi #machine := "prolog.midi"
 		INTERVAL interval
 	]
 
-#machine midi_in_info := "midi_in_info"
-#machine midi_out_info := "midi_out_info"
-#machine midi_in_port := "midi_in_port"
-#machine midi_out_port := "midi_out_port"
+#machine createLine := "createLine"
+#machine control := "control"
+;#machine midi_in_info := "midi_in_info"
+;#machine midi_out_info := "midi_out_info"
+;#machine midi_in_port := "midi_in_port"
+;#machine midi_out_port := "midi_out_port"
 
-#machine DCMOD := "DCMOD"
-#machine INTERVAL := "INTERVAL"
+;#machine DCMOD := "DCMOD"
+;#machine INTERVAL := "INTERVAL"
 
-#machine midi_short_msg := "midi_short_msg"
-#machine MIDI_SHORT_MSG := "MIDI_SHORT_MSG"
-#machine midi_long_msg := "midi_long_msg"
-#machine sysex := "sysex"
-#machine sysexch := "sysexch"
-#machine SYSEX := "SYSEX"
-#machine SYSEXCH := "SYSEXCH"
-#machine midi_manufacturers_id := "midi_manufacturers_id"
-#machine midi_product_id := "midi_product_id"
-#machine midi_product_version := "midi_product_version"
+;#machine midi_short_msg := "midi_short_msg"
+;#machine MIDI_SHORT_MSG := "MIDI_SHORT_MSG"
+;#machine midi_long_msg := "midi_long_msg"
+;#machine sysex := "sysex"
+;#machine sysexch := "sysexch"
+;#machine SYSEX := "SYSEX"
+;#machine SYSEXCH := "SYSEXCH"
+;#machine midi_manufacturers_id := "midi_manufacturers_id"
+;#machine midi_product_id := "midi_product_id"
+;#machine midi_product_version := "midi_product_version"
 
 ; demo
 [[noteon *key] [keyon 0 *key 100]]
@@ -61,7 +64,7 @@ program midi #machine := "prolog.midi"
 [[keyoff *channel *key *velocity] [midi_short_msg 128 *channel *key *velocity]]
 [[keyon *channel *key *velocity] [midi_short_msg 144 *channel *key *velocity]]
 [[polyaftertouch *channel *key *value] [midi_short_msg 160 *channel *key *value]]
-[[control *channel *controller *value] [midi_short_msg 176 *channel *controller *value]]
+;[[control *channel *controller *value] [midi_short_msg 176 *channel *controller *value]]
 [[programchange *channel *program] [midi_short_msg 192 *channel *program]]
 [[programchange *channel *msb *lsb *program] [add *channel 64 *selector] [sysex *selector 84 *lsb *program *msb]]
 [[aftertouch *channel *value] [midi_short_msg 208 *channel *value]]

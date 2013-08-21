@@ -186,7 +186,7 @@ objects = \
 	$(pi)prolog_element.o $(pi)prolog_loader.o $(pi)prolog_match.o $(pi)prolog_midi_command.o \
 	$(pi)prolog_native_code.o $(pi)prolog_query.o $(pi)prolog_reader.o $(pi)prolog_resolution.o \
 	$(pi)prolog_root.o $(pi)prolog_service_class.o \
-	$(pi)prolog_studio.o $(pi)prolog_conductor.o $(pi)prolog_neural.o $(pi)prolog_http.o \
+	$(pi)prolog_studio.o $(pi)prolog_conductor.o $(pi)prolog_midi.o $(pi)prolog_neural.o $(pi)prolog_http.o \
 	$(pi)prolog_transport.o \
 	$(pi)prolog_variable.o \
 	$(pi)prolog_linux_console.o

@@ -23,12 +23,34 @@
 #ifndef _PROLOG_MIDI_SERVICE_CLASS_
 #define _PROLOG_MIDI_SERVICE_CLASS_
 
-#include "hercs_prolog_sdk.h"
+#include "prolog.h"
+
+class PrologMidiNativeCode : public PrologNativeCode {
+public:
+	static char * name (void);
+	virtual char * codeName (void);
+	virtual void insert_one (int command);
+	virtual void insert_two (int command, int channel, int msb);
+	virtual void insert_three (int command, int channel, int msb, int lsb);
+};
 
 class PrologMidiServiceClass : public PrologServiceClass {
 private:
 	PrologRoot * root;
+	PrologDirectory * dir;
+	PrologAtom * c, * cb, * cbb, * cx, * cxx;
+	PrologAtom * d, * db, * dbb, * dx, * dxx;
+	PrologAtom * e, * eb, * ebb, * ex, * exx;
+	PrologAtom * f, * fb, * fbb, * fx, * fxx;
+	PrologAtom * g, * gb, * gbb, * gx, * gxx;
+	PrologAtom * a, * ab, * abb, * ax, * axx;
+	PrologAtom * b, * bb, * bbb, * bx, * bxx;
 public:
+	PrologMidiNativeCode * default_source;
+	PrologMidiNativeCode * default_destination;
+	int diatonic (PrologAtom * atom);
+	int chromatic (PrologAtom * atom);
+	void set_atoms (void);
 	virtual void init (PrologRoot * root);
 	virtual PrologNativeCode * getNativeCode (char * name);
 	PrologMidiServiceClass (void);

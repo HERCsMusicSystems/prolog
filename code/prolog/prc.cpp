@@ -62,7 +62,7 @@ void beginthread (runner_procedure runner, int value, PrologRoot * root) {
 #ifdef INTERNAL_RESOURCES
 #include "prolog_neural.h"
 #include "prolog_conductor.h"
-//#include "prolog_midi.h"
+#include "prolog_midi.h"
 //#ifdef LINUX_OPERATING_SYSTEM
 //#include "prolog_mysql.h"
 //#endif
@@ -149,7 +149,7 @@ class service_class_loader_class : public PrologServiceClassLoader {
 public:
 	PrologServiceClass * load (char * name) {
 		if (strcmp (name, "prolog.conductor") == 0) return new PrologConductorServiceClass ();
-//		if (strcmp (name, "prolog.midi") == 0) return new PrologMidiServiceClass ();
+		if (strcmp (name, "prolog.midi") == 0) return new PrologMidiServiceClass ();
 //		if (strcmp (name, "prolog.http") == 0) return new PrologHttpServiceClass ();
 		if (strcmp (name, "prolog.neural") == 0) return new PrologNeuralServiceClass ();
 		return NULL;

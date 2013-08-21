@@ -20,8 +20,105 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-/*
 #include "prolog_midi.h"
+#include "midi_stream.h"
+#include <string.h>
+
+static bool midi_process (midi_stream * line, PrologElement * parameters) {
+	printf ("I am here!\n");
+	return true;
+}
+
+static char * midi_internal_line_name = "MidiInternalLine";
+char * PrologMidiNativeCode :: name (void) {return midi_internal_line_name;}
+char * PrologMidiNativeCode :: codeName (void) {return midi_internal_line_name;}
+void PrologMidiNativeCode :: insert_one (int command) {printf ("command [%i]\n", command);}
+void PrologMidiNativeCode :: insert_two (int command, int channel, int msb) {printf ("command [%i %i]\n", command + channel, msb);}
+void PrologMidiNativeCode :: insert_three (int command, int channel, int msb, int lsb) {printf ("command [%i %i %i]\n", command + channel, msb, lsb);}
+
+class MidiInternalLine : public PrologMidiNativeCode {
+public:
+	PrologAtom * atom;
+	buffered_midi_stream * line;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
+		return midi_process (line, parameters);
+	}
+	MidiInternalLine (PrologAtom * atom) {this -> atom = atom; line = new buffered_midi_stream (512);}
+	~ MidiInternalLine (void) {if (line) delete line; line = 0;}
+};
+
+bool short_message_processor (int command, PrologElement * parameters, PrologMidiServiceClass * servo) {
+	PrologMidiNativeCode * destination = servo -> default_destination;
+	if (parameters -> isPair ()) {
+		PrologElement * el = parameters -> getLeft ();
+		if (el -> isAtom ()) {
+			PrologNativeCode * machine = el -> getAtom () -> getMachine ();
+			if (machine == 0) return false;
+			if (machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
+			destination = (PrologMidiNativeCode *) machine;
+			parameters = parameters -> getRight ();
+		}
+	}
+	if (destination == 0) return false;
+	if (parameters -> isEarth ()) {
+		destination -> insert_one (command);
+		return true;
+	}
+	if (! parameters -> isPair ()) return false;
+	PrologElement * el = parameters -> getLeft ();
+	if (! el -> isInteger ()) return false;
+	int channel = el -> getInteger ();
+	parameters = parameters -> getRight ();
+	if (! parameters -> isPair ()) return false;
+	el = parameters -> getLeft ();
+	int msb = 0;
+	if (el -> isInteger ()) msb = el -> getInteger ();
+	else if (el -> isPair ()) {
+		PrologElement * note = el -> getLeft ();
+		el = el -> getRight ();
+		if (! el -> isPair ()) return false;
+		PrologElement * octave = el -> getLeft ();
+		if (! note -> isAtom ()) return false;
+		if (! octave -> isInteger ()) return false;
+		msb = 48 + octave -> getInteger () * 12 + servo -> chromatic (note -> getAtom ());
+	} else return false;
+	parameters = parameters -> getRight ();
+	if (parameters -> isEarth ()) {
+		destination -> insert_two (command, channel, msb);
+		return true;
+	}
+	if (! parameters -> isPair ()) return false;
+	el = parameters -> getLeft ();
+	if (! el -> isInteger ()) return false;
+	int lsb = el -> getInteger ();
+	destination -> insert_three (command, channel, msb, lsb);
+	return true;
+}
+
+class CreateLine : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * line_atom = parameters -> getLeft ();
+		if (line_atom -> isVar ()) line_atom -> setAtom (new PrologAtom ());
+		if (! line_atom -> isAtom ()) return false;
+		MidiInternalLine * line = new MidiInternalLine (line_atom -> getAtom ());
+		if (line_atom -> getAtom () -> setMachine (line)) return true;
+		delete line;
+		return false;
+	}
+	CreateLine (void) {}
+};
+
+class control : public PrologNativeCode {
+public:
+	PrologMidiServiceClass * servo;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {return short_message_processor (176, parameters, servo);}
+	control (PrologMidiServiceClass * servo) {this -> servo = servo;}
+};
+
+/*
 
 class prolog_midi_reader : public midi_reader {
 public:
@@ -675,37 +772,6 @@ public:
 	interval_processor (PrologRoot * root, PrologStudio * studio) {this -> root = root; this -> studio = studio;}
 };
 
-int PrologStudio :: diatonic (PrologAtom * atom) {
-	if (atom == c || atom == cb || atom == cbb || atom == cx || atom == cxx) return 0;
-	if (atom == d || atom == db || atom == dbb || atom == dx || atom == dxx) return 1;
-	if (atom == e || atom == eb || atom == ebb || atom == ex || atom == exx) return 2;
-	if (atom == f || atom == fb || atom == fbb || atom == fx || atom == fxx) return 3;
-	if (atom == g || atom == gb || atom == gbb || atom == gx || atom == gxx) return 4;
-	if (atom == a || atom == ab || atom == abb || atom == ax || atom == axx) return 5;
-	if (atom == b || atom == bb || atom == bbb || atom == bx || atom == bxx) return 6;
-	return -127;
-}
-
-int PrologStudio :: chromatic (PrologAtom * atom) {
-	if (atom == cbb) return -2;
-	if (atom == cb) return -1;
-	if (atom == c || atom == dbb) return 0;
-	if (atom == cx || atom == db) return 1;
-	if (atom == cxx || atom == d || atom == ebb) return 2;
-	if (atom == dx || atom == eb || atom == fbb) return 3;
-	if (atom == dxx || atom == e || atom == fb) return 4;
-	if (atom == ex || atom == f || atom == gbb) return 5;
-	if (atom == exx || atom == fx || atom == gb) return 6;
-	if (atom == fxx || atom == g || atom == abb) return 7;
-	if (atom == gx || atom == ab) return 8;
-	if (atom == gxx || atom == a || atom == bbb) return 9;
-	if (atom == ax || atom == bb || atom == cbb) return 10;
-	if (atom == axx || atom == b || atom == cb) return 11;
-	if (atom == bx) return 12;
-	if (atom == bxx) return 13;
-	return 0;
-}
-
 PrologAtom * PrologStudio :: note (int diatonic, int chromatic) {
 	switch (diatonic) {
 	case 0:
@@ -783,13 +849,7 @@ private:
 	PrologNoise n;
 public:
 	PrologDirectory * dir;
-	PrologAtom * c, * cb, * cbb, * cx, * cxx;
-	PrologAtom * d, * db, * dbb, * dx, * dxx;
-	PrologAtom * e, * eb, * ebb, * ex, * exx;
-	PrologAtom * f, * fb, * fbb, * fx, * fxx;
-	PrologAtom * g, * gb, * gbb, * gx, * gxx;
-	PrologAtom * a, * ab, * abb, * ax, * axx;
-	PrologAtom * b, * bb, * bbb, * bx, * bxx;
+///
 	void set_atoms (void);
 	int diatonic (PrologAtom * atom);
 	int chromatic (PrologAtom * atom);
@@ -811,19 +871,6 @@ void PrologStudio :: init (PrologRoot * root) {
 	a = ab = abb = ax = axx = NULL;
 	b = bb = bbb = bx = bxx = NULL;
 	midi_mutex = PTHREAD_MUTEX_INITIALIZER;
-}
-
-void PrologStudio :: set_atoms (void) {
-	if (dir != NULL) return;
-	dir = root -> searchDirectory ("studio");
-	if (dir == NULL) return;
-	c = dir -> searchAtom ("C"); cb = dir -> searchAtom ("Cb"); cbb = dir -> searchAtom ("Cbb"); cx = dir -> searchAtom ("C#"); cxx = dir -> searchAtom ("Cx");
-	d = dir -> searchAtom ("D"); db = dir -> searchAtom ("Db"); dbb = dir -> searchAtom ("Dbb"); dx = dir -> searchAtom ("D#"); dxx = dir -> searchAtom ("Dx");
-	e = dir -> searchAtom ("E"); eb = dir -> searchAtom ("Eb"); ebb = dir -> searchAtom ("Ebb"); ex = dir -> searchAtom ("E#"); exx = dir -> searchAtom ("Ex");
-	f = dir -> searchAtom ("F"); fb = dir -> searchAtom ("Fb"); fbb = dir -> searchAtom ("Fbb"); fx = dir -> searchAtom ("F#"); fxx = dir -> searchAtom ("Fx");
-	g = dir -> searchAtom ("G"); gb = dir -> searchAtom ("Gb"); gbb = dir -> searchAtom ("Gbb"); gx = dir -> searchAtom ("G#"); gxx = dir -> searchAtom ("Gx");
-	a = dir -> searchAtom ("A"); ab = dir -> searchAtom ("Ab"); abb = dir -> searchAtom ("Abb"); ax = dir -> searchAtom ("A#"); axx = dir -> searchAtom ("Ax");
-	b = dir -> searchAtom ("B"); bb = dir -> searchAtom ("Bb"); bbb = dir -> searchAtom ("Bbb"); bx = dir -> searchAtom ("B#"); bxx = dir -> searchAtom ("Bx");
 }
 
 PrologStudio :: ~ PrologStudio (void) {
@@ -865,11 +912,58 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 
 */
 
+int PrologMidiServiceClass :: diatonic (PrologAtom * atom) {
+	if (atom == c || atom == cb || atom == cbb || atom == cx || atom == cxx) return 0;
+	if (atom == d || atom == db || atom == dbb || atom == dx || atom == dxx) return 1;
+	if (atom == e || atom == eb || atom == ebb || atom == ex || atom == exx) return 2;
+	if (atom == f || atom == fb || atom == fbb || atom == fx || atom == fxx) return 3;
+	if (atom == g || atom == gb || atom == gbb || atom == gx || atom == gxx) return 4;
+	if (atom == a || atom == ab || atom == abb || atom == ax || atom == axx) return 5;
+	if (atom == b || atom == bb || atom == bbb || atom == bx || atom == bxx) return 6;
+	return -127;
+}
+
+int PrologMidiServiceClass :: chromatic (PrologAtom * atom) {
+	if (atom == cbb) return -2;
+	if (atom == cb) return -1;
+	if (atom == c || atom == dbb) return 0;
+	if (atom == cx || atom == db) return 1;
+	if (atom == cxx || atom == d || atom == ebb) return 2;
+	if (atom == dx || atom == eb || atom == fbb) return 3;
+	if (atom == dxx || atom == e || atom == fb) return 4;
+	if (atom == ex || atom == f || atom == gbb) return 5;
+	if (atom == exx || atom == fx || atom == gb) return 6;
+	if (atom == fxx || atom == g || atom == abb) return 7;
+	if (atom == gx || atom == ab) return 8;
+	if (atom == gxx || atom == a || atom == bbb) return 9;
+	if (atom == ax || atom == bb || atom == cbb) return 10;
+	if (atom == axx || atom == b || atom == cb) return 11;
+	if (atom == bx) return 12;
+	if (atom == bxx) return 13;
+	return 0;
+}
+
+void PrologMidiServiceClass :: set_atoms (void) {
+	if (dir != NULL) return;
+	dir = root -> searchDirectory ("studio");
+	if (dir == NULL) return;
+	c = dir -> searchAtom ("C"); cb = dir -> searchAtom ("Cb"); cbb = dir -> searchAtom ("Cbb"); cx = dir -> searchAtom ("C#"); cxx = dir -> searchAtom ("Cx");
+	d = dir -> searchAtom ("D"); db = dir -> searchAtom ("Db"); dbb = dir -> searchAtom ("Dbb"); dx = dir -> searchAtom ("D#"); dxx = dir -> searchAtom ("Dx");
+	e = dir -> searchAtom ("E"); eb = dir -> searchAtom ("Eb"); ebb = dir -> searchAtom ("Ebb"); ex = dir -> searchAtom ("E#"); exx = dir -> searchAtom ("Ex");
+	f = dir -> searchAtom ("F"); fb = dir -> searchAtom ("Fb"); fbb = dir -> searchAtom ("Fbb"); fx = dir -> searchAtom ("F#"); fxx = dir -> searchAtom ("Fx");
+	g = dir -> searchAtom ("G"); gb = dir -> searchAtom ("Gb"); gbb = dir -> searchAtom ("Gbb"); gx = dir -> searchAtom ("G#"); gxx = dir -> searchAtom ("Gx");
+	a = dir -> searchAtom ("A"); ab = dir -> searchAtom ("Ab"); abb = dir -> searchAtom ("Abb"); ax = dir -> searchAtom ("A#"); axx = dir -> searchAtom ("Ax");
+	b = dir -> searchAtom ("B"); bb = dir -> searchAtom ("Bb"); bbb = dir -> searchAtom ("Bbb"); bx = dir -> searchAtom ("B#"); bxx = dir -> searchAtom ("Bx");
+}
+
 PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
+	set_atoms ();
+	if (strcmp (name, "createLine") == 0) return new CreateLine ();
+	if (strcmp (name, "control") == 0) return new control (this);
 	return NULL;
 }
 
-void PrologMidiServiceClass :: init (PrologRoot * root) {this -> root = root;}
-PrologMidiServiceClass :: PrologMidiServiceClass (void) {this -> root = NULL;}
+void PrologMidiServiceClass :: init (PrologRoot * root) {this -> root = root; default_source = default_destination = 0;}
+PrologMidiServiceClass :: PrologMidiServiceClass (void) {this -> root = NULL; dir = 0;}
 PrologMidiServiceClass :: ~ PrologMidiServiceClass (void) {}
 
