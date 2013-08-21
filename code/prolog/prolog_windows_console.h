@@ -20,28 +20,22 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-#include "prolog.h"
-#include <windows.h>
-
 #ifndef _PROLOG_WINDOWS_CONSOLE_
 #define _PROLOG_WINDOWS_CONSOLE_
+
+#include "prolog.h"
+#include <windows.h>
 
 class PrologWindowsConsole : public PrologCommand {
 private:
 	HANDLE output;
 	HANDLE input;
-	volatile bool running;
 	AREA area;
-	int delay;
-	void configure (void);
 public:
 	virtual void print (char * text);
-	virtual void open (void);
-	virtual void close (void);
-	virtual void read (void);
+	virtual int get (void);
 	virtual void setColors (int foreground, int background);
-	PrologWindowsConsole (int horizontal);
-	PrologWindowsConsole (int horizontal, int seconds);
+	PrologWindowsConsole (void);
 	~ PrologWindowsConsole (void);
 };
 

@@ -95,11 +95,11 @@ void PrologReader :: reset_var_number (void) {
 int PrologReader :: lastRead (void) {return act_znak;}
 
 int PrologReader :: getString (char * area, int ind) {
-	while (act_znak > 127 || act_znak < 32) {
+	while (act_znak > 127 || act_znak <= 32) {
 		if (act_znak < 0) return act_znak;
 		act_znak = move_z ();
 	}
-	while (act_znak > 31) {
+	while (act_znak > 32) {
 		if (ind < AREA_SIZE_1) area [ind++] = (char) act_znak;
 		act_znak = move_z ();
 	}
@@ -138,10 +138,6 @@ int PrologReader :: readln (char * area, int ind) {
 		act_znak = move_z ();
 	}
 	area [ind] = '\0';
-	while (act_znak > 127 || act_znak < 32) {
-		if (act_znak < 0) return act_znak;
-		act_znak = move_z ();
-	}
 	return ind;
 }
 

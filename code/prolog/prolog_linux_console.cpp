@@ -53,16 +53,22 @@ void PrologLinuxConsole :: print (char * text) {
 AREA previous_line = "";
 #endif
 
-void PrologLinuxConsole :: read (void) {
-	char * area = readline (prompt);
-	if (strlen (area) > 2) {
-		HIST_ENTRY * * histories = history_list ();
-		if (histories != 0 && history_length > 0) {
-			if (strcmp (area, histories [history_length - 1] -> line) != 0) add_history (area);
-		} else add_history (area);
+int PrologLinuxConsole :: get (void) {
+	int ch = PrologCommand :: get ();
+	if (ch >= 0) return ch;
+	while (ch < 0) {
+		char * area = readline (prompt);
+		if (strlen (area) > 2) {
+			HIST_ENTRY * * histories = history_list ();
+			if (histories != 0 && history_length > 0) {
+				if (strcmp (area, histories [history_length - 1] -> line) != 0) add_history (area);
+			} else add_history (area);
+		}
+		insert (area);
+		insert ("\n");
+		ch = PrologCommand :: get ();
 	}
-	insert (area);
-	insert ("\n");
+	return ch;
 }
 
 char * PrologLinuxConsole :: getPrompt (void) {return prompt;}

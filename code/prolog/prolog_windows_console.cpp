@@ -24,82 +24,40 @@
 
 #include "process.h"
 
-//static void command_runner (void * parameter) {((PrologWindowsConsole *) parameter) -> run ();}
-
 void PrologWindowsConsole :: print (char * text) {
 	DWORD x;
 	WriteFile (output, text, (DWORD) strlen (text), & x, NULL);
 }
 
-//void PrologWindowsConsole :: run (void) {
-//	DWORD x;
-//	running = true;
-//	while (running) {
-//		ReadFile (input, area, AREA_SIZE_1, & x, NULL);
-//		area [x] = '\0';
-//		insert (area);
-//		Sleep (delay);
-//	}
-//	running = true;
-//}
-
-void PrologWindowsConsole :: read (void) {
-	if (input == 0) return;
-	DWORD end;
-	ReadFile (input, area, AREA_SIZE_1, & end, 0);
-	area [end] = '\0';
-	insert (area);
+int PrologWindowsConsole :: get (void) {
+	int ch = PrologCommand :: get ();
+	if (ch >= 0) return ch;
+	if (input == 0) return ch;
+	while (ch < 0) {
+		DWORD end;
+		ReadFile (input, area, AREA_SIZE_1, & end, 0);
+		area [end] = '\0';
+		insert (area);
+		ch = PrologCommand :: get ();
+	}
+	return ch;
 }
 
-PrologWindowsConsole :: PrologWindowsConsole (int horizontal) {
-	if (horizontal < 1) horizontal = 1;
-	delay = 1000 / horizontal;
-	configure ();
-}
-
-PrologWindowsConsole :: PrologWindowsConsole (int horizontal, int seconds) {
-	if (seconds < 1) seconds = 1;
-	if (horizontal < 1) horizontal = 1;
-	seconds *= 1000;
-	delay = seconds / horizontal;
-	configure ();
-}
-
-void PrologWindowsConsole :: configure (void) {
+PrologWindowsConsole :: PrologWindowsConsole (void) {
 	output = NULL;
 	input = NULL;
-	running = false;
-}
-
-void PrologWindowsConsole :: open (void) {
-	if (output != NULL) return;
 	AllocConsole ();
 	SetConsoleTitle ("HERCs PROLOG CONSOLE");
 	output = GetStdHandle (STD_OUTPUT_HANDLE);
 	input = GetStdHandle (STD_INPUT_HANDLE);
 	SetConsoleTextAttribute (output, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-//	_beginthread (command_runner, 0, this);
 }
 
-void PrologWindowsConsole :: close (void) {
-	if (output == NULL) return;
-//	stop ();
-	CloseHandle (output);
-	CloseHandle (input);
+PrologWindowsConsole :: ~ PrologWindowsConsole (void) {
+	if (output != 0) CloseHandle (output); output = 0;
+	if (input != 0) CloseHandle (input); input = 0;
 	FreeConsole ();
-	input = NULL;
-	output = NULL;
 }
-
-//void PrologWindowsConsole :: stop (void) {
-//	if (running) {
-//		running = false;
-//		while (! running) Sleep (20);
-//		running = false;
-//	}
-//}
-
-PrologWindowsConsole :: ~ PrologWindowsConsole (void) {close ();}
 
 void PrologWindowsConsole :: setColors (int foreground, int background) {
 	if (output == NULL) return;

@@ -92,16 +92,9 @@ class read : public PrologNativeCode {
 public:
 	standard_in_reader * stdr;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (stdr -> root -> command) stdr -> root -> command -> read ();
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
 		AREA area;
-		if (stdr -> getString (area, 0) < 0) {
-			if (stdr -> root -> command) {
-				stdr -> act_znak = 0;
-				return true;
-			}
-			return false;
-		}
+		stdr -> getString (area, 0);
 		parameters -> setText (area);
 		return true;
 	}
@@ -112,7 +105,6 @@ class readln : public PrologNativeCode {
 public:
 	standard_in_reader * stdr;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (stdr -> root -> command) stdr -> root -> command -> read ();
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
 		AREA area;
 		stdr -> readln (area, 0);
@@ -126,12 +118,7 @@ class pr : public PrologNativeCode {
 public:
 	standard_in_reader * stdr;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (stdr -> root -> command) {
-			stdr -> root -> command -> read ();
-			while (stdr -> prefetch_whites ()) {stdr -> root -> command -> read (); stdr -> act_znak = '\0';}
-		}
 		if (! parameters -> isPair ()) return false;
-		if (stdr -> act_znak < 0) stdr -> act_znak = 0;
 		PrologElement * dup = stdr -> readElement ();
 		if (dup != NULL) {
 			parameters -> setLeft (dup);

@@ -522,7 +522,6 @@ public:
 	virtual void insert (char * text);
 	virtual int get (void);
 	virtual void print (char * text);
-	virtual void read (void);
 	virtual void setColors (int foreground, int background);
 	virtual void openEditor1 (void);
 	virtual void openEditor2 (int selector);

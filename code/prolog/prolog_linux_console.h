@@ -31,7 +31,7 @@ private:
 	PROLOG_STRING prompt;
 public:
 	virtual void print (char * text);
-	virtual void read (void);
+	virtual int get (void);
 	virtual void setColors (int foreground, int background);
 	virtual char * getPrompt (void);
 	virtual void setPrompt (char * prompt);

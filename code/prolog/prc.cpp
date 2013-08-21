@@ -21,7 +21,6 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "prolog.h"
-//#include "prolog_studio.h"
 
 #include <string.h>
 
@@ -42,25 +41,6 @@
 #define RUNNER_PARAMETER void *
 #define RETURN return 0;
 #endif
-
-/*
-#ifdef LINUX_OPERATING_SYSTEM
-#ifdef MAC_OPERATING_SYSTEM
-#include "mac_midi.h"
-mac_midi_service midi_service ("STUDIO");
-#else
-#include "linux_midi.h"
-linux_midi_service midi_service;
-#endif
-#endif
-
-#ifdef WINDOWS_OPERATING_SYSTEM
-#include "windows_midi.h"
-windows_midi_service midi_service;
-#endif
-
-prolog_midi_reader * midi_reader = NULL;
-*/
 
 #ifdef LINUX_OPERATING_SYSTEM
 typedef void * (* runner_procedure) (RUNNER_PARAMETER);
@@ -205,7 +185,7 @@ int main (int args, char * argv []) {
 	PrologCommand * console = new PrologLinuxConsole ();
 	#endif
 	#ifdef WINDOWS_OPERATING_SYSTEM
-	PrologCommand * console = new PrologWindowsConsole (10);
+	PrologCommand * console = new PrologWindowsConsole ();
 	#endif
 
 	root -> insertCommander (console);
@@ -219,9 +199,7 @@ int main (int args, char * argv []) {
 	delete root;
 //	if (object_left ())
 		drop_object_counter ();
-	#ifdef WINDOWS_OPERATING_SYSTEM
-	FreeConsole ();
-	#endif
+
 	return 0;
 }
 
