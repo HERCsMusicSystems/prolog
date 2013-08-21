@@ -221,6 +221,8 @@ public:
 
 class PrologNativeCode TRACK {
 public:
+	char * name (void);
+	virtual char * codeName (void);
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution);
 	PrologNativeCode (void);
 	virtual ~ PrologNativeCode (void);

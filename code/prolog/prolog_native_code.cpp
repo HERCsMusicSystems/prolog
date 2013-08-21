@@ -22,6 +22,9 @@
 
 #include "prolog.h"
 
+static char * native_code_name = "PrologNativeCode";
+char * PrologNativeCode :: name (void) {return native_code_name;}
+char * PrologNativeCode :: codeName (void) {return native_code_name;}
 bool PrologNativeCode :: code (PrologElement * parameter, PrologResolution * resolution) {return true;}
 PrologNativeCode :: PrologNativeCode (void) TRACKING (16) {}
 PrologNativeCode :: ~ PrologNativeCode (void) {}
