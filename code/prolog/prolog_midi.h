@@ -25,14 +25,7 @@
 
 #include "prolog.h"
 
-class PrologMidiNativeCode : public PrologNativeCode {
-public:
-	static char * name (void);
-	virtual char * codeName (void);
-	virtual void insert_one (int command);
-	virtual void insert_two (int command, int channel, int msb);
-	virtual void insert_three (int command, int channel, int msb, int lsb);
-};
+class PrologMidiNativeCode;
 
 class PrologMidiServiceClass : public PrologServiceClass {
 private:

@@ -120,6 +120,7 @@ public:
 	void connect_thru (midi_stream * thru);
 	void disconnect_thru (void);
 	midi_stream (void);
+	virtual ~ midi_stream (void);
 };
 
 class buffered_midi_stream : public midi_stream {
@@ -142,7 +143,7 @@ protected:
 public:
 	virtual bool message_waiting (void);
 	buffered_midi_stream (int size);
-	~ buffered_midi_stream (void);
+	virtual ~ buffered_midi_stream (void);
 };
 
 class clearable_midi_stream : public buffered_midi_stream {

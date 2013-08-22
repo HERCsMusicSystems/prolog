@@ -30,22 +30,42 @@ static bool midi_process (midi_stream * line, PrologElement * parameters) {
 }
 
 static char * midi_internal_line_name = "MidiInternalLine";
-char * PrologMidiNativeCode :: name (void) {return midi_internal_line_name;}
-char * PrologMidiNativeCode :: codeName (void) {return midi_internal_line_name;}
-void PrologMidiNativeCode :: insert_one (int command) {printf ("command [%i]\n", command);}
-void PrologMidiNativeCode :: insert_two (int command, int channel, int msb) {printf ("command [%i %i]\n", command + channel, msb);}
-void PrologMidiNativeCode :: insert_three (int command, int channel, int msb, int lsb) {printf ("command [%i %i %i]\n", command + channel, msb, lsb);}
+//void PrologMidiNativeCode :: insert_one (int command) {printf ("command [%i]\n", command);}
+//void PrologMidiNativeCode :: insert_two (int command, int channel, int msb) {printf ("command [%i %i]\n", command + channel, msb);}
+//void PrologMidiNativeCode :: insert_three (int command, int channel, int msb, int lsb) {printf ("command [%i %i %i]\n", command + channel, msb, lsb);}
 
-class MidiInternalLine : public PrologMidiNativeCode {
+class InternalMidiLine : public buffered_midi_stream {
+public:
+	virtual void internal_close_message (void) {
+		buffered_midi_stream :: internal_close_message ();
+		printf ("CLOSED.\n");
+	}
+	InternalMidiLine (void) : buffered_midi_stream (512) {}
+	virtual ~ InternalMidiLine (void) {
+		printf ("DESTROYED\n");
+	}
+};
+
+class PrologMidiNativeCode : public PrologNativeCode {
 public:
 	PrologAtom * atom;
-	buffered_midi_stream * line;
+	midi_stream * line;
+	static char * name (void) {return midi_internal_line_name;}
+	char * codeName (void) {return midi_internal_line_name;}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
 		return midi_process (line, parameters);
 	}
-	MidiInternalLine (PrologAtom * atom) {this -> atom = atom; line = new buffered_midi_stream (512);}
-	~ MidiInternalLine (void) {if (line) delete line; line = 0;}
+	PrologMidiNativeCode (PrologAtom * atom) {
+		this -> atom = atom;
+		line = new InternalMidiLine ();
+	}
+	~ PrologMidiNativeCode (void) {
+		printf ("hello\n");
+		if (line)
+			delete line;
+		line = 0;
+	}
 };
 
 bool short_message_processor (int command, PrologElement * parameters, PrologMidiServiceClass * servo) {
@@ -62,7 +82,7 @@ bool short_message_processor (int command, PrologElement * parameters, PrologMid
 	}
 	if (destination == 0) return false;
 	if (parameters -> isEarth ()) {
-		destination -> insert_one (command);
+		destination -> line -> insert (command);
 		return true;
 	}
 	if (! parameters -> isPair ()) return false;
@@ -85,14 +105,14 @@ bool short_message_processor (int command, PrologElement * parameters, PrologMid
 	} else return false;
 	parameters = parameters -> getRight ();
 	if (parameters -> isEarth ()) {
-		destination -> insert_two (command, channel, msb);
+		destination -> line -> insert (command + channel, msb);
 		return true;
 	}
 	if (! parameters -> isPair ()) return false;
 	el = parameters -> getLeft ();
 	if (! el -> isInteger ()) return false;
 	int lsb = el -> getInteger ();
-	destination -> insert_three (command, channel, msb, lsb);
+	destination -> line -> insert (command + channel, msb, lsb);
 	return true;
 }
 
@@ -103,7 +123,7 @@ public:
 		PrologElement * line_atom = parameters -> getLeft ();
 		if (line_atom -> isVar ()) line_atom -> setAtom (new PrologAtom ());
 		if (! line_atom -> isAtom ()) return false;
-		MidiInternalLine * line = new MidiInternalLine (line_atom -> getAtom ());
+		PrologMidiNativeCode * line = new PrologMidiNativeCode (line_atom -> getAtom ());
 		if (line_atom -> getAtom () -> setMachine (line)) return true;
 		delete line;
 		return false;

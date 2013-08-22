@@ -41,6 +41,8 @@ midi_stream :: midi_stream (void) {
 	set_product_version ("CORE");
 }
 
+midi_stream :: ~ midi_stream (void) {}
+
 int midi_stream :: get (void) {
 	last_get = internal_get ();
 	get_checksum -= last_get;
