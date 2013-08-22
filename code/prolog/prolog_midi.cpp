@@ -24,26 +24,140 @@
 #include "midi_stream.h"
 #include <string.h>
 
-static bool midi_process (midi_stream * line, PrologElement * parameters) {
-	printf ("I am here!\n");
-	return true;
+class prolog_midi_reader : public midi_reader {
+public:
+	PrologDirectory * midi_dir;
+	PrologRoot * root;
+	PrologAtom * income_midi_atom;
+	PrologAtom * keyoff_atom;
+	PrologAtom * keyon_atom;
+	PrologAtom * polyaftertouch_atom;
+	PrologAtom * control_atom;
+	PrologAtom * programchange_atom;
+	PrologAtom * aftertouch_atom;
+	PrologAtom * pitch_atom;
+	PrologAtom * sysex_atom;
+	PrologAtom * SYSEX_atom;
+	PrologAtom * timingclock_atom;
+	PrologAtom * start_atom;
+	PrologAtom * continue_atom;
+	PrologAtom * stop_atom;
+	PrologAtom * activesensing_atom;
+	void call (PrologElement * query);
+	PrologElement * build_call (PrologAtom * atom, int channel, int ind);
+	PrologElement * build_call (PrologAtom * atom, int channel, int ind, int sub);
+	virtual void midi_keyoff (int channel, int key);
+	virtual void midi_keyon (int channel, int key, int velocity);
+	virtual void midi_pat (int channel, int key, int value);
+	virtual void midi_control (int channel, int controller, int value);
+	virtual void midi_programchange (int channel, int program);
+	virtual void midi_cat (int channel, int value);
+	virtual void midi_pitchbend (int channel, int v1, int v2);
+	virtual void midi_system_exclusive (midi_stream * line);
+	virtual void midi_timing_clock (void);
+	virtual void midi_start (void);
+	virtual void midi_continue (void);
+	virtual void midi_stop (void);
+	virtual void midi_active_sensing (void);
+	prolog_midi_reader (PrologRoot * root, PrologAtom * atom);
+	~ prolog_midi_reader (void);
+};
+
+void prolog_midi_reader :: call (PrologElement * query) {
+	if (income_midi_atom == 0) {delete query; return;}
+	query = root -> pair (root -> atom (income_midi_atom), query);
+	query = root -> pair (query, root -> earth ());
+	query = root -> pair (root -> head (NULL), query);
+	root -> resolution (query);
+	delete query;
 }
+PrologElement * prolog_midi_reader :: build_call (PrologAtom * atom, int channel, int ind) {
+	return root -> pair (root -> atom (atom), root -> pair (root -> integer (channel + (midi_channel_extension != 0x7f ? midi_channel_extension << 4 : 0)), root -> pair (root -> integer (ind), root -> earth ())));
+}
+PrologElement * prolog_midi_reader :: build_call (PrologAtom * atom, int channel, int ind, int sub) {
+	return root -> pair (root -> atom (atom), root -> pair (root -> integer (channel + (midi_channel_extension != 0x7f ? midi_channel_extension << 4 : 0)), root -> pair (root -> integer (ind), root -> pair (root -> integer (sub), root -> earth ()))));
+}
+void prolog_midi_reader :: midi_keyoff (int channel, int key) {call (build_call (keyoff_atom, channel, key));}
+void prolog_midi_reader :: midi_keyon (int channel, int key, int velocity) {
+	call (build_call (keyon_atom, channel, key, velocity));
+}
+void prolog_midi_reader :: midi_pat (int channel, int key, int value) {call (build_call (polyaftertouch_atom, channel, key, value));}
+void prolog_midi_reader :: midi_control (int channel, int controller, int value) {call (build_call (control_atom, channel, controller, value));}
+void prolog_midi_reader :: midi_programchange (int channel, int program) {call (build_call (programchange_atom, channel, program));}
+void prolog_midi_reader :: midi_cat (int channel, int value) {call (build_call (aftertouch_atom, channel, value));}
+void prolog_midi_reader :: midi_pitchbend (int channel, int v1, int v2) {call (build_call (pitch_atom, channel, v1, v2));}
+void prolog_midi_reader :: midi_system_exclusive (midi_stream * line) {
+	// prolog command sysex filter
+	line -> mark ();
+	PrologAtom * atom = SYSEX_atom;
+	if (line -> check_system_exclusive ()) atom = sysex_atom;
+	else line -> restore ();
+	PrologElement * query = root -> pair (root -> atom (atom), root -> earth ());
+	PrologElement * el = query -> getRight ();
+	int ind = line -> get ();
+	while (ind < 247) {
+		el -> setPair (root -> integer (ind), root -> earth ());
+		el = el -> getRight ();
+		ind = line -> get ();
+	}
+	call (query);
+}
+void prolog_midi_reader :: midi_timing_clock (void) {call (root -> pair (root -> atom (timingclock_atom), root -> earth ()));}
+void prolog_midi_reader :: midi_start (void) {call (root -> pair (root -> atom (start_atom), root -> earth ()));}
+void prolog_midi_reader :: midi_continue (void) {call (root -> pair (root -> atom (continue_atom), root -> earth ()));}
+void prolog_midi_reader :: midi_stop (void) {call (root -> pair (root -> atom (stop_atom), root -> earth ()));}
+void prolog_midi_reader :: midi_active_sensing (void) {call (root -> pair (root -> atom (activesensing_atom), root -> earth ()));}
+prolog_midi_reader :: prolog_midi_reader (PrologRoot * root, PrologAtom * atom) {
+	this -> root = root;
+	midi_dir = 0;
+	income_midi_atom = atom;
+	if (income_midi_atom) {COLLECTOR_REFERENCE_INC (income_midi_atom);}
+	keyoff_atom = 0;
+	keyon_atom = 0;
+	polyaftertouch_atom = 0;
+	control_atom = 0;
+	programchange_atom = 0;
+	aftertouch_atom = 0;
+	pitch_atom = 0;
+	sysex_atom = 0;
+	SYSEX_atom = 0;
+	timingclock_atom = 0;
+	start_atom = 0;
+	continue_atom = 0;
+	stop_atom = 0;
+	activesensing_atom = 0;
+	if (root == 0) return;
+	midi_dir = root -> searchDirectory ("midi");
+	if (midi_dir == 0) return;
+	keyoff_atom = midi_dir -> searchAtom ("keyoff");
+	keyon_atom = midi_dir -> searchAtom ("keyon");
+	polyaftertouch_atom = midi_dir -> searchAtom ("polyaftertouch");
+	control_atom = midi_dir -> searchAtom ("control");
+	programchange_atom = midi_dir -> searchAtom ("programchange");
+	aftertouch_atom = midi_dir -> searchAtom ("aftertouch");
+	pitch_atom = midi_dir -> searchAtom ("pitch");
+	sysex_atom = midi_dir -> searchAtom ("sysex");
+	SYSEX_atom = midi_dir -> searchAtom ("SYSEX");
+	timingclock_atom = midi_dir -> searchAtom ("timingclock");
+	start_atom = midi_dir -> searchAtom ("START");
+	continue_atom = midi_dir -> searchAtom ("CONTINUE");
+	stop_atom = midi_dir -> searchAtom ("STOP");
+	activesensing_atom = midi_dir -> searchAtom ("activesensing");
+}
+prolog_midi_reader :: ~ prolog_midi_reader (void) {if (income_midi_atom) income_midi_atom -> removeAtom (); income_midi_atom = 0;}
 
 static char * midi_internal_line_name = "MidiInternalLine";
-//void PrologMidiNativeCode :: insert_one (int command) {printf ("command [%i]\n", command);}
-//void PrologMidiNativeCode :: insert_two (int command, int channel, int msb) {printf ("command [%i %i]\n", command + channel, msb);}
-//void PrologMidiNativeCode :: insert_three (int command, int channel, int msb, int lsb) {printf ("command [%i %i %i]\n", command + channel, msb, lsb);}
 
 class InternalMidiLine : public buffered_midi_stream {
 public:
+	prolog_midi_reader * reader;
 	virtual void internal_close_message (void) {
 		buffered_midi_stream :: internal_close_message ();
+		reader -> read (this);
 		printf ("CLOSED.\n");
 	}
-	InternalMidiLine (void) : buffered_midi_stream (512) {}
-	virtual ~ InternalMidiLine (void) {
-		printf ("DESTROYED\n");
-	}
+	InternalMidiLine (PrologRoot * root, PrologAtom * atom) : buffered_midi_stream (512) {reader = new prolog_midi_reader (root, atom);}
+	virtual ~ InternalMidiLine (void) {if (reader) delete reader; reader = 0;}
 };
 
 class PrologMidiNativeCode : public PrologNativeCode {
@@ -54,18 +168,13 @@ public:
 	char * codeName (void) {return midi_internal_line_name;}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
-		return midi_process (line, parameters);
+		return false;
 	}
-	PrologMidiNativeCode (PrologAtom * atom) {
+	PrologMidiNativeCode (PrologAtom * atom, PrologRoot * root, PrologAtom * income_midi) {
 		this -> atom = atom;
-		line = new InternalMidiLine ();
+		line = new InternalMidiLine (root, income_midi);
 	}
-	~ PrologMidiNativeCode (void) {
-		printf ("hello\n");
-		if (line)
-			delete line;
-		line = 0;
-	}
+	~ PrologMidiNativeCode (void) {if (line) delete line; line = 0;}
 };
 
 bool short_message_processor (int command, PrologElement * parameters, PrologMidiServiceClass * servo) {
@@ -118,17 +227,26 @@ bool short_message_processor (int command, PrologElement * parameters, PrologMid
 
 class CreateLine : public PrologNativeCode {
 public:
+	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
 		PrologElement * line_atom = parameters -> getLeft ();
 		if (line_atom -> isVar ()) line_atom -> setAtom (new PrologAtom ());
 		if (! line_atom -> isAtom ()) return false;
-		PrologMidiNativeCode * line = new PrologMidiNativeCode (line_atom -> getAtom ());
+		PrologAtom * income_midi = 0;
+		if (parameters -> isPair ()) {
+			parameters = parameters -> getRight ();
+			if (parameters -> isPair ()) {
+				PrologElement * el = parameters -> getLeft ();
+				if (el -> isAtom ()) income_midi = el -> getAtom ();
+			}
+		}
+		PrologMidiNativeCode * line = new PrologMidiNativeCode (line_atom -> getAtom (), root, income_midi);
 		if (line_atom -> getAtom () -> setMachine (line)) return true;
 		delete line;
 		return false;
 	}
-	CreateLine (void) {}
+	CreateLine (PrologRoot * root) {this -> root = root;}
 };
 
 class control : public PrologNativeCode {
@@ -139,45 +257,6 @@ public:
 };
 
 /*
-
-class prolog_midi_reader : public midi_reader {
-public:
-	PrologDirectory * studio_dir;
-	PrologRoot * root;
-	PrologAtom * income_midi_atom;
-	PrologAtom * keyoff_atom;
-	PrologAtom * keyon_atom;
-	PrologAtom * polyaftertouch_atom;
-	PrologAtom * control_atom;
-	PrologAtom * programchange_atom;
-	PrologAtom * aftertouch_atom;
-	PrologAtom * pitch_atom;
-	PrologAtom * sysex_atom;
-	PrologAtom * SYSEX_atom;
-	PrologAtom * timingclock_atom;
-	PrologAtom * start_atom;
-	PrologAtom * continue_atom;
-	PrologAtom * stop_atom;
-	PrologAtom * activesensing_atom;
-	void call (PrologElement * query);
-	PrologElement * build_call (PrologAtom * atom, int channel, int ind);
-	PrologElement * build_call (PrologAtom * atom, int channel, int ind, int sub);
-	virtual void midi_keyoff (int channel, int key);
-	virtual void midi_keyon (int channel, int key, int velocity);
-	virtual void midi_pat (int channel, int key, int value);
-	virtual void midi_control (int channel, int controller, int value);
-	virtual void midi_programchange (int channel, int program);
-	virtual void midi_cat (int channel, int value);
-	virtual void midi_pitchbend (int channel, int v1, int v2);
-	virtual void midi_system_exclusive (midi_stream * line);
-	virtual void midi_timing_clock (void);
-	virtual void midi_start (void);
-	virtual void midi_continue (void);
-	virtual void midi_stop (void);
-	virtual void midi_active_sensing (void);
-	virtual bool is_ready (void);
-	prolog_midi_reader (PrologRoot * root);
-};
 
 ////////////////
 // MIDI Ports //
@@ -618,91 +697,6 @@ public:
 	midi_product_version (PrologRoot * root) {this -> root = root;}
 };
 
-void prolog_midi_reader :: call (PrologElement * query) {
-	query = root -> pair (root -> atom (income_midi_atom), query);
-	query = root -> pair (query, root -> earth ());
-	query = root -> pair (root -> head (NULL), query);
-	root -> resolution (query);
-	delete query;
-}
-PrologElement * prolog_midi_reader :: build_call (PrologAtom * atom, int channel, int ind) {
-	return root -> pair (root -> atom (atom), root -> pair (root -> integer (channel + (midi_channel_extension != 0x7f ? midi_channel_extension << 4 : 0)), root -> pair (root -> integer (ind), root -> earth ())));
-}
-PrologElement * prolog_midi_reader :: build_call (PrologAtom * atom, int channel, int ind, int sub) {
-	return root -> pair (root -> atom (atom), root -> pair (root -> integer (channel + (midi_channel_extension != 0x7f ? midi_channel_extension << 4 : 0)), root -> pair (root -> integer (ind), root -> pair (root -> integer (sub), root -> earth ()))));
-}
-void prolog_midi_reader :: midi_keyoff (int channel, int key) {call (build_call (keyoff_atom, channel, key));}
-void prolog_midi_reader :: midi_keyon (int channel, int key, int velocity) {
-	call (build_call (keyon_atom, channel, key, velocity));
-}
-void prolog_midi_reader :: midi_pat (int channel, int key, int value) {call (build_call (polyaftertouch_atom, channel, key, value));}
-void prolog_midi_reader :: midi_control (int channel, int controller, int value) {call (build_call (control_atom, channel, controller, value));}
-void prolog_midi_reader :: midi_programchange (int channel, int program) {call (build_call (programchange_atom, channel, program));}
-void prolog_midi_reader :: midi_cat (int channel, int value) {call (build_call (aftertouch_atom, channel, value));}
-void prolog_midi_reader :: midi_pitchbend (int channel, int v1, int v2) {call (build_call (pitch_atom, channel, v1, v2));}
-void prolog_midi_reader :: midi_system_exclusive (midi_stream * line) {
-	// prolog command sysex filter
-	line -> mark ();
-	PrologAtom * atom = SYSEX_atom;
-	if (line -> check_system_exclusive ()) atom = sysex_atom;
-	else line -> restore ();
-	PrologElement * query = root -> pair (root -> atom (atom), root -> earth ());
-	PrologElement * el = query -> getRight ();
-	int ind = line -> get ();
-	while (ind < 247) {
-		el -> setPair (root -> integer (ind), root -> earth ());
-		el = el -> getRight ();
-		ind = line -> get ();
-	}
-	call (query);
-}
-void prolog_midi_reader :: midi_timing_clock (void) {call (root -> pair (root -> atom (timingclock_atom), root -> earth ()));}
-void prolog_midi_reader :: midi_start (void) {call (root -> pair (root -> atom (start_atom), root -> earth ()));}
-void prolog_midi_reader :: midi_continue (void) {call (root -> pair (root -> atom (continue_atom), root -> earth ()));}
-void prolog_midi_reader :: midi_stop (void) {call (root -> pair (root -> atom (stop_atom), root -> earth ()));}
-void prolog_midi_reader :: midi_active_sensing (void) {call (root -> pair (root -> atom (activesensing_atom), root -> earth ()));}
-bool prolog_midi_reader :: is_ready (void) {
-	if (studio_dir != NULL) return true;
-	studio_dir = root -> searchDirectory ("studio");
-	if (studio_dir == NULL) return false;
-	income_midi_atom = studio_dir -> searchAtom ("income_midi");
-	keyoff_atom = studio_dir -> searchAtom ("keyoff");
-	keyon_atom = studio_dir -> searchAtom ("keyon");
-	polyaftertouch_atom = studio_dir -> searchAtom ("polyaftertouch");
-	control_atom = studio_dir -> searchAtom ("control");
-	programchange_atom = studio_dir -> searchAtom ("programchange");
-	aftertouch_atom = studio_dir -> searchAtom ("aftertouch");
-	pitch_atom = studio_dir -> searchAtom ("pitch");
-	sysex_atom = studio_dir -> searchAtom ("sysex");
-	SYSEX_atom = studio_dir -> searchAtom ("SYSEX");
-	timingclock_atom = studio_dir -> searchAtom ("timingclock");
-	start_atom = studio_dir -> searchAtom ("START");
-	continue_atom = studio_dir -> searchAtom ("CONTINUE");
-	stop_atom = studio_dir -> searchAtom ("STOP");
-	activesensing_atom = studio_dir -> searchAtom ("activesensing");
-	return true;
-}
-prolog_midi_reader :: prolog_midi_reader (PrologRoot * root) {
-	this -> root = root;
-	studio_dir = NULL;
-	income_midi_atom = NULL;
-	keyoff_atom = NULL;
-	keyon_atom = NULL;
-	polyaftertouch_atom = NULL;
-	control_atom = NULL;
-	programchange_atom = NULL;
-	aftertouch_atom = NULL;
-	pitch_atom = NULL;
-	sysex_atom = NULL;
-	SYSEX_atom = NULL;
-	timingclock_atom = NULL;
-	start_atom = NULL;
-	continue_atom = NULL;
-	stop_atom = NULL;
-	activesensing_atom = NULL;
-	is_ready ();
-}
-
 class interval_processor : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -978,7 +972,7 @@ void PrologMidiServiceClass :: set_atoms (void) {
 
 PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	set_atoms ();
-	if (strcmp (name, "createLine") == 0) return new CreateLine ();
+	if (strcmp (name, "createLine") == 0) return new CreateLine (root);
 	if (strcmp (name, "control") == 0) return new control (this);
 	return NULL;
 }
