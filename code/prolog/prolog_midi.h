@@ -39,6 +39,8 @@ private:
 	PrologAtom * a, * ab, * abb, * ax, * axx;
 	PrologAtom * b, * bb, * bbb, * bx, * bxx;
 public:
+	PrologAtom * keyoff_atom, * keyon_atom, * polyaftertouch_atom, * control_atom, * programchange_atom, * aftertouch_atom, * pitch_atom;
+	PrologAtom * sysex_atom, * SYSEX_atom, * timingclock_atom, * start_atom, * continue_atom, * stop_atom, * activesensing_atom;
 	PrologMidiNativeCode * default_source;
 	PrologMidiNativeCode * default_destination;
 	int diatonic (PrologAtom * atom);

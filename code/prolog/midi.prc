@@ -34,7 +34,6 @@ program midi #machine := "prolog.midi"
 	]
 
 #machine createLine := "createLine"
-#machine control := "control"
 ;#machine midi_in_info := "midi_in_info"
 ;#machine midi_out_info := "midi_out_info"
 ;#machine midi_in_port := "midi_in_port"
@@ -64,6 +63,7 @@ program midi #machine := "prolog.midi"
 [[keyoff *channel *key *velocity] [midi_short_msg 128 *channel *key *velocity]]
 [[keyon *channel *key *velocity] [midi_short_msg 144 *channel *key *velocity]]
 [[polyaftertouch *channel *key *value] [midi_short_msg 160 *channel *key *value]]
+#machine control := "control"
 ;[[control *channel *controller *value] [midi_short_msg 176 *channel *controller *value]]
 [[programchange *channel *program] [midi_short_msg 192 *channel *program]]
 [[programchange *channel *msb *lsb *program] [add *channel 64 *selector] [sysex *selector 84 *lsb *program *msb]]
@@ -79,10 +79,14 @@ program midi #machine := "prolog.midi"
 
 ; controllers
 [[keyoff *channel] [midi_short_msg 176 *channel 123 0]]
-[[attack *channel *value] [midi_short_msg 176 *channel 73 *value]]
-[[release *channel *value] [midi_short_msg 176 *channel 72 *value]]
-[[cutoff *channel *value] [midi_short_msg 176 *channel 74 *value]]
-[[resonance *channel *value] [midi_short_msg 176 *channel 71 *value]]
+#machine attack := "attack"
+#machine release := "release"
+#machine cutoff := "cutoff"
+#machine resonance := "resonance"
+;[[attack *channel *value] [midi_short_msg 176 *channel 73 *value]]
+;[[release *channel *value] [midi_short_msg 176 *channel 72 *value]]
+;[[cutoff *channel *value] [midi_short_msg 176 *channel 74 *value]]
+;[[resonance *channel *value] [midi_short_msg 176 *channel 71 *value]]
 [[mono *channel] [midi_short_msg 176 *channel 126 0]]
 [[poly *channel] [midi_short_msg 176 *channel 127 0]]
 [[bank *channel *msb *lsb] [midi_short_msg 176 *channel 0 *msb] [midi_short_msg 176 *channel 32 *lsb]]
@@ -92,30 +96,51 @@ program midi #machine := "prolog.midi"
 [[banklsb *channel *value] [midi_short_msg 176 *channel 32 *value]]
 [[portaon *channel] [midi_short_msg 176 *channel 65 127]]
 [[portaoff *channel] [midi_short_msg 176 *channel 65 0]]
-[[portatime *channel *value] [midi_short_msg 176 *channel 5 *value]]
-[[volume *channel *value] [midi_short_msg 176 *channel 7 *value]]
-[[reverb *channel *value] [midi_short_msg 176 *channel 91 *value]]
-[[chorus *channel *value] [midi_short_msg 176 *channel 93 *value]]
-[[foot *channel *value] [midi_short_msg 176 *channel 4 *value]]
-[[breath *channel *value] [midi_short_msg 176 *channel 2 *value]]
-[[pan *channel *value] [midi_short_msg 176 *channel 10 *value]]
-[[modulation *channel *value] [midi_short_msg 176 *channel 1 *value]]
+#machine portatime := "portatime"
+#machine volume := "volume"
+#machine reverb := "reverb"
+#machine chorus := "chorus"
+#machine foot := "foot"
+#machine breath := "breath"
+#machine pan := "pan"
+#machine modulation := "modulation"
+;[[portatime *channel *value] [midi_short_msg 176 *channel 5 *value]]
+;[[volume *channel *value] [midi_short_msg 176 *channel 7 *value]]
+;[[reverb *channel *value] [midi_short_msg 176 *channel 91 *value]]
+;[[chorus *channel *value] [midi_short_msg 176 *channel 93 *value]]
+;[[foot *channel *value] [midi_short_msg 176 *channel 4 *value]]
+;[[breath *channel *value] [midi_short_msg 176 *channel 2 *value]]
+;[[pan *channel *value] [midi_short_msg 176 *channel 10 *value]]
+;[[modulation *channel *value] [midi_short_msg 176 *channel 1 *value]]
 [[holdon *channel] [midi_short_msg 176 *channel 64 127]]
 [[holdoff *channel] [midi_short_msg 176 *channel 64 0]]
 ; capital controllers
-[[CONTROL *channel *controller *value] [MIDI_SHORT_MSG 176 *channel *controller *value]]
-[[ATTACK *channel *value] [MIDI_SHORT_MSG 176 *channel 73 *value]]
-[[RELEASE *channel *value] [MIDI_SHORT_MSG 176 *channel 72 *value]]
-[[CUTOFF *channel *value] [MIDI_SHORT_MSG 176 *channel 74 *value]]
-[[RESONANCE *channel *value] [MIDI_SHORT_MSG 176 *channel 71 *value]]
-[[PORTATIME *channel *value] [MIDI_SHORT_MSG 176 *channel 5 *value]]
-[[VOLUME *channel *value] [MIDI_SHORT_MSG 176 *channel 7 *value]]
-[[REVERB *channel *value] [MIDI_SHORT_MSG 176 *channel 91 *value]]
-[[CHORUS *channel *value] [MIDI_SHORT_MSG 176 *channel 93 *value]]
-[[FOOT *channel *value] [MIDI_SHORT_MSG 176 *channel 4 *value]]
-[[BREATH *channel *value] [MIDI_SHORT_MSG 176 *channel 2 *value]]
-[[PAN *channel *value] [MIDI_SHORT_MSG 176 *channel 10 *value]]
-[[MODULATION *channel *value] [MIDI_SHORT_MSG 176 *channel 1 *value]]
+#machine CONTROL := "CONTROL"
+#machine ATTACK := "ATTACK"
+#machine RELEASE := "RELEASE"
+#machine CUTOFF := "CUTOFF"
+#machine RESONANCE := "RESONANCE"
+#machine PORTATIME := "PORTATIME"
+#machine VOLUME := "VOLUME"
+#machine REVERB := "REVERB"
+#machine CHORUS := "CHORUS"
+#machine FOOT := "FOOT"
+#machine BREATH := "BREATH"
+#machine PAN := "PAN"
+#machine MODULATION := "MODULATION"
+;[[CONTROL *channel *controller *value] [MIDI_SHORT_MSG 176 *channel *controller *value]]
+;[[ATTACK *channel *value] [MIDI_SHORT_MSG 176 *channel 73 *value]]
+;[[RELEASE *channel *value] [MIDI_SHORT_MSG 176 *channel 72 *value]]
+;[[CUTOFF *channel *value] [MIDI_SHORT_MSG 176 *channel 74 *value]]
+;[[RESONANCE *channel *value] [MIDI_SHORT_MSG 176 *channel 71 *value]]
+;[[PORTATIME *channel *value] [MIDI_SHORT_MSG 176 *channel 5 *value]]
+;[[VOLUME *channel *value] [MIDI_SHORT_MSG 176 *channel 7 *value]]
+;[[REVERB *channel *value] [MIDI_SHORT_MSG 176 *channel 91 *value]]
+;[[CHORUS *channel *value] [MIDI_SHORT_MSG 176 *channel 93 *value]]
+;[[FOOT *channel *value] [MIDI_SHORT_MSG 176 *channel 4 *value]]
+;[[BREATH *channel *value] [MIDI_SHORT_MSG 176 *channel 2 *value]]
+;[[PAN *channel *value] [MIDI_SHORT_MSG 176 *channel 10 *value]]
+;[[MODULATION *channel *value] [MIDI_SHORT_MSG 176 *channel 1 *value]]
 
 ; nrpn / rpn
 [[nrpn *ch *pmsb *plsb *vmsb *vlsb]
