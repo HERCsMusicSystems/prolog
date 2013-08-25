@@ -118,6 +118,45 @@ public:
 	virtual ~ InternalMidiLine (void) {if (reader) delete reader; reader = 0;}
 };
 
+typedef void * (* runner_procedure) (void * parameter);
+static void beginthread (runner_procedure runner, void * root) {
+	pthread_t threader;
+	pthread_attr_t attr;
+	pthread_attr_init (& attr);
+	pthread_attr_setstacksize (& attr, 120 * 1024);
+	pthread_attr_setdetachstate (& attr, PTHREAD_CREATE_DETACHED);
+	pthread_create (& threader, & attr, runner, root);
+	pthread_attr_destroy (& attr);
+}
+
+#include <unistd.h>
+#include <fcntl.h>
+static int midi_input_id = -1;
+
+static void * midi_runner (void * parameter) {
+	unsigned char v1;
+	while (true) {
+		int res = read (midi_input_id, & v1, 1);
+		if (v1 != 254) printf ("read [%i %i]\n", res, v1);
+	}
+}
+
+class SourceMidiLine : public midi_stream {
+public:
+	prolog_midi_reader * reader;
+	virtual void internal_close_message (void) {
+		midi_stream :: internal_close_message ();
+		reader -> read (this);
+	}
+	SourceMidiLine (PrologRoot * root, PrologAtom * atom, PrologMidiServiceClass * servo, char * file_name) {
+		reader = new prolog_midi_reader (root, atom, servo);
+		midi_input_id = open (file_name, O_RDONLY);
+		printf ("open [%i]\n", midi_input_id);
+		//beginthread (midi_runner, this);
+	}
+	virtual ~ SourceMidiLine (void) {if (reader) delete reader; reader = 0;}
+};
+
 class PrologMidiNativeCode : public PrologNativeCode {
 public:
 	PrologAtom * atom;
@@ -133,6 +172,21 @@ public:
 		line = new InternalMidiLine (root, income_midi, servo);
 	}
 	~ PrologMidiNativeCode (void) {if (line) delete line; line = 0;}
+};
+
+class PrologMidiSourceCode : public PrologNativeCode {
+public:
+	PrologAtom * atom;
+	midi_stream * line;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
+		return false;
+	}
+	PrologMidiSourceCode (PrologRoot * root, PrologMidiServiceClass * servo, PrologAtom * atom, PrologAtom * income, char * file_name) {
+		this -> atom = atom;
+		line = new SourceMidiLine (root, income, servo, file_name);
+	}
+	~ PrologMidiSourceCode (void) {if (line) delete line; line = 0;}
 };
 
 bool short_message_processor (int required, int command, PrologElement * parameters, PrologMidiServiceClass * servo, int ctrl = -1, bool extended = false) {
@@ -226,6 +280,39 @@ public:
 		return false;
 	}
 	CreateLine (PrologRoot * root, PrologMidiServiceClass * servo) {this -> root = root; this -> servo = servo;}
+};
+
+class CreateSource : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	PrologMidiServiceClass * servo;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		PrologAtom * line = 0;
+		PrologAtom * income = 0;
+		char * file_name = 0;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isVar ()) el -> setAtom (new PrologAtom ());
+			if (el -> isAtom ()) {
+				if (line != 0) income = el -> getAtom ();
+				else line = el -> getAtom ();
+			}
+			if (el -> isText ()) file_name = el -> getText ();
+			parameters = parameters -> getRight ();
+		}
+		PrologMidiSourceCode * source = new PrologMidiSourceCode (root, servo, line, income, file_name);
+		if (line -> setMachine (source)) return true;
+		delete source;
+		return false;
+	}
+	CreateSource (PrologRoot * root, PrologMidiServiceClass * servo) {this -> root = root; this -> servo = servo;}
+};
+
+class CreateDestination : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		return false;
+	}
 };
 
 class MidiShortCommand : public PrologNativeCode {
@@ -960,6 +1047,8 @@ void PrologMidiServiceClass :: set_atoms (void) {
 PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	set_atoms ();
 	if (strcmp (name, "createLine") == 0) return new CreateLine (root, this);
+	if (strcmp (name, "createSource") == 0) return new CreateSource (root, this);
+	if (strcmp (name, "createDestination") == 0) return new CreateDestination ();
 	if (strcmp (name, "control") == 0) return new control_command (this);
 	if (strcmp (name, "attack") == 0) return new attack_command (this);
 	if (strcmp (name, "release") == 0) return new release_command (this);
