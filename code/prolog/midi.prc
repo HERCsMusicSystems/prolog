@@ -17,7 +17,7 @@ program midi #machine := "prolog.midi"
 		CONTROL ATTACK RELEASE CUTOFF RESONANCE PORTATIME
 		VOLUME REVERB CHORUS FOOT BREATH PAN MODULATION
 		nrpn rpn NRPN RPN hit DCMOD
-		createLine
+		createLine createSource createDestination
 		midi_info midi_port midi midi_in_info midi_out_info midi_in_port midi_out_port midi_short_msg MIDI_SHORT_MSG midi_long_msg
 		midi_manufacturers_id midi_product_id midi_product_version
 		egcopy egcopy_freq egcopy_amp egcopy_index egcopy_pan
@@ -34,6 +34,8 @@ program midi #machine := "prolog.midi"
 	]
 
 #machine createLine := "createLine"
+#machine createSource := "createSource"
+#machine createDestination := "createDestination"
 ;#machine midi_in_info := "midi_in_info"
 ;#machine midi_out_info := "midi_out_info"
 ;#machine midi_in_port := "midi_in_port"
