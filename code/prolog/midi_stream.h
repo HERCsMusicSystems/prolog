@@ -174,6 +174,7 @@ public:
 public:
 	void read (midi_stream * line);
 	virtual void midi_keyoff (int channel, int key);
+	virtual void midi_keyoffv (int channel, int key, int velocity);
 	virtual void midi_keyon (int channel, int key, int velocity);
 	virtual void midi_pat (int channel, int key, int value);
 	virtual void midi_control (int channel, int controller, int value);

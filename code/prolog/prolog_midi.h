@@ -24,8 +24,26 @@
 #define _PROLOG_MIDI_SERVICE_CLASS_
 
 #include "prolog.h"
+#include "midi_stream.h"
 
+class prolog_midi_reader;
 class PrologMidiNativeCode;
+class PrologMidiServiceClass;
+
+class SourceMidiLine : public midi_stream {
+public:
+	prolog_midi_reader * reader;
+	int midi_input_id;
+	int command;
+	int prefetch;
+	bool running;
+	virtual void internal_close_message (void);
+	virtual bool message_waiting (void);
+	virtual int internal_get (void);
+	virtual int internal_get_command (void);
+	SourceMidiLine (PrologRoot * root, PrologAtom * atom, PrologMidiServiceClass * servo, int midi_input_id);
+	virtual ~ SourceMidiLine (void);
+};
 
 class PrologMidiServiceClass : public PrologServiceClass {
 private:
@@ -41,10 +59,12 @@ private:
 public:
 	PrologAtom * keyoff_atom, * keyon_atom, * polyaftertouch_atom, * control_atom, * programchange_atom, * aftertouch_atom, * pitch_atom;
 	PrologAtom * sysex_atom, * SYSEX_atom, * timingclock_atom, * start_atom, * continue_atom, * stop_atom, * activesensing_atom;
+	PrologAtom * midi_manufacturers_id_atom, * midi_product_id_atom, * midi_product_version_atom;
 	PrologMidiNativeCode * default_source;
 	PrologMidiNativeCode * default_destination;
 	int diatonic (PrologAtom * atom);
 	int chromatic (PrologAtom * atom);
+	PrologAtom * note (int diatonic, int chromatic);
 	void set_atoms (void);
 	virtual void init (PrologRoot * root);
 	virtual PrologNativeCode * getNativeCode (char * name);

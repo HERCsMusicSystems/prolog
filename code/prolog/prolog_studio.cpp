@@ -1133,47 +1133,6 @@ public:
 	mod (PrologRoot * root) {this -> root = root;}
 };
 
-class DCMOD : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e_diatonic = parameters -> getLeft ();
-		if (! e_diatonic -> isInteger ()) return false;
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e_chromatic = parameters -> getLeft ();
-		if (! e_chromatic -> isInteger ()) return false;
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e_octave = parameters -> getLeft ();
-		if (! e_octave -> isInteger ()) return false;
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e_diatonic_shift = parameters -> getLeft ();
-		if (! e_diatonic_shift -> isInteger ()) return false;
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e_chromatic_shift = parameters -> getLeft ();
-		if (! e_chromatic_shift -> isInteger ()) return false;
-		parameters = parameters -> getRight ();
-		int diatonic = e_diatonic -> getInteger () + e_diatonic_shift -> getInteger ();
-
-		int chromatic = e_chromatic -> getInteger () + e_chromatic_shift -> getInteger ();
-		int octave = e_octave -> getInteger ();
-		while (chromatic < 0) {chromatic += 12; diatonic += 7; octave--;}
-		while (chromatic > 11) {chromatic -= 12; diatonic -= 7; octave++;}
-		if (! parameters -> isPair ()) return false;
-		parameters -> getLeft () -> setInteger (diatonic);
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		parameters -> getLeft () -> setInteger (chromatic);
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		parameters -> getLeft () -> setInteger (octave);
-		return true;
-	}
-};
-
 class sub : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {

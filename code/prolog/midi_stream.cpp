@@ -126,7 +126,7 @@ bool midi_stream :: check_checksum (void) {
 void midi_stream :: insert (int value) {
 	internal_insert (value);
 	checksum -= value;
-	if (value > 0x7f) {last_message = value; close_message ();}
+	if (value > 0x7f) {last_message = value;} // close_message ();}
 	if (thru == NULL) return;
 	thru -> insert (value);
 }
@@ -435,8 +435,10 @@ void midi_reader :: read (midi_stream * line) {
 		command &= 0xf0;
 		switch (command) {
 		case 0x80:
-			midi_keyoff (channel, line -> get ());
-			line -> get ();
+			data1 = line -> get ();
+			data2 = line -> get ();
+			if (data2 == 0) midi_keyoff (channel, data1);
+			else midi_keyoffv (channel, data1, data2);
 			break;
 		case 0x90:
 			data1 = line -> get ();
@@ -490,6 +492,7 @@ void midi_reader :: midi_pitchbend (int channel, int v1, int v2) {
 	midi_control (channel, 128, v2);
 }
 void midi_reader :: midi_keyoff (int channel, int key) {}
+void midi_reader :: midi_keyoffv (int channel, int key, int velocity) {midi_keyoff (channel, key);}
 void midi_reader :: midi_keyon (int channel, int key, int velocity) {}
 void midi_reader :: midi_control (int channel, int controller, int value) {}
 void midi_reader :: midi_programchange (int channel, int program) {}

@@ -21,7 +21,6 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "prolog_midi.h"
-#include "midi_stream.h"
 #include <string.h>
 
 class prolog_midi_reader : public midi_reader {
@@ -34,6 +33,7 @@ public:
 	PrologElement * build_call (PrologAtom * atom, int channel, int ind);
 	PrologElement * build_call (PrologAtom * atom, int channel, int ind, int sub);
 	virtual void midi_keyoff (int channel, int key);
+	virtual void midi_keyoffv (int channel, int key, int velocity);
 	virtual void midi_keyon (int channel, int key, int velocity);
 	virtual void midi_pat (int channel, int key, int value);
 	virtual void midi_control (int channel, int controller, int value);
@@ -65,6 +65,7 @@ PrologElement * prolog_midi_reader :: build_call (PrologAtom * atom, int channel
 	return root -> pair (root -> atom (atom), root -> pair (root -> integer (channel + (midi_channel_extension != 0x7f ? midi_channel_extension << 4 : 0)), root -> pair (root -> integer (ind), root -> pair (root -> integer (sub), root -> earth ()))));
 }
 void prolog_midi_reader :: midi_keyoff (int channel, int key) {call (build_call (servo -> keyoff_atom, channel, key));}
+void prolog_midi_reader :: midi_keyoffv (int channel, int key, int velocity) {call (build_call (servo -> keyoff_atom, channel, key, velocity));}
 void prolog_midi_reader :: midi_keyon (int channel, int key, int velocity) {
 	call (build_call (servo -> keyon_atom, channel, key, velocity));
 }
@@ -129,46 +130,105 @@ static void beginthread (runner_procedure runner, void * root) {
 	pthread_attr_destroy (& attr);
 }
 
-#include <unistd.h>
 #include <fcntl.h>
-static int midi_input_id = -1;
+
+#ifdef LINUX_OPERATING_SYSTEM
+#include <unistd.h>
+#endif
+
+#ifdef WINDOWS_OPERATING_SYSTEM
+int read (int ind, unsigned char * data, int size) {return -1;}
+int open (char * name, unsigned long int switches) {return 0;}
+int close (int id) {return 0;}
+void usleep (unsigned long int delay) {Sleep (delay / 1000);}
+#endif
 
 static void * midi_runner (void * parameter) {
-	unsigned char v1;
-	while (true) {
-		int res = read (midi_input_id, & v1, 1);
-		if (v1 != 254) printf ("read [%i %i]\n", res, v1);
-	}
+	SourceMidiLine * line = (SourceMidiLine *) parameter;
+	line -> reader -> read (line);
+	line -> running = false;
+	printf ("RUNNER STOPPED.\n");
+	return 0;
 }
 
-class SourceMidiLine : public midi_stream {
-public:
-	prolog_midi_reader * reader;
-	virtual void internal_close_message (void) {
-		midi_stream :: internal_close_message ();
-		reader -> read (this);
-	}
-	SourceMidiLine (PrologRoot * root, PrologAtom * atom, PrologMidiServiceClass * servo, char * file_name) {
-		reader = new prolog_midi_reader (root, atom, servo);
-		midi_input_id = open (file_name, O_RDONLY);
-		printf ("open [%i]\n", midi_input_id);
-		//beginthread (midi_runner, this);
-	}
-	virtual ~ SourceMidiLine (void) {if (reader) delete reader; reader = 0;}
-};
+class PrologMidiSourceCode;
+
+void SourceMidiLine :: internal_close_message (void) {
+	midi_stream :: internal_close_message ();
+	reader -> read (this);
+}
+
+bool SourceMidiLine :: message_waiting (void) {
+	unsigned char v1;
+	int res = read (midi_input_id, & v1, 1);
+	prefetch = v1;
+	return res >= 0;
+}
+
+int SourceMidiLine :: internal_get (void) {
+	if (prefetch >= 0) {int ret = prefetch; prefetch = -1; return ret;}
+	unsigned char v1;
+	int res = read (midi_input_id, & v1, 1);
+	return v1;
+}
+
+int SourceMidiLine :: internal_get_command (void) {
+	if (prefetch < 0x80) return command;
+	command = prefetch;
+	prefetch = -1;
+	return command;
+}
+
+SourceMidiLine :: SourceMidiLine (PrologRoot * root, PrologAtom * atom, PrologMidiServiceClass * servo, int midi_input_id) {
+	reader = new prolog_midi_reader (root, atom, servo);
+	this -> midi_input_id = midi_input_id;
+	command = 0;
+	prefetch = -1;
+	running = true;
+	beginthread (midi_runner, this);
+}
+
+SourceMidiLine :: ~ SourceMidiLine (void) {if (reader) delete reader; reader = 0; printf ("SOURCE LINE DELETED.\n");}
 
 class PrologMidiNativeCode : public PrologNativeCode {
 public:
 	PrologAtom * atom;
 	midi_stream * line;
+	PrologMidiServiceClass * servo;
 	static char * name (void) {return midi_internal_line_name;}
 	char * codeName (void) {return midi_internal_line_name;}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
+		if (! parameters -> isPair ()) return false;
+		PrologElement * el = parameters -> getLeft (); parameters -> getRight ();
+		if (! el -> isAtom ()) return false;
+		if (el -> getAtom () == servo -> midi_manufacturers_id_atom) {
+			if (parameters -> isEarth ()) {line -> set_manufacturers_id (); return true;}
+			if (! parameters -> isPair ()) return false;
+			PrologElement * ind = parameters -> getLeft (); if (! ind -> isInteger ()) return false; parameters = parameters -> getRight ();
+			if (parameters -> isEarth ()) {line -> set_manufacturers_id (ind -> getInteger ()); return true;}
+			if (! parameters -> isPair ()) return false;
+			PrologElement * sub = parameters -> getLeft (); if (! sub -> isInteger ()) return false;
+			line -> set_manufacturers_id (ind -> getInteger (), sub -> getInteger ());
+			return true;
+		}
+		if (el -> getAtom () == servo -> midi_product_id_atom || el -> getAtom () == servo -> midi_product_version_atom) {
+			char id [4] = {-1, -1, -1, -1}; int ind = 0;
+			while (parameters -> isPair () && ind < 4) {
+				PrologElement * e = parameters -> getLeft ();
+				if (! e -> isInteger ()) return false;
+				id [ind++] = (char) e -> getInteger ();
+				parameters = parameters -> getRight ();
+			}
+			if (el -> getAtom () == servo -> midi_product_id_atom) line -> set_product_id (id [0], id [1], id [2], id [3]);
+			if (el -> getAtom () == servo -> midi_product_version_atom) line -> set_product_version (id [0], id [1], id [2], id [3]);
+			return true;
+		}
 		return false;
 	}
 	PrologMidiNativeCode (PrologAtom * atom, PrologRoot * root, PrologAtom * income_midi, PrologMidiServiceClass * servo) {
 		this -> atom = atom;
+		this -> servo = servo;
 		line = new InternalMidiLine (root, income_midi, servo);
 	}
 	~ PrologMidiNativeCode (void) {if (line) delete line; line = 0;}
@@ -177,17 +237,190 @@ public:
 class PrologMidiSourceCode : public PrologNativeCode {
 public:
 	PrologAtom * atom;
-	midi_stream * line;
+	SourceMidiLine * line;
+	int midi_input_id;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
+		if (parameters -> isEarth ()) {
+			atom -> setMachine (0);
+			close (midi_input_id);
+			while (line -> running) usleep (10000);
+			delete this;
+			return true;
+		}
 		return false;
 	}
-	PrologMidiSourceCode (PrologRoot * root, PrologMidiServiceClass * servo, PrologAtom * atom, PrologAtom * income, char * file_name) {
+	PrologMidiSourceCode (PrologRoot * root, PrologMidiServiceClass * servo, PrologAtom * atom, PrologAtom * income, int midi_input_id) {
 		this -> atom = atom;
-		line = new SourceMidiLine (root, income, servo, file_name);
+		this -> midi_input_id = midi_input_id;
+		line = new SourceMidiLine (root, income, servo, midi_input_id);
 	}
-	~ PrologMidiSourceCode (void) {if (line) delete line; line = 0;}
+	~ PrologMidiSourceCode (void) {if (line) delete line; line = 0; printf ("SOURCE CODE DELETED.\n");}
 };
+
+class sysex : public PrologNativeCode {
+public:
+	PrologMidiServiceClass * servo;
+	bool generic_sysex;
+	bool checksum;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		PrologMidiNativeCode * destination = servo -> default_destination;
+		if (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isAtom ()) {
+				PrologNativeCode * machine = el -> getAtom () -> getMachine ();
+				if (machine == 0) return false;
+				if (machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
+				destination = (PrologMidiNativeCode *) machine;
+				parameters = parameters -> getRight ();
+			}
+		}
+		if (destination == 0) return false;
+		if (generic_sysex) destination -> line -> open_generic_system_exclusive ();
+		else destination -> line -> open_system_exclusive ();
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isInteger ()) destination -> line -> insert (el -> getInteger ());
+			if (el -> isText ()) destination -> line -> insert (el -> getText ());
+			parameters = parameters -> getRight ();
+		}
+		if (checksum) destination -> line -> insert_checksum ();
+		destination -> line -> close_system_exclusive ();
+		return true;
+	}
+	sysex (PrologMidiServiceClass * servo, bool generic_sysex, bool checksum) {this -> servo = servo; this -> generic_sysex = generic_sysex; this -> checksum = checksum;}
+};
+
+class keyoff_command : public PrologNativeCode {
+public:
+	PrologMidiServiceClass * servo;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		PrologMidiNativeCode * destination = servo -> default_destination;
+		if (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isAtom ()) {
+				PrologNativeCode * machine = el -> getAtom () -> getMachine ();
+				if (machine == 0) return false;
+				if (machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
+				destination = (PrologMidiNativeCode *) machine;
+				parameters = parameters -> getRight ();
+			}
+		}
+		if (destination == 0) return false;
+		if (! parameters -> isPair ()) return false;
+		PrologElement * channel = parameters -> getLeft (); if (! channel -> isInteger ()) return false; parameters = parameters -> getRight ();
+		if (parameters -> isEarth ()) {destination -> line -> insert (176 + destination -> line -> chex (channel -> getInteger ()), 123, 0); return true;}
+		if (! parameters -> isPair ()) return false;
+		PrologElement * keyel = parameters -> getLeft (); parameters = parameters -> getRight ();
+		int key = 0;
+		if (keyel -> isInteger ()) key = keyel -> getInteger ();
+		else if (keyel -> isPair ()) {
+			PrologElement * note = keyel -> getLeft (); keyel = keyel -> getRight (); if (! keyel -> isPair ()) return false;
+			PrologElement * octave = keyel -> getLeft (); if (! note -> isAtom ()) return false; if (! octave -> isInteger ()) return false;
+			key = 48 + octave -> getInteger () * 12 + servo -> chromatic (note -> getAtom ());
+		} else return false;
+		if (parameters -> isEarth ()) {destination -> line -> insert (128 + destination -> line -> chex (channel -> getInteger ()), key, 0); return true;}
+		if (! parameters -> isPair ()) return false;
+		PrologElement * velocity = parameters -> getLeft (); if (! velocity -> isInteger ()) return false;
+		destination -> line -> insert (128 + destination -> line -> chex (channel -> getInteger ()), key, velocity -> getInteger ());
+		return true;
+	}
+	keyoff_command (PrologMidiServiceClass * servo) {this -> servo = servo;}
+};
+
+class pitch_command : public PrologNativeCode {
+public:
+	PrologMidiServiceClass * servo;
+	bool extended;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		PrologMidiNativeCode * destination = servo -> default_destination;
+		if (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isAtom ()) {
+				PrologNativeCode * machine = el -> getAtom () -> getMachine ();
+				if (machine == 0) return false;
+				if (machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
+				destination = (PrologMidiNativeCode *) machine;
+				parameters = parameters -> getRight ();
+			}
+		}
+		if (destination == 0) return false;
+		if (! parameters -> isPair ()) return false;
+		PrologElement * channel = parameters -> getLeft (); if (! channel -> isInteger ()) return false; parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		PrologElement * msb = parameters -> getLeft (); if (! msb -> isInteger ()) return false; parameters = parameters -> getRight ();
+		if (parameters -> isEarth ()) {
+			if (extended) {
+				int mmsb = msb -> getInteger () & 0x3fff;
+				int llsb = mmsb & 0x7f;
+				mmsb >>= 7;
+				destination -> line -> insert (224 + destination -> line -> chex (channel -> getInteger ()), llsb, mmsb);
+			} else destination -> line -> insert (224 + destination -> line -> chex (channel -> getInteger ()), 0, msb -> getInteger ());
+			return true;
+		}
+		if (! parameters -> isPair ()) return false;
+		PrologElement * lsb = parameters -> getLeft (); if (! lsb -> isInteger ()) return false; parameters = parameters -> getRight ();
+		if (parameters -> isEarth ()) {destination -> line -> insert (224 + destination -> line -> chex (channel -> getInteger ()), lsb -> getInteger (), msb -> getInteger ()); return true;}
+		return false;
+	}
+	pitch_command (PrologMidiServiceClass * servo, bool extended) {this -> servo = servo; this -> extended = extended;}
+};
+
+class programchange_command : public PrologNativeCode {
+public:
+	PrologMidiServiceClass * servo;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		PrologMidiNativeCode * destination = servo -> default_destination;
+		if (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isAtom ()) {
+				PrologNativeCode * machine = el -> getAtom () -> getMachine ();
+				if (machine == 0) return false;
+				if (machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
+				destination = (PrologMidiNativeCode *) machine;
+				parameters = parameters -> getRight ();
+			}
+		}
+		if (destination == 0) return false;
+		if (! parameters -> isPair ()) return false;
+		PrologElement * channel = parameters -> getLeft (); if (! channel -> isInteger ()) return false; parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		PrologElement * msb = parameters -> getLeft (); if (! msb -> isInteger ()) return false; parameters = parameters -> getRight ();
+		if (! parameters -> isEarth ()) return false;
+		destination -> line -> insert (192 + destination -> line -> chex (channel -> getInteger ()), msb -> getInteger ());
+		return true;
+	}
+	programchange_command (PrologMidiServiceClass * servo) {this -> servo = servo;}
+};
+
+class midi_message_command : public PrologNativeCode {
+public:
+	PrologMidiServiceClass * servo;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		PrologMidiNativeCode * destination = servo -> default_destination;
+		if (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isAtom ()) {
+				PrologNativeCode * machine = el -> getAtom () -> getMachine ();
+				if (machine == 0) return false;
+				if (machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
+				destination = (PrologMidiNativeCode *) machine;
+				parameters = parameters -> getRight ();
+			}
+		}
+		if (destination == 0) return false;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (! el -> isInteger ()) return false;
+			destination -> line -> insert (el -> getInteger ());
+			parameters = parameters -> getRight ();
+		}
+		destination -> line -> close_message ();
+		return true;
+	}
+	midi_message_command (PrologMidiServiceClass * servo) {this -> servo = servo;}
+};
+
+
 
 bool short_message_processor (int required, int command, PrologElement * parameters, PrologMidiServiceClass * servo, int ctrl = -1, bool extended = false) {
 	PrologMidiNativeCode * destination = servo -> default_destination;
@@ -203,7 +436,7 @@ bool short_message_processor (int required, int command, PrologElement * paramet
 	}
 	if (destination == 0) return false;
 	if (parameters -> isEarth ()) {
-		if (required > 1) return false;
+		if (required > 0) return false;
 		destination -> line -> insert (command);
 		return true;
 	}
@@ -212,6 +445,11 @@ bool short_message_processor (int required, int command, PrologElement * paramet
 	if (! el -> isInteger ()) return false;
 	int channel = el -> getInteger ();
 	parameters = parameters -> getRight ();
+	if (parameters -> isEarth ()) {
+		if (required != 1) return false;
+		destination -> line -> insert (176 + destination -> line -> chex (channel), command, ctrl);
+		return true;
+	}
 	if (! parameters -> isPair ()) return false;
 	el = parameters -> getLeft ();
 	int msb = 0;
@@ -228,7 +466,7 @@ bool short_message_processor (int required, int command, PrologElement * paramet
 	parameters = parameters -> getRight ();
 	command += destination -> line -> chex (channel);
 	if (parameters -> isEarth ()) {
-		if (required > 2) return false;
+		if (required != 2) return false;
 		if (extended) {
 			if (ctrl < 0) return false;
 			msb &= 0x3fff;
@@ -246,7 +484,7 @@ bool short_message_processor (int required, int command, PrologElement * paramet
 	el = parameters -> getLeft ();
 	if (! el -> isInteger ()) return false;
 	int lsb = el -> getInteger ();
-	if (required > 3) return false;
+	if (required != 3 || ! parameters -> getRight () -> isEarth ()) return false;
 	if (extended) {
 		int mlsb = lsb & 0x3fff;
 		int llsb = mlsb & 0x7f;
@@ -300,7 +538,9 @@ public:
 			if (el -> isText ()) file_name = el -> getText ();
 			parameters = parameters -> getRight ();
 		}
-		PrologMidiSourceCode * source = new PrologMidiSourceCode (root, servo, line, income, file_name);
+		int midi_input_id = open (file_name, O_RDONLY);
+		if (midi_input_id < 0) return false;
+		PrologMidiSourceCode * source = new PrologMidiSourceCode (root, servo, line, income, midi_input_id);
 		if (line -> setMachine (source)) return true;
 		delete source;
 		return false;
@@ -332,6 +572,8 @@ public:
 	}
 };
 
+class keyon_command : public MidiShortCommand {
+public: keyon_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 3, 144) {}};
 class control_command : public MidiShortCommand {
 public: control_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 3, 176) {}};
 
@@ -371,6 +613,24 @@ public: pan_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 
 class modulation_command : public MidiShortCommand {
 public: modulation_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 1) {}};
 
+class mono_command : public MidiShortCommand {
+public: mono_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 1, 126, 0) {}};
+
+class poly_command : public MidiShortCommand {
+public: poly_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 1, 127, 0) {}};
+
+class portaon_command : public MidiShortCommand {
+public: portaon_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 1, 65, 127) {}};
+
+class portaoff_command : public MidiShortCommand {
+public: portaoff_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 1, 65, 0) {}};
+
+class holdon_command : public MidiShortCommand {
+public: holdon_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 1, 64, 127) {}};
+
+class holdoff_command : public MidiShortCommand {
+public: holdoff_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 1, 64, 0) {}};
+
 class CONTROL_command : public MidiShortCommand {
 public: CONTROL_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 3, 176, true) {}};
 
@@ -409,6 +669,227 @@ public: PAN_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 
 
 class MODULATION_command : public MidiShortCommand {
 public: MODULATION_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 1, true) {}};
+
+class polyaftertouch_command : public MidiShortCommand {
+public: polyaftertouch_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 3, 160) {}};
+
+class aftertouch_command : public MidiShortCommand {
+public: aftertouch_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 208) {}};
+
+class timingclock_command : public MidiShortCommand {
+public: timingclock_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 0, 248) {}};
+
+class START_command : public MidiShortCommand {
+public: START_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 0, 250) {}};
+
+class STOP_command : public MidiShortCommand {
+public: STOP_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 0, 252) {}};
+
+class CONTINUE_command : public MidiShortCommand {
+public: CONTINUE_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 0, 251) {}};
+
+class activesensing_command : public MidiShortCommand {
+public: activesensing_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 0, 254) {}};
+
+class interval_processor : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	PrologMidiServiceClass * servo;
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * left_note = parameters -> getLeft ();
+		parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		PrologElement * right_note = parameters -> getLeft ();
+		parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		PrologElement * interval = parameters -> getLeft ();
+		if (left_note -> isPair ()) {
+			PrologElement * note_left = left_note -> getLeft ();
+			if (! note_left -> isAtom ()) return false;
+			int diatonic_left = servo -> diatonic (note_left -> getAtom ());
+			if (diatonic_left < 0) return false;
+			int chromatic_left = servo -> chromatic (note_left -> getAtom ());
+			left_note = left_note -> getRight ();
+			if (! left_note -> isPair ()) return false;
+			PrologElement * octave_left = left_note -> getLeft ();
+			if (! octave_left -> isInteger ()) return false;
+			if (right_note -> isPair ()) {
+				diatonic_left += 28 + octave_left -> getInteger () * 7;
+				chromatic_left += 48 + octave_left -> getInteger () * 12;
+				PrologElement * note_right = right_note -> getLeft ();
+				if (! note_right -> isAtom ()) return false;
+				int diatonic_right = servo -> diatonic (note_right -> getAtom ());
+				if (diatonic_right < 0) return false;
+				int chromatic_right = servo -> chromatic (note_right -> getAtom ());
+				right_note = right_note -> getRight ();
+				if (! right_note -> isPair ()) return false;
+				PrologElement * octave_right = right_note -> getLeft ();
+				if (! octave_right -> isInteger ()) return false;
+				diatonic_right += 28 + octave_right -> getInteger () * 7;
+				chromatic_right += 48 + octave_right -> getInteger () * 12;
+				interval -> setPair (root -> integer (diatonic_right - diatonic_left), root -> pair (root -> integer (chromatic_right - chromatic_left), root -> earth ()));
+				return true;
+			}
+			if (interval -> isPair ()) {
+				PrologElement * diatonic_interval = interval -> getLeft ();
+				if (! diatonic_interval -> isInteger ()) return false;
+				interval = interval -> getRight ();
+				if (! interval -> isPair ()) return false;
+				PrologElement * chromatic_interval = interval -> getLeft ();
+				if (! chromatic_interval -> isInteger ()) return false;
+				int diatonic_right = diatonic_left + diatonic_interval -> getInteger ();
+				int chromatic_right = chromatic_left + chromatic_interval -> getInteger ();
+				int octave_right = octave_left -> getInteger ();
+				while (diatonic_right < 0) {diatonic_right += 7; chromatic_right += 12; octave_right--;}
+				while (diatonic_right > 6) {diatonic_right -= 7; chromatic_right -= 12; octave_right++;}
+				PrologAtom * ret = servo -> note (diatonic_right, chromatic_right);
+				if (ret == NULL) return false;
+				right_note -> setPair (root -> atom (ret), root -> pair (root -> integer (octave_right), root -> earth ()));
+				return true;
+			}
+			return false;
+		}
+		if (! right_note -> isPair ()) return false;
+		PrologElement * note_right = right_note -> getLeft ();
+		if (! note_right -> isAtom ()) return false;
+		int diatonic_right = servo -> diatonic (note_right -> getAtom ());
+		if (diatonic_right < 0) return false;
+		int chromatic_right = servo -> chromatic (note_right -> getAtom ());
+		right_note = right_note -> getRight ();
+		if (! right_note -> isPair ()) return false;
+		PrologElement * octave_right = right_note -> getLeft ();
+		if (! octave_right -> isInteger ()) return false;
+		if (! interval -> isPair ()) return false;
+		PrologElement * diatonic_interval = interval -> getLeft ();
+		if (! diatonic_interval -> isInteger ()) return false;
+		interval = interval -> getRight ();
+		if (! interval -> isPair ()) return false;
+		PrologElement * chromatic_interval = interval -> getLeft ();
+		if (! chromatic_interval -> isInteger ()) return false;
+		int diatonic_left = diatonic_right - diatonic_interval -> getInteger ();
+		int chromatic_left = chromatic_right - chromatic_interval -> getInteger ();
+		int octave_left = octave_right -> getInteger ();
+		while (diatonic_left < 0) {diatonic_left += 7; chromatic_left += 12; octave_left--;}
+		while (diatonic_left > 6) {diatonic_left -= 7; chromatic_left -= 12; octave_left++;}
+		PrologAtom * ret = servo -> note (diatonic_left, chromatic_left);
+		if (ret == NULL) return false;
+		left_note -> setPair (root -> atom (ret), root -> pair (root -> integer (octave_left), root -> earth ()));
+		return true;
+	}
+	interval_processor (PrologRoot * root, PrologMidiServiceClass * servo) {this -> root = root; this -> servo = servo;}
+};
+
+PrologAtom * PrologMidiServiceClass :: note (int diatonic, int chromatic) {
+	switch (diatonic) {
+	case 0:
+		switch (chromatic) {
+		case -2: return cbb;
+		case -1: return cb;
+		case 0: return c;
+		case 1: return cx;
+		case 2: return cxx;
+		default: return NULL;
+		} return NULL;
+	case 1:
+		switch (chromatic) {
+		case 0: return dbb;
+		case 1: return db;
+		case 2: return d;
+		case 3: return dx;
+		case 4: return dxx;
+		default: return NULL;
+		} return NULL;
+	case 2:
+		switch (chromatic) {
+		case 2: return ebb;
+		case 3: return eb;
+		case 4: return e;
+		case 5: return ex;
+		case 6: return exx;
+		default: return NULL;
+		} return NULL;
+	case 3:
+		switch (chromatic) {
+		case 3: return fbb;
+		case 4: return fb;
+		case 5: return f;
+		case 6: return fx;
+		case 7: return fxx;
+		default: return NULL;
+		} return NULL;
+	case 4:
+		switch (chromatic) {
+		case 5: return gbb;
+		case 6: return gb;
+		case 7: return g;
+		case 8: return gx;
+		case 9: return gxx;
+		default: return NULL;
+		} return NULL;
+	case 5:
+		switch (chromatic) {
+		case 7: return abb;
+		case 8: return ab;
+		case 9: return a;
+		case 10: return ax;
+		case 11: return axx;
+		default: return NULL;
+		} return NULL;
+	case 6:
+		switch (chromatic) {
+		case 9: return bbb;
+		case 10: return bb;
+		case 11: return b;
+		case 12: return bx;
+		case 13: return bxx;
+		default: return NULL;
+		} return NULL;
+	default: return NULL;
+	}
+	return NULL;
+}
+
+class DCMOD : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * e_diatonic = parameters -> getLeft ();
+		if (! e_diatonic -> isInteger ()) return false;
+		parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		PrologElement * e_chromatic = parameters -> getLeft ();
+		if (! e_chromatic -> isInteger ()) return false;
+		parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		PrologElement * e_octave = parameters -> getLeft ();
+		if (! e_octave -> isInteger ()) return false;
+		parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		PrologElement * e_diatonic_shift = parameters -> getLeft ();
+		if (! e_diatonic_shift -> isInteger ()) return false;
+		parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		PrologElement * e_chromatic_shift = parameters -> getLeft ();
+		if (! e_chromatic_shift -> isInteger ()) return false;
+		parameters = parameters -> getRight ();
+		int diatonic = e_diatonic -> getInteger () + e_diatonic_shift -> getInteger ();
+		int chromatic = e_chromatic -> getInteger () + e_chromatic_shift -> getInteger ();
+		int octave = e_octave -> getInteger ();
+		while (chromatic < 0) {chromatic += 12; diatonic += 7; octave--;}
+		while (chromatic > 11) {chromatic -= 12; diatonic -= 7; octave++;}
+		if (! parameters -> isPair ()) return false;
+		parameters -> getLeft () -> setInteger (diatonic);
+		parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		parameters -> getLeft () -> setInteger (chromatic);
+		parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		parameters -> getLeft () -> setInteger (octave);
+		return true;
+	}
+};
+
 
 /*
 
@@ -528,393 +1009,6 @@ public:
 static pthread_mutex_t midi_mutex;
 static void midi_wait (void) {pthread_mutex_lock (& midi_mutex);}
 static void midi_signal (void) {pthread_mutex_unlock (& midi_mutex);}
-
-class midi_long_msg : public PrologNativeCode {
-public:
-	midi_stream * line;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		PrologElement * el;
-		midi_wait ();
-		while (parameters -> isPair ()) {
-			el = parameters -> getLeft ();
-			if (! el -> isInteger ()) return false;
-			line -> insert (el -> getInteger ());
-			parameters = parameters -> getRight ();
-		}
-		line -> close_message ();
-		midi_signal ();
-		return true;
-	}
-	midi_long_msg (midi_stream * line) {this -> line = line;}
-};
-
-class sysex : public PrologNativeCode {
-public:
-	midi_stream * line;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		midi_wait ();
-		line -> open_system_exclusive ();
-		PrologElement * el;
-		while (parameters -> isPair ()) {
-			el = parameters -> getLeft ();
-			if (! el -> isInteger () && ! el -> isText ()) {line -> close_system_exclusive (); midi_signal (); return false;}
-			if (el -> isInteger ()) line -> insert (el -> getInteger ());
-			if (el -> isText ()) line -> insert (el -> getText ());
-			parameters = parameters -> getRight ();
-		}
-		line -> close_system_exclusive ();
-		midi_signal ();
-		return true;
-	}
-	sysex (midi_stream * line) {this -> line = line;}
-};
-
-class SYSEX : public PrologNativeCode {
-public:
-	midi_stream * line;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		midi_wait ();
-		line -> open_generic_system_exclusive ();
-		PrologElement * el;
-		while (parameters -> isPair ()) {
-			el = parameters -> getLeft ();
-			if (! el -> isInteger () && ! el -> isText ()) {line -> close_system_exclusive (); midi_signal (); return false;}
-			if (el -> isInteger ()) line -> insert (el -> getInteger ());
-			if (el -> isText ()) line -> insert (el -> getText ());
-			parameters = parameters -> getRight ();
-		}
-		line -> close_system_exclusive ();
-		midi_signal ();
-		return true;
-	}
-	SYSEX (midi_stream * line) {this -> line = line;}
-};
-
-class sysexch : public PrologNativeCode {
-public:
-	midi_stream * line;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		midi_wait ();
-		line -> open_system_exclusive ();
-		PrologElement * el;
-		while (parameters -> isPair ()) {
-			el = parameters -> getLeft ();
-			if (! el -> isInteger () && ! el -> isText ()) {
-				line -> insert_checksum ();
-				line -> close_system_exclusive ();
-				midi_signal ();
-				return false;
-			}
-			if (el -> isInteger ()) line -> insert (el -> getInteger ());
-			if (el -> isText ()) line -> insert (el -> getText ());
-			parameters = parameters -> getRight ();
-		}
-		line -> insert_checksum ();
-		line -> close_system_exclusive ();
-		midi_signal ();
-		return true;
-	}
-	sysexch (midi_stream * line) {this -> line = line;}
-};
-
-class SYSEXCH : public PrologNativeCode {
-public:
-	midi_stream * line;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		midi_wait ();
-		line -> open_generic_system_exclusive ();
-		PrologElement * el;
-		while (parameters -> isPair ()) {
-			el = parameters -> getLeft ();
-			if (! el -> isInteger () && ! el -> isText ()) {
-				line -> insert_checksum ();
-				line -> close_system_exclusive ();
-				midi_signal ();
-				return false;
-			}
-			if (el -> isInteger ()) line -> insert (el -> getInteger ());
-			if (el -> isText ()) line -> insert (el -> getText ());
-			parameters = parameters -> getRight ();
-		}
-		line -> insert_checksum ();
-		line -> close_system_exclusive ();
-		midi_signal ();
-		return true;
-	}
-	SYSEXCH (midi_stream * line) {this -> line = line;}
-};
-
-class midi_manufacturers_id : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		midi_stream * line_in = root -> getMidiInput ();
-		midi_stream * line_out = root -> getMidiOutput ();
-		PrologMidiPortServiceClass * service = root -> getMidiPortServiceClass ();
-		if (parameters -> isEarth ()) {
-			if (line_in != NULL) line_in -> set_manufacturers_id ();
-			if (line_out != NULL) line_out -> set_manufacturers_id ();
-			if (service != NULL) service -> changeManufacturersId ();
-			return true;
-		}
-		if (! parameters -> isPair ()) return false;
-		PrologElement * m1 = parameters -> getLeft ();
-		if (! m1 -> isInteger ()) return false;
-		parameters = parameters -> getRight ();
-		if (parameters -> isEarth ()) {
-			if (line_in != NULL) line_in -> set_manufacturers_id (m1 -> getInteger ());
-			if (line_out != NULL) line_out -> set_manufacturers_id (m1 -> getInteger ());
-			if (service != NULL) service -> changeManufacturersId (m1 -> getInteger ());
-			return true;
-		}
-		if (! parameters -> isPair ()) return false;
-		PrologElement * m2 = parameters -> getLeft ();
-		if (! m2 -> isInteger ()) return false;
-		if (line_in != NULL) line_in -> set_manufacturers_id (m1 -> getInteger (), m2 -> getInteger ());
-		if (line_out != NULL) line_out -> set_manufacturers_id (m1 -> getInteger (), m2 -> getInteger ());
-		if (service != NULL) service -> changeManufacturersId (m1 -> getInteger (), m2 -> getInteger ());
-		return true;
-	}
-	midi_manufacturers_id (PrologRoot * root) {this -> root = root;}
-};
-
-class midi_product_id : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		midi_stream * line_in = root -> getMidiInput ();
-		midi_stream * line_out = root -> getMidiOutput ();
-		PrologMidiPortServiceClass * service = root -> getMidiPortServiceClass ();
-		char id1 = -1, id2 = -1, id3 = -1, id4 = -1;
-		if (parameters -> isPair ()) {
-			PrologElement * e = parameters -> getLeft ();
-			if (! e -> isInteger ()) return false;
-			id1 = (char) e -> getInteger ();
-			parameters = parameters -> getRight ();
-			if (parameters -> isPair ()) {
-				e = parameters -> getLeft ();
-				if (! e -> isInteger ()) return false;
-				id2 = (char) e -> getInteger ();
-				parameters = parameters -> getRight ();
-				if (parameters -> isPair ()) {
-					e = parameters -> getLeft ();
-					if (! e -> isInteger ()) return false;
-					id3 = (char) e -> getInteger ();
-					parameters = parameters -> getRight ();
-					if (parameters -> isPair ()) {
-						e = parameters -> getLeft ();
-						if (! e -> isInteger ()) return false;
-						id4 = (char) e -> getInteger ();
-					}
-				}
-			}
-		}
-		if (line_in != NULL) line_in -> set_product_id (id1, id2, id3, id4);
-		if (line_out != NULL) line_out -> set_product_id (id1, id2, id3, id4);
-		if (service != NULL) service -> changeProductId (id1, id2, id3, id4);
-		return true;
-	}
-	midi_product_id (PrologRoot * root) {this -> root = root;}
-};
-
-class midi_product_version : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		midi_stream * line_in = root -> getMidiInput ();
-		midi_stream * line_out = root -> getMidiOutput ();
-		PrologMidiPortServiceClass * service = root -> getMidiPortServiceClass ();
-		char id1 = -1, id2 = -1, id3 = -1, id4 = -1;
-		if (parameters -> isPair ()) {
-			PrologElement * e = parameters -> getLeft ();
-			if (! e -> isInteger ()) return false;
-			id1 = (char) e -> getInteger ();
-			parameters = parameters -> getRight ();
-			if (parameters -> isPair ()) {
-				e = parameters -> getLeft ();
-				if (! e -> isInteger ()) return false;
-				id2 = (char) e -> getInteger ();
-				parameters = parameters -> getRight ();
-				if (parameters -> isPair ()) {
-					e = parameters -> getLeft ();
-					if (! e -> isInteger ()) return false;
-					id3 = (char) e -> getInteger ();
-					parameters = parameters -> getRight ();
-					if (parameters -> isPair ()) {
-						e = parameters -> getLeft ();
-						if (! e -> isInteger ()) return false;
-						id4 = (char) e -> getInteger ();
-					}
-				}
-			}
-		}
-		if (line_in != NULL) line_in -> set_product_version (id1, id2, id3, id4);
-		if (line_out != NULL) line_out -> set_product_version (id1, id2, id3, id4);
-		if (service != NULL) service -> changeProductVersion (id1, id2, id3, id4);
-		return true;
-		return true;
-	}
-	midi_product_version (PrologRoot * root) {this -> root = root;}
-};
-
-class interval_processor : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	PrologStudio * studio;
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * left_note = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * right_note = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * interval = parameters -> getLeft ();
-		if (left_note -> isPair ()) {
-			PrologElement * note_left = left_note -> getLeft ();
-			if (! note_left -> isAtom ()) return false;
-			int diatonic_left = studio -> diatonic (note_left -> getAtom ());
-			if (diatonic_left < 0) return false;
-			int chromatic_left = studio -> chromatic (note_left -> getAtom ());
-			left_note = left_note -> getRight ();
-			if (! left_note -> isPair ()) return false;
-			PrologElement * octave_left = left_note -> getLeft ();
-			if (! octave_left -> isInteger ()) return false;
-			if (right_note -> isPair ()) {
-				diatonic_left += 28 + octave_left -> getInteger () * 7;
-				chromatic_left += 48 + octave_left -> getInteger () * 12;
-				PrologElement * note_right = right_note -> getLeft ();
-				if (! note_right -> isAtom ()) return false;
-				int diatonic_right = studio -> diatonic (note_right -> getAtom ());
-				if (diatonic_right < 0) return false;
-				int chromatic_right = studio -> chromatic (note_right -> getAtom ());
-				right_note = right_note -> getRight ();
-				if (! right_note -> isPair ()) return false;
-				PrologElement * octave_right = right_note -> getLeft ();
-				if (! octave_right -> isInteger ()) return false;
-				diatonic_right += 28 + octave_right -> getInteger () * 7;
-				chromatic_right += 48 + octave_right -> getInteger () * 12;
-				interval -> setPair (root -> integer (diatonic_right - diatonic_left), root -> pair (root -> integer (chromatic_right - chromatic_left), root -> earth ()));
-				return true;
-			}
-			if (interval -> isPair ()) {
-				PrologElement * diatonic_interval = interval -> getLeft ();
-				if (! diatonic_interval -> isInteger ()) return false;
-				interval = interval -> getRight ();
-				if (! interval -> isPair ()) return false;
-				PrologElement * chromatic_interval = interval -> getLeft ();
-				if (! chromatic_interval -> isInteger ()) return false;
-				int diatonic_right = diatonic_left + diatonic_interval -> getInteger ();
-				int chromatic_right = chromatic_left + chromatic_interval -> getInteger ();
-				int octave_right = octave_left -> getInteger ();
-				while (diatonic_right < 0) {diatonic_right += 7; chromatic_right += 12; octave_right--;}
-				while (diatonic_right > 6) {diatonic_right -= 7; chromatic_right -= 12; octave_right++;}
-				PrologAtom * ret = studio -> note (diatonic_right, chromatic_right);
-				if (ret == NULL) return false;
-				right_note -> setPair (root -> atom (ret), root -> pair (root -> integer (octave_right), root -> earth ()));
-				return true;
-			}
-			return false;
-		}
-		if (! right_note -> isPair ()) return false;
-		PrologElement * note_right = right_note -> getLeft ();
-		if (! note_right -> isAtom ()) return false;
-		int diatonic_right = studio -> diatonic (note_right -> getAtom ());
-		if (diatonic_right < 0) return false;
-		int chromatic_right = studio -> chromatic (note_right -> getAtom ());
-		right_note = right_note -> getRight ();
-		if (! right_note -> isPair ()) return false;
-		PrologElement * octave_right = right_note -> getLeft ();
-		if (! octave_right -> isInteger ()) return false;
-		if (! interval -> isPair ()) return false;
-		PrologElement * diatonic_interval = interval -> getLeft ();
-		if (! diatonic_interval -> isInteger ()) return false;
-		interval = interval -> getRight ();
-		if (! interval -> isPair ()) return false;
-		PrologElement * chromatic_interval = interval -> getLeft ();
-		if (! chromatic_interval -> isInteger ()) return false;
-		int diatonic_left = diatonic_right - diatonic_interval -> getInteger ();
-		int chromatic_left = chromatic_right - chromatic_interval -> getInteger ();
-		int octave_left = octave_right -> getInteger ();
-		while (diatonic_left < 0) {diatonic_left += 7; chromatic_left += 12; octave_left--;}
-		while (diatonic_left > 6) {diatonic_left -= 7; chromatic_left -= 12; octave_left++;}
-		PrologAtom * ret = studio -> note (diatonic_left, chromatic_left);
-		if (ret == NULL) return false;
-		left_note -> setPair (root -> atom (ret), root -> pair (root -> integer (octave_left), root -> earth ()));
-		return true;
-	}
-	interval_processor (PrologRoot * root, PrologStudio * studio) {this -> root = root; this -> studio = studio;}
-};
-
-PrologAtom * PrologStudio :: note (int diatonic, int chromatic) {
-	switch (diatonic) {
-	case 0:
-		switch (chromatic) {
-		case -2: return cbb;
-		case -1: return cb;
-		case 0: return c;
-		case 1: return cx;
-		case 2: return cxx;
-		default: return NULL;
-		} return NULL;
-	case 1:
-		switch (chromatic) {
-		case 0: return dbb;
-		case 1: return db;
-		case 2: return d;
-		case 3: return dx;
-		case 4: return dxx;
-		default: return NULL;
-		} return NULL;
-	case 2:
-		switch (chromatic) {
-		case 2: return ebb;
-		case 3: return eb;
-		case 4: return e;
-		case 5: return ex;
-		case 6: return exx;
-		default: return NULL;
-		} return NULL;
-	case 3:
-		switch (chromatic) {
-		case 3: return fbb;
-		case 4: return fb;
-		case 5: return f;
-		case 6: return fx;
-		case 7: return fxx;
-		default: return NULL;
-		} return NULL;
-	case 4:
-		switch (chromatic) {
-		case 5: return gbb;
-		case 6: return gb;
-		case 7: return g;
-		case 8: return gx;
-		case 9: return gxx;
-		default: return NULL;
-		} return NULL;
-	case 5:
-		switch (chromatic) {
-		case 7: return abb;
-		case 8: return ab;
-		case 9: return a;
-		case 10: return ax;
-		case 11: return axx;
-		default: return NULL;
-		} return NULL;
-	case 6:
-		switch (chromatic) {
-		case 9: return bbb;
-		case 10: return bb;
-		case 11: return b;
-		case 12: return bx;
-		case 13: return bxx;
-		default: return NULL;
-		} return NULL;
-	default: return NULL;
-	}
-	return NULL;
-}
 
 class PrologStudio : public PrologServiceClass {
 private:
@@ -1042,6 +1136,9 @@ void PrologMidiServiceClass :: set_atoms (void) {
 	continue_atom = dir -> searchAtom ("CONTINUE");
 	stop_atom = dir -> searchAtom ("STOP");
 	activesensing_atom = dir -> searchAtom ("activesensing");
+	midi_manufacturers_id_atom = dir -> searchAtom ("midi_manufacturers_id");
+	midi_product_id_atom = dir -> searchAtom ("midi_product_id");
+	midi_product_version_atom = dir -> searchAtom ("midi_product_version");
 }
 
 PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
@@ -1049,6 +1146,13 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "createLine") == 0) return new CreateLine (root, this);
 	if (strcmp (name, "createSource") == 0) return new CreateSource (root, this);
 	if (strcmp (name, "createDestination") == 0) return new CreateDestination ();
+	if (strcmp (name, "midi_message") == 0) return new midi_message_command (this);
+	if (strcmp (name, "keyoff") == 0) return new keyoff_command (this);
+	if (strcmp (name, "keyon") == 0) return new keyon_command (this);
+	if (strcmp (name, "polyaftertouch") == 0) return new polyaftertouch_command (this);
+	if (strcmp (name, "aftertouch") == 0) return new aftertouch_command (this);
+	if (strcmp (name, "programchange") == 0) return new programchange_command (this);
+	if (strcmp (name, "pitch") == 0) return new pitch_command (this, false);
 	if (strcmp (name, "control") == 0) return new control_command (this);
 	if (strcmp (name, "attack") == 0) return new attack_command (this);
 	if (strcmp (name, "release") == 0) return new release_command (this);
@@ -1062,6 +1166,22 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "breath") == 0) return new breath_command (this);
 	if (strcmp (name, "pan") == 0) return new pan_command (this);
 	if (strcmp (name, "modulation") == 0) return new modulation_command (this);
+	if (strcmp (name, "mono") == 0) return new mono_command (this);
+	if (strcmp (name, "poly") == 0) return new poly_command (this);
+	if (strcmp (name, "portaon") == 0) return new portaon_command (this);
+	if (strcmp (name, "portaoff") == 0) return new portaoff_command (this);
+	if (strcmp (name, "holdon") == 0) return new holdon_command (this);
+	if (strcmp (name, "holdoff") == 0) return new holdoff_command (this);
+	if (strcmp (name, "sysex") == 0) return new sysex (this, false, false);
+	if (strcmp (name, "sysexch") == 0) return new sysex (this, false, true);
+	if (strcmp (name, "SYSEX") == 0) return new sysex (this, true, false);
+	if (strcmp (name, "SYSEXCH") == 0) return new sysex (this, true, true);
+	if (strcmp (name, "timingclock") == 0) return new timingclock_command (this);
+	if (strcmp (name, "START") == 0) return new START_command (this);
+	if (strcmp (name, "STOP") == 0) return new STOP_command (this);
+	if (strcmp (name, "CONTINUE") == 0) return new CONTINUE_command (this);
+	if (strcmp (name, "activesensing") == 0) return new activesensing_command (this);
+	if (strcmp (name, "PITCH") == 0) return new pitch_command (this, true);
 	if (strcmp (name, "CONTROL") == 0) return new CONTROL_command (this);
 	if (strcmp (name, "ATTACK") == 0) return new ATTACK_command (this);
 	if (strcmp (name, "RELEASE") == 0) return new RELEASE_command (this);
@@ -1075,6 +1195,8 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "BREATH") == 0) return new BREATH_command (this);
 	if (strcmp (name, "PAN") == 0) return new PAN_command (this);
 	if (strcmp (name, "MODULATION") == 0) return new MODULATION_command (this);
+	if (strcmp (name, "DCMOD") == 0) return new DCMOD ();
+	if (strcmp (name, "INTERVAL") == 0) return new interval_processor (root, this);
 	return NULL;
 }
 
