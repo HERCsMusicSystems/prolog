@@ -23,16 +23,11 @@
 #ifndef _MIDI_STREAM
 #define _MIDI_STREAM
 
-#include "prolog_export_definitions.h"
-
-class HERCs_PROLOG_SDK_EXPORT midi_stream;
-class HERCs_PROLOG_SDK_EXPORT buffered_midi_stream;
-class HERCs_PROLOG_SDK_EXPORT clearable_midi_stream;
-class HERCs_PROLOG_SDK_EXPORT delayed_buffered_midi_stream;
-class HERCs_PROLOG_SDK_EXPORT midi_reader;
-class HERCs_PROLOG_SDK_EXPORT midi_nrpn_reader;
+#include <pthread.h>
 
 class midi_stream {
+private:
+	pthread_mutex_t locker;
 private:
 	int manufacturers_id_1;
 	int manufacturers_id_2;
@@ -58,6 +53,7 @@ protected:
 	virtual void internal_mark (void);
 	virtual void internal_restore (void);
 	virtual int internal_get_data_xor (void);
+	virtual void internal_ready (void);
 public:
 	void close_message (void);
 	void mark (void);
@@ -78,6 +74,8 @@ public:
 	void set_product_version (char * id);
 	void set_product_version (char id1, char id2, char id3, char id4);
 public:
+	virtual void lock (void);
+	virtual void unlock (void);
 	int get_command (void);
 	int get (void);
 	int get (char * text);
@@ -101,16 +99,22 @@ public:
 	void insert_pat (int channel, int key, int value);
 	void insert_control (int channel, int control, int value);
 	void insert_control (int channel, int control, int msb, int lsb);
+	void insert_nrpn (int channel);
+	void insert_nrpn (int channel, int msb_data);
+	void insert_nrpn (int channel, int msb, int lsb);
 	void insert_nrpn (int channel, int msb, int lsb, int msb_data);
 	void insert_nrpn (int channel, int msb, int lsb, int msb_data, int lsb_data);
+	void insert_nrpn_14 (int channel, int data);
 	void insert_nrpn_14 (int channel, int msb, int lsb, int data);
-	void INSERT_NRPN (int channel, int msb, int lsb, int msb_data);
-	void INSERT_NRPN (int channel, int msb, int lsb, int msb_data, int lsb_data);
+	void insert_rpn (int channel);
+	void insert_rpn (int channel, int delta);
+	void insert_rpn (int channel, int msb, int lsb);
 	void insert_rpn (int channel, int msb, int lsb, int delta);
 	void insert_programchange (int channel, int program);
 	void insert_cat (int channel, int value);
 	void insert_pitchbend (int channel, int value);
 	void insert_pitchbend (int channel, int msb, int lsb);
+	void insert_channel_command (int command);
 	void open_system_exclusive (void);
 	void open_generic_system_exclusive (void);
 	void insert_checksum (void);
@@ -119,6 +123,7 @@ public:
 	void close_system_exclusive (void);
 	void connect_thru (midi_stream * thru);
 	void disconnect_thru (void);
+	void ready (void);
 	midi_stream (void);
 	virtual ~ midi_stream (void);
 };

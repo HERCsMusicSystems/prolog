@@ -16,7 +16,7 @@ program midi #machine := "prolog.midi"
 		volume reverb chorus foot breath pan modulation holdon holdoff
 		PITCH CONTROL ATTACK RELEASE CUTOFF RESONANCE PORTATIME
 		VOLUME REVERB CHORUS FOOT BREATH PAN MODULATION
-		nrpn rpn NRPN RPN hit DCMOD
+		nrpn rpn NRPN hit DCMOD
 		createLine createSource createDestination
 		midi_info midi_port midi midi_in_info midi_out_info midi_in_port midi_out_port midi_message
 		midi_manufacturers_id midi_product_id midi_product_version
@@ -76,11 +76,8 @@ program midi #machine := "prolog.midi"
 #machine release := "release"
 #machine cutoff := "cutoff"
 #machine resonance := "resonance"
-[[bank *channel *msb *lsb] [control *channel 0 *msb] [control *channel 32 *lsb]]
-[[bank *channel *value] [control *channel 0 *value]]
-[[bank *channel *msb *lsb] [add *channel 64 *selector] [sysex *selector 83 *lsb *msb]]
-[[bank *channel *msb] [add *channel 64 *selector] [sysex *selector 82 *msb]]
-[[banklsb *channel *value] [control *channel 32 *value]]
+#machine bank := "bank"
+#machine banklsb := "banklsb"
 #machine portatime := "portatime"
 #machine volume := "volume"
 #machine reverb := "reverb"
@@ -111,103 +108,9 @@ program midi #machine := "prolog.midi"
 #machine PAN := "PAN"
 #machine MODULATION := "MODULATION"
 
-; nrpn / rpn
-[[nrpn *ch *pmsb *plsb *vmsb *vlsb]
-	[control *ch 99 *pmsb]
-	[control *ch 98 *plsb]
-	[control *ch 38 *vlsb]
-	[control *ch  6 *vmsb]]
-[[nrpn *ch *pmsb *plsb *vmsb]
-	[control *ch 99 *pmsb]
-	[control *ch 98 *plsb]
-	[control *ch  6 *vmsb]]
-[[nrpn *ch *pmsb *plsb]
-	[control *ch 99 *pmsb]
-	[control *ch 98 *plsb]]
-[[nrpn *ch *vmsb]
-	[control *ch 6 *vmsb]]
-[[nrpn *ch]
-	[control *ch 99 127]
-	[control *ch 98 127]]
-[[NRPN *ch *pmsb *plsb *vmsb]
-	[control *ch 99 *pmsb]
-	[control *ch 98 *plsb]
-	[CONTROL *ch  6 *vmsb]]
-[[NRPN *ch *vmsb]
-	[CONTROL *ch 6 *vmsb]]
-
-[[rpn *ch *pmsb *plsb *vmsb *vlsb]
-	[control *ch 101 *pmsb]
-	[control *ch 100 *plsb]
-	[control *ch 38 *vlsb]
-	[control *ch  6 *vmsb]]
-[[rpn *ch *pmsb *plsb *vmsb]
-	[control *ch 101 *pmsb]
-	[control *ch 100 *plsb]
-	[control *ch  6 *vmsb]]
-[[rpn *ch *pmsb *plsb]
-	[control *ch 101 *pmsb]
-	[control *ch 100 *plsb]]
-[[rpn *ch *vmsb]
-	[control *ch 6 *vmsb]]
-[[rpn *ch]
-	[control *ch 101 127]
-	[control *ch 100 127]]
-[[RPN *ch *pmsb *plsb *vmsb]
-	[control *ch 101 *pmsb]
-	[control *ch 100 *plsb]
-	[CONTROL *ch 6 *vmsb]]
-[[RPN *ch *vmsb]
-	[CONTROL *ch 6 *vmsb]]
-
-; nrpn / rpn with line specified
-[[nrpn *line *ch *pmsb *plsb *vmsb *vlsb]
-	[control *line *ch 99 *pmsb]
-	[control *line *ch 98 *plsb]
-	[control *line *ch 38 *vlsb]
-	[control *line *ch  6 *vmsb]]
-[[nrpn *line *ch *pmsb *plsb *vmsb]
-	[control *line *ch 99 *pmsb]
-	[control *line *ch 98 *plsb]
-	[control *line *ch  6 *vmsb]]
-[[nrpn *line *ch *pmsb *plsb]
-	[control *line *ch 99 *pmsb]
-	[control *line *ch 98 *plsb]]
-[[nrpn *line *ch *vmsb]
-	[control *line *ch 6 *vmsb]]
-[[nrpn *line *ch]
-	[control *line *ch 99 127]
-	[control *line *ch 98 127]]
-[[NRPN *line *ch *pmsb *plsb *vmsb]
-	[control *line *ch 99 *pmsb]
-	[control *line *ch 98 *plsb]
-	[CONTROL *line *ch  6 *vmsb]]
-[[NRPN *line *ch *vmsb]
-	[CONTROL *line *ch 6 *vmsb]]
-
-[[rpn *line *ch *pmsb *plsb *vmsb *vlsb]
-	[control *line *ch 101 *pmsb]
-	[control *line *ch 100 *plsb]
-	[control *line *ch 38 *vlsb]
-	[control *line *ch  6 *vmsb]]
-[[rpn *line *ch *pmsb *plsb *vmsb]
-	[control *line *ch 101 *pmsb]
-	[control *line *ch 100 *plsb]
-	[control *line *ch  6 *vmsb]]
-[[rpn *line *ch *pmsb *plsb]
-	[control *line *ch 101 *pmsb]
-	[control *line *ch 100 *plsb]]
-[[rpn *line *ch *vmsb]
-	[control *line *ch 6 *vmsb]]
-[[rpn *line *ch]
-	[control *line *ch 101 127]
-	[control *line *ch 100 127]]
-[[RPN *line *ch *pmsb *plsb *vmsb]
-	[control *line *ch 101 *pmsb]
-	[control *line *ch 100 *plsb]
-	[CONTROL *line *ch  6 *vmsb]]
-[[RPN *line *ch *vmsb]
-	[CONTROL *line *ch 6 *vmsb]]
+#machine nrpn := "nrpn"
+#machine NRPN := "NRPN"
+#machine rpn := "rpn"
 
 ; macros
 

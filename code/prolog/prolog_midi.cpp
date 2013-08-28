@@ -111,10 +111,7 @@ static char * midi_internal_line_name = "MidiInternalLine";
 class InternalMidiLine : public buffered_midi_stream {
 public:
 	prolog_midi_reader * reader;
-	virtual void internal_close_message (void) {
-		buffered_midi_stream :: internal_close_message ();
-		reader -> read (this);
-	}
+	virtual void internal_ready (void) {reader -> read (this);}
 	InternalMidiLine (PrologRoot * root, PrologAtom * atom, PrologMidiServiceClass * servo) : buffered_midi_stream (512) {reader = new prolog_midi_reader (root, atom, servo);}
 	virtual ~ InternalMidiLine (void) {if (reader) delete reader; reader = 0;}
 };
@@ -257,34 +254,40 @@ public:
 	~ PrologMidiSourceCode (void) {if (line) delete line; line = 0; printf ("SOURCE CODE DELETED.\n");}
 };
 
+#define FIND_MIDI_DESTINATION \
+		midi_stream * destination = servo -> default_destination;\
+		if (parameters -> isPair ()) {\
+			PrologElement * el = parameters -> getLeft ();\
+			if (el -> isAtom ()) {\
+				PrologNativeCode * machine = el -> getAtom () -> getMachine ();\
+				if (machine == 0) return false;\
+				if (machine -> codeName () != PrologMidiNativeCode :: name ()) return false;\
+				destination = ((PrologMidiNativeCode *) machine) -> line;\
+				parameters = parameters -> getRight ();\
+			}\
+		}\
+		if (destination == 0) return false
+
 class sysex : public PrologNativeCode {
 public:
 	PrologMidiServiceClass * servo;
 	bool generic_sysex;
 	bool checksum;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		PrologMidiNativeCode * destination = servo -> default_destination;
-		if (parameters -> isPair ()) {
-			PrologElement * el = parameters -> getLeft ();
-			if (el -> isAtom ()) {
-				PrologNativeCode * machine = el -> getAtom () -> getMachine ();
-				if (machine == 0) return false;
-				if (machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
-				destination = (PrologMidiNativeCode *) machine;
-				parameters = parameters -> getRight ();
-			}
-		}
-		if (destination == 0) return false;
-		if (generic_sysex) destination -> line -> open_generic_system_exclusive ();
-		else destination -> line -> open_system_exclusive ();
+		FIND_MIDI_DESTINATION;
+		destination -> lock ();
+		if (generic_sysex) destination -> open_generic_system_exclusive ();
+		else destination -> open_system_exclusive ();
 		while (parameters -> isPair ()) {
 			PrologElement * el = parameters -> getLeft ();
-			if (el -> isInteger ()) destination -> line -> insert (el -> getInteger ());
-			if (el -> isText ()) destination -> line -> insert (el -> getText ());
+			if (el -> isInteger ()) destination -> insert (el -> getInteger ());
+			if (el -> isText ()) destination -> insert (el -> getText ());
 			parameters = parameters -> getRight ();
 		}
-		if (checksum) destination -> line -> insert_checksum ();
-		destination -> line -> close_system_exclusive ();
+		if (checksum) destination -> insert_checksum ();
+		destination -> close_system_exclusive ();
+		destination -> unlock ();
+		destination -> ready ();
 		return true;
 	}
 	sysex (PrologMidiServiceClass * servo, bool generic_sysex, bool checksum) {this -> servo = servo; this -> generic_sysex = generic_sysex; this -> checksum = checksum;}
@@ -294,21 +297,10 @@ class keyoff_command : public PrologNativeCode {
 public:
 	PrologMidiServiceClass * servo;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		PrologMidiNativeCode * destination = servo -> default_destination;
-		if (parameters -> isPair ()) {
-			PrologElement * el = parameters -> getLeft ();
-			if (el -> isAtom ()) {
-				PrologNativeCode * machine = el -> getAtom () -> getMachine ();
-				if (machine == 0) return false;
-				if (machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
-				destination = (PrologMidiNativeCode *) machine;
-				parameters = parameters -> getRight ();
-			}
-		}
-		if (destination == 0) return false;
+		FIND_MIDI_DESTINATION;
 		if (! parameters -> isPair ()) return false;
 		PrologElement * channel = parameters -> getLeft (); if (! channel -> isInteger ()) return false; parameters = parameters -> getRight ();
-		if (parameters -> isEarth ()) {destination -> line -> insert (176 + destination -> line -> chex (channel -> getInteger ()), 123, 0); return true;}
+		if (parameters -> isEarth ()) {destination -> insert_control (channel -> getInteger (), 123, 0); destination -> ready (); return true;}
 		if (! parameters -> isPair ()) return false;
 		PrologElement * keyel = parameters -> getLeft (); parameters = parameters -> getRight ();
 		int key = 0;
@@ -318,10 +310,11 @@ public:
 			PrologElement * octave = keyel -> getLeft (); if (! note -> isAtom ()) return false; if (! octave -> isInteger ()) return false;
 			key = 48 + octave -> getInteger () * 12 + servo -> chromatic (note -> getAtom ());
 		} else return false;
-		if (parameters -> isEarth ()) {destination -> line -> insert (128 + destination -> line -> chex (channel -> getInteger ()), key, 0); return true;}
+		if (parameters -> isEarth ()) {destination -> insert_keyoff (channel -> getInteger (), key); destination -> ready (); return true;}
 		if (! parameters -> isPair ()) return false;
 		PrologElement * velocity = parameters -> getLeft (); if (! velocity -> isInteger ()) return false;
-		destination -> line -> insert (128 + destination -> line -> chex (channel -> getInteger ()), key, velocity -> getInteger ());
+		destination -> insert_keyoff (channel -> getInteger (), key, velocity -> getInteger ());
+		destination -> ready ();
 		return true;
 	}
 	keyoff_command (PrologMidiServiceClass * servo) {this -> servo = servo;}
@@ -332,18 +325,7 @@ public:
 	PrologMidiServiceClass * servo;
 	bool extended;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		PrologMidiNativeCode * destination = servo -> default_destination;
-		if (parameters -> isPair ()) {
-			PrologElement * el = parameters -> getLeft ();
-			if (el -> isAtom ()) {
-				PrologNativeCode * machine = el -> getAtom () -> getMachine ();
-				if (machine == 0) return false;
-				if (machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
-				destination = (PrologMidiNativeCode *) machine;
-				parameters = parameters -> getRight ();
-			}
-		}
-		if (destination == 0) return false;
+		FIND_MIDI_DESTINATION;
 		if (! parameters -> isPair ()) return false;
 		PrologElement * channel = parameters -> getLeft (); if (! channel -> isInteger ()) return false; parameters = parameters -> getRight ();
 		if (! parameters -> isPair ()) return false;
@@ -353,13 +335,14 @@ public:
 				int mmsb = msb -> getInteger () & 0x3fff;
 				int llsb = mmsb & 0x7f;
 				mmsb >>= 7;
-				destination -> line -> insert (224 + destination -> line -> chex (channel -> getInteger ()), llsb, mmsb);
-			} else destination -> line -> insert (224 + destination -> line -> chex (channel -> getInteger ()), 0, msb -> getInteger ());
+				destination -> insert_pitchbend (channel -> getInteger (), mmsb, llsb);
+			} else destination -> insert_pitchbend (channel -> getInteger (), msb -> getInteger ());
+			destination -> ready ();
 			return true;
 		}
 		if (! parameters -> isPair ()) return false;
 		PrologElement * lsb = parameters -> getLeft (); if (! lsb -> isInteger ()) return false; parameters = parameters -> getRight ();
-		if (parameters -> isEarth ()) {destination -> line -> insert (224 + destination -> line -> chex (channel -> getInteger ()), lsb -> getInteger (), msb -> getInteger ()); return true;}
+		if (parameters -> isEarth ()) {destination -> insert_pitchbend (channel -> getInteger (), msb -> getInteger (), lsb -> getInteger ()); destination -> ready (); return true;}
 		return false;
 	}
 	pitch_command (PrologMidiServiceClass * servo, bool extended) {this -> servo = servo; this -> extended = extended;}
@@ -369,52 +352,127 @@ class programchange_command : public PrologNativeCode {
 public:
 	PrologMidiServiceClass * servo;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		PrologMidiNativeCode * destination = servo -> default_destination;
-		if (parameters -> isPair ()) {
-			PrologElement * el = parameters -> getLeft ();
-			if (el -> isAtom ()) {
-				PrologNativeCode * machine = el -> getAtom () -> getMachine ();
-				if (machine == 0) return false;
-				if (machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
-				destination = (PrologMidiNativeCode *) machine;
-				parameters = parameters -> getRight ();
-			}
-		}
-		if (destination == 0) return false;
+		FIND_MIDI_DESTINATION;
 		if (! parameters -> isPair ()) return false;
 		PrologElement * channel = parameters -> getLeft (); if (! channel -> isInteger ()) return false; parameters = parameters -> getRight ();
 		if (! parameters -> isPair ()) return false;
 		PrologElement * msb = parameters -> getLeft (); if (! msb -> isInteger ()) return false; parameters = parameters -> getRight ();
 		if (! parameters -> isEarth ()) return false;
-		destination -> line -> insert (192 + destination -> line -> chex (channel -> getInteger ()), msb -> getInteger ());
+		destination -> insert_programchange (channel -> getInteger (), msb -> getInteger ());
+		destination -> ready ();
+		// To do..... possible system exclusive
 		return true;
 	}
 	programchange_command (PrologMidiServiceClass * servo) {this -> servo = servo;}
+};
+
+class bank_command : public PrologNativeCode {
+public:
+	PrologMidiServiceClass * servo;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		FIND_MIDI_DESTINATION;
+		if (! parameters -> isPair ()) return false;
+		PrologElement * channel = parameters -> getLeft (); if (! channel -> isInteger ()) return false; parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		PrologElement * msb = parameters -> getLeft (); parameters = parameters -> getRight ();
+		if (parameters -> isEarth ()) {
+			//[[bank *channel *value] [control *channel 0 *value]]
+			if (msb -> isInteger ()) {destination -> insert_control (channel -> getInteger (), 0, msb -> getInteger ()); destination -> ready (); return true;}
+			//[[bank *channel *msb] [add *channel 64 *selector] [sysex *selector 82 *msb]]
+			// To do.... double check
+			if (msb -> isText ()) {
+				destination -> lock ();
+				int ch = destination -> chex (channel -> getInteger ());
+				destination -> open_system_exclusive ();
+				destination -> insert (64 + ch); destination -> insert (82); destination -> insert (msb -> getText ());
+				destination -> close_system_exclusive ();
+				destination -> unlock ();
+				destination -> ready ();
+				return true;
+			}
+			return false;
+		}
+		if (! parameters -> isPair ()) return false;
+		PrologElement * lsb = parameters -> getLeft (); if (! lsb -> isInteger ()) return false;
+		//[[bank *channel *msb *lsb] [control *channel 0 *msb] [control *channel 32 *lsb]]
+		if (msb -> isInteger ()) {destination -> insert_control (channel -> getInteger (), 0, msb -> getInteger (), lsb -> getInteger ()); destination -> ready (); return true;}
+		//[[bank *channel *msb *lsb] [add *channel 64 *selector] [sysex *selector 83 *lsb *msb]]
+		// To do..... double check
+		if (msb -> isText ()) {
+			destination -> lock ();
+			int ch = destination -> chex (channel -> getInteger ());
+			destination -> open_system_exclusive ();
+			destination -> insert (64 + ch); destination -> insert (83); destination -> insert (lsb -> getInteger ()); destination -> insert (msb -> getText ());
+			destination -> close_system_exclusive ();
+			destination -> unlock ();
+			destination -> ready ();
+			return true;
+		}
+		return false;
+	}
+	bank_command (PrologMidiServiceClass * servo) {this -> servo = servo;}
+};
+
+class nrpn_rpn_command : public PrologNativeCode {
+public:
+	PrologMidiServiceClass * servo;
+	bool rpn;
+	bool extended;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		FIND_MIDI_DESTINATION;
+		int numbers [5];
+		int ind = 0;
+		while (parameters -> isPair () && ind < 5) {
+			PrologElement * el = parameters -> getLeft ();
+			if (! el -> isInteger ()) return false;
+			numbers [ind++] = el -> getInteger ();
+			parameters = parameters -> getRight ();
+		}
+		if (rpn) {
+			switch (ind) {
+			case 1: destination -> insert_rpn (numbers [0]); break;
+			case 2: destination -> insert_rpn (numbers [0], numbers [1]); break;
+			case 3: destination -> insert_rpn (numbers [0], numbers [1], numbers [2]); break;
+			case 4: destination -> insert_rpn (numbers [0], numbers [1], numbers [2], numbers [3]); break;
+			default: return false; break;
+			}
+			destination -> ready ();
+			return true;
+		}
+		switch (ind) {
+		case 1: destination -> insert_nrpn (numbers [0]); break;
+		case 2:
+			if (extended) destination -> insert_nrpn_14 (numbers [0], numbers [1]);
+			else destination -> insert_nrpn (numbers [0], numbers [1]);
+			break;
+		case 3: destination -> insert_nrpn (numbers [0], numbers [1], numbers [2]); break;
+		case 4:
+			if (extended) destination -> insert_nrpn_14 (numbers [0], numbers [1], numbers [2], numbers [3]);
+			else destination -> insert_nrpn (numbers [0], numbers [1], numbers [2], numbers [3]);
+			break;
+		case 5: destination -> insert_nrpn (numbers [0], numbers [1], numbers [2], numbers [3], numbers [4]); break;
+		default: return false;
+		}
+		destination -> ready ();
+		return true;
+	}
+	nrpn_rpn_command (PrologMidiServiceClass * servo, bool rpn = false, bool extended = false) {this -> servo = servo; this -> rpn = rpn; this -> extended = extended;}
 };
 
 class midi_message_command : public PrologNativeCode {
 public:
 	PrologMidiServiceClass * servo;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		PrologMidiNativeCode * destination = servo -> default_destination;
-		if (parameters -> isPair ()) {
-			PrologElement * el = parameters -> getLeft ();
-			if (el -> isAtom ()) {
-				PrologNativeCode * machine = el -> getAtom () -> getMachine ();
-				if (machine == 0) return false;
-				if (machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
-				destination = (PrologMidiNativeCode *) machine;
-				parameters = parameters -> getRight ();
-			}
-		}
-		if (destination == 0) return false;
+		FIND_MIDI_DESTINATION;
+		destination -> lock ();
 		while (parameters -> isPair ()) {
 			PrologElement * el = parameters -> getLeft ();
-			if (! el -> isInteger ()) return false;
-			destination -> line -> insert (el -> getInteger ());
+			if (el -> isInteger ()) destination -> insert (el -> getInteger ());
 			parameters = parameters -> getRight ();
 		}
-		destination -> line -> close_message ();
+		destination -> close_message ();
+		destination -> unlock ();
+		destination -> ready ();
 		return true;
 	}
 	midi_message_command (PrologMidiServiceClass * servo) {this -> servo = servo;}
@@ -423,21 +481,10 @@ public:
 
 
 bool short_message_processor (int required, int command, PrologElement * parameters, PrologMidiServiceClass * servo, int ctrl = -1, bool extended = false) {
-	PrologMidiNativeCode * destination = servo -> default_destination;
-	if (parameters -> isPair ()) {
-		PrologElement * el = parameters -> getLeft ();
-		if (el -> isAtom ()) {
-			PrologNativeCode * machine = el -> getAtom () -> getMachine ();
-			if (machine == 0) return false;
-			if (machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
-			destination = (PrologMidiNativeCode *) machine;
-			parameters = parameters -> getRight ();
-		}
-	}
-	if (destination == 0) return false;
+	FIND_MIDI_DESTINATION;
 	if (parameters -> isEarth ()) {
 		if (required > 0) return false;
-		destination -> line -> insert (command);
+		destination -> insert_channel_command (command); destination -> ready ();
 		return true;
 	}
 	if (! parameters -> isPair ()) return false;
@@ -447,7 +494,8 @@ bool short_message_processor (int required, int command, PrologElement * paramet
 	parameters = parameters -> getRight ();
 	if (parameters -> isEarth ()) {
 		if (required != 1) return false;
-		destination -> line -> insert (176 + destination -> line -> chex (channel), command, ctrl);
+		destination -> insert_control (channel, command, ctrl);
+		destination -> ready ();
 		return true;
 	}
 	if (! parameters -> isPair ()) return false;
@@ -464,7 +512,6 @@ bool short_message_processor (int required, int command, PrologElement * paramet
 		msb = 48 + octave -> getInteger () * 12 + servo -> chromatic (note -> getAtom ());
 	} else return false;
 	parameters = parameters -> getRight ();
-	command += destination -> line -> chex (channel);
 	if (parameters -> isEarth ()) {
 		if (required != 2) return false;
 		if (extended) {
@@ -472,12 +519,12 @@ bool short_message_processor (int required, int command, PrologElement * paramet
 			msb &= 0x3fff;
 			int lsb = msb & 0x7f;
 			msb >>= 7;
-			destination -> line -> insert (command, ctrl + 32, lsb);
-			destination -> line -> insert (command, ctrl, msb);
+			destination -> insert_control (channel, ctrl, msb, lsb);
 		} else {
-			if (ctrl >= 0) destination -> line -> insert (command, ctrl, msb);
-			else destination -> line -> insert (command, msb);
+			if (ctrl >= 0) destination -> insert_control (channel, ctrl, msb);
+			else destination -> insert_cat (channel, msb);
 		}
+		destination -> ready ();
 		return true;
 	}
 	if (! parameters -> isPair ()) return false;
@@ -489,9 +536,16 @@ bool short_message_processor (int required, int command, PrologElement * paramet
 		int mlsb = lsb & 0x3fff;
 		int llsb = mlsb & 0x7f;
 		mlsb >>= 7;
-		destination -> line -> insert (command, msb + 32, llsb);
-		destination -> line -> insert (command, msb, mlsb);
-	} else destination -> line -> insert (command, msb, lsb);
+		destination -> insert_control (channel, msb, mlsb, llsb);
+	} else {
+		switch (command) {
+		case 144: destination -> insert_keyon (channel, msb, lsb); break;
+		case 160: destination -> insert_pat (channel, msb, lsb); break;
+		case 176: destination -> insert_control (channel, msb, lsb); break;
+		default: break;
+		}
+	}
+	destination -> ready ();
 	return true;
 }
 
@@ -574,8 +628,12 @@ public:
 
 class keyon_command : public MidiShortCommand {
 public: keyon_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 3, 144) {}};
+
 class control_command : public MidiShortCommand {
 public: control_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 3, 176) {}};
+
+class banklsb_command : public MidiShortCommand {
+public: banklsb_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 0) {}};
 
 class attack_command : public MidiShortCommand {
 public: attack_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 73) {}};
@@ -1153,7 +1211,9 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "aftertouch") == 0) return new aftertouch_command (this);
 	if (strcmp (name, "programchange") == 0) return new programchange_command (this);
 	if (strcmp (name, "pitch") == 0) return new pitch_command (this, false);
+	if (strcmp (name, "bank") == 0) return new bank_command (this);
 	if (strcmp (name, "control") == 0) return new control_command (this);
+	if (strcmp (name, "banklsb") == 0) return new banklsb_command (this);
 	if (strcmp (name, "attack") == 0) return new attack_command (this);
 	if (strcmp (name, "release") == 0) return new release_command (this);
 	if (strcmp (name, "cutoff") == 0) return new cutoff_command (this);
@@ -1166,6 +1226,8 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "breath") == 0) return new breath_command (this);
 	if (strcmp (name, "pan") == 0) return new pan_command (this);
 	if (strcmp (name, "modulation") == 0) return new modulation_command (this);
+	if (strcmp (name, "nrpn") == 0) return new nrpn_rpn_command (this);
+	if (strcmp (name, "rpn") == 0) return new nrpn_rpn_command (this, true);
 	if (strcmp (name, "mono") == 0) return new mono_command (this);
 	if (strcmp (name, "poly") == 0) return new poly_command (this);
 	if (strcmp (name, "portaon") == 0) return new portaon_command (this);
@@ -1195,6 +1257,7 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "BREATH") == 0) return new BREATH_command (this);
 	if (strcmp (name, "PAN") == 0) return new PAN_command (this);
 	if (strcmp (name, "MODULATION") == 0) return new MODULATION_command (this);
+	if (strcmp (name, "NRPN") == 0) return new nrpn_rpn_command (this, false, true);
 	if (strcmp (name, "DCMOD") == 0) return new DCMOD ();
 	if (strcmp (name, "INTERVAL") == 0) return new interval_processor (root, this);
 	return NULL;

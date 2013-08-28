@@ -24,6 +24,7 @@
 #include "midi_stream.h"
 
 midi_stream :: midi_stream (void) {
+	locker = PTHREAD_MUTEX_INITIALIZER;
 	thru = NULL;
 	checksum = 0;
 	get_checksum = 0;
@@ -41,7 +42,10 @@ midi_stream :: midi_stream (void) {
 	set_product_version ("CORE");
 }
 
-midi_stream :: ~ midi_stream (void) {}
+midi_stream :: ~ midi_stream (void) {pthread_mutex_destroy (& locker);}
+
+void midi_stream :: lock (void) {pthread_mutex_lock (& locker);}
+void midi_stream :: unlock (void) {pthread_mutex_unlock (& locker);}
 
 int midi_stream :: get (void) {
 	last_get = internal_get ();
@@ -188,59 +192,111 @@ void midi_stream :: close_message (void) {
 	thru -> close_message ();
 }
 
-void midi_stream :: insert_keyoff (int channel, int key, int velocity) {insert (0x80 + chex (channel), key, velocity);}
-void midi_stream :: insert_keyon (int channel, int key, int velocity) {insert (0x90 + chex (channel), key, velocity);}
-void midi_stream :: insert_pat (int channel, int key, int value) {insert (0xa0 + chex (channel), key, value);}
-void midi_stream :: insert_control (int channel, int control, int value) {insert (0xb0 + chex (channel), control, value);}
+void midi_stream :: ready (void) {
+	internal_ready ();
+	if (thru == NULL) return;
+	thru -> ready ();
+}
+
+void midi_stream :: insert_keyoff (int channel, int key, int velocity) {lock (); insert (0x80 + chex (channel), key, velocity); unlock ();}
+void midi_stream :: insert_keyon (int channel, int key, int velocity) {lock (); insert (0x90 + chex (channel), key, velocity); unlock ();}
+void midi_stream :: insert_pat (int channel, int key, int value) {lock (); insert (0xa0 + chex (channel), key, value); unlock ();}
+void midi_stream :: insert_control (int channel, int control, int value) {lock (); insert (0xb0 + chex (channel), control, value); unlock ();}
 void midi_stream :: insert_control (int channel, int control, int msb, int lsb) {
+	lock ();
 	channel = 0xb0 + chex (channel);
 	insert (channel, control + 32, lsb);
 	insert (channel, control, msb);
+	unlock ();
+}
+void midi_stream :: insert_nrpn (int channel) {
+	lock ();
+	channel = 0xb0 + chex (channel);
+	insert (channel, 99, 127);
+	insert (channel, 98, 127);
+	unlock ();
+}
+void midi_stream :: insert_nrpn (int channel, int msb_data) {
+	lock ();
+	channel = 0xb0 + chex (channel);
+	insert (channel, 6, msb_data);
+	unlock ();
+}
+void midi_stream :: insert_nrpn (int channel, int msb, int lsb) {
+	lock ();
+	channel = 0xb0 + chex (channel);
+	insert (channel, 99, msb);
+	insert (channel, 98, lsb);
+	unlock ();
 }
 void midi_stream :: insert_nrpn (int channel, int msb, int lsb, int msb_data) {
+	lock ();
 	channel = 0xb0 + chex (channel);
 	insert (channel, 99, msb);
 	insert (channel, 98, lsb);
 	insert (channel, 6, msb_data);
+	unlock ();
 }
 void midi_stream :: insert_nrpn (int channel, int msb, int lsb, int msb_data, int lsb_data) {
+	lock ();
 	channel = 0xb0 + chex (channel);
 	insert (channel, 99, msb);
 	insert (channel, 98, lsb);
 	insert (channel, 38, lsb_data);
 	insert (channel, 6, msb_data);
+	unlock ();
+}
+void midi_stream :: insert_nrpn_14 (int channel, int data) {
+	lock ();
+	channel = 0xb0 + chex (channel);
+	insert (channel, 38, data & 0x7f);
+	insert (channel, 6, (data >> 7) & 0x7f);
+	unlock ();
 }
 void midi_stream :: insert_nrpn_14 (int channel, int msb, int lsb, int data) {
+	lock ();
 	channel = 0xb0 + chex (channel);
 	insert (channel, 99, msb);
 	insert (channel, 98, lsb);
 	insert (channel, 38, data & 0x7f);
 	insert (channel, 6, (data >> 7) & 0x7f);
+	unlock ();
 }
-void midi_stream :: INSERT_NRPN (int channel, int msb, int lsb, int msb_data) {
-	channel |= 0xb0;
-	insert (channel, 99, msb);
-	insert (channel, 98, lsb);
-	insert (channel, 6, msb_data);
+void midi_stream :: insert_rpn (int channel) {
+	lock ();
+	channel = 0xb0 + chex (channel);
+	insert (channel, 101, 127);
+	insert (channel, 100, 127);
+	unlock ();
 }
-void midi_stream :: INSERT_NRPN (int channel, int msb, int lsb, int msb_data, int lsb_data) {
-	channel |= 0xb0;
-	insert (channel, 99, msb);
-	insert (channel, 98, lsb);
-	insert (channel, 38, lsb_data);
-	insert (channel, 6, msb_data);
+void midi_stream :: insert_rpn (int channel, int delta) {
+	lock ();
+	channel = 0xb0 + chex (channel);
+	if (delta >= 0) insert (channel, 96, delta);
+	else insert (channel, 97, - delta);
+	unlock ();
+}
+void midi_stream :: insert_rpn (int channel, int msb, int lsb) {
+	lock ();
+	channel = 0xb0 + chex (channel);
+	insert (channel, 101, msb);
+	insert (channel, 100, lsb);
+	unlock ();
 }
 void midi_stream :: insert_rpn (int channel, int msb, int lsb, int delta) {
+	lock ();
 	channel = 0xb0 + chex (channel);
 	insert (channel, 101, msb);
 	insert (channel, 100, lsb);
 	if (delta >= 0) insert (channel, 96, delta);
 	else insert (channel, 97, - delta);
+	unlock ();
 }
-void midi_stream :: insert_programchange (int channel, int program) {insert (0xc0 + chex (channel), program);}
-void midi_stream :: insert_cat (int channel, int value) {insert (0xd0 + chex (channel), value);}
-void midi_stream :: insert_pitchbend (int channel, int value) {insert (0xe0 + chex (channel), 0, value);}
-void midi_stream :: insert_pitchbend (int channel, int msb, int lsb) {insert (0xe0 + chex (channel), lsb, msb);}
+void midi_stream :: insert_programchange (int channel, int program) {lock (); insert (0xc0 + chex (channel), program); unlock ();}
+void midi_stream :: insert_cat (int channel, int value) {lock (); insert (0xd0 + chex (channel), value); unlock ();}
+void midi_stream :: insert_pitchbend (int channel, int value) {lock (); insert (0xe0 + chex (channel), 0, value); unlock ();}
+void midi_stream :: insert_pitchbend (int channel, int msb, int lsb) {lock (); insert (0xe0 + chex (channel), lsb, msb); unlock ();}
+void midi_stream :: insert_channel_command (int command) {lock (); insert_command (command); close_message (); unlock ();}
 void midi_stream :: open_system_exclusive (void) {
 	open_generic_system_exclusive ();
 	insert_manufacturers_id ();
@@ -274,6 +330,7 @@ void midi_stream :: internal_mark (void) {}
 void midi_stream :: internal_restore (void) {}
 int midi_stream :: internal_get_data_xor (void) {return 0;}
 void midi_stream :: internal_close_message (void) {}
+void midi_stream :: internal_ready (void) {}
 bool midi_stream :: message_waiting (void) {return false;}
 void midi_stream :: mark (void) {
 	marked_last_get = last_get;

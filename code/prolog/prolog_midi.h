@@ -60,8 +60,8 @@ public:
 	PrologAtom * keyoff_atom, * keyon_atom, * polyaftertouch_atom, * control_atom, * programchange_atom, * aftertouch_atom, * pitch_atom;
 	PrologAtom * sysex_atom, * SYSEX_atom, * timingclock_atom, * start_atom, * continue_atom, * stop_atom, * activesensing_atom;
 	PrologAtom * midi_manufacturers_id_atom, * midi_product_id_atom, * midi_product_version_atom;
-	PrologMidiNativeCode * default_source;
-	PrologMidiNativeCode * default_destination;
+	midi_stream * default_source;
+	midi_stream * default_destination;
 	int diatonic (PrologAtom * atom);
 	int chromatic (PrologAtom * atom);
 	PrologAtom * note (int diatonic, int chromatic);
