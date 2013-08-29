@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{566ED8F7-31D1-4B8A-BF68-29D74CF380EE}</ProjectGuid>
+    <RootNamespace>windows</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>studio</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.51106.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.;../../pthread;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>PTW32_STATIC_LIB;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>../../Debug/pthread.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>studio.exe</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\code\prolog\encoder.cpp" />
+    <ClCompile Include="..\code\prolog\midi_stream.cpp" />
+    <ClCompile Include="..\code\prolog\object_tracker.cpp" />
+    <ClCompile Include="..\code\prolog\prc.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_atom.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_command.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_conductor.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_directory.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_dll_loader.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_element.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_loader.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_match.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_midi.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_native_code.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_neural.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_query.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_reader.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_resolution.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_root.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_service_class.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_studio.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_transport.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_variable.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_windows_console.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\code\prolog\encoder.h" />
+    <ClInclude Include="..\code\prolog\midi_command_prompt.h" />
+    <ClInclude Include="..\code\prolog\midi_stream.h" />
+    <ClInclude Include="..\code\prolog\object_tracker.h" />
+    <ClInclude Include="..\code\prolog\prolog_conductor.h" />
+    <ClInclude Include="..\code\prolog\prolog_midi.h" />
+    <ClInclude Include="..\code\prolog\prolog_neural.h" />
+    <ClInclude Include="operating_system.h" />
+    <ClInclude Include="..\code\prolog\prolog.h" />
+    <ClInclude Include="..\code\prolog\prolog_export_definitions.h" />
+    <ClInclude Include="..\code\prolog\prolog_midi_command.h" />
+    <ClInclude Include="..\code\prolog\prolog_studio.h" />
+    <ClInclude Include="..\code\prolog\prolog_windows_console.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\code\prolog\windows_midi.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="studio.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\code\prolog\conductor.prc" />
+    <None Include="..\code\prolog\database.sql" />
+    <None Include="..\code\prolog\f1.prc" />
+    <None Include="..\code\prolog\help.prc" />
+    <None Include="..\code\prolog\http.prc" />
+    <None Include="..\code\prolog\keyboard.prc" />
+    <None Include="..\code\prolog\lisp.prc" />
+    <None Include="..\code\prolog\main_course.prc" />
+    <None Include="..\code\prolog\midi.prc" />
+    <None Include="..\code\prolog\mysql.prc" />
+    <None Include="..\code\prolog\neural.prc" />
+    <None Include="..\code\prolog\randezvous.prc" />
+    <None Include="..\code\prolog\record.prc" />
+    <None Include="..\code\prolog\scala_reader.prc" />
+    <None Include="..\code\prolog\sql.prc" />
+    <None Include="..\code\prolog\store.prc" />
+    <None Include="..\code\prolog\studio.prc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
