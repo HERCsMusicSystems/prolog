@@ -13,6 +13,9 @@
 #define F1_PRC                          138
 #define NOTES_PRC                       139
 #define SQL_PRC                         140
+#define CONDUCTOR_PRC                   141
+#define MIDI_PRC                        142
+#define HTTP_PRC                        143
 #define KEYBOARD_PRC                    234
 
 // Next default values for new objects

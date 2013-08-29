@@ -59,8 +59,10 @@ KEYBOARD_PRC            RCDATA                  "../code/prolog/keyboard.prc"
 RECORD_PRC              RCDATA                  "../code/prolog/record.prc"
 NEURAL_PRC              RCDATA                  "../code/prolog/neural.prc"
 F1_PRC                  RCDATA                  "../code/prolog/f1.prc"
-NOTES_PRC               RCDATA                  "../code/prolog/notes.prc"
 SQL_PRC                 RCDATA                  "../code/prolog/sql.prc"
+CONDUCTOR_PRC           RCDATA                  "../code/prolog/conductor.prc"
+MIDI_PRC                RCDATA                  "../code/prolog/midi.prc"
+HTTP_PRC                RCDATA                  "../code/prolog/http.prc"
 #endif    // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 

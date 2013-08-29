@@ -11,7 +11,7 @@ program midi #machine := "prolog.midi"
 		noteon noteoff
 
 		income_midi drag_and_drop keyoff keyon polyaftertouch control programchange aftertouch pitch
-		sysex sysexch SYSEX SYSEXCH timingclock START CONTINUE STOP activesensing
+		sysex sysexch SYSEX SYSEXCH chex timingclock START CONTINUE STOP activesensing
 		attack release cutoff resonance mono poly bank banklsb portaon portaoff portatime
 		volume reverb chorus foot breath pan modulation holdon holdoff
 		PITCH CONTROL ATTACK RELEASE CUTOFF RESONANCE PORTATIME
@@ -49,6 +49,7 @@ program midi #machine := "prolog.midi"
 #machine sysexch := "sysexch"
 #machine SYSEX := "SYSEX"
 #machine SYSEXCH := "SYSEXCH"
+#machine chex := "chex"
 
 ; demo
 [[noteon *key] [keyon 0 *key 100]]
@@ -68,7 +69,6 @@ program midi #machine := "prolog.midi"
 #machine STOP := "STOP"
 #machine CONTINUE := "CONTINUE"
 #machine activesensing := "activesensing"
-;[[programchange *channel *msb *lsb *program] [add *channel 64 *selector] [sysex *selector 84 *lsb *program *msb]]
 
 
 ; controllers
@@ -118,11 +118,11 @@ program midi #machine := "prolog.midi"
 [[hit *ch *vel *key :*r]
 	[keyon *ch *key *vel]/[hit *ch *vel :*r]]
 
-[[egcopy_index *channel *from *to] [sum *channel 64 *ch] [sysex *ch 66 *from *to]]
-[[egcopy_freq *channel *from *to] [sum *channel 64 *ch] [sum *from 16 *f] [sum *to 16 *t] [sysex *ch 66 *f *t]]
-[[egcopy_amp *channel *from *to] [sum *channel 64 *ch] [sum *from 32 *f] [sum *to 32 *t] [sysex *ch 66 *f *t]]
-[[egcopy_pan *channel *from *to] [sum *channel 64 *ch] [sum *from 48 *f] [sum *to 48 *t] [sysex *ch 66 *f *t]]
-[[egcopy : *command] [egcopy_amp : *command]]
+#machine egcopy := "egcopy"
+#machine egcopy_index := "egcopy_index"
+#machine egcopy_freq := "egcopy_freq"
+#machine egcopy_amp := "egcopy_amp"
+#machine egcopy_pan := "egcopy_pan"
 
 ; midi port manipulations
 

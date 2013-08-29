@@ -293,6 +293,25 @@ public:
 	sysex (PrologMidiServiceClass * servo, bool generic_sysex, bool checksum) {this -> servo = servo; this -> generic_sysex = generic_sysex; this -> checksum = checksum;}
 };
 
+class chex : public PrologNativeCode {
+public:
+	PrologMidiServiceClass * servo;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		FIND_MIDI_DESTINATION;
+		if (! parameters -> isPair ()) return false;
+		PrologElement * channel = parameters -> getLeft ();
+		if (! channel -> isInteger ()) return false;
+		parameters = parameters -> getRight ();
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		destination -> lock ();
+		int chx = destination -> chex (channel -> getInteger ());
+		destination -> unlock ();
+		parameters -> setInteger (chx);
+		return true;
+	}
+	chex (PrologMidiServiceClass * servo) {this -> servo = servo;}
+};
+
 class keyoff_command : public PrologNativeCode {
 public:
 	PrologMidiServiceClass * servo;
@@ -356,14 +375,63 @@ public:
 		if (! parameters -> isPair ()) return false;
 		PrologElement * channel = parameters -> getLeft (); if (! channel -> isInteger ()) return false; parameters = parameters -> getRight ();
 		if (! parameters -> isPair ()) return false;
-		PrologElement * msb = parameters -> getLeft (); if (! msb -> isInteger ()) return false; parameters = parameters -> getRight ();
+		PrologElement * msb = parameters -> getLeft (); parameters = parameters -> getRight ();
+		//[[programchange *channel *msb *lsb *program] [add *channel 64 *selector] [sysex *selector 84 *lsb *program *msb]]
+		if (msb -> isText ()) {
+			if (! parameters -> isPair ()) return false;
+			PrologElement * lsb = parameters -> getLeft (); if (! lsb -> isInteger ()) return false; parameters = parameters -> getRight ();
+			if (! parameters -> isPair ()) return false;
+			PrologElement * program = parameters -> getLeft (); if (! program -> isInteger ()) return false;
+			destination -> lock ();
+			int selector = destination -> chex (channel -> getInteger ());
+			destination -> open_system_exclusive ();
+			destination -> insert (64 + selector);
+			destination -> insert (67);
+			destination -> insert (lsb -> getInteger ());
+			destination -> insert (program -> getInteger ());
+			destination -> insert (msb -> getText ());
+			destination -> close_system_exclusive ();
+			destination -> unlock ();
+			destination -> ready ();
+			return true;
+		}
+		if (! msb -> isInteger ()) return false;
 		if (! parameters -> isEarth ()) return false;
 		destination -> insert_programchange (channel -> getInteger (), msb -> getInteger ());
 		destination -> ready ();
-		// To do..... possible system exclusive
 		return true;
 	}
 	programchange_command (PrologMidiServiceClass * servo) {this -> servo = servo;}
+};
+
+//[[egcopy_index *channel *from *to] [sum *channel 64 *ch] [sysex *ch 66 *from *to]]
+//[[egcopy_freq *channel *from *to] [sum *channel 64 *ch] [sum *from 16 *f] [sum *to 16 *t] [sysex *ch 66 *f *t]]
+//[[egcopy_amp *channel *from *to] [sum *channel 64 *ch] [sum *from 32 *f] [sum *to 32 *t] [sysex *ch 66 *f *t]]
+//[[egcopy_pan *channel *from *to] [sum *channel 64 *ch] [sum *from 48 *f] [sum *to 48 *t] [sysex *ch 66 *f *t]]
+//[[egcopy : *command] [egcopy_amp : *command]]
+
+class egcopy : public PrologNativeCode {
+public:
+	PrologMidiServiceClass * servo;
+	int selector;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		FIND_MIDI_DESTINATION;
+		if (! parameters -> isPair ()) return false; PrologElement * channel = parameters -> getLeft (); if (! channel -> isInteger ()) return false; parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false; PrologElement * from = parameters -> getLeft (); if (! from -> isInteger ()) return false; parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false; PrologElement * to = parameters -> getLeft (); if (! to -> isInteger ()) return false; parameters = parameters -> getRight ();
+		destination -> lock ();
+		int chx = destination -> chex (channel -> getInteger ());
+		destination -> open_system_exclusive ();
+		destination -> insert (64 + chx);
+		destination -> insert (72);
+		destination -> insert (from -> getInteger () + selector);
+		destination -> insert (to -> getInteger () + selector);
+		destination -> close_system_exclusive ();
+		destination -> unlock ();
+		destination -> ready ();
+		return true;
+	}
+	egcopy (PrologMidiServiceClass * servo, int selector) {this -> servo = servo; this -> selector = selector;}
 };
 
 class bank_command : public PrologNativeCode {
@@ -384,7 +452,7 @@ public:
 				destination -> lock ();
 				int ch = destination -> chex (channel -> getInteger ());
 				destination -> open_system_exclusive ();
-				destination -> insert (64 + ch); destination -> insert (82); destination -> insert (msb -> getText ());
+				destination -> insert (64 + ch); destination -> insert (65); destination -> insert (msb -> getText ());
 				destination -> close_system_exclusive ();
 				destination -> unlock ();
 				destination -> ready ();
@@ -397,12 +465,11 @@ public:
 		//[[bank *channel *msb *lsb] [control *channel 0 *msb] [control *channel 32 *lsb]]
 		if (msb -> isInteger ()) {destination -> insert_control (channel -> getInteger (), 0, msb -> getInteger (), lsb -> getInteger ()); destination -> ready (); return true;}
 		//[[bank *channel *msb *lsb] [add *channel 64 *selector] [sysex *selector 83 *lsb *msb]]
-		// To do..... double check
 		if (msb -> isText ()) {
 			destination -> lock ();
 			int ch = destination -> chex (channel -> getInteger ());
 			destination -> open_system_exclusive ();
-			destination -> insert (64 + ch); destination -> insert (83); destination -> insert (lsb -> getInteger ()); destination -> insert (msb -> getText ());
+			destination -> insert (64 + ch); destination -> insert (66); destination -> insert (lsb -> getInteger ()); destination -> insert (msb -> getText ());
 			destination -> close_system_exclusive ();
 			destination -> unlock ();
 			destination -> ready ();
@@ -1212,6 +1279,11 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "programchange") == 0) return new programchange_command (this);
 	if (strcmp (name, "pitch") == 0) return new pitch_command (this, false);
 	if (strcmp (name, "bank") == 0) return new bank_command (this);
+	if (strcmp (name, "egcopy_index") == 0) return new egcopy (this, 0);
+	if (strcmp (name, "egcopy_freq") == 0) return new egcopy (this, 16);
+	if (strcmp (name, "egcopy_amp") == 0) return new egcopy (this, 32);
+	if (strcmp (name, "egcopy_pan") == 0) return new egcopy (this, 48);
+	if (strcmp (name, "egcopy") == 0) return new egcopy (this, 32);
 	if (strcmp (name, "control") == 0) return new control_command (this);
 	if (strcmp (name, "banklsb") == 0) return new banklsb_command (this);
 	if (strcmp (name, "attack") == 0) return new attack_command (this);
@@ -1238,6 +1310,7 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "sysexch") == 0) return new sysex (this, false, true);
 	if (strcmp (name, "SYSEX") == 0) return new sysex (this, true, false);
 	if (strcmp (name, "SYSEXCH") == 0) return new sysex (this, true, true);
+	if (strcmp (name, "chex") == 0) return new chex (this);
 	if (strcmp (name, "timingclock") == 0) return new timingclock_command (this);
 	if (strcmp (name, "START") == 0) return new START_command (this);
 	if (strcmp (name, "STOP") == 0) return new STOP_command (this);
