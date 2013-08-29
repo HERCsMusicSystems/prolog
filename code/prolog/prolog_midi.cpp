@@ -189,11 +189,19 @@ SourceMidiLine :: ~ SourceMidiLine (void) {if (reader) delete reader; reader = 0
 
 class PrologMidiNativeCode : public PrologNativeCode {
 public:
+	static char * name (void) {return midi_internal_line_name;}
+	virtual char * codeName (void) {return midi_internal_line_name;}
+	virtual void connectThru (PrologMidiNativeCode * destination) = 0;
+	virtual midi_stream * getLine (void) = 0;
+};
+
+class PrologMidiLineNativeCode : public PrologMidiNativeCode {
+public:
 	PrologAtom * atom;
 	midi_stream * line;
 	PrologMidiServiceClass * servo;
-	static char * name (void) {return midi_internal_line_name;}
-	char * codeName (void) {return midi_internal_line_name;}
+	virtual midi_stream * getLine (void) {return line;}
+	virtual void connectThru (PrologMidiNativeCode * code) {}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
 		if (! parameters -> isPair ()) return false;
@@ -223,12 +231,12 @@ public:
 		}
 		return false;
 	}
-	PrologMidiNativeCode (PrologAtom * atom, PrologRoot * root, PrologAtom * income_midi, PrologMidiServiceClass * servo) {
+	PrologMidiLineNativeCode (PrologAtom * atom, PrologRoot * root, PrologAtom * income_midi, PrologMidiServiceClass * servo) {
 		this -> atom = atom;
 		this -> servo = servo;
 		line = new InternalMidiLine (root, income_midi, servo);
 	}
-	~ PrologMidiNativeCode (void) {if (line) delete line; line = 0;}
+	~ PrologMidiLineNativeCode (void) {if (line) delete line; line = 0;}
 };
 
 class PrologMidiSourceCode : public PrologNativeCode {
@@ -254,6 +262,19 @@ public:
 	~ PrologMidiSourceCode (void) {if (line) delete line; line = 0; printf ("SOURCE CODE DELETED.\n");}
 };
 
+class ConnectThru : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * source = parameters -> getLeft (); if (! source -> isAtom ()) return false; parameters = parameters -> getRight ();
+		PrologNativeCode * machine = source -> getAtom () -> getMachine ();
+		if (machine == 0 || machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
+		PrologMidiNativeCode * source_code = (PrologMidiNativeCode *)  machine;
+		if (parameters -> isEarth ()) {source_code -> connectThru (0); return false;}
+		return false;
+	}
+};
+
 #define FIND_MIDI_DESTINATION \
 		midi_stream * destination = servo -> default_destination;\
 		if (parameters -> isPair ()) {\
@@ -262,7 +283,7 @@ public:
 				PrologNativeCode * machine = el -> getAtom () -> getMachine ();\
 				if (machine == 0) return false;\
 				if (machine -> codeName () != PrologMidiNativeCode :: name ()) return false;\
-				destination = ((PrologMidiNativeCode *) machine) -> line;\
+				destination = ((PrologMidiNativeCode *) machine) -> getLine ();\
 				parameters = parameters -> getRight ();\
 			}\
 		}\
@@ -633,7 +654,7 @@ public:
 				if (el -> isAtom ()) income_midi = el -> getAtom ();
 			}
 		}
-		PrologMidiNativeCode * line = new PrologMidiNativeCode (line_atom -> getAtom (), root, income_midi, servo);
+		PrologMidiLineNativeCode * line = new PrologMidiLineNativeCode (line_atom -> getAtom (), root, income_midi, servo);
 		if (line_atom -> getAtom () -> setMachine (line)) return true;
 		delete line;
 		return false;
@@ -1271,6 +1292,7 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "createLine") == 0) return new CreateLine (root, this);
 	if (strcmp (name, "createSource") == 0) return new CreateSource (root, this);
 	if (strcmp (name, "createDestination") == 0) return new CreateDestination ();
+	if (strcmp (name, "connectThru") == 0) return new ConnectThru ();
 	if (strcmp (name, "midi_message") == 0) return new midi_message_command (this);
 	if (strcmp (name, "keyoff") == 0) return new keyoff_command (this);
 	if (strcmp (name, "keyon") == 0) return new keyon_command (this);

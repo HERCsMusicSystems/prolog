@@ -44,8 +44,16 @@ midi_stream :: midi_stream (void) {
 
 midi_stream :: ~ midi_stream (void) {pthread_mutex_destroy (& locker);}
 
-void midi_stream :: lock (void) {pthread_mutex_lock (& locker);}
-void midi_stream :: unlock (void) {pthread_mutex_unlock (& locker);}
+void midi_stream :: lock (void) {
+	pthread_mutex_lock (& locker);
+	if (thru == 0) return;
+	thru -> lock ();
+}
+void midi_stream :: unlock (void) {
+	pthread_mutex_unlock (& locker);
+	if (thru == 0) return;
+	thru -> unlock ();
+}
 
 int midi_stream :: get (void) {
 	last_get = internal_get ();
