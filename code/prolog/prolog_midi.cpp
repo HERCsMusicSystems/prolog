@@ -221,8 +221,11 @@ public:
 			char id [4] = {-1, -1, -1, -1}; int ind = 0;
 			while (parameters -> isPair () && ind < 4) {
 				PrologElement * e = parameters -> getLeft ();
-				if (! e -> isInteger ()) return false;
-				id [ind++] = (char) e -> getInteger ();
+				if (e -> isInteger ()) id [ind++] = (char) e -> getInteger ();
+				if (e -> isText ()) {
+					char * text = e -> getText ();
+					while (* text != '\0' && ind < 4) id [ind++] = * text++;
+				}
 				parameters = parameters -> getRight ();
 			}
 			if (el -> getAtom () == servo -> midi_product_id_atom) line -> set_product_id (id [0], id [1], id [2], id [3]);
