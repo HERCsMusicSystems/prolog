@@ -111,8 +111,8 @@ static char * midi_internal_line_name = "MidiInternalLine";
 class InternalMidiLine : public buffered_midi_stream {
 public:
 	prolog_midi_reader * reader;
-	virtual void internal_ready (void) {reader -> read (this);}
-	InternalMidiLine (PrologRoot * root, PrologAtom * atom, PrologMidiServiceClass * servo) : buffered_midi_stream (512) {reader = new prolog_midi_reader (root, atom, servo);}
+	virtual void internal_ready (void) {if (reader != 0) reader -> read (this);}
+	InternalMidiLine (PrologRoot * root, PrologAtom * atom, PrologMidiServiceClass * servo) : buffered_midi_stream (512) {reader = atom == 0 ? 0 : new prolog_midi_reader (root, atom, servo);}
 	virtual ~ InternalMidiLine (void) {if (reader) delete reader; reader = 0;}
 };
 
@@ -191,7 +191,7 @@ class PrologMidiNativeCode : public PrologNativeCode {
 public:
 	static char * name (void) {return midi_internal_line_name;}
 	virtual char * codeName (void) {return midi_internal_line_name;}
-	virtual void connectThru (PrologMidiNativeCode * destination) = 0;
+	virtual bool connectThru (PrologMidiNativeCode * destination) = 0;
 	virtual midi_stream * getLine (void) = 0;
 };
 
@@ -201,11 +201,11 @@ public:
 	midi_stream * line;
 	PrologMidiServiceClass * servo;
 	virtual midi_stream * getLine (void) {return line;}
-	virtual void connectThru (PrologMidiNativeCode * code) {}
+	virtual bool connectThru (PrologMidiNativeCode * code) {if (line == 0) return false; line -> connect_thru (code -> getLine ()); return true;}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
 		if (! parameters -> isPair ()) return false;
-		PrologElement * el = parameters -> getLeft (); parameters -> getRight ();
+		PrologElement * el = parameters -> getLeft (); parameters = parameters -> getRight ();
 		if (! el -> isAtom ()) return false;
 		if (el -> getAtom () == servo -> midi_manufacturers_id_atom) {
 			if (parameters -> isEarth ()) {line -> set_manufacturers_id (); return true;}
@@ -271,8 +271,30 @@ public:
 		if (machine == 0 || machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
 		PrologMidiNativeCode * source_code = (PrologMidiNativeCode *)  machine;
 		if (parameters -> isEarth ()) {source_code -> connectThru (0); return false;}
-		return false;
+		if (! parameters -> isPair ()) return false;
+		PrologElement * destination = parameters -> getLeft (); if (! destination -> isAtom ()) return false;
+		machine = destination -> getAtom () -> getMachine ();
+		if (machine == 0 || machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
+		PrologMidiNativeCode * destination_code = (PrologMidiNativeCode *) machine;
+		return source_code -> connectThru (destination_code);
 	}
+};
+
+class DefaultDestination : public PrologNativeCode {
+public:
+	PrologMidiServiceClass * servo;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (servo == 0) return false;
+		if (parameters -> isEarth ()) {servo -> default_destination = 0; return true;}
+		if (! parameters -> isPair ()) return false;
+		parameters = parameters -> getLeft ();
+		if (! parameters -> isAtom ()) return false;
+		PrologNativeCode * code = parameters -> getAtom () -> getMachine ();
+		if (code == 0 || code -> codeName () != PrologMidiNativeCode :: name ()) return false;
+		servo -> default_destination = ((PrologMidiNativeCode *) code) -> getLine ();
+		return true;
+	}
+	DefaultDestination (PrologMidiServiceClass * servo) {this -> servo = servo;}
 };
 
 #define FIND_MIDI_DESTINATION \
@@ -317,17 +339,21 @@ public:
 class chex : public PrologNativeCode {
 public:
 	PrologMidiServiceClass * servo;
+	int chexer (midi_stream * line, int channel, int offset) {line -> lock (); int chx = offset + line -> chex (channel); line -> unlock (); return chx;}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		FIND_MIDI_DESTINATION;
 		if (! parameters -> isPair ()) return false;
 		PrologElement * channel = parameters -> getLeft ();
 		if (! channel -> isInteger ()) return false;
 		parameters = parameters -> getRight ();
+		if (parameters -> isVar ()) {parameters -> setInteger (chexer (destination, channel -> getInteger (), 0)); return true;}
+		if (! parameters -> isPair ()) return false;
+		PrologElement * offset = parameters -> getLeft ();
+		if (offset -> isVar ()) {offset -> setInteger (chexer (destination, channel -> getInteger (), 0)); return true;}
+		if (! offset -> isInteger ()) return false;
+		parameters = parameters -> getRight ();
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		destination -> lock ();
-		int chx = destination -> chex (channel -> getInteger ());
-		destination -> unlock ();
-		parameters -> setInteger (chx);
+		parameters -> setInteger (chexer (destination, channel -> getInteger (), offset -> getInteger ()));
 		return true;
 	}
 	chex (PrologMidiServiceClass * servo) {this -> servo = servo;}
@@ -655,7 +681,7 @@ public:
 			}
 		}
 		PrologMidiLineNativeCode * line = new PrologMidiLineNativeCode (line_atom -> getAtom (), root, income_midi, servo);
-		if (line_atom -> getAtom () -> setMachine (line)) return true;
+		if (line_atom -> getAtom () -> setMachine (line)) {servo -> default_destination = line -> getLine (); return true;}
 		delete line;
 		return false;
 	}
@@ -1293,6 +1319,7 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "createSource") == 0) return new CreateSource (root, this);
 	if (strcmp (name, "createDestination") == 0) return new CreateDestination ();
 	if (strcmp (name, "connectThru") == 0) return new ConnectThru ();
+	if (strcmp (name, "defaultDestination") == 0) return new DefaultDestination (this);
 	if (strcmp (name, "midi_message") == 0) return new midi_message_command (this);
 	if (strcmp (name, "keyoff") == 0) return new keyoff_command (this);
 	if (strcmp (name, "keyon") == 0) return new keyon_command (this);
@@ -1358,7 +1385,7 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	return NULL;
 }
 
-void PrologMidiServiceClass :: init (PrologRoot * root) {this -> root = root; default_source = default_destination = 0;}
+void PrologMidiServiceClass :: init (PrologRoot * root) {this -> root = root; default_destination = 0;}
 PrologMidiServiceClass :: PrologMidiServiceClass (void) {this -> root = NULL; dir = 0;}
 PrologMidiServiceClass :: ~ PrologMidiServiceClass (void) {}
 
