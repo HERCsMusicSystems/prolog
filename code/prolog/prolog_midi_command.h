@@ -26,7 +26,7 @@
 #ifndef _PROLOG_MIDI_COMMAND_
 #define _PROLOG_MIDI_COMMAND_
 
-class HERCs_PROLOG_SDK_EXPORT PrologMidiCommand;
+class PrologMidiCommand;
 
 class PrologMidiCommand : public PrologCommand {
 private:
