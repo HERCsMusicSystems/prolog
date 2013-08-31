@@ -232,6 +232,21 @@ public:
 			if (el -> getAtom () == servo -> midi_product_version_atom) line -> set_product_version (id [0], id [1], id [2], id [3]);
 			return true;
 		}
+		if (el -> getAtom () == servo -> connect_thru_atom) {
+			if (parameters -> isEarth ()) {connectThru (0); return true;}
+			if (! parameters -> isPair ()) return false;
+			parameters = parameters -> getLeft ();
+			if (! parameters -> isAtom ()) return false;
+			PrologNativeCode * machine = parameters -> getAtom () -> getMachine ();
+			if (machine == 0 || machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
+			connectThru ((PrologMidiNativeCode *) machine);
+			return true;
+		}
+		if (el -> getAtom () == servo -> default_destination_atom) {
+			if (! parameters -> isEarth ()) return false;
+			servo -> default_destination = getLine ();
+			return true;
+		}
 		return false;
 	}
 	PrologMidiLineNativeCode (PrologAtom * atom, PrologRoot * root, PrologAtom * income_midi, PrologMidiServiceClass * servo) {
@@ -1314,6 +1329,8 @@ void PrologMidiServiceClass :: set_atoms (void) {
 	midi_manufacturers_id_atom = dir -> searchAtom ("midi_manufacturers_id");
 	midi_product_id_atom = dir -> searchAtom ("midi_product_id");
 	midi_product_version_atom = dir -> searchAtom ("midi_product_version");
+	connect_thru_atom = dir -> searchAtom ("connectThru");
+	default_destination_atom = dir -> searchAtom ("defaultDestination");
 }
 
 PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
