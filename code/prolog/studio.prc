@@ -365,9 +365,8 @@ program studio #machine := "prolog.studio"
 
 [[accept *task *s *parameters : *commands]
 	[*task enter *s *s1 *s2]
-	[*s1 enter]
+	[*s1 enter]                              ; enter if ready or backtrack
 	[*s2 signal]
-;	[*trigger wait]
 	[*task task *trigger *v *e1 *e2]
 	[*e1 signal]
 	[*e2 wait]
@@ -384,7 +383,7 @@ program studio #machine := "prolog.studio"
 	[*trigger signal]
 	]
 
-[[enter *task *s *data]
+[[enter *task *s : *data]
 	[*task enter *s *s1 *s2]
 	[*s1 signal]                             ; ready for specific entry ...
 	[*task task *trigger *v *e1 *e2]

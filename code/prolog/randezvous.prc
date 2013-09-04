@@ -1,4 +1,3 @@
-import help
 import studio
 import f1
 
@@ -17,7 +16,7 @@ auto := [
 	[mieso 0]
 	]
 
-[[robkanapki]
+[[robkanapki *k]
 	[pieczywo : *p]
 	[mieso : *mieso]
 	[less 0 *mieso] [less 0 *p]
@@ -34,22 +33,20 @@ auto := [
 	]
 
 [[akceptuj_pieczywo *task 0]
-	[accept *task dostarczpieczywo *pieczywo]
+	[accept *task dostarczpieczywo [*pieczywo]]
 	[pieczywo *pieczywo]
 	[show "Dostalem pieczywo => " *pieczywo]
 	]
 [[akceptuj_mieso *task 0]
-	[accept *task dostarczmieso *mieso]
+	[accept *task dostarczmieso [*mieso]]
 	[mieso *mieso]
 	[show "Dostalem mieso => " *mieso]
 	]
 [[akceptuj_klienta *task *p *m]
 	[less 0 *p] [less 0 *m]
-	[accept *task gospoda *pk
-		[robkanapki]
-		[kanapki : *k]
-		[show "	Zrobilem kanapki => " *k]
-		[eq *k *pk]
+	[accept *task gospoda [*pk]
+		[robkanapki *pk]
+		[show "	Zrobilem kanapki => " *pk]
 		]
 	[wait 4000] [kanapki 0]
 	]
