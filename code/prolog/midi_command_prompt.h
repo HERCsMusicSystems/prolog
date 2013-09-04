@@ -21,6 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "prolog.h"
+#include "midi_stream.h"
 
 #ifdef WINDOWS_OPERATING_SYSTEM
 #include <windows.h>
@@ -34,7 +35,7 @@
 #ifndef _MIDI_COMMAND_PROMPT_
 #define _MIDI_COMMAND_PROMPT_
 
-class HERCs_PROLOG_SDK_EXPORT MidiCommandPrompt;
+class MidiCommandPrompt;
 
 class MidiCommandPrompt {
 private:
