@@ -29,7 +29,7 @@ program studio #machine := "prolog.studio"
 		WHILE FOR FOREVER forever IF
 		CONSTANT VARIABLE ACCUMULATOR CLOSURE ARRAY var inc dec closure call BLOCK ALL ISALL isall isallr
 		rnd rnd_control grnd series
-		crack wait timeout enter signal semaphore mutex accept select critical_section monitor task
+		crack wait timeout enter signal semaphore msemaphore mutex accept select critical_section monitor task
 		set_colors OPEN_EDITOR open_editor close_editor
 		screen_coordinates
 		open_keyboard open_oscilloscope
@@ -112,6 +112,7 @@ program studio #machine := "prolog.studio"
 #machine wait := "wait"
 #machine timeout := "timeout"
 #machine semaphore := "semaphore"
+#machine msemaphore := "msemaphore"
 #machine mutex := "mutex"
 #machine rnd := "rnd"
 #machine rnd_control := "rnd_control"

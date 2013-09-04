@@ -2777,7 +2777,34 @@ public:
 	crack (PrologRoot * root) {this -> root = root;}
 };
 
-class semaphore : public PrologNativeCode {
+#include <semaphore.h>
+
+class semaphore_posix : public PrologNativeCode {
+public:
+	PrologAtom * atom;
+	PrologAtom * waitAtom, * enterAtom, * signalAtom;
+	sem_t semaphore;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (! parameters -> isAtom ()) return false;
+		PrologAtom * ctrl = parameters -> getAtom ();
+		if (ctrl == signalAtom) {sem_post (& semaphore); return true;}
+		if (ctrl == waitAtom) {sem_wait (& semaphore); return true;}
+		if (ctrl == enterAtom) {return sem_trywait (& semaphore) == 0;}
+		return false;
+	}
+	semaphore_posix (PrologAtom * atom, PrologAtom * waitAtom, PrologAtom * enterAtom, PrologAtom * signalAtom, int ind) {
+		this -> atom = atom;
+		this -> waitAtom = waitAtom;
+		this -> enterAtom = enterAtom;
+		this -> signalAtom = signalAtom;
+		sem_init (& semaphore, 0, ind);
+	}
+	~ semaphore_posix (void) {sem_destroy (& semaphore);}
+};
+
+class semaphore_mutex : public PrologNativeCode {
 public:
 	PrologAtom * atom;
 	PrologAtom * waitAtom, * enterAtom, * signalAtom;
@@ -2811,7 +2838,7 @@ public:
 		}
 		return false;
 	}
-	semaphore (PrologAtom * atom, PrologAtom * waitAtom, PrologAtom * enterAtom, PrologAtom * signalAtom, int ind) {
+	semaphore_mutex (PrologAtom * atom, PrologAtom * waitAtom, PrologAtom * enterAtom, PrologAtom * signalAtom, int ind) {
 		this -> atom = atom;
 		this -> waitAtom = waitAtom;
 		this -> enterAtom = enterAtom;
@@ -2820,13 +2847,14 @@ public:
 		mutex = PTHREAD_MUTEX_INITIALIZER;
 		conditional = PTHREAD_COND_INITIALIZER;
 	}
-	~ semaphore (void) {pthread_mutex_destroy (& mutex); pthread_cond_destroy (& conditional);}
+	~ semaphore_mutex (void) {pthread_mutex_destroy (& mutex); pthread_cond_destroy (& conditional);}
 };
 
 class semaphore_maker : public PrologNativeCode {
 public:
 	PrologRoot * root;
 	PrologAtom * waitAtom, * enterAtom, * signalAtom;
+	bool mutexed;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (waitAtom == NULL || enterAtom == NULL || signalAtom == NULL) return false;
 		if (! parameters -> isPair ()) return false;
@@ -2847,13 +2875,16 @@ public:
 			ind = parameters -> getInteger ();
 			if (ind < 0) return false;
 		}
-		semaphore * s = new semaphore (atom, waitAtom, enterAtom, signalAtom, ind);
+		PrologNativeCode * s;
+		if (mutexed) s = new semaphore_mutex (atom, waitAtom, enterAtom, signalAtom, ind);
+		else s = new semaphore_posix (atom, waitAtom, enterAtom, signalAtom, ind);
 		if (atom -> setMachine (s)) return true;
 		delete s;
 		return false;
 	}
-	semaphore_maker (PrologRoot * root) {
+	semaphore_maker (PrologRoot * root, bool mutexed = false) {
 		this -> root = root;
+		this -> mutexed = mutexed;
 		PrologDirectory * dir = root -> searchDirectory ("studio");
 		waitAtom = dir -> searchAtom ("wait");
 		enterAtom = dir -> searchAtom ("enter");
@@ -2864,8 +2895,6 @@ public:
 ///////////
 // MUTEX //
 ///////////
-
-#include <pthread.h>
 
 class PrologMutex : public PrologNativeCode {
 public:
@@ -3120,6 +3149,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "wait") == 0) return new wait (root);
 	if (strcmp (name, "timeout") == 0) return new timeout_class (root);
 	if (strcmp (name, "semaphore") == 0) return new semaphore_maker (root);
+	if (strcmp (name, "msemaphore") == 0) return new semaphore_maker (root, true);
 	if (strcmp (name, "mutex") == 0) return new MutexMaker (root);
 	if (strcmp (name, "file_writer") == 0) return new file_writer (root);
 	if (strcmp (name, "file_reader") == 0) return new file_reader (root);
