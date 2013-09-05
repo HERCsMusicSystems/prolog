@@ -387,7 +387,7 @@ int PrologResolution :: resolution (PrologElement * query) {
 	int ctrl;
 	do {
 		if (timeout > 0) {
-			if (root -> get_system_time () > timeout) {
+			if (root -> get_system_time () >= timeout) {
 				drop_stack (q_root, NULL); q_root = NULL;
 				reset ();
 				if (timeout_query != NULL) {
