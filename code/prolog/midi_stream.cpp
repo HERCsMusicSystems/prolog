@@ -25,7 +25,8 @@
 
 midi_stream :: midi_stream (void) {
 	locker = PTHREAD_MUTEX_INITIALIZER;
-	thru = NULL;
+	thru = 0;
+	next = 0;
 	checksum = 0;
 	get_checksum = 0;
 	last_message = 0;
@@ -139,19 +140,19 @@ void midi_stream :: insert (int value) {
 	internal_insert (value);
 	checksum -= value;
 	if (value > 0x7f) {last_message = value;} // close_message ();}
-	if (thru == NULL) return;
+	if (thru == 0) return;
 	thru -> insert (value);
 }
 
 void midi_stream :: insert_command (int value) {
 	internal_insert_command (value);
-	if (thru == NULL) return;
+	if (thru == 0) return;
 	thru -> insert_command (value);
 }
 
 void midi_stream :: insert_running_command (int value) {
 	internal_insert_running_command (value);
-	if (thru == NULL) return;
+	if (thru == 0) return;
 	thru -> insert_running_command (value);
 }
 
@@ -196,13 +197,13 @@ void midi_stream :: insert_channel_extension (int extension) {
 
 void midi_stream :: close_message (void) {
 	internal_close_message ();
-	if (thru == NULL) return;
+	if (thru == 0) return;
 	thru -> close_message ();
 }
 
 void midi_stream :: ready (void) {
 	internal_ready ();
-	if (thru == NULL) return;
+	if (thru == 0) return;
 	thru -> ready ();
 }
 
@@ -326,7 +327,7 @@ void midi_stream :: close_system_exclusive (void) {
 }
 
 void midi_stream :: connect_thru (midi_stream * thru) {this -> thru = thru;}
-void midi_stream :: disconnect_thru (void) {this -> thru = NULL;}
+void midi_stream :: disconnect_thru (void) {this -> thru = 0;}
 
 int midi_stream :: internal_get (void) {return 0;}
 int midi_stream :: internal_get_command (void) {return 0;}
@@ -548,6 +549,7 @@ void midi_reader :: read (midi_stream * line) {
 		if (active_sensed == 0) midi_active_sensed ();
 		active_sensed--;
 	}
+	if (line -> next != 0) read (line -> next);
 }
 
 void midi_reader :: midi_pat (int channel, int key, int value) {midi_control (channel, 130, value);}
@@ -608,3 +610,4 @@ midi_nrpn_reader :: midi_nrpn_reader (void) {
 	set_midi_channel_all ();
 	cancel_midi_channel_extension ();
 }
+

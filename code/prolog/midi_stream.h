@@ -43,6 +43,8 @@ private:
 	int marked_get_checksum;
 	int channel_extension;
 	int write_channel_extension;
+public:
+	midi_stream * next;
 protected:
 	virtual int internal_get (void);
 	virtual int internal_get_command (void);
