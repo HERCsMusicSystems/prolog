@@ -22,6 +22,11 @@
 
 #include "midi_command_prompt.h"
 
+MidiCommandPrompt :: MidiCommandPrompt (midi_stream * line) {
+	delay = 20;
+	configure (line);
+}
+
 MidiCommandPrompt :: MidiCommandPrompt (midi_stream * line, int horizontal) {
 	if (horizontal < 1) horizontal = 1;
 	delay = 1000 / horizontal;

@@ -57,6 +57,7 @@ public:
 	void open (void);
 	void close (void);
 	void run (void);
+	MidiCommandPrompt (midi_stream * line);
 	MidiCommandPrompt (midi_stream * line, int horizontal);
 	MidiCommandPrompt (midi_stream * line, int horizontal, int seconds);
 	~ MidiCommandPrompt (void);
