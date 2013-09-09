@@ -469,11 +469,9 @@ public:
 	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
-		if (parameters -> getLeft () -> isVar ()) {
-			parameters -> getLeft () -> setAtom (new PrologAtom ());
-			return true;
-		}
 		PrologElement * left = parameters -> getLeft ();
+		if (left -> isAtom ()) return true;
+		if (left -> isVar ()) {left -> setAtom (new PrologAtom ()); return true;}
 		if (! left -> isText ()) return false;
 		parameters = parameters -> getRight ();
 		PrologAtom * atom;
