@@ -138,8 +138,9 @@ bool PrologTransport :: start (void) {
 	if (processRunning) {pthread_mutex_unlock (& lock); return false;}
 	processRunning = true;
 	processPaused = processStopping = false;
-	pthread_create (& myselfRunning, 0, transportRunner, this);
-	pthread_detach (myselfRunning);
+	pthread_t thread;
+	pthread_create (& thread, 0, transportRunner, this);
+	pthread_detach (thread);
 	pthread_mutex_unlock (& lock);
 	return true;
 }

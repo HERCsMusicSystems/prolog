@@ -25,7 +25,6 @@ class WaitFor;
 class PrologTransport TRACK {
 private:
 	WaitFor * waiters;
-	pthread_t myselfRunning;
 	pthread_mutex_t lock;
 	friend void * transportRunner (void * parameter);
 	bool processRunning, processStopping, processPaused;

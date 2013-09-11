@@ -34,9 +34,6 @@ static int time_started = start_time ();
 #define GET_SYMBOL(dll, name) dlsym (dll, name)
 #define DLL_CLOSE(dll) dlclose (dll)
 #define SYSTEM_DELAY(miliseconds) usleep (miliseconds * 1000)
-#define RUNNER_RETURN static void *
-#define RUNNER_PARAMETER void *
-#define RUNNER_RETURN_VALUE return 0;
 #endif
 
 #ifdef WINDOWS_OPERATING_SYSTEM
@@ -48,9 +45,6 @@ static int time_started = start_time ();
 #define GET_SYMBOL(dll, name) GetProcAddress (dll, name)
 #define DLL_CLOSE(dll) FreeLibrary (dll)
 #define SYSTEM_DELAY(miliseconds) Sleep (miliseconds)
-#define RUNNER_RETURN void
-#define RUNNER_PARAMETER void *
-#define RUNNER_RETURN_VALUE
 #endif
 
 ///////////////////////////////////
@@ -251,29 +245,17 @@ public:
 };
 
 
-RUNNER_RETURN runner (RUNNER_PARAMETER parameters) {
+static void * runner (void * parameters) {
 	starter * x = (starter *) parameters;
 	x -> resolution ();
 	delete x;
-	RUNNER_RETURN_VALUE
+	return 0;
 }
 
 void PrologRoot :: start (PrologElement * parameters) {
 	starter * x = new starter (this, parameters);
-	#ifdef LINUX_OPERATING_SYSTEM
-		pthread_t threader;
-		pthread_attr_t attr;
-		pthread_attr_init (& attr);
-		pthread_attr_setstacksize (& attr, 120 * 1024);
-		pthread_attr_setdetachstate (& attr, PTHREAD_CREATE_DETACHED);
-		pthread_create (& threader, & attr, runner, x);
-		pthread_attr_destroy (& attr);
-	#endif
-	#ifdef WINDOWS_OPERATING_SYSTEM
-//		DWORD thread_id;
-//		HANDLE thread = CreateThread (NULL, 0, runner, x, 0, & thread_id);
-//		CloseHandle (thread);
-		_beginthread (runner, 0, x);
-	#endif
+	pthread_t thread;
+	pthread_create (& thread, 0, runner, x);
+	pthread_detach (thread);
 }
 

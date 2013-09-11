@@ -116,17 +116,6 @@ public:
 	virtual ~ InternalMidiLine (void) {if (reader) delete reader; reader = 0;}
 };
 
-typedef void * (* runner_procedure) (void * parameter);
-static void beginthread (runner_procedure runner, void * root) {
-	pthread_t threader;
-	pthread_attr_t attr;
-	pthread_attr_init (& attr);
-	pthread_attr_setstacksize (& attr, 120 * 1024);
-	pthread_attr_setdetachstate (& attr, PTHREAD_CREATE_DETACHED);
-	pthread_create (& threader, & attr, runner, root);
-	pthread_attr_destroy (& attr);
-}
-
 #include <fcntl.h>
 
 #ifdef LINUX_OPERATING_SYSTEM
@@ -182,7 +171,9 @@ SourceMidiLine :: SourceMidiLine (PrologRoot * root, PrologAtom * atom, PrologMi
 	command = 0;
 	prefetch = -1;
 	running = true;
-	beginthread (midi_runner, this);
+	pthread_t thread;
+	pthread_create (& thread, 0, midi_runner, this);
+	pthread_detach (thread);
 }
 
 SourceMidiLine :: ~ SourceMidiLine (void) {if (reader) delete reader; reader = 0; printf ("SOURCE LINE DELETED.\n");}
