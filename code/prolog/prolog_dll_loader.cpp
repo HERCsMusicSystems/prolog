@@ -253,9 +253,8 @@ static void * runner (void * parameters) {
 }
 
 void PrologRoot :: start (PrologElement * parameters) {
-	starter * x = new starter (this, parameters);
 	pthread_t thread;
-	pthread_create (& thread, 0, runner, x);
+	pthread_create (& thread, 0, runner, new starter (this, parameters));
 	pthread_detach (thread);
 }
 
