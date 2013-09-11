@@ -340,87 +340,55 @@ program studio #machine := "prolog.studio"
 	[addcl [[*atom : *parameters] [*s wait] [TRY : *commands] [*s signal] [wait 0]]]
 	]
 
+;;;;;;;;;;;;;;
+; RENDEZVOUS ;
+;;;;;;;;;;;;;;
+; THREAD: .... [*task enter atom : *parameters]
+; TASK:   .... [*task accept atom [*parameters:...] : *body]
+;     OR: .... [SELECT
+;                      [.... conditions ..... [*task select atom [*parameters:...] : *body] ..... body .... ]
+;                      [.... conditions ..... [*task select sonda [*parameters:...] : *body] ..... body .... ]
+;                      [.... conditions ..... [*task select extra [*parameters:...] : *body] ..... body .... ]
+;                      [[*task wait]]     ; this prevents active pooling by a waiting for a semaphore activated by either [*task enter....] or [*task signal]
+;              ]
+;;;;;;;;;;;;;;
 
-;[[task *atom]
-;	[is_atom *atom]
-;	[semaphore *trigger 0]
-;	[semaphore *e1 0]
-;	[semaphore *e2 0]
-;	[VARIABLE *v1]
-;	[addcl [[*atom task *trigger *v1 *e1 *e2]]]
-;	]
-;
-;[[task *atom enter []]]
-;[[task *atom enter [*entry : *entries]]
-;	[is_atom *atom]
-;	[is_atom *entry]
-;	[semaphore *s1 0]
-;	[semaphore *s2 0]
-;	[addcl [[*atom enter *entry *s1 *s2]]]
-;	/ [task *atom enter *entries]
-;	]
-;
-;[[task *atom [*entry : *entries] : *body] [task *atom] [task *atom enter [*entry : *entries]] [crack : *body]]
-
-[[task accept *atom *selector []]]
-[[task accept *atom *selector [*entry : *entries]]
-	[semaphore *enter 0] [semaphore *accept 0] [semaphore *select 0]
+[[task accept *atom *trigger []]]
+[[task accept *atom *trigger [*entry : *entries]]
+	[semaphore *enter 0] [semaphore *accept 0] [semaphore *complete 0]
 	[var *data]
-	[addcl [[*atom accept *entry : *body] [*enter wait] [*data *body] [*accept signal] [*select wait]] ]
-	[addcl [[*atom enter *entry : *parameters] [*enter signal] [*selector signal] [*accept wait] [*selector wait] [*data : *d] [eq [*parameters : *body] *d] [TRY : *body] [*select signal]] ]
-	[addcl [[*atom select *entry : *body] [*enter enter] [*data *body] [*accept signal] [*select wait]] ]
-	/ [task accept *atom *selector *entries]
+	[addcl [[*atom accept *entry : *body]
+				[*enter wait]                                  ; wait for the enter trigger
+				[*data *body]                                  ; transfer parameters and body
+				[*accept signal]                               ; indicate transfer complete
+				[*complete wait]                               ; wait for completion on the other side
+			]
+	]
+	[addcl [[*atom enter *entry : *parameters]
+				[*enter signal]                                ; trigger entry
+				[*trigger signal]                              ; just in case if the task is suspended on default wait
+				[*accept wait]                                 ; wait for parameters and body
+				[*data : *d]                                   ; get them
+				[TRY [eq [*parameters : *body] *d] : *body]    ; and perform
+				[*complete signal]                             ; indicate the completion
+			]
+	]
+	[addcl [[*atom select *entry : *body]
+				[*enter enter]                                 ; main trigger has already been passed, so just wait for the particular trigger
+				[*data *body]                                  ; transfer parameters and body
+				[*accept signal]                               ; indicate transfer complete
+				[*complete wait]                               ; wait for completion on the other side
+			]
+	]
+	/ [task accept *atom *trigger *entries]
 ]
 [[task *atom *entries : *commands]
-	[create_atom *atom] [semaphore *selector 0]
-	[addcl [[*atom accept] [*selector wait] [*selector signal]] ]
-	[list *task]
-	[task accept *atom *selector *entries]
+	[create_atom *atom] [semaphore *trigger 0]
+	[task accept *atom *trigger *entries]
+	[addcl [[*atom wait]   [*trigger wait]]   ]                ; stop actively pooling until trigger
+	[addcl [[*atom signal] [*trigger signal]] ]                ; re-activate active pooling
 	[crack : *commands]
 ]	
-
-[[accept *task *s *parameters : *commands]
-	[*task enter *s *s1 *s2]
-	[*s1 enter]                              ; enter if ready or backtrack
-	[*s2 signal]
-	[*task task *trigger *v *e1 *e2]
-	[*e1 signal]
-	[*e2 wait]
-	[*v : *x]
-	[eq *x *parameters]
-	[TRY : *commands]
-	[*v *x]
-	[*e1 signal]
-	[*e2 wait]
-	[*trigger signal]
-	]
-[[accept *task]
-	[*task task *trigger : *]
-	[*trigger signal]
-	]
-
-[[enter *task *s : *data]
-	[*task enter *s *s1 *s2]
-	[*s1 signal]                             ; ready for specific entry ...
-	[*task task *trigger *v *e1 *e2]
-	[*trigger signal]                        ; ... of specific task
-	[*s2 wait]
-	[*e1 wait]                               ; waiting for sending the data
-	[*v *data]                               ; actual data transfer
-	[*e2 signal]                             ; data transferred to the task
-	[*e1 wait]                               ; wait for task to do it's job
-	[*v : *return]                           ; receiving the data
-	[*e2 signal]
-	[eq *data *return]                       ; ...
-	]
-
-[[select *task : *branches]
-	[*task task *trigger : *]
-	[*trigger wait]
-	[SELECT : *branches]
-	]
-[[select : *tail] / [select : *tail]]
-
 
 ; command processor
 
