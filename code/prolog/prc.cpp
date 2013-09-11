@@ -66,6 +66,7 @@ public:
 #endif
 
 #ifdef LINUX_OPERATING_SYSTEM
+#include "prolog_http.h"
 extern char resource_0 [];
 extern char resource_1 [];
 extern char resource_2 [];
