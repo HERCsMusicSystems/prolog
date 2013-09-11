@@ -24,48 +24,11 @@
 
 #include <string.h>
 
-#ifdef WINDOWS_OPERATING_SYSTEM
-#include <process.h>
-#define RUNNER_RETURN void
-#define RUNNER_PARAMETER void *
-#define RETURN
-#endif
-
-#ifdef LINUX_OPERATING_SYSTEM
-#include <pthread.h>
-#include <dlfcn.h>
-#include <unistd.h>
-#include <sys/times.h>
-#include <fcntl.h>
-#define RUNNER_RETURN static void *
-#define RUNNER_PARAMETER void *
-#define RETURN return 0;
-#endif
-
-#ifdef LINUX_OPERATING_SYSTEM
-typedef void * (* runner_procedure) (RUNNER_PARAMETER);
-void beginthread (runner_procedure runner, int value, PrologRoot * root) {
-	pthread_t threader;
-	pthread_attr_t attr;
-	pthread_attr_init (& attr);
-	pthread_attr_setstacksize (& attr, 120 * 1024);
-	pthread_attr_setdetachstate (& attr, PTHREAD_CREATE_DETACHED);
-	pthread_create (& threader, & attr, runner, root);
-	pthread_attr_destroy (& attr);
-}
-#endif
-#ifdef WINDOWS_OPERATING_SYSTEM
-#define beginthread(procedure, value, pointer) _beginthread (procedure, value, pointer)
-#endif
-
-
 #ifdef INTERNAL_RESOURCES
 #include "prolog_neural.h"
 #include "prolog_conductor.h"
 #include "prolog_midi.h"
-//#ifdef LINUX_OPERATING_SYSTEM
-//#include "prolog_mysql.h"
-//#endif
+
 #ifdef WINDOWS_OPERATING_SYSTEM
 #include "resource.h"
 class resource_loader_class : public PrologResourceLoader {
@@ -150,7 +113,9 @@ public:
 	PrologServiceClass * load (char * name) {
 		if (strcmp (name, "prolog.conductor") == 0) return new PrologConductorServiceClass ();
 		if (strcmp (name, "prolog.midi") == 0) return new PrologMidiServiceClass ();
-//		if (strcmp (name, "prolog.http") == 0) return new PrologHttpServiceClass ();
+#ifdef LINUX_OPERATING_SYSTEM
+		if (strcmp (name, "prolog.http") == 0) return new PrologHttpServiceClass ();
+#endif
 		if (strcmp (name, "prolog.neural") == 0) return new PrologNeuralServiceClass ();
 		return NULL;
 	}
