@@ -25,9 +25,22 @@
 
 PrologMidiCommand :: PrologMidiCommand (midi_stream * line) : PrologCommand () {
 	this -> line = line;
+	previous_char = 0;
+	sem_init (& semaphore, 0, 1);
 }
 
-PrologMidiCommand :: ~ PrologMidiCommand (void) {}
+PrologMidiCommand :: ~ PrologMidiCommand (void) {sem_destroy (& semaphore);}
+
+int PrologMidiCommand :: get (void) {
+	if (previous_char < 0) sem_wait (& semaphore);
+	previous_char = PrologCommand :: get ();
+	return previous_char < 0 ? 13 : previous_char;
+}
+
+void PrologMidiCommand :: insert (char * text) {
+	PrologCommand :: insert (text);
+	sem_post (& semaphore);
+}
 
 void PrologMidiCommand :: insert_midi (int cc, int mm, int ll) {
 	line -> open_system_exclusive ();

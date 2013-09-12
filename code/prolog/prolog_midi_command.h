@@ -22,6 +22,7 @@
 
 #include "prolog.h"
 #include "midi_stream.h"
+#include "semaphore.h"
 
 #ifndef _PROLOG_MIDI_COMMAND_
 #define _PROLOG_MIDI_COMMAND_
@@ -32,7 +33,11 @@ class PrologMidiCommand : public PrologCommand {
 private:
 	midi_stream * line;
 	void insert_midi (int cc, int mm, int ll);
+	sem_t semaphore;
+	int previous_char;
 public:
+	virtual void insert (char * text);
+	virtual int get (void);
 	virtual void print (char * text);
 	virtual void open (void);
 	virtual void close (void);
