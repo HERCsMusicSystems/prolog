@@ -34,7 +34,6 @@ private:
 	char product_id [4];
 	char product_version [4];
 private:
-	midi_stream * thru;
 	int checksum;
 	int get_checksum;
 	int last_message;
@@ -44,6 +43,7 @@ private:
 	int channel_extension;
 	int write_channel_extension;
 public:
+	midi_stream * thru;
 	midi_stream * next;
 protected:
 	virtual int internal_get (void);
@@ -123,7 +123,7 @@ public:
 	void insert_data_xor (void);
 	void insert_channel_extension (int extension);
 	void close_system_exclusive (void);
-	void connect_thru (midi_stream * thru);
+	void connect_thru (midi_stream * thru = 0);
 	void disconnect_thru (void);
 	void ready (void);
 	midi_stream (void);
