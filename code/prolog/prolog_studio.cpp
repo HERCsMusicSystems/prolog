@@ -2042,6 +2042,7 @@ public:
 		if (parameters -> isEarth ()) {root -> deleteSearchDirectories (); return true;}
 		if (parameters -> isVar ()) {
 			PrologString * search_directory = root -> search_directories;
+			if (search_directory == NULL) {parameters -> setEarth (); return true;}
 			while (search_directory != NULL) {
 				parameters -> setPair ();
 				parameters -> getLeft () -> setText (search_directory -> text);

@@ -39,7 +39,6 @@ class MidiCommandPrompt;
 
 class MidiCommandPrompt {
 private:
-	midi_stream * line;
 	#ifdef WINDOWS_OPERATING_SYSTEM
 	HANDLE output;
 	HANDLE input;
@@ -49,18 +48,16 @@ private:
 	pthread_t thread;
 	#endif
 	AREA area;
-	int delay;
-	void configure (midi_stream * line);
 public:
+	virtual midi_stream * getLine (void) = 0;
 	void print (char * text);
 	void setColors (int foreground, int background);
 	void open (void);
 	void close (void);
 	void run (void);
-	MidiCommandPrompt (midi_stream * line);
-	MidiCommandPrompt (midi_stream * line, int horizontal);
-	MidiCommandPrompt (midi_stream * line, int horizontal, int seconds);
+	MidiCommandPrompt (void);
 	~ MidiCommandPrompt (void);
 };
 
 #endif
+

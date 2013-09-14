@@ -107,7 +107,8 @@ bool PrologLoader :: LOAD (char * file_name) {
 		fi = fopen (file_name, "rb");
 		PrologString * root_directory = root -> search_directories;
 		while (root_directory != NULL && fi == NULL) {
-			fi = fopen (file_name, "rb");
+			sprintf (command, "%s%s", root_directory -> text, file_name);
+			fi = fopen (command, "rb");
 			root_directory = root_directory -> next;
 		}
 		if (fi == NULL) {message_v ("File not found: ", file_name); return false;}

@@ -22,29 +22,7 @@
 
 #include "midi_command_prompt.h"
 
-MidiCommandPrompt :: MidiCommandPrompt (midi_stream * line) {
-	delay = 20;
-	configure (line);
-}
-
-MidiCommandPrompt :: MidiCommandPrompt (midi_stream * line, int horizontal) {
-	if (horizontal < 1) horizontal = 1;
-	delay = 1000 / horizontal;
-	configure (line);
-}
-
-MidiCommandPrompt :: MidiCommandPrompt (midi_stream * line, int horizontal, int seconds) {
-	if (seconds < 1) seconds = 1;
-	if (horizontal < 1) horizontal = 1;
-	seconds *= 1000;
-	delay = seconds / horizontal;
-	configure (line);
-}
-
-MidiCommandPrompt :: ~ MidiCommandPrompt (void) {}
-
-void MidiCommandPrompt :: configure (midi_stream * line) {
-	this -> line = line;
+MidiCommandPrompt :: MidiCommandPrompt (void) {
 	#ifdef WINDOWS_OPERATING_SYSTEM
 	output = NULL;
 	input = NULL;
@@ -55,6 +33,8 @@ void MidiCommandPrompt :: configure (midi_stream * line) {
 	#endif
 }
 
+MidiCommandPrompt :: ~ MidiCommandPrompt (void) {}
+
 #ifdef WINDOWS_OPERATING_SYSTEM
 
 static DWORD WINAPI midi_command_prompt_runner (LPVOID parameter) {
@@ -62,6 +42,8 @@ static DWORD WINAPI midi_command_prompt_runner (LPVOID parameter) {
 }
 
 void MidiCommandPrompt :: run (void) {
+	midi_stream * line = getLine ();
+	if (line == 0) return;
 	DWORD x;
 	ReadFile (input, area, AREA_SIZE_1, & x, NULL);
 	area [x] = '\0';
@@ -69,7 +51,6 @@ void MidiCommandPrompt :: run (void) {
 	line -> insert (0x28);
 	line -> insert (area);
 	line -> close_system_exclusive ();
-	Sleep (delay);
 }
 
 void MidiCommandPrompt :: print (char * text) {
@@ -134,11 +115,12 @@ void MidiCommandPrompt :: run (void) {
 		ch = getchar ();
 	}
 	area_cat (area, ind, "\0");
+	midi_stream * line = getLine ();
+	if (line == 0) return;
 	line -> open_system_exclusive ();
 	line -> insert (0x28);
 	line -> insert (area);
 	line -> close_system_exclusive ();
-	usleep (delay);
 }
 
 /*
@@ -162,12 +144,8 @@ void MidiCommandPrompt :: print (char * text) {
 }
 
 void MidiCommandPrompt :: open (void) {
-	pthread_attr_t attr;
-	pthread_attr_init (& attr);
-	pthread_attr_setstacksize (& attr, 120 * 1024);
-	pthread_attr_setdetachstate (& attr, PTHREAD_CREATE_DETACHED);
-	pthread_create (& thread, & attr, command_runner, this);
-	pthread_attr_destroy (& attr);
+	pthread_create (& thread, 0, command_runner, this);
+	pthread_detach (thread);
 }
 
 void MidiCommandPrompt :: close (void) {pthread_cancel (thread);}
