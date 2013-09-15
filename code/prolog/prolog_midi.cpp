@@ -178,13 +178,8 @@ SourceMidiLine :: SourceMidiLine (PrologRoot * root, PrologAtom * atom, PrologMi
 
 SourceMidiLine :: ~ SourceMidiLine (void) {if (reader) delete reader; reader = 0; printf ("SOURCE LINE DELETED.\n");}
 
-class PrologMidiNativeCode : public PrologNativeCode {
-public:
-	static char * name (void) {return midi_internal_line_name;}
-	virtual char * codeName (void) {return midi_internal_line_name;}
-	virtual bool connectThru (PrologMidiNativeCode * destination) = 0;
-	virtual midi_stream * getLine (void) = 0;
-};
+char * PrologMidiNativeCode :: name (void) {return midi_internal_line_name;}
+char * PrologMidiNativeCode :: codeName (void) {return midi_internal_line_name;}
 
 class PrologMidiLineNativeCode : public PrologMidiNativeCode {
 public:

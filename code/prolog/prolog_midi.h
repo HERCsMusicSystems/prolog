@@ -45,6 +45,14 @@ public:
 	virtual ~ SourceMidiLine (void);
 };
 
+class PrologMidiNativeCode : public PrologNativeCode {
+public:
+	static char * name (void);
+	virtual char * codeName (void);
+	virtual bool connectThru (PrologMidiNativeCode * destination) = 0;
+	virtual midi_stream * getLine (void) = 0;
+};
+
 class PrologMidiServiceClass : public PrologServiceClass {
 private:
 	PrologRoot * root;
