@@ -187,12 +187,14 @@ public:
 	midi_stream * line;
 	PrologMidiServiceClass * servo;
 	virtual midi_stream * getLine (void) {return line;}
-	virtual bool connectThru (PrologMidiNativeCode * code) {if (line == 0) return false; line -> connect_thru (code -> getLine ()); return true;}
+	virtual bool connectThru (PrologMidiNativeCode * code) {line -> connect_thru (code != 0 ? code -> getLine () : 0); return true;}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
 		if (! parameters -> isPair ()) return false;
 		PrologElement * el = parameters -> getLeft (); parameters = parameters -> getRight ();
 		if (! el -> isAtom ()) return false;
+		PrologNativeCode * machine = parameters -> getAtom () -> getMachine ();
+		if (machine != 0 && machine -> codeName () == PrologMidiNativeCode :: name ()) return connectThru ((PrologMidiNativeCode *) machine);
 		if (el -> getAtom () == servo -> midi_manufacturers_id_atom) {
 			if (parameters -> isEarth ()) {line -> set_manufacturers_id (); return true;}
 			if (! parameters -> isPair ()) return false;
@@ -223,10 +225,8 @@ public:
 			if (! parameters -> isPair ()) return false;
 			parameters = parameters -> getLeft ();
 			if (! parameters -> isAtom ()) return false;
-			PrologNativeCode * machine = parameters -> getAtom () -> getMachine ();
 			if (machine == 0 || machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
-			connectThru ((PrologMidiNativeCode *) machine);
-			return true;
+			return connectThru ((PrologMidiNativeCode *) machine);
 		}
 		if (el -> getAtom () == servo -> default_destination_atom) {
 			if (! parameters -> isEarth ()) return false;
