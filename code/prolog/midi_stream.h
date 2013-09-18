@@ -179,7 +179,7 @@ public:
 	int active_sensed;
 	int active_sensing_delay;
 public:
-	void read (midi_stream * line);
+	void read (midi_stream * line, int samples = 1);
 	virtual void midi_keyoff (int channel, int key);
 	virtual void midi_keyoffv (int channel, int key, int velocity);
 	virtual void midi_keyon (int channel, int key, int velocity);

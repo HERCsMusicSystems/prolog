@@ -489,7 +489,7 @@ void delayed_buffered_midi_stream :: internal_insert (int value) {
 	delays [to] = 0;
 }
 
-void midi_reader :: read (midi_stream * line) {
+void midi_reader :: read (midi_stream * line, int samples) {
 	int command;
 	int channel;
 	int data1;
@@ -545,11 +545,10 @@ void midi_reader :: read (midi_stream * line) {
 		}
 	}
 	line -> set_channel_extension (midi_channel_extension);
-	if (active_sensed >= 0) {
-		if (active_sensed == 0) midi_active_sensed ();
-		active_sensed--;
+	if (active_sensed > 0) {
+		if ((active_sensed -= samples) < 0) midi_active_sensed ();
 	}
-	if (line -> next != 0) read (line -> next);
+	if (line -> next != 0) read (line -> next, samples);
 }
 
 void midi_reader :: midi_pat (int channel, int key, int value) {midi_control (channel, 130, value);}
