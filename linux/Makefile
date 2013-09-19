@@ -202,7 +202,7 @@ prolog_resources.o: prolog_resources.cpp
 hercs_gem.o: $(pc)hercs_gem.cpp
 	g++ -Wno-write-strings -I. $(INCFLAGS) $(pc)hercs_gem.cpp -c -o hercs_gem.o
 midi_stream.o: $(pc)midi_stream.h $(pc)midi_stream.cpp
-	g++ -Wno-write-strings -I. $(pc)midi_stream.cpp -c -o midi_stream.o
+	g++ -Wno-write-strings -std=c++11 -I. $(pc)midi_stream.cpp -c -o midi_stream.o
 object_tracker.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)object_tracker.h $(pc)object_tracker.cpp
 	g++ -Wno-write-strings -I. $(pc)object_tracker.cpp -c -o object_tracker.o
 prolog_atom.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)object_tracker.h $(pc)prolog_atom.cpp
