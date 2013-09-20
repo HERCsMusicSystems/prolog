@@ -48,14 +48,15 @@ private:
 	pthread_t thread;
 	#endif
 	AREA area;
+	midi_stream * line;
 public:
-	virtual midi_stream * getLine (void) = 0;
+	virtual midi_stream * getLine (void);
 	void print (char * text);
 	void setColors (int foreground, int background);
 	void open (void);
 	void close (void);
 	void run (void);
-	MidiCommandPrompt (void);
+	MidiCommandPrompt (midi_stream * line = 0);
 	~ MidiCommandPrompt (void);
 };
 

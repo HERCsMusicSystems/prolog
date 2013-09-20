@@ -22,7 +22,8 @@
 
 #include "midi_command_prompt.h"
 
-MidiCommandPrompt :: MidiCommandPrompt (void) {
+MidiCommandPrompt :: MidiCommandPrompt (midi_stream * line) {
+	this -> line = line;
 	#ifdef WINDOWS_OPERATING_SYSTEM
 	output = NULL;
 	input = NULL;
@@ -34,6 +35,8 @@ MidiCommandPrompt :: MidiCommandPrompt (void) {
 }
 
 MidiCommandPrompt :: ~ MidiCommandPrompt (void) {}
+
+midi_stream * MidiCommandPrompt :: getLine (void) {return line;}
 
 #ifdef WINDOWS_OPERATING_SYSTEM
 
