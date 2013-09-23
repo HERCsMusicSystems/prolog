@@ -27,7 +27,6 @@ MidiCommandPrompt :: MidiCommandPrompt (midi_stream * line) {
 	#ifdef WINDOWS_OPERATING_SYSTEM
 	output = NULL;
 	input = NULL;
-	thread = NULL;
 	#endif
 	#ifdef LINUX_OPERATING_SYSTEM
 	thread = 0;
@@ -40,8 +39,11 @@ midi_stream * MidiCommandPrompt :: getLine (void) {return line;}
 
 #ifdef WINDOWS_OPERATING_SYSTEM
 
-static DWORD WINAPI midi_command_prompt_runner (LPVOID parameter) {
-	while (true) {((MidiCommandPrompt *) parameter) -> run ();}
+static void * command_runner (void * parameter) {
+	while (true) {
+		((MidiCommandPrompt *) parameter) -> run ();
+	}
+	return 0;
 }
 
 void MidiCommandPrompt :: run (void) {
@@ -69,20 +71,18 @@ void MidiCommandPrompt :: open (void) {
 	output = GetStdHandle (STD_OUTPUT_HANDLE);
 	input = GetStdHandle (STD_INPUT_HANDLE);
 	SetConsoleTextAttribute (output, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-	DWORD id;
-	thread = CreateThread (NULL, 0, midi_command_prompt_runner, this, 0, & id);
+	pthread_create (& thread, 0, command_runner, this);
+	pthread_detach (thread);
 }
 
 void MidiCommandPrompt :: close (void) {
 	if (output == NULL) return;
-	TerminateThread (thread, 0);
-	CloseHandle (thread);
+	pthread_cancel (thread);
 	CloseHandle (output);
 	CloseHandle (input);
 	FreeConsole ();
 	output = NULL;
 	input = NULL;
-	thread = NULL;
 }
 
 void MidiCommandPrompt :: setColors (int foreground, int background) {

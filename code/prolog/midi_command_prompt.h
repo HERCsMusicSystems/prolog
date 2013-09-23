@@ -42,11 +42,8 @@ private:
 	#ifdef WINDOWS_OPERATING_SYSTEM
 	HANDLE output;
 	HANDLE input;
-	HANDLE thread;
 	#endif
-	#ifdef LINUX_OPERATING_SYSTEM
 	pthread_t thread;
-	#endif
 	AREA area;
 	midi_stream * line;
 public:
