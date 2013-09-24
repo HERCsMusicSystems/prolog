@@ -685,7 +685,7 @@ public:
 			}
 		}
 		PrologMidiLineNativeCode * line = new PrologMidiLineNativeCode (line_atom -> getAtom (), root, income_midi, servo);
-		if (line_atom -> getAtom () -> setMachine (line)) {servo -> default_destination = line -> getLine (); return true;}
+		if (line_atom -> getAtom () -> setMachine (line)) {if (servo -> default_destination == 0) servo -> default_destination = line -> getLine (); return true;}
 		delete line;
 		return false;
 	}
