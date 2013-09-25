@@ -112,7 +112,7 @@ class InternalMidiLine : public buffered_midi_stream {
 public:
 	prolog_midi_reader * reader;
 	virtual void internal_ready (void) {if (reader != 0) reader -> read (this);}
-	InternalMidiLine (PrologRoot * root, PrologAtom * atom, PrologMidiServiceClass * servo) : buffered_midi_stream (2048) {reader = atom == 0 ? 0 : new prolog_midi_reader (root, atom, servo);}
+	InternalMidiLine (PrologRoot * root, PrologAtom * atom, PrologMidiServiceClass * servo, int size) : buffered_midi_stream (size) {reader = atom == 0 ? 0 : new prolog_midi_reader (root, atom, servo);}
 	virtual ~ InternalMidiLine (void) {if (reader) delete reader; reader = 0;}
 };
 
@@ -235,10 +235,10 @@ public:
 		}
 		return false;
 	}
-	PrologMidiLineNativeCode (PrologAtom * atom, PrologRoot * root, PrologAtom * income_midi, PrologMidiServiceClass * servo) {
+	PrologMidiLineNativeCode (PrologAtom * atom, PrologRoot * root, PrologAtom * income_midi, PrologMidiServiceClass * servo, int size) {
 		this -> atom = atom;
 		this -> servo = servo;
-		line = new InternalMidiLine (root, income_midi, servo);
+		line = new InternalMidiLine (root, income_midi, servo, size);
 	}
 	~ PrologMidiLineNativeCode (void) {if (line) delete line; line = 0;}
 };
@@ -673,18 +673,18 @@ public:
 	PrologMidiServiceClass * servo;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
-		PrologElement * line_atom = parameters -> getLeft ();
+		PrologElement * line_atom = parameters -> getLeft (); parameters = parameters -> getRight ();
 		if (line_atom -> isVar ()) line_atom -> setAtom (new PrologAtom ());
 		if (! line_atom -> isAtom ()) return false;
 		PrologAtom * income_midi = 0;
-		if (parameters -> isPair ()) {
+		int size = 2048;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isAtom ()) income_midi = el -> getAtom ();
+			if (el -> isInteger ()) size = el -> getInteger ();
 			parameters = parameters -> getRight ();
-			if (parameters -> isPair ()) {
-				PrologElement * el = parameters -> getLeft ();
-				if (el -> isAtom ()) income_midi = el -> getAtom ();
-			}
 		}
-		PrologMidiLineNativeCode * line = new PrologMidiLineNativeCode (line_atom -> getAtom (), root, income_midi, servo);
+		PrologMidiLineNativeCode * line = new PrologMidiLineNativeCode (line_atom -> getAtom (), root, income_midi, servo, size);
 		if (line_atom -> getAtom () -> setMachine (line)) {if (servo -> default_destination == 0) servo -> default_destination = line -> getLine (); return true;}
 		delete line;
 		return false;
