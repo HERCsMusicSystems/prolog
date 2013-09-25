@@ -24,6 +24,8 @@
 
 MidiCommandPrompt :: MidiCommandPrompt (midi_stream * line) {
 	this -> line = line;
+	previous_char = 0;
+	sem_init (& semaphore, 0, 1);
 	#ifdef WINDOWS_OPERATING_SYSTEM
 	output = NULL;
 	input = NULL;
@@ -33,9 +35,7 @@ MidiCommandPrompt :: MidiCommandPrompt (midi_stream * line) {
 	#endif
 }
 
-MidiCommandPrompt :: ~ MidiCommandPrompt (void) {}
-
-midi_stream * MidiCommandPrompt :: getLine (void) {return line;}
+MidiCommandPrompt :: ~ MidiCommandPrompt (void) {sem_destroy (& semaphore);}
 
 #ifdef WINDOWS_OPERATING_SYSTEM
 
@@ -47,7 +47,6 @@ static void * command_runner (void * parameter) {
 }
 
 void MidiCommandPrompt :: run (void) {
-	midi_stream * line = getLine ();
 	if (line == 0) return;
 	DWORD x;
 	ReadFile (input, area, AREA_SIZE_1, & x, NULL);
@@ -169,3 +168,37 @@ void MidiCommandPrompt :: setColors (int foreground, int background) {
 
 #endif
 
+////////////////////////////////////////
+// Inherited from Prolog Midi Command //
+////////////////////////////////////////
+
+int MidiCommandPrompt :: get (void) {
+	if (previous_char < 0) sem_wait (& semaphore);
+	previous_char = PrologCommand :: get ();
+	return previous_char < 0 ? 13 : previous_char;
+}
+
+void MidiCommandPrompt :: insert (char * text) {
+	PrologCommand :: insert (text);
+	sem_post (& semaphore);
+}
+
+void MidiCommandPrompt :: insert_midi (int cc, int mm, int ll) {
+	line -> open_system_exclusive ();
+	line -> insert (0x29);
+	line -> insert (cc);
+	line -> insert (mm);
+	line -> insert (ll);
+	line -> close_system_exclusive ();
+}
+
+void MidiCommandPrompt :: openEditor1 (void) {insert_midi (1, 0, 0);}
+void MidiCommandPrompt :: openEditor2 (int selector) {insert_midi (2, selector, 0);}
+void MidiCommandPrompt :: openEditor3 (int selector, int sub_selector) {insert_midi (3, selector, sub_selector);}
+void MidiCommandPrompt :: closeEditor1 (void) {insert_midi (5, 0, 0);}
+void MidiCommandPrompt :: closeEditor2 (int selector) {insert_midi (6, selector, 0);}
+void MidiCommandPrompt :: closeEditor3 (int selector, int sub_selector) {insert_midi (7, selector, sub_selector);}
+void MidiCommandPrompt :: setScreenCoordinates (int x, int y) {
+	insert_midi (12, x >> 7, x & 0x7f);
+	insert_midi (13, y >> 7, y & 0x7f);
+}

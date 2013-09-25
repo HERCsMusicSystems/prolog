@@ -22,6 +22,7 @@
 
 #include "prolog.h"
 #include "midi_stream.h"
+#include "semaphore.h"
 
 #ifdef WINDOWS_OPERATING_SYSTEM
 #include <windows.h>
@@ -37,25 +38,35 @@
 
 class MidiCommandPrompt;
 
-class MidiCommandPrompt {
+class MidiCommandPrompt : public PrologCommand {
 private:
 	#ifdef WINDOWS_OPERATING_SYSTEM
 	HANDLE output;
 	HANDLE input;
 	#endif
+	int previous_char;
+	sem_t semaphore;
 	pthread_t thread;
 	AREA area;
 	midi_stream * line;
+	void insert_midi (int cc, int mm, int ll);
 public:
-	virtual midi_stream * getLine (void);
-	void print (char * text);
-	void setColors (int foreground, int background);
-	void open (void);
-	void close (void);
 	void run (void);
-	MidiCommandPrompt (midi_stream * line = 0);
+	virtual void insert (char * text);
+	virtual int get (void);
+	virtual void print (char * text);
+	virtual void setColors (int foreground, int background);
+	virtual void open (void);
+	virtual void close (void);
+	virtual void openEditor1 (void);
+	virtual void openEditor2 (int selector);
+	virtual void openEditor3 (int selector, int sub_selector);
+	virtual void closeEditor1 (void);
+	virtual void closeEditor2 (int selector);
+	virtual void closeEditor3 (int selector, int sub_selector);
+	virtual void setScreenCoordinates (int x, int y);
+	MidiCommandPrompt (midi_stream * line);
 	~ MidiCommandPrompt (void);
 };
 
 #endif
-

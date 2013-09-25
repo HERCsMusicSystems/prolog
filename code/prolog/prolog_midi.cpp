@@ -112,7 +112,7 @@ class InternalMidiLine : public buffered_midi_stream {
 public:
 	prolog_midi_reader * reader;
 	virtual void internal_ready (void) {if (reader != 0) reader -> read (this);}
-	InternalMidiLine (PrologRoot * root, PrologAtom * atom, PrologMidiServiceClass * servo) : buffered_midi_stream (512) {reader = atom == 0 ? 0 : new prolog_midi_reader (root, atom, servo);}
+	InternalMidiLine (PrologRoot * root, PrologAtom * atom, PrologMidiServiceClass * servo) : buffered_midi_stream (2048) {reader = atom == 0 ? 0 : new prolog_midi_reader (root, atom, servo);}
 	virtual ~ InternalMidiLine (void) {if (reader) delete reader; reader = 0;}
 };
 
