@@ -133,6 +133,10 @@ int PrologReader :: getString (char * area, int ind, char * char_set) {
 }
 
 int PrologReader :: readln (char * area, int ind) {
+	while (act_znak > 127 || act_znak <= 32) {
+		if (act_znak < 0) return act_znak;
+		act_znak = move_z ();
+	}
 	while (act_znak > 31) {
 		if (ind < AREA_SIZE_1) area [ind++] = (char) act_znak;
 		act_znak = move_z ();
