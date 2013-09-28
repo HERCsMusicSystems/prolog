@@ -117,7 +117,6 @@ void MidiCommandPrompt :: run (void) {
 		ch = getchar ();
 	}
 	area_cat (area, ind, "\0");
-	midi_stream * line = getLine ();
 	if (line == 0) return;
 	line -> open_system_exclusive ();
 	line -> insert (0x28);
