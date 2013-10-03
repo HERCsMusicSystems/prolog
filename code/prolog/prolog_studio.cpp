@@ -352,8 +352,8 @@ public:
 		if (! parameters -> isPair ()) return false;
 		if (! parameters -> getLeft () -> isAtom ()) return false;
 		PrologAtom * atom = parameters -> getLeft () -> getAtom ();
+		PrologElement * e_clause = parameters;
 		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
 		PrologElement * dup = atom -> firstClause;
 		if (dup == NULL) return false;
 		while (ind > 0) {
@@ -363,6 +363,8 @@ public:
 		}
 		dup = dup -> duplicate ();
 		dup -> getLeft () -> getLeft () -> setAtom (atom);
+		if (parameters -> isVar ()) {e_clause -> setRight (dup); return true;}
+		parameters -> setPair ();
 		parameters -> setLeft (dup);
 		return true;
 	}
@@ -372,13 +374,16 @@ public:
 class delcl : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		if (! parameters -> getLeft () -> isInteger ()) return false;
-		int ind = parameters -> getLeft () -> getInteger ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		if (! parameters -> getLeft () -> isAtom ()) return false;
-		PrologAtom * atom = parameters -> getLeft () -> getAtom ();
+		PrologAtom * atom = 0;
+		int ind = -1;
+		while (parameters -> isPair ()) {
+			PrologElement * e = parameters -> getLeft ();
+			if (e -> isAtom ()) atom = e -> getAtom ();
+			else if (e -> isInteger ()) ind = e -> getInteger ();
+			else return false;
+			parameters = parameters -> getRight ();
+		}
+		if (atom == 0 || ind < 0) return false;
 		if (atom -> Protected) return false;
 		PrologElement * dup = atom -> firstClause;
 		if (dup == NULL) return false;
