@@ -84,7 +84,7 @@ void MidiCommandPrompt :: close (void) {
 	input = NULL;
 }
 
-void MidiCommandPrompt :: setColors (int foreground, int background) {
+void MidiCommandPrompt :: setColours (int foreground, int background) {
 	if (output == NULL) return;
 	WORD attribute = 0;
 	if (foreground & 1) attribute |= FOREGROUND_BLUE;
@@ -151,7 +151,7 @@ void MidiCommandPrompt :: open (void) {
 
 void MidiCommandPrompt :: close (void) {pthread_cancel (thread);}
 
-void MidiCommandPrompt :: setColors (int foreground, int background) {
+void MidiCommandPrompt :: setColours (int foreground, int background) {
 	bool foreground_intensity = foreground > 7;
 	bool background_intensity = background > 7;
 	int foreground_red = (foreground & 0x4) ? (foreground_intensity ? 5 : 2) : 0;

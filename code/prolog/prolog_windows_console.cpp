@@ -50,7 +50,7 @@ PrologWindowsConsole :: PrologWindowsConsole (void) {
 	SetConsoleTitle ("HERCs PROLOG CONSOLE");
 	output = GetStdHandle (STD_OUTPUT_HANDLE);
 	input = GetStdHandle (STD_INPUT_HANDLE);
-	SetConsoleTextAttribute (output, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+	SetConsoleTextAttribute (output, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 }
 
 PrologWindowsConsole :: ~ PrologWindowsConsole (void) {
@@ -59,7 +59,7 @@ PrologWindowsConsole :: ~ PrologWindowsConsole (void) {
 	FreeConsole ();
 }
 
-void PrologWindowsConsole :: setColors (int foreground, int background) {
+void PrologWindowsConsole :: setColours (int foreground, int background) {
 	if (output == NULL) return;
 	int foreground_red = (foreground >> 16) & 0xff;
 	int foreground_green = (foreground >> 8) & 0xff;

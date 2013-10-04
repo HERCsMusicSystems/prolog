@@ -2955,24 +2955,28 @@ public:
 // console procedures //
 ////////////////////////
 
-class set_colors : public PrologNativeCode {
+class bgcolour : public PrologNativeCode {
 public:
 	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * foreground = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (foreground -> isInteger () && parameters -> isInteger ()) {
-			root -> setColors (foreground -> getInteger (), parameters -> getInteger ());
-			return true;
-		}
-		foreground -> setInteger (root -> current_foreground);
-		parameters -> setInteger (root -> current_background);
-		return true;
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (parameters -> isInteger ()) {root -> setBackground (parameters -> getInteger ()); return true;}
+		if (parameters -> isVar ()) {parameters -> setInteger (root -> current_background); return true;}
+		return false;
 	}
-	set_colors (PrologRoot * root) {this -> root = root;}
+	bgcolour (PrologRoot * root) {this -> root = root;}
+};
+
+class fgcolour : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (parameters -> isInteger ()) {root -> setForeground (parameters -> getInteger ()); return true;}
+		if (parameters -> isVar ()) {parameters -> setInteger (root -> current_foreground); return true;}
+		return false;
+	}
+	fgcolour (PrologRoot * root) {this -> root = root;}
 };
 
 class open_editor : public PrologNativeCode {
@@ -3186,7 +3190,8 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "CLOSURE") == 0) return new CLOSURE ();
 	if (strcmp (name, "ARRAY") == 0) return new ARRAY ();
 
-	if (strcmp (name, "set_colors") == 0) return new set_colors (root);
+	if (strcmp (name, "background") == 0) return new bgcolour (root);
+	if (strcmp (name, "foreground") == 0) return new fgcolour (root);
 	if (strcmp (name, "open_editor") == 0) return new open_editor (root);
 	if (strcmp (name, "close_editor") == 0) return new close_editor (root);
 	if (strcmp (name, "screen_coordinates") == 0) return new screen_coordinates (root);

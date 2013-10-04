@@ -332,7 +332,8 @@ public:
 	void insertCommander (PrologCommand * command);
 	PrologCommand * getCommander (void);
 	void insertCommand (char * text);
-	void setColors (int foreground, int background);
+	void setBackground (int background);
+	void setForeground (int foreground);
 	void openEditor (void);
 	void openEditor (int selector);
 	void openEditor (int selector, int sub_selector);
@@ -524,7 +525,7 @@ public:
 	virtual void insert (char * text);
 	virtual int get (void);
 	virtual void print (char * text);
-	virtual void setColors (int foreground, int background);
+	virtual void setColours (int foreground, int background);
 	virtual void openEditor1 (void);
 	virtual void openEditor2 (int selector);
 	virtual void openEditor3 (int selector, int sub_selector);

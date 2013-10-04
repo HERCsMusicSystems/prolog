@@ -30,7 +30,7 @@ program studio #machine := "prolog.studio"
 		CONSTANT VARIABLE ACCUMULATOR CLOSURE ARRAY var inc dec closure call BLOCK ALL ISALL isall isallr
 		rnd rnd_control grnd series
 		crack wait timeout enter signal semaphore msemaphore mutex accept select critical_section monitor task
-		set_colors OPEN_EDITOR open_editor close_editor
+		background foreground OPEN_EDITOR open_editor close_editor
 		screen_coordinates
 		open_keyboard open_oscilloscope
 		get_volume_serial_number security_check
@@ -145,7 +145,8 @@ program studio #machine := "prolog.studio"
 #machine CLOSURE := "CLOSURE"
 #machine ARRAY := "ARRAY"
 
-#machine set_colors := "set_colors"
+#machine background := "background"
+#machine foreground := "foreground"
 #machine OPEN_EDITOR := "open_editor"
 #machine close_editor := "close_editor"
 #machine screen_coordinates := "screen_coordinates"

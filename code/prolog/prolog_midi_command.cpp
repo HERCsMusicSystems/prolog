@@ -70,7 +70,7 @@ void PrologMidiCommand :: print (char * text) {
 
 void PrologMidiCommand :: open (void) {insert_midi (0, 0, 0);}
 void PrologMidiCommand :: close (void) {insert_midi (4, 0, 0);}
-void PrologMidiCommand :: setColors (int foreground, int background) {
+void PrologMidiCommand :: setColours (int foreground, int background) {
 //	insert_midi (0x0b, foreground, background);
 	int foreground_red = (foreground >> 16) & 0xff;
 	int foreground_green = (foreground >> 8) & 0xff;

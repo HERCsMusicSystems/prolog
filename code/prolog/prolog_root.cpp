@@ -38,7 +38,7 @@ PrologRoot :: PrologRoot (void) TRACKING (5) {
 	args = NULL;
 	volume_id = 0;
 	serial_shift = 0;
-	current_foreground = 65280;
+	current_foreground = 0xffff00;
 	current_background = 0;
 }
 
@@ -393,11 +393,14 @@ void PrologRoot :: insertCommand (char * text) {
 	command -> insert (text);
 }
 
-void PrologRoot :: setColors (int foreground, int background) {
-	current_foreground = foreground;
+void PrologRoot :: setBackground (int background) {
 	current_background = background;
-	if (command == NULL) return;
-	command -> setColors (foreground, background);
+	if (command != 0) command -> setColours (current_foreground, current_background);
+}
+
+void PrologRoot :: setForeground (int foreground) {
+	current_foreground = foreground;
+	if (command != 0) command -> setColours (current_foreground, current_background);
 }
 
 void PrologRoot :: openEditor (void) {
