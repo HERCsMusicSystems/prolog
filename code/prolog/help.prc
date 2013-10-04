@@ -5,6 +5,7 @@
 
 import studio
 import conductor
+import midi
 
 program help [help helper commands tutorials syntax syntax_helper remove_demo command_helper midi_helper orakle_help MIDI_HELPER]
 
@@ -513,13 +514,13 @@ program help [help helper commands tutorials syntax syntax_helper remove_demo co
 	[write "Sets or gets command command prompt string.\n"]
 ]
 
-[[help crd]
-	[command_helper "crd []	crd [\"directory\"]	crd [*directory]	[crd : *directory]"]
-	[write "Changes the current root directory.\n"]
-	[write "When a variable is passed, crd returns the current root directory.\n"]
-	[write "When no parameters are passed,\n"]
-	[write "crd moves one level up within the current root directory.\n"]
-]
+;[[help crd]
+;	[command_helper "crd []	crd [\"directory\"]	crd [*directory]	[crd : *directory]"]
+;	[write "Changes the current root directory.\n"]
+;	[write "When a variable is passed, crd returns the current root directory.\n"]
+;	[write "When no parameters are passed,\n"]
+;	[write "crd moves one level up within the current root directory.\n"]
+;]
 
 [[help cd]
 	[command_helper "cd []	cd [\"directory\"]"]
@@ -527,12 +528,12 @@ program help [help helper commands tutorials syntax syntax_helper remove_demo co
 	[write "cd [] is an equivalent of cd [\"..\"].\n"]
 ]
 
-[[help root_directory]
-	[command_helper "root_directory []	root_directory [\"directory\"]\nroot_directory [*x]	[root_directory : *x]"]
-	[write "Changes the current root directory.\n"]
-	[write "When a variable is passed, it return the current root directory.\n"]
-	[write "Displays the current root directory when no parameter is passed.\n"]
-]
+;[[help root_directory]
+;	[command_helper "root_directory []	root_directory [\"directory\"]\nroot_directory [*x]	[root_directory : *x]"]
+;	[write "Changes the current root directory.\n"]
+;	[write "When a variable is passed, it return the current root directory.\n"]
+;	[write "Displays the current root directory when no parameter is passed.\n"]
+;]
 
 [[help add_search_directory]
 	[command_helper "add_search_directory [\"directory\"]"]
@@ -1512,13 +1513,13 @@ program help [help helper commands tutorials syntax syntax_helper remove_demo co
 	[list rpn]
 ]
 
-[[help RPN]
-	[command_helper "RPN [*channel *pmsb *plsb *value]"]
-	[command_helper "RPN [*channel *value]"]
-	[write "Sends 14-bit rpn MIDI message.\n"]
-	[write "Macrodefinition:\n"]
-	[list RPN]
-]
+;[[help RPN]
+;	[command_helper "RPN [*channel *pmsb *plsb *value]"]
+;	[command_helper "RPN [*channel *value]"]
+;	[write "Sends 14-bit rpn MIDI message.\n"]
+;	[write "Macrodefinition:\n"]
+;	[list RPN]
+;]
 
 [[help hit]
 	[command_helper "hit [*channel *velocity *key1 *key2 ... *keyn]"]
