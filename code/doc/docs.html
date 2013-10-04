@@ -1,0 +1,353 @@
+<head>
+    <style type="text/css">
+        .doc_header {font-family:Arial; font-size:1.5em; font-weight:bold;}
+        .doc_library {font-family:Arial; font-size:1.5em;}
+        .doc_library_section {font-family:Arial; font-size:1.5em; margin-top:1em;}
+        .doc_predicate{font-family:Arial; padding:1em; width:40em;}
+        .doc_predicate_header {background-color:#eeeeee; font-family:monospace;}
+        .doc_predicate_body {font-family:Arial;}
+        .doc_predicate_code {font-family:monospace; background-color:#eeeeee;}
+    </style>
+</head>
+<body bgcolor="blue">
+<div align="center"><div align="left" style="width:1200px; background-color:white;">
+<div class="doc_header">TABLE OF CONTENT</div>
+<ul>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#syntax">Syntax</a></li>
+    <li><a href="#libraries">Libraries</a></li>
+    <ul>
+        <li><a href="#studio">studio</a></li>
+        <ul>
+            <li><a href="#arithmetic">Arithmetic</a></li>
+            <li><a href="#logic">Logic</a></li>
+            <li><a href="#input_output">Input / Output</a></li>
+            <li><a href="#clause_atome">Clause and Atome manipulation</a></li>
+            <li><a href="#term">Term manipulation</a></li>
+            <li><a href="#multithreading">Multi-threading</a></li>
+            <li><a href="#metalogical">Metalogical</a></li>
+        </ul>
+        <li><a href="#conductor">conductor</a></li>
+        <li><a href="#midi">midi</a></li>
+        <li><a href="#neural">neural</a></li>
+        <li><a href="#http">http</a></li>
+        <li><a href="sql">sql</a></li>
+    </ul>
+</ul>
+
+<br />
+
+<div class="doc_header"><a id="syntax">SYNTAX</a></div>
+<table class="syntax_table" style="font-family:monospace; background:#eeeeee">
+    <tr><td>&lt;command&gt;</td><td>:=</td><td>&lt;list&gt; | &lt;atom&gt &lt;list&gt;</td></tr>
+    <tr><td>&lt;program&gt;</td><td>:=</td><td>{ import ( &lt;atom&gt; | &lt;text&gt; ) }</td></tr>
+    <tr><td></td><td></td><td>program &lt;atom&gt; [ #machine := &lt;text&gt; ] ( #auto | &lt;atoms&gt; )</td></tr>
+    <tr><td></td><td></td><td>{ (</td></tr>
+    <tr><td></td><td></td><td>&emsp;&emsp;&emsp;&lt;machine&gt; |</td></tr>
+    <tr><td></td><td></td><td>&emsp;&emsp;&emsp;[ auto := ] &lt;clause&gt; |</td></tr>
+    <tr><td></td><td></td><td>&emsp;&emsp;&emsp;&lt;preprocessor&gt; |</td></tr>
+    <tr><td></td><td></td><td>&emsp;&emsp;&emsp;protect &lt;atoms&gt; |</td></tr>
+    <tr><td></td><td></td><td>&emsp;&emsp;&emsp;private &lt;atoms&gt;</td></tr>
+    <tr><td></td><td></td><td>) }</td></tr>
+    <tr><td></td><td></td><td>end [ := &lt;clause&gt; ] .</td></tr>
+    <tr><td>&lt;atom&gt;</td><td>::=</td><td>( "_" | &lt;letter&gt; ) { ( "_" | &lt;letter&gt; | &lt;numeral&gt; ) }</td></tr>
+    <tr><td>&lt;atoms&gt;</td><td>::=</td><td>"[" { &lt;atom&gt; } "]"</td></tr>
+    <tr><td>&lt;positive&gt;</td><td>::=</td><td>&lt;numeral&gt; { &lt;numeral&gt; }</td></tr>
+    <tr><td>&lt;number&gt;</td><td>::=</td><td>[ "-" ] &lt;positive&gt;</td></tr>
+    <tr><td>&lt;float&gt;</td><td>::=</td><td>&lt;number&gt; . &lt;positive&gt;</td></tr>
+    <tr><td>&lt;text&gt;</td><td>::=</td><td>"\"" { &lt;any-character&gt; } "\""</td></tr>
+    <tr><td>&lt;variable&gt;</td><td>::=</td><td>"*" { ( "_" | &lt;letter&gt; | &lt;numeral&gt; ) }</td></tr>
+    <tr><td>&lt;element&gt;</td><td>::=</td><td>&lt;atom&gt; | &lt;number&gt; | &lt;float&gt; | &lt;text&gt; | / | fail | "[]" | &lt;list&gt; | &lt;variable&gt;</td></tr>
+    <tr><td>&lt;tail&gt;</td><td>::=</td><td>{ &lt;element&gt; } [ : &lt;element&gt; ] "]"</td></tr>
+    <tr><td>&lt;list&gt;</td><td>::=</td><td>"[" &lt;element&gt; &lt;tail&gt;</td></tr>
+    <tr><td>&lt;clause&gt;</td><td>::=</td><td>"[[" &lt;atom&gt; &lt;tail&gt; &lt;tail&gt;</td></tr>
+    <tr><td>&lt;machine&gt;</td><td>::=</td><td>#machine &lt;atom&gt; := &lt;text&gt;</td></tr>
+    <tr><td>&lt;preprocessor&gt;</td><td>::=</td><td>preprocessor := ( &lt;atom&gt; | "[]" )</td></tr>
+</table>
+
+<br />
+
+<div class="doc_predicate">
+    <a id="predicate_@">
+        <div class="doc_predicate_header">
+            @
+        </div>
+        <div class="doc_predicate_body">
+            @
+        </div>
+    </a>
+</div>
+
+<div class="doc_header"><a id="libraries">LIBRARIES</a></div>
+
+<ul>
+    <li><a href="#studio">studio</a></li>
+    <ul>
+        <li><a href="#arithmetic_logic">Arithmetic and Logic</a></li>
+        <li><a href="#input_output">Input / Output</a>
+            <br />
+            <a href="#predicate_nl">nl</a>
+            <a href="#predicate_pp">pp</a>
+            <a href="#predicate_pr">pr</a>
+            <a href="#predicate_pt">pt</a>
+            <a href="#predicate_read">read</a>
+            <a href="#predicate_readln">readln</a>
+            <a href="#predicate_write">write</a>
+            <a href="#predicate_set_captions">set_...._captions</a>
+        </li>
+        <li><a href="#clause_atome">Clause and Atome manipulation</a>
+            <br />
+            <a href="#predicate_auto_atoms">auto_atoms</a>
+            <a href="#predicate_CL">CL</a>
+            <a href="#predicate_DELCL">DELCL</a>
+            <a href="#predicate_overwrite">overwrite</a>
+            <a href="#predicate_OVERWRITE">OVERWRITE</a>
+            <a href="#predicate_scripted_atoms">scripted_atoms</a>
+        </li>
+        <li><a href="#term">Term manipulation</a></li>
+        <li><a href="#multithreading">Multi-threading</a></li>
+        <li><a href="#metalogical">Metalogical</a></li>
+    </ul>
+    <li><a href="#conductor">conductor</a></li>
+    <li><a href="#midi">midi</a></li>
+    <li><a href="#neural">neural</a></li>
+    <li><a href="#http">http</a></li>
+    <li><a href="sql">sql</a></li>
+</ul>
+
+
+<div class="doc_library"><a id="studio">LIBRARY: <b>studio</b></a></div>
+
+<div class="doc_library_section"><a id="arithmetic_logic">Arithmetic and Logic Predicates</a></div>
+
+<div class="doc_library_section"><a id="logic">Logic Predicates</a></div>
+
+<div class="doc_library_section"><a id="input_output">Input / Output Predicates</a></div>
+
+<div class="doc_predicate">
+    <a id="predicate_list">
+        <div class="doc_predicate_header">
+            [list] [list *x] [list : *x]<br />
+            [list command] [list command *x] [list command : *x]<br />
+            [list "module"] [list "module" *x] [list "module" : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Behaviour of <b>list</b> depends on the form of the parameters.<br />
+            First parameter:<br />
+            <li>none: gets the list of loaded modules</li>
+            <li>text: gets the list of atoms defined in a module</li>
+            <li>atom: gets the list of clauses defining the atom</li><br />
+            Second parameter:<br />
+            <li>none: the list is displayed in the console</li>
+            <li>variable (*x): the list is returned as text</li>
+            <li>variable tail (:*x): the list is returned as a Prolog term</li>
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_nl">
+        <div class="doc_predicate_header">
+            [nl]
+        </div>
+        <div class="doc_predicate_body">
+            Prints a new line.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_pp">
+        <div class="doc_predicate_header">
+            [pp : *parameters]
+        </div>
+        <div class="doc_predicate_body">
+            Prints all its parameters as Prolog terms. In particular, texts will be enclosed by quotation marks.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_pr">
+        <div class="doc_predicate_header">
+            [pr *term]
+        </div>
+        <div class="doc_predicate_body">
+            Reads Prolog term from the console.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_pt">
+        <div class="doc_predicate_header">
+            [pt : *parameters]
+        </div>
+        <div class="doc_predicate_body">
+            Prints the true representation of all parameters. In particular, lists will be displayed as nested pairs.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_read">
+        <div class="doc_predicate_header">
+            [read *text]
+        </div>
+        <div class="doc_predicate_body">
+            Skips whitespaces and then reads the input text from the console, until a whitespace is detected.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_readln">
+        <div class="doc_predicate_header">
+            [readln *text]
+        </div>
+        <div class="doc_predicate_body">
+            Skips whitespaces and then reads the input text from the console, until a new line is detected.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_write">
+        <div class="doc_predicate_header">
+            [write : *parameters]
+        </div>
+        <div class="doc_predicate_body">
+            Displays all its parameters.
+            The exact display format depends on the type of the parameter:
+            <li>texts are displayed without quotation marks</li>
+            <li>atoms are displayed exactly as they are</li>
+            <li>integers are displayed as ASCII characters</li>
+            <li>content of lists are displayed using <b>pp</b></li>
+            <li>parameters of other types are ignored</li>
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_set_captions">
+        <div class="doc_predicate_header">
+            [set_uap32_captions] [set_standard_captions]<br />
+            [set_edinburgh_captions] [set_marseille_captions]<br />
+            [set_functional_captions]
+        </div>
+        <div class="doc_predicate_body">
+            Controls the behaviour of lexical and syntax analyser.
+            This feature is experimental. It is recommended to use uap32 captions at all times (default option).
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="###">
+        <div class="doc_predicate_header">
+            ###
+        </div>
+        <div class="doc_predicate_body">
+            ###
+        </div>
+    </a>
+</div>
+
+<div class="doc_library_section"><a id="clause_atome">Clause and Atome Manipulation Predicates</a></div>
+
+<div class="doc_predicate">
+    <a id="predicate_auto_atoms">
+        <div class="doc_predicate_header">
+            [auto_atoms]
+        </div>
+        <div class="doc_predicate_body">
+            Modifies the behaviour of Prolog reader.
+            If the reader encounters an unknown symbol (atom) then it is automatically created (in the root module).
+            See also: <a href="#predicate_scripted_atoms">scripted_atoms</a>.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_CL">
+        <div class="doc_predicate_header">
+            [CL atom index : *clause] [CL atom index *clause]<br />
+            [CL index atom : *clause] [CL index atom *clause]<br />
+            [CL atom : *index] [CL atom *index]<br />
+            [CL atom : index] [CL atom index]
+        </div>
+        <div class="doc_predicate_body">
+            Retrieves a <b>clause</b> attached to the <b>atom</b> and specified by <b>index</b>.
+            It also retrieves or checks the total number of clauses attached to the <b>atom</b>
+            (ZERO if the atom is <b>free</b>).
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_DELCL">
+        <div class="doc_predicate_header">
+            [DELCL index atom] [DELCL atom index]
+        </div>
+        <div class="doc_predicate_body">
+            Deletes a <b>clause</b> attached to the <b>atom</b> and specified by the <b>index</b>.
+            Fails if the <b>atom</b> is <b>protected</b> or if the <b>clause</b> does not exist.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_overwrite">
+        <div class="doc_predicate_header">
+            [overwrite *old *new]
+        </div>
+        <div class="doc_predicate_body">
+            Replaces an old clause with the new one.
+            Fails if the <b>atom</b> is <b>protected</b> or if the <b>clause</b> does not exist.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[overwrite [[*a:*b]:*c] [[*a:*h]:*i]][cl *x [[*a:*b]:*c]]<br />
+            &emsp;&emsp;&emsp;[OVERWRITE *x [[*a:*h]:*i]]<br />
+            ]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_OVERWRITE">
+        <div class="doc_predicate_header">
+            [OVERWRITE index [[atom : parameters] : body]]
+        </div>
+        <div class="doc_predicate_body">
+            Replaces old clause attached to <b>atom</b> and specified by <b>index</b>
+            with the new definition.
+            Fails if the <b>atom</b> is <b>protected</b> or if the <b>clause</b> does not exist.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_scripted_atoms">
+        <div class="doc_predicate_header">
+            [scripted_atoms]
+        </div>
+        <div class="doc_predicate_body">
+            Modifies the behaviour of Prolog reader.
+            All symbols must be explicitly created (by <a href="predicate_create_atom">create_atom</a>) or declared in a separate module.
+            If the reader encounters an unknown symbol (atom) then it fails.
+            See also: <a href="#predicate_auto_atoms">auto_atoms</a>.
+        </div>
+    </a>
+</div>
+
+<div class="doc_library_section"><a id="term">Term Manipulation Predicates</a></div>
+
+<div class="doc_library_section"><a id="multithreading">Multithreading Predicates</a></div>
+
+<div class="doc_library_section"><a id="metalogical">Metalogical Predicates</a></div>
+
+<div class="doc_library"><a id="conductor">LIBRARY: <b>conductor</b></a></div>
+
+</div></div>
+</body>

@@ -138,6 +138,7 @@
     <ResourceCompile Include="studio.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\code\doc\docs.html" />
     <None Include="..\code\prolog\conductor.prc" />
     <None Include="..\code\prolog\database.sql" />
     <None Include="..\code\prolog\f1.prc" />
@@ -158,6 +159,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Icon1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\code\doc\hercs_prolog_syntax.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
