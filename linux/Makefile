@@ -178,7 +178,8 @@ prc_objects = \
 	$(pc)record.prc\
 	$(pc)neural.prc\
 	$(pc)keyboard.prc\
-	$(pc)sql.prc
+	$(pc)sql.prc\
+	$(pc)test.prc
 
 objects = \
 	$(pi)prolog_dll_loader.o\

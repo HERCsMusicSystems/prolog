@@ -61,6 +61,7 @@ SQL_PRC                 RCDATA                  "../code/prolog/sql.prc"
 CONDUCTOR_PRC           RCDATA                  "../code/prolog/conductor.prc"
 MIDI_PRC                RCDATA                  "../code/prolog/midi.prc"
 HTTP_PRC                RCDATA                  "../code/prolog/http.prc"
+TEST_PRC                RCDATA                  "../../prolog/code/prolog/test.prc"
 #endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////
 

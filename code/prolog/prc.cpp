@@ -46,6 +46,7 @@ public:
 		if (strcmp (name, "neural") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (NEURAL_PRC), RT_RCDATA);
 		if (strcmp (name, "keyboard") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (KEYBOARD_PRC), RT_RCDATA);
 		if (strcmp (name, "sql") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (SQL_PRC), RT_RCDATA);
+		if (strcmp (name, "test") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (TEST_PRC), RT_RCDATA);
 		if (strcmp (name, "studio.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (STUDIO_PRC), RT_RCDATA);
 		if (strcmp (name, "conductor.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (CONDUCTOR_PRC), RT_RCDATA);
 		if (strcmp (name, "midi.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (MIDI_PRC), RT_RCDATA);
@@ -57,6 +58,7 @@ public:
 		if (strcmp (name, "neural.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (NEURAL_PRC), RT_RCDATA);
 		if (strcmp (name, "keyboard.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (KEYBOARD_PRC), RT_RCDATA);
 		if (strcmp (name, "sql.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (SQL_PRC), RT_RCDATA);
+		if (strcmp (name, "test.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (TEST_PRC), RT_RCDATA);
 		if (! resource) return NULL;
 		HGLOBAL loader = LoadResource (NULL, resource);
 		if (! loader) return NULL;
@@ -78,6 +80,7 @@ extern char resource_7 [];
 extern char resource_8 [];
 extern char resource_9 [];
 extern char resource_10 [];
+extern char resource_11 [];
 class resource_loader_class : public PrologResourceLoader {
 public:
 	char * load (char * name) {
@@ -93,6 +96,7 @@ public:
 		if (strcmp (name, "neural") == 0) ret = resource_8;
 		if (strcmp (name, "keyboard") == 0) ret = resource_9;
 		if (strcmp (name, "sql") == 0) ret = resource_10;
+		if (strcmp (name, "test") == 0) ret = resource_11;
 		if (strcmp (name, "studio.prc") == 0) ret = resource_0;
 		if (strcmp (name, "conductor.prc") == 0) ret = resource_1;
 		if (strcmp (name, "midi.prc") == 0) ret = resource_2;
@@ -104,6 +108,7 @@ public:
 		if (strcmp (name, "neural.prc") == 0) ret = resource_8;
 		if (strcmp (name, "keyboard.prc") == 0) ret = resource_9;
 		if (strcmp (name, "sql.prc") == 0) ret = resource_10;
+		if (strcmp (name, "test.prc") == 0) ret = resource_11;
 		return ret;
 	}
 } resource_loader;

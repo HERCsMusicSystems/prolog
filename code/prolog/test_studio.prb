@@ -1,0 +1,36 @@
+
+[import "test"]
+[import "capitol"]
+
+[TestEq "list *" "user! capitol test studio" *x [list *x]]
+[TestEq "list : *" ["user!" "capitol" "test" "studio"] *x [list : *x]]
+[TestEq "list \"capitol\" *" "capitol\n" *x [list "capitol" *x]]
+[TestEq "list \"capitol\" : *" [capitol] *x [list "capitol" : *x]]
+[TestEq "list not *" "[[not : *0] *0 / fail]\n[[not : *0]]\n" *x [list not *x]]
+[TestEq "list not : *" [[[not : *i] *i / fail] [[not : *i]]] *x [list not : *x]]
+
+[scripted_atoms]
+[TestFails "scripted_atoms" [text_term "sonda" *x]]
+[auto_atoms]
+[TestWorks "auto_atoms" [text_term "sonda" *x]]
+[scripted_atoms]
+
+[TestEq "DELCL" [[[capitol "Australia" "Canberra"]] [[capitol "Poland" "Warsaw"]] [[capitol "USA" "Cupertino"]]] *x [DELCL capitol 2] [DELCL 1 capitol] [list capitol : *x]]
+
+[TestFails "DELCL Fails 1" [DELCL capitol 3]]
+[TestFails "DELCL Fails 2" [DELCL 3 capitol]]
+[TestFails "DELCL Fails 3" [DELCL capitol -1]]
+[TestFails "DELCL Fails 4" [DELCL -1 capitol]]
+
+[TestFails "DELCL protected" [DELCL 0 not]]
+
+
+[nl]
+
+[TestSummary]
+
+[nl]
+
+[foreground 0xffff00]
+
+[exit]
