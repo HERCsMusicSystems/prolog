@@ -210,7 +210,15 @@ void midi_stream :: ready (void) {
 void midi_stream :: insert_keyoff (int channel, int key, int velocity) {lock (); insert (0x80 + chex (channel), key, velocity); unlock ();}
 void midi_stream :: insert_keyon (int channel, int key, int velocity) {lock (); insert (0x90 + chex (channel), key, velocity); unlock ();}
 void midi_stream :: insert_pat (int channel, int key, int value) {lock (); insert (0xa0 + chex (channel), key, value); unlock ();}
-void midi_stream :: insert_control (int channel, int control, int value) {lock (); insert (0xb0 + chex (channel), control, value); unlock ();}
+void midi_stream :: insert_control (int channel, int control, int value) {
+	lock ();
+	if (value >= 128) {
+		channel = 0xb0 + chex (channel);
+		insert (channel, control + 32, 127);
+		insert (channel, control, 127);
+	} else insert (0xb0 + chex (channel), control, value);
+	unlock ();
+}
 void midi_stream :: insert_control (int channel, int control, int msb, int lsb) {
 	lock ();
 	channel = 0xb0 + chex (channel);
@@ -228,7 +236,10 @@ void midi_stream :: insert_nrpn (int channel) {
 void midi_stream :: insert_nrpn (int channel, int msb_data) {
 	lock ();
 	channel = 0xb0 + chex (channel);
-	insert (channel, 6, msb_data);
+	if (msb_data >= 128) {
+		insert (channel, 38, 127);
+		insert (channel, 6, 127);
+	} else insert (channel, 6, msb_data);
 	unlock ();
 }
 void midi_stream :: insert_nrpn (int channel, int msb, int lsb) {
@@ -243,7 +254,10 @@ void midi_stream :: insert_nrpn (int channel, int msb, int lsb, int msb_data) {
 	channel = 0xb0 + chex (channel);
 	insert (channel, 99, msb);
 	insert (channel, 98, lsb);
-	insert (channel, 6, msb_data);
+	if (msb_data >= 128) {
+		insert (channel, 38, 127);
+		insert (channel, 6, 127);
+	} else insert (channel, 6, msb_data);
 	unlock ();
 }
 void midi_stream :: insert_nrpn (int channel, int msb, int lsb, int msb_data, int lsb_data) {
@@ -303,8 +317,13 @@ void midi_stream :: insert_rpn (int channel, int msb, int lsb, int delta) {
 }
 void midi_stream :: insert_programchange (int channel, int program) {lock (); insert (0xc0 + chex (channel), program); unlock ();}
 void midi_stream :: insert_cat (int channel, int value) {lock (); insert (0xd0 + chex (channel), value); unlock ();}
-void midi_stream :: insert_pitchbend (int channel, int value) {lock (); insert (0xe0 + chex (channel), 0, value); unlock ();}
-void midi_stream :: insert_pitchbend (int channel, int msb, int lsb) {lock (); insert (0xe0 + chex (channel), lsb, msb); unlock ();}
+void midi_stream :: insert_pitchbend (int channel, int value) {
+	lock ();
+	if (value >= 128) insert (0xe0 + chex (channel), 127, 127);
+	else insert (0xe0 + chex (channel), 0, value);
+	unlock ();
+}
+void midi_stream :: insert_pitchbend (int channel, int lsb, int msb) {lock (); insert (0xe0 + chex (channel), lsb, msb); unlock ();}
 void midi_stream :: insert_channel_command (int command) {lock (); insert_command (command); close_message (); unlock ();}
 void midi_stream :: open_system_exclusive (void) {
 	open_generic_system_exclusive ();
