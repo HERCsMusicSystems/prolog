@@ -405,7 +405,7 @@ public:
 				int mmsb = msb -> getInteger () & 0x3fff;
 				int llsb = mmsb & 0x7f;
 				mmsb >>= 7;
-				destination -> insert_pitchbend (channel -> getInteger (), mmsb, llsb);
+				destination -> insert_pitchbend (channel -> getInteger (), llsb, mmsb);
 			} else destination -> insert_pitchbend (channel -> getInteger (), msb -> getInteger ());
 			destination -> ready ();
 			return true;
