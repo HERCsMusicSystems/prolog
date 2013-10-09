@@ -15,6 +15,17 @@
 [TestWorks "auto_atoms" [text_term "sonda" *x]]
 [scripted_atoms]
 
+[TestEq "CL atom index *clause" [[capitol "Australia" "Canberra"]] *x [CL capitol 0 *x]]
+[TestEq "CL atom index:*clause" [[capitol "New Zealand" "Wellington"]] *x [CL capitol 1 : *x]]
+[TestEq "CL index atom *clause" [[capitol "France" "Paris"]] *x [CL 2 capitol *x]]
+[TestEq "CL index atom:*clause" [[capitol "Poland" "Warsaw"]] *x [CL 3 capitol : *x]]
+[TestEq "CL atom *index" 5 *x [CL capitol *x]]
+[TestEq "CL atom:*index" 5 *x [CL capitol *x]]
+[TestWorks "CL atom index" [CL capitol 5]]
+[TestFails "CL atom index" [CL capitol 4]]
+[TestWorks "CL atom:index" [CL capitol : 5]]
+[TestFails "CL atom:index" [CL capitol : 4]]
+
 [TestEq "DELCL" [[[capitol "Australia" "Canberra"]] [[capitol "Poland" "Warsaw"]] [[capitol "USA" "Cupertino"]]] *x [DELCL capitol 2] [DELCL 1 capitol] [list capitol : *x]]
 
 [TestFails "DELCL Fails 1" [DELCL capitol 3]]
@@ -22,7 +33,46 @@
 [TestFails "DELCL Fails 3" [DELCL capitol -1]]
 [TestFails "DELCL Fails 4" [DELCL -1 capitol]]
 
-[TestFails "DELCL protected" [DELCL 0 not]]
+[TestFails "DELCL Protected" [DELCL 0 not]]
+
+[TestEq "OVERWRITE" [[[capitol "Australia" "Canberra"]] [[capitol "Poland" "Warsaw"]] [[capitol] [show capitol]]] *x [OVERWRITE 2 [[capitol] [show capitol]]]]
+[TestFails "OVERWRITE Fails 1" [OVERWRITE 3 [[capitol] [show capitol]]]]
+[TestFails "OVERWRITE Fails 2" [OVERWRITE 0 [[enter]]]]
+
+[TestFails "OVERWRITE Protected" [OVERWRITE 0 [[not]]]]
+
+[TestFails "addcl0 protected" [addcl0 [[not]]]]
+[TestEq "addcl0" [[capitol 1] 2 3 fail] *x [addcl0 [[capitol 1] 2 3 fail]] [CL 0 capitol *x]]
+[TestFails "addcl protected" [addcl [[not]]]]
+[TestEq "addcl" [[capitol 2] 33 4 fail] *x [addcl [[capitol 2] 33 4 fail] 4] [CL capitol 4 *x]]
+[TestEq "addcl -1" [[capitol 123]] *x [addcl [[capitol 123]] -1] [CL 0 capitol *x]]
+[TestEq "addcl 3" [[capitol fail]] *x [addcl [[capitol fail]] 3] [CL 3 capitol *x]]
+
+[TestFails "create_atom 127 (confirms not atom)" [create_atom 127]]
+[TestWorks "create_atom atom (confirms atom)" [create_atom sonda]]
+[TestEq "create_atom *var (anonymous)" [sonda] *x [create_atom *atom] [list "user!" : *x] [is_atom *atom]]
+[TestEq "create_atom name" "mariner sonda\n" *x [create_atom "mariner"] [list "user!" *x]]
+[TestEq "create_atom name *var" ["mariner sonda\n" "voyager"] [*x *y] [create_atom "voyager" *atom] [add "" *atom *y] [list "user!" *x]]
+[TestEq "create_atom name:*var" ["mariner sonda\n" "voyager"] [*x *y] [create_atom "voyager" *atom] [add "" *atom : *y] [list "user!" *x]]
+
+[TestFails "search_atom directory/atom 1" [search_atom "stdio" "command" *x]]
+[TestFails "search_atom directory/atom 2" [search_atom "studio" "cmmnd" *x]]
+[TestFails "search_atom atom" [search_atom "cmmnd" *x]]
+[TestEq "search_atom 1" command *x [search_atom "studio" "command" *x]]
+[TestEq "search_atom 2" command *x [search_atom "studio" "command" : *x]]
+[TestEq "search_atom 3" command *x [search_atom "command" *x]]
+[TestEq "search_atom 4" command *x [search_atom "command" : *x]]
+
+[TestEq "preprocessor *x" [] *x [preprocessor *x]]
+[TestEq "preprocessor:*x" [] *x [preprocessor : *x]]
+[TestEq "preprocessor eq" eq *x [preprocessor eq] [preprocessor : *x]]
+[TestEq "preprocessor []" [] *x [preprocessor []] [preprocessor *x]]
+[TestEq "preprocessor:eq" eq *x [preprocessor eq] [preprocessor : *x]]
+[TestEq "[preprpocessor]" [] *x [preprocessor] [preprocessor : *x]]
+
+[TestWorks "prompt set" [prompt "=> "]]
+[TestEq "prompt *x" "=> " *x [prompt *x]]
+[TestEq "prompt:*x" "=> " *x [prompt : *x]]
 
 
 [nl]

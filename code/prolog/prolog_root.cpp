@@ -727,8 +727,8 @@ int PrologRoot :: attachClause (PrologElement * clause, int position) {
 	sub = sub -> getLeft ();
 	if (! sub -> isAtom ()) return 3;
 	atom = sub -> getAtom ();
-	if (atom -> Privated) return 4;
-	if ((atom -> firstClause == NULL) || (position == 0)) {
+	if (atom -> Protected) return 4;
+	if ((atom -> firstClause == NULL) || (position <= 0)) {
 		sub -> setHead (atom -> firstClause);
 		atom -> firstClause = clause;
 		return 0;

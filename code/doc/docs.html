@@ -97,11 +97,16 @@
         </li>
         <li><a href="#clause_atome">Clause and Atome manipulation</a>
             <br />
+            <a href="#predicate_addcl">addcl</a>
+            <a href="#predicate_addcl0">addcl0</a>
             <a href="#predicate_auto_atoms">auto_atoms</a>
             <a href="#predicate_CL">CL</a>
             <a href="#predicate_DELCL">DELCL</a>
             <a href="#predicate_overwrite">overwrite</a>
             <a href="#predicate_OVERWRITE">OVERWRITE</a>
+            <a href="#predicate_preprocessor">preprocessor</a>
+            <a href="#predicate_prompt">prompt</a>
+            <a href="#predicate_search_atom">search_atom</a>
             <a href="#predicate_scripted_atoms">scripted_atoms</a>
         </li>
         <li><a href="#term">Term manipulation</a></li>
@@ -256,6 +261,34 @@
 <div class="doc_library_section"><a id="clause_atome">Clause and Atome Manipulation Predicates</a></div>
 
 <div class="doc_predicate">
+    <a id="predicate_addcl">
+        <div class="doc_predicate_header">
+            [addcl [[relation : *parameters] : *body] ]<br />
+            [addcl [[relation : *parameters] : *body] index]
+        </div>
+        <div class="doc_predicate_body">
+            Adds a new clause as the last clause of the relation
+            or at the position specified by <b>index</b>.
+            If the index is out of range (too low, negative or too high)
+            then the clause will be added as either first or last.
+            Fails if relation is <b>protected</b>.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_addcl0">
+        <div class="doc_predicate_header">
+            [addcl0 [[relation : *parameters] : *body] ]
+        </div>
+        <div class="doc_predicate_body">
+            Adds a new clause as the first clause of the relation.
+            Fails if relation is <b>protected</b>.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_auto_atoms">
         <div class="doc_predicate_header">
             [auto_atoms]
@@ -285,6 +318,25 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_create_atom">
+        <div class="doc_predicate_header">
+            [create_atom atom]<br />
+            [create_atom *atom]<br />
+            [create_atom "name"]<br />
+            [create_atom "name" *atom] [create_atom "name" : *atom]
+        </div>
+        <div class="doc_predicate_body">
+            Creates a new symbol, or checks if the supplied argument is an existing symbol.
+            This relation has several forms:
+            <li><b>with symbol</b> checks if it is an existing symbol</li>
+            <li><b>with var</b> creates an anonymous symbol in a form of <b>&lt;Atom:=004D9C98&gt;</b></li>
+            <li><b>with text</b> creates a new symbol and places it into the root directory</li>
+            <li><b>with text and var</b> creates an anonymous symbol with specified name</li>
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_DELCL">
         <div class="doc_predicate_header">
             [DELCL index atom] [DELCL atom index]
@@ -307,7 +359,8 @@
             Macrodefinition:
         </div>
         <div class="doc_predicate_code">
-            [[overwrite [[*a:*b]:*c] [[*a:*h]:*i]][cl *x [[*a:*b]:*c]]<br />
+            [[overwrite [[*a:*b]:*c] [[*a:*h]:*i]]<br />
+            &emsp;&emsp;&emsp;[cl *x [[*a:*b]:*c]]<br />
             &emsp;&emsp;&emsp;[OVERWRITE *x [[*a:*h]:*i]]<br />
             ]
         </div>
@@ -323,6 +376,51 @@
             Replaces old clause attached to <b>atom</b> and specified by <b>index</b>
             with the new definition.
             Fails if the <b>atom</b> is <b>protected</b> or if the <b>clause</b> does not exist.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_preprocessor">
+        <div class="doc_predicate_header">
+            [preprocessor] [preprocessor []]<br />
+            [preprocessor atom]<br />
+            [preprocessor *atom] [preprocessor : *atom]
+        </div>
+        <div class="doc_predicate_body">
+            Sets or gets preprocessor.
+            Without parameters or with empty list, it removes preprocessor.
+            The preprocessor itself is a relation, which takes two parameters:
+            first is the original clause (or list of calls), the second is the result of processing.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_prompt">
+        <div class="doc_predicate_header">
+            [prompt "=> "]<br />
+            [prompt *x] [prompt : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Sets or gets the current prompt, which is used by command console.
+            Default value is usually "".
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_search_atom">
+        <div class="doc_predicate_header">
+            [search_atom "name" *atom]<br />
+            [search_atom "name" : *atom]<br />
+            [search_atom "module" "name" *atom]<br />
+            [search_atom "module" "name" : *atom]
+        </div>
+        <div class="doc_predicate_body">
+            Finds a symbol.
+            If module name is specified then it searches only this particular module.
+            Otherwise it search in all modules.
         </div>
     </a>
 </div>

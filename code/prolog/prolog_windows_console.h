@@ -31,10 +31,13 @@ private:
 	HANDLE output;
 	HANDLE input;
 	AREA area;
+	PROLOG_STRING prompt;
 public:
 	virtual void print (char * text);
 	virtual int get (void);
 	virtual void setColours (int foreground, int background);
+	virtual char * getPrompt (void);
+	virtual void setPrompt (char * prompt);
 	PrologWindowsConsole (void);
 	~ PrologWindowsConsole (void);
 };

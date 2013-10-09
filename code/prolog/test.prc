@@ -23,14 +23,14 @@ auto := [[ResetCounters]]
 
 [[TestWorks *name : *action]
 	[SELECT
-		[[res : *action] [Successes *name] [foreground 0xff00] [write "OK: "] [foreground 0xffff00] [write *name] [foreground 0xff00] [write " works."] [nl]]
+		[[res : *action] [Successes *name] [foreground 0xff00] [write "OK: "] [foreground 0xffff00] [write *name] [foreground 0xff00] [write " worked."] [nl]]
 		[[Failures *name] [foreground 0xff0000] [write "FAILED: "] [foreground 0xffff00] [write *name] [foreground 0xff0000] [write " failed."] [nl]]
 	]
 ]
 
 [[TestFails *name : *action]
 	[SELECT
-		[[res : *action] [Failures *name] [foreground 0xff0000] [write "FAILED: "] [foreground 0xffff00] [write *name] [foreground 0xff0000] [write " works."] [nl]]
+		[[res : *action] [Failures *name] [foreground 0xff0000] [write "FAILED: "] [foreground 0xffff00] [write *name] [foreground 0xff0000] [write " worked."] [nl]]
 		[[Successes *name] [foreground 0xff00] [write "OK: "] [foreground 0xffff00] [write *name] [foreground 0xff00] [write " failed."] [nl]]
 	]
 ]

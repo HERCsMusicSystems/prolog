@@ -495,26 +495,30 @@ public:
 class search_atom : public PrologNativeCode {
 public:
 	PrologRoot * root;
+	bool sub_code (PrologElement * parameters, char * name) {
+		PrologAtom * atom = root -> search (name);
+		if (atom == 0) return false;
+		parameters -> setAtom (atom);
+		return true;
+	}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
-		if (! parameters -> getLeft () -> isText ()) return false;
-		if (! parameters -> getRight () -> isPair ()) return false;
-		char * name = parameters -> getLeft () -> getText ();
-		if (parameters -> getRight () -> getLeft () -> isText ()) {
-			PrologDirectory * dir = root -> searchDirectory (name);
-			if (dir == NULL) return false;
-			parameters = parameters -> getRight ();
-			name = parameters -> getLeft () -> getText ();
-			if (! parameters -> getRight () -> isPair ()) return false;
-			PrologAtom * atom = dir -> searchAtom (name);
-			if (atom == NULL) return false;
-			parameters -> getRight () -> getLeft () -> setAtom (atom);
+		PrologElement * name = parameters -> getLeft (); if (! name -> isText ()) return false; parameters = parameters -> getRight ();
+		if (parameters -> isVar ()) return sub_code (parameters, name -> getText ());
+		if (! parameters -> isPair ()) return false;
+		PrologElement * e = parameters -> getLeft ();
+		parameters = parameters -> getRight ();
+		if (e -> isVar ()) return sub_code (e, name -> getText ());
+		if (e -> isText ()) {
+			PrologDirectory * dir = root -> searchDirectory (name -> getText ());
+			if (dir == 0) return false;
+			PrologAtom * atom = dir -> searchAtom (e -> getText ());
+			if (atom == 0) return false;
+			if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+			parameters -> setAtom (atom);
 			return true;
 		}
-		PrologElement * atom = root -> atom (name);
-		if (atom == NULL) return false;
-		parameters -> getRight () -> setLeft (atom);
-		return true;
+		return false;
 	}
 	search_atom (PrologRoot * root) {this -> root = root;}
 };
@@ -524,6 +528,7 @@ public:
 	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		PrologAtom * preprocessor = root -> getPreprocessor ();
+		if (parameters -> isEarth ()) {root -> setPreprocessor (NULL); return true;}
 		if (! parameters -> isPair ()) {
 			if (preprocessor != NULL) parameters -> setAtom (preprocessor);
 			else parameters -> setEarth ();

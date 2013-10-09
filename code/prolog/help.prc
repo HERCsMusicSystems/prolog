@@ -7,8 +7,9 @@ import studio
 import conductor
 import midi
 
-program help [help helper commands tutorials syntax syntax_helper remove_demo command_helper midi_helper orakle_help MIDI_HELPER]
+program help [help helper commands tutorials syntax syntax_helper remove_demo command_helper midi_helper orakle_help MIDI_HELPER set_colors]
 
+[[set_colors *foreground *background] [foreground *foreground] [background *background]]
 [[helper *x *y]
 	[set_colors 16777215 0] [write *x] [set_colors 65280 0] [write *y]
 	]

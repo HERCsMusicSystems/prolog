@@ -33,6 +33,7 @@ int PrologWindowsConsole :: get (void) {
 	int ch = PrologCommand :: get ();
 	if (ch >= 0) return ch;
 	if (input == 0) return ch;
+	print (prompt);
 	while (ch < 0) {
 		DWORD end;
 		ReadFile (input, area, AREA_SIZE_1, & end, 0);
@@ -44,6 +45,7 @@ int PrologWindowsConsole :: get (void) {
 }
 
 PrologWindowsConsole :: PrologWindowsConsole (void) {
+	strcpy (prompt, "");
 	output = NULL;
 	input = NULL;
 	AllocConsole ();
@@ -58,6 +60,9 @@ PrologWindowsConsole :: ~ PrologWindowsConsole (void) {
 	if (input != 0) CloseHandle (input); input = 0;
 	FreeConsole ();
 }
+
+char * PrologWindowsConsole :: getPrompt (void) {return prompt;}
+void PrologWindowsConsole :: setPrompt (char * prompt) {prolog_string_copy (this -> prompt, prompt);}
 
 void PrologWindowsConsole :: setColours (int foreground, int background) {
 	if (output == NULL) return;
