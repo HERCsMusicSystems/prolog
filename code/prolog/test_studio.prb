@@ -74,6 +74,74 @@
 [TestEq "prompt *x" "=> " *x [prompt *x]]
 [TestEq "prompt:*x" "=> " *x [prompt : *x]]
 
+[TestWorks "is_atom atom" [is_atom command]]
+[TestFails "is_atom 127" [is_atom 127]]
+
+[TestWorks "is_integer 127" [is_integer 127]]
+[TestFails "is_integer 127.0" [is_integer command]]
+
+[TestWorks "is_double 127.0" [is_double 127.0]]
+[TestFails "is_double 127" [is_double 127]]
+
+[TestWorks "is_number 127.0" [is_number 127.0]]
+[TestWorks "is_number 127" [is_number 127]]
+[TestFails "is_number atom" [is_number command]]
+
+[TestWorks "is_var *" [is_var *]]
+[TestFails "is_var atom" [is_var command]]
+
+[TestFails "is_head atom" [is_head command]]
+
+[TestWorks "is_text text" [is_text "sonda"]]
+[TestFails "is_text atom" [is_text command]]
+
+[TestWorks "has_machine sum" [has_machine sum]]
+[TestFails "has_machine command" [has_machine command]]
+[TestWorks "has_machine studio" [has_machine "studio"]]
+[TestFails "has_machine capitol" [has_machine "capitol"]]
+
+[TestEq "text_list sonda" [115 111 110 100 97] *x [text_list "sonda" *x]]
+[TestEq "text_list 115 111 110 100 97" "sonda" *x [text_list *x [115 111 110 100 97]]]
+
+[TestEq "e32 *" 0 *x [e32 *x]]
+[TestEq "e32 * be" 190 *x [e32 *x 0xbe]]
+[TestEq "e32 * babe" 47806 *x [e32 *x 0xbe 0xba]]
+[TestEq "e32 * febabe" 16693950 *x [e32 *x 0xbe 0xba 0xfe]]
+[TestEq "e32 * cafebabe" -889275714 *x [e32 *x 0xbe 0xba 0xfe 0xca]]
+[TestEq "e32 -889275714 : *" [0xbe 0xba 0xfe 0xca] *x [e32 -889275714 : *x]]
+[TestEq "e32 cafebabe" [0xbe 0xba 0xfe 0xca] [*a *b *c *d] [e32 -889275714 *a *b *c *d]]
+
+[TestEq "sum [1 2 *]" 3 *x [sum 1 2 *x]]
+[TestEq "sum [1 2.0 : *]" 3.0 *x [sum 1 2.0 : *x]]
+[TestEq "sum [1 * 3]" 2 *x [sum 1 *x 3]]
+[TestEq "sum [1 * : 3.0]" 2.0 *x [sum 1 *x : 3.0]]
+[TestEq "sum [1.0 2 : *]" 3.0 *x [sum 1.0 2 : *x]]
+[TestEq "sum [1.0 2.0 *]" 3.0 *x [sum 1.0 2.0 *x]]
+[TestEq "sum [1.0 * : 3]" 2.0 *x [sum 1.0 *x : 3]]
+[TestEq "sum [1.0 * 3.0]" 2.0 *x [sum 1.0 *x 3.0]]
+[TestEq "sum [* 2 : 3]" 1 *x [sum *x 2 : 3]]
+[TestEq "sum [* 2 3.0]" 1.0 *x [sum *x 2 3.0]]
+[TestEq "sum [* 2.0 : 3]" 1.0 *x [sum *x 2.0 : 3]]
+[TestEq "sum [* 2.0 3.0]" 1.0 *x [sum *x 2.0 3.0]]
+
+[TestEq "times [2 8 : *]" 16 *x [times 2 8 : *x]]
+[TestEq "times [2 8.5 *]" 17.0 *x [times 2 8.5 *x]]
+[TestFails "times [0 * 16]" [times 0 * 16]]
+[TestEq "times [2 * 17]" 8 *x [times 2 *x 17]]
+[TestEq "times [2 * : 17.0]" 8.5 *x [times 2 *x : 17.0]]
+[TestEq "times [2.0 8  *]" 16.0 *x [times 2.0 8 *x]]
+[TestEq "times [2.0 8.5 : *]" 17.0 *x [times 2.0 8.5 : *x]]
+[TestFails "times [0.0 * : 16]" [times 0.0 * : 16]]
+[TestEq "times [2.0 * : 17]" 8.5 *x [times 2.0 *x : 17]]
+[TestEq "times [2.0 * 17.0]" 8.5 *x [times 2.0 *x 17.0]]
+[TestFails "times [* 0 : 17]" [times * 0 : 17]]
+[TestEq "times [* 8 17]" 2 *x [times *x 8 17]]
+[TestEq "times [* 8 : 17.0]" 2.125 *x [times *x 8 : 17.0]]
+[TestFails "times [* 0.0 17]" [times * 0.0 17]]
+[TestEq "times [* 8.5 17]" 2.0 *x [times *x 8.5 17]]
+[TestEq "times [* 8.5 : 17.0]" 2.0 *x [times *x 8.5 : 17.0]]
+
+
 
 [nl]
 

@@ -83,13 +83,22 @@
 <ul>
     <li><a href="#studio">studio</a></li>
     <ul>
-        <li><a href="#arithmetic_logic">Arithmetic and Logic</a></li>
+        <li><a href="#arithmetic_logic">Arithmetic and Logic</a>
+            <br />
+            <a href="#predicate_sum">sum</a>
+            <a href="#predicate_times">times</a>
+        </li>
         <li><a href="#input_output">Input / Output</a>
             <br />
+            <a href="#predicate_list">list</a>
             <a href="#predicate_nl">nl</a>
+            <a href="#predicate_object_counter">object_counter</a>
             <a href="#predicate_pp">pp</a>
             <a href="#predicate_pr">pr</a>
+            <a href="#predicate_preprocessor">preprocessor</a>
+            <a href="#predicate_prompt">prompt</a>
             <a href="#predicate_pt">pt</a>
+            <a href="#predicate_query_stack">query_stack</a>
             <a href="#predicate_read">read</a>
             <a href="#predicate_readln">readln</a>
             <a href="#predicate_write">write</a>
@@ -104,12 +113,22 @@
             <a href="#predicate_DELCL">DELCL</a>
             <a href="#predicate_overwrite">overwrite</a>
             <a href="#predicate_OVERWRITE">OVERWRITE</a>
-            <a href="#predicate_preprocessor">preprocessor</a>
-            <a href="#predicate_prompt">prompt</a>
             <a href="#predicate_search_atom">search_atom</a>
             <a href="#predicate_scripted_atoms">scripted_atoms</a>
         </li>
-        <li><a href="#term">Term manipulation</a></li>
+        <li><a href="#term">Term manipulation</a>
+            <br />
+            <a href="#predicate_e32">e32</a>
+            <a href="#predicate_has_machine">has_machine</a>
+            <a href="#predicate_is_atom">is_atom</a>
+            <a href="#predicate_is_double">is_double</a>
+            <a href="#predicate_is_head">is_head</a>
+            <a href="#predicate_is_integer">is_integer</a>
+            <a href="#predicate_is_number">is_number</a>
+            <a href="#predicate_is_text">is_text</a>
+            <a href="#predicate_is_var">is_var</a>
+            <a href="#predicate_text_list">text_list</a>
+        </li>
         <li><a href="#multithreading">Multi-threading</a></li>
         <li><a href="#metalogical">Metalogical</a></li>
     </ul>
@@ -124,6 +143,36 @@
 <div class="doc_library"><a id="studio">LIBRARY: <b>studio</b></a></div>
 
 <div class="doc_library_section"><a id="arithmetic_logic">Arithmetic and Logic Predicates</a></div>
+
+<div class="doc_predicate">
+    <a id="predicate_sum">
+        <div class="doc_predicate_header">
+            [sum a b c]<br />
+            [sum a b : c]
+        </div>
+        <div class="doc_predicate_body">
+            Adds or subtract arguments to make sure a + b = c.
+            Only one of them can be a variable.
+            If two arguments are integers then the result will be integer.
+            If any of the arguments is double then the result will be double as well.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_times">
+        <div class="doc_predicate_header">
+            [times a b c]<br />
+            [times a b : c]
+        </div>
+        <div class="doc_predicate_body">
+            Multiplies or divides arguments to make sure a * b = c.
+            Only one of them can be a variable.
+            If two arguments are integers then the result will be integer.
+            If any of the arguments is double then the result will be double as well.
+        </div>
+    </a>
+</div>
 
 <div class="doc_library_section"><a id="logic">Logic Predicates</a></div>
 
@@ -162,6 +211,18 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_object_counter">
+        <div class="doc_predicate_header">
+            [object_counter]<br />
+            [object_counter *x]
+        </div>
+        <div class="doc_predicate_body">
+            Displays or returns statistical information about all the objects currently allocated in the memory.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_pp">
         <div class="doc_predicate_header">
             [pp : *parameters]
@@ -184,12 +245,52 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_preprocessor">
+        <div class="doc_predicate_header">
+            [preprocessor] [preprocessor []]<br />
+            [preprocessor atom]<br />
+            [preprocessor *atom] [preprocessor : *atom]
+        </div>
+        <div class="doc_predicate_body">
+            Sets or gets preprocessor.
+            Without parameters or with empty list, it removes preprocessor.
+            The preprocessor itself is a relation, which takes two parameters:
+            first is the original clause (or list of calls), the second is the result of processing.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_prompt">
+        <div class="doc_predicate_header">
+            [prompt "=> "]<br />
+            [prompt *x] [prompt : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Sets or gets the current prompt, which is used by command console.
+            Default value is usually "".
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_pt">
         <div class="doc_predicate_header">
             [pt : *parameters]
         </div>
         <div class="doc_predicate_body">
             Prints the true representation of all parameters. In particular, lists will be displayed as nested pairs.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_query_stack">
+        <div class="doc_predicate_header">
+            [query_stack]
+        </div>
+        <div class="doc_predicate_body">
+            Prints the content of the query stack on the console.
         </div>
     </a>
 </div>
@@ -381,35 +482,6 @@
 </div>
 
 <div class="doc_predicate">
-    <a id="predicate_preprocessor">
-        <div class="doc_predicate_header">
-            [preprocessor] [preprocessor []]<br />
-            [preprocessor atom]<br />
-            [preprocessor *atom] [preprocessor : *atom]
-        </div>
-        <div class="doc_predicate_body">
-            Sets or gets preprocessor.
-            Without parameters or with empty list, it removes preprocessor.
-            The preprocessor itself is a relation, which takes two parameters:
-            first is the original clause (or list of calls), the second is the result of processing.
-        </div>
-    </a>
-</div>
-
-<div class="doc_predicate">
-    <a id="predicate_prompt">
-        <div class="doc_predicate_header">
-            [prompt "=> "]<br />
-            [prompt *x] [prompt : *x]
-        </div>
-        <div class="doc_predicate_body">
-            Sets or gets the current prompt, which is used by command console.
-            Default value is usually "".
-        </div>
-    </a>
-</div>
-
-<div class="doc_predicate">
     <a id="predicate_search_atom">
         <div class="doc_predicate_header">
             [search_atom "name" *atom]<br />
@@ -441,11 +513,163 @@
 
 <div class="doc_library_section"><a id="term">Term Manipulation Predicates</a></div>
 
+<div class="doc_predicate">
+    <a id="predicate_e32">
+        <div class="doc_predicate_header">
+            [e32 *number]<br />
+            [e32 *number lsb]<br />
+            [e32 *number lsb msb]<br />
+            [e32 *number llsb lmsb msb]<br />
+            [e32 *number llsb lmsb mlsb mmsb]<br />
+            [e32 number *llsb *lmsb *mlsb *mmsb]
+        </div>
+        <div class="doc_predicate_body">
+            Constructs a 32-bit integer from supplied 8-bit components
+            or extracs 4 8-bit components from a 32-bit integer.
+            The least significant byte is first (llsb), so it is possible to
+            supply as many 8-bit components as necessary.
+            (The result will be ZERO if no components are passed.)
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_has_machine">
+        <div class="doc_predicate_header">
+            [has_machine atom]<br />
+            [has_machine "module"]
+        </div>
+        <div class="doc_predicate_body">
+            Checks if a symbol has clauses attached or if a module has a service class attached.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_is_atom">
+        <div class="doc_predicate_header">
+            [is_atom atom]
+        </div>
+        <div class="doc_predicate_body">
+            Checks if the supplied parameter is a symbol (atom).
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_is_double">
+        <div class="doc_predicate_header">
+            [is_double 127.0]
+        </div>
+        <div class="doc_predicate_body">
+            Checks if the supplied parameter is a number with fractional part.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_is_head">
+        <div class="doc_predicate_header">
+            [is_head head]
+        </div>
+        <div class="doc_predicate_body">
+            Checks if the supplied parameter is a pointer to a location in memory.
+            This is more of a legacy code as these pointers are not generated
+            by any of the standard predicates.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_is_integer">
+        <div class="doc_predicate_header">
+            [is_integer 127]
+        </div>
+        <div class="doc_predicate_body">
+            Checks if the supplied parameter is a integer number.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_is_number">
+        <div class="doc_predicate_header">
+            [is_number value]
+        </div>
+        <div class="doc_predicate_body">
+            Checks if the supplied parameter is either an integer of fractional number.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_is_text">
+        <div class="doc_predicate_header">
+            [is_text "text"]
+        </div>
+        <div class="doc_predicate_body">
+            Checks if the supplied parameters is textual.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_is_var">
+        <div class="doc_predicate_header">
+            [is_var *variable]
+        </div>
+        <div class="doc_predicate_body">
+            Checks if the supplied parameter is a variable.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_text_list">
+        <div class="doc_predicate_header">
+            [text_list "sonda" *ASCII]<br />
+            [text_list *text [115 111 110 100 97]]
+        </div>
+        <div class="doc_predicate_body">
+            Converst text into a list of ASCII numbers and vice-versa.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="###">
+        <div class="doc_predicate_header">
+            ###
+        </div>
+        <div class="doc_predicate_body">
+            ###
+        </div>
+    </a>
+</div>
+
+
+
+
+
+
 <div class="doc_library_section"><a id="multithreading">Multithreading Predicates</a></div>
 
 <div class="doc_library_section"><a id="metalogical">Metalogical Predicates</a></div>
 
 <div class="doc_library"><a id="conductor">LIBRARY: <b>conductor</b></a></div>
+
+
+<div class="doc_predicate">
+    <a id="###">
+        <div class="doc_predicate_header">
+            ###
+        </div>
+        <div class="doc_predicate_body">
+            ###
+        </div>
+    </a>
+</div>
+
 
 </div></div>
 </body>

@@ -599,7 +599,6 @@ public:
 		parameters -> setText (area);
 		return true;
 	}
-	object_counter_class (void) {}
 };
 
 class is_atom : public PrologNativeCode {
@@ -608,7 +607,6 @@ public:
 		if (! parameters -> isPair ()) return false;
 		return parameters -> getLeft () -> isAtom ();
 	}
-	is_atom (PrologRoot * root) {}
 };
 
 class is_integer : public PrologNativeCode {
@@ -617,7 +615,6 @@ public:
 		if (! parameters -> isPair ()) return false;
 		return parameters -> getLeft () -> isInteger ();
 	}
-	is_integer (PrologRoot * root) {}
 };
 
 class is_double : public PrologNativeCode {
@@ -626,7 +623,6 @@ public:
 		if (! parameters -> isPair ()) return false;
 		return parameters -> getLeft () -> isDouble ();
 	}
-	is_double (PrologRoot * root) {}
 };
 
 class is_number : public PrologNativeCode {
@@ -636,7 +632,6 @@ public:
 		parameters = parameters -> getLeft ();
 		return parameters -> isInteger () || parameters -> isDouble ();
 	}
-	is_number (PrologRoot * root) {}
 };
 
 class is_var : public PrologNativeCode {
@@ -645,7 +640,6 @@ public:
 		if (! parameters -> isPair ()) return false;
 		return parameters -> getLeft () -> isVar ();
 	}
-	is_var (PrologRoot * root) {}
 };
 
 class is_head : public PrologNativeCode {
@@ -654,7 +648,6 @@ public:
 		if (! parameters -> isPair ()) return false;
 		return parameters -> getLeft () -> isHead ();
 	}
-	is_head (PrologRoot * root) {}
 };
 
 class is_text : public PrologNativeCode {
@@ -663,7 +656,6 @@ public:
 		if (! parameters -> isPair ()) return false;
 		return parameters -> getLeft () -> isText ();
 	}
-	is_text (PrologRoot * root) {}
 };
 
 class has_machine : public PrologNativeCode {
@@ -687,7 +679,6 @@ public:
 
 class text_list : public PrologNativeCode {
 public:
-	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
 		if (parameters -> getLeft () -> isText ()) {
@@ -696,7 +687,8 @@ public:
 			if (! parameters -> isPair ()) return false;
 			parameters = parameters -> getLeft ();
 			while (* text != '\0') {
-				parameters -> setPair (root -> integer (* text++), root -> earth ());
+				parameters -> setPair ();
+				parameters -> getLeft () -> setInteger (* text++);
 				parameters = parameters -> getRight ();
 			}
 			return true;
@@ -715,7 +707,6 @@ public:
 		text_ptr -> setText (area);
 		return parameters -> isEarth ();
 	}
-	text_list (PrologRoot * root) {this -> root = root;}
 };
 
 class term_reader : public PrologReader {
@@ -770,36 +761,41 @@ public:
 
 class e32 : public PrologNativeCode {
 public:
-	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
-		int ind;
-		if (parameters -> getLeft () -> isInteger ()) {
-			ind = parameters -> getLeft () -> getInteger ();
-			parameters -> getRight () -> setPair (root -> integer (ind & 0xff), root -> pair (root -> integer ((ind >> 8) & 0xff), root -> pair (root -> integer ((ind >> 16) & 0xff), root -> pair (root -> integer ((ind >> 24) & 0xff), root -> earth ()))));
+		int ind = 0;
+		PrologElement * el = parameters -> getLeft ();
+		if (el -> isInteger ()) {
+			ind = el -> getInteger ();
+			parameters = parameters -> getRight (); parameters -> setPair (); parameters -> getLeft () -> setInteger (ind & 0xff);
+			parameters = parameters -> getRight (); parameters -> setPair (); parameters -> getLeft () -> setInteger ((ind >> 8) & 0xff);
+			parameters = parameters -> getRight (); parameters -> setPair (); parameters -> getLeft () -> setInteger ((ind >> 16) & 0xff);
+			parameters = parameters -> getRight (); parameters -> setPair (); parameters -> getLeft () -> setInteger ((ind >> 24) & 0xff);
 			return true;
 		}
-		PrologElement * el = parameters -> getLeft ();
 		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		if (! parameters -> getLeft () ->isInteger ()) return false;
-		ind = parameters -> getLeft () -> getInteger ();
+		if (! parameters -> isPair ()) {el -> setInteger (ind); return true;}
+		PrologElement * ex = parameters -> getLeft ();
+		if (! ex -> isInteger ()) return false;
+		ind = ex -> getInteger ();
 		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		if (! parameters -> getLeft () -> isInteger ()) return false;
-		ind += parameters -> getLeft () -> getInteger () << 8;
+		if (! parameters -> isPair ()) {el -> setInteger (ind); return true;}
+		ex = parameters -> getLeft ();
+		if (! ex -> isInteger ()) return false;
+		ind += ex -> getInteger () << 8;
 		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		if (! parameters -> getLeft () -> isInteger ()) return false;
-		ind += parameters -> getLeft () -> getInteger () << 16;
+		if (! parameters -> isPair ()) {el -> setInteger (ind); return true;}
+		ex = parameters -> getLeft ();
+		if (! ex -> isInteger ()) return false;
+		ind += ex -> getInteger () << 16;
 		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		if (! parameters -> getLeft () -> isInteger ()) return false;
-		ind += parameters -> getLeft () -> getInteger () << 24;
+		if (! parameters -> isPair ()) {el -> setInteger (ind); return true;}
+		ex = parameters -> getLeft ();
+		if (! ex -> isInteger ()) return false;
+		ind += ex -> getInteger () << 24;
 		el -> setInteger (ind);
 		return true;
 	}
-	e32 (PrologRoot * root) {this -> root = root;}
 };
 
 class sum : public PrologNativeCode {
@@ -873,12 +869,10 @@ public:
 		}
 		return false;
 	}
-	sum (PrologRoot * root) {}
 };
 
 class times : public PrologNativeCode {
 public:
-	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
 		PrologElement * e1 = parameters -> getLeft ();
@@ -899,7 +893,7 @@ public:
 				return true;
 			}
 			ind = e1 -> getInteger ();
-			if (ind == 0) {root -> message ("by zero"); root -> message (root -> new_line_caption); return false;}
+			if (ind == 0) return false;
 			if (e3 -> isInteger ()) {
 				e2 -> setInteger (e3 -> getInteger () / ind);
 				return true;
@@ -920,7 +914,7 @@ public:
 				return true;
 			}
 			db = e1 -> getDouble ();
-			if (db == 0.0) {root -> message ("by zero"); root -> message (root -> new_line_caption); return false;}
+			if (db == 0.0) return false;
 			if (e3 -> isInteger ()) {
 				e2 -> setDouble (e3 -> getInteger () / db);
 				return true;
@@ -933,7 +927,7 @@ public:
 		}
 		if (e2 -> isInteger ()) {
 			ind = e2 -> getInteger ();
-			if (ind == 0) {root -> message ("by zero"); root -> message (root -> new_line_caption); return false;}
+			if (ind == 0) return false;
 			if (e3 -> isInteger ()) {
 				e1 -> setInteger (e3 -> getInteger () / ind);
 				return true;
@@ -946,7 +940,7 @@ public:
 		}
 		if (e2 -> isDouble ()) {
 			db = e2 -> getDouble ();
-			if (db == 0.0) {root -> message ("by zero"); root -> message (root -> new_line_caption); return false;}
+			if (db == 0.0) return false;
 			if (e3 -> isInteger ()) {
 				e1 -> setDouble (e3 -> getInteger () / db);
 				return true;
@@ -958,7 +952,6 @@ public:
 		}
 		return false;
 	}
-	times (PrologRoot * root) {this -> root = root;}
 };
 
 class add_strings : public PrologNativeCode {
@@ -981,7 +974,6 @@ public:
 		delete area;
 		return true;
 	}
-	add_strings (PrologRoot * root) {}
 };
 
 class add : public PrologNativeCode {
@@ -1047,12 +1039,10 @@ public:
 		}
 		return true;
 	}
-	add (PrologRoot * root) {}
 };
 
 class division : public PrologNativeCode {
 public:
-	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
 		PrologElement * e1 = parameters -> getLeft ();
@@ -1063,7 +1053,7 @@ public:
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
 		if (e2 -> isInteger ()) {
 			int ind = e2 -> getInteger ();
-			if (ind == 0) {root -> message ("by zero"); root -> message (root -> new_line_caption); return false;}
+			if (ind == 0) return false;
 			if (e1 -> isInteger ()) {
 				parameters -> setInteger (e1 -> getInteger () / ind);
 				return true;
@@ -1076,7 +1066,7 @@ public:
 		}
 		if (e2 -> isDouble ()) {
 			double db = e2 -> getDouble ();
-			if (db == 0.0) {root -> message ("by zero"); root -> message (root -> new_line_caption); return false;}
+			if (db == 0.0) return false;
 			if (e1 -> isInteger ()) {
 				parameters -> setDouble (e1 -> getInteger () / db);
 				return true;
@@ -1088,12 +1078,10 @@ public:
 		}
 		return false;
 	}
-	division (PrologRoot * root) {this -> root = root;}
 };
 
 class mod : public PrologNativeCode {
 public:
-	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
 		PrologElement * e1 = parameters -> getLeft ();
@@ -1109,7 +1097,7 @@ public:
 		}
 		if (e2 -> isInteger ()) {
 			int ind = e2 -> getInteger ();
-			if (ind == 0) {root -> message ("by zero"); root -> message (root -> new_line_caption); return false;}
+			if (ind == 0) return false;
 			if (e1 -> isInteger ()) {
 				parameters -> setInteger (e1 -> getInteger () % ind);
 				if (e_div != NULL) e_div -> setInteger (e1 -> getInteger () / ind);
@@ -1124,7 +1112,7 @@ public:
 		}
 		if (e2 -> isDouble ()) {
 			int db = (int) e2 -> getDouble ();
-			if (db == 0) {root -> message ("by zero"); root -> message (root -> new_line_caption); return false;}
+			if (db == 0) return false;
 			if (e1 -> isInteger ()) {
 				parameters -> setDouble (e1 -> getInteger () % db);
 				if (e_div != NULL) e_div -> setDouble (e1 -> getInteger () / db);
@@ -1138,7 +1126,6 @@ public:
 		}
 		return false;
 	}
-	mod (PrologRoot * root) {this -> root = root;}
 };
 
 class sub : public PrologNativeCode {
@@ -1174,7 +1161,6 @@ public:
 		}
 		return false;
 	}
-	sub (PrologRoot * root) {}
 };
 
 class mult : public PrologNativeCode {
@@ -1217,7 +1203,6 @@ public:
 		}
 		return true;
 	}
-	mult (PrologRoot * root) {}
 };
 
 class logical : public PrologNativeCode {
@@ -1241,19 +1226,16 @@ public:
 class logical_and : public logical {
 public:
 	int operation (int a, int b) {return a & b;}
-	logical_and (PrologRoot * root) {}
 };
 
 class logical_or : public logical {
 public:
 	int operation (int a, int b) {return a | b;}
-	logical_or (PrologRoot * root) {}
 };
 
 class logical_xor : public logical {
 public:
 	int operation (int a, int b) {return a ^ b;}
-	logical_xor (PrologRoot * root) {}
 };
 class abs_operation : public PrologNativeCode {
 public:
@@ -3088,17 +3070,17 @@ void PrologStudio :: init (PrologRoot * root) {
 }
 
 PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
-	if (strcmp (name, "sum") == 0) return new sum (root);
-	if (strcmp (name, "add_strings") == 0) return new add_strings (root);
-	if (strcmp (name, "add") == 0) return new add (root);
-	if (strcmp (name, "sub") == 0) return new sub (root);
-	if (strcmp (name, "times") == 0) return new times (root);
-	if (strcmp (name, "mult") == 0) return new mult (root);
-	if (strcmp (name, "div") == 0) return new division (root);
-	if (strcmp (name, "mod") == 0) return new mod (root);
-	if (strcmp (name, "and") == 0) return new logical_and (root);
-	if (strcmp (name, "or") == 0) return new logical_or (root);
-	if (strcmp (name, "xor") == 0) return new logical_xor (root);
+	if (strcmp (name, "sum") == 0) return new sum ();
+	if (strcmp (name, "add_strings") == 0) return new add_strings ();
+	if (strcmp (name, "add") == 0) return new add ();
+	if (strcmp (name, "sub") == 0) return new sub ();
+	if (strcmp (name, "times") == 0) return new times ();
+	if (strcmp (name, "mult") == 0) return new mult ();
+	if (strcmp (name, "div") == 0) return new division ();
+	if (strcmp (name, "mod") == 0) return new mod ();
+	if (strcmp (name, "and") == 0) return new logical_and ();
+	if (strcmp (name, "or") == 0) return new logical_or ();
+	if (strcmp (name, "xor") == 0) return new logical_xor ();
 
 	if (strcmp (name, "abs") == 0) return new abs_operation ();
 	if (strcmp (name, "cos") == 0) return new cos_operation ();
@@ -3117,17 +3099,17 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 
 	if (strcmp (name, "timestamp") == 0) return new timestamp ();
 
-	if (strcmp (name, "is_atom") == 0) return new is_atom (root);
-	if (strcmp (name, "is_integer") == 0) return new is_integer (root);
-	if (strcmp (name, "is_double") == 0) return new is_double (root);
-	if (strcmp (name, "is_number") == 0) return new is_number (root);
-	if (strcmp (name, "is_var") == 0) return new is_var (root);
-	if (strcmp (name, "is_head") == 0) return new is_head (root);
-	if (strcmp (name, "is_text") == 0) return new is_text (root);
+	if (strcmp (name, "is_atom") == 0) return new is_atom ();
+	if (strcmp (name, "is_integer") == 0) return new is_integer ();
+	if (strcmp (name, "is_double") == 0) return new is_double ();
+	if (strcmp (name, "is_number") == 0) return new is_number ();
+	if (strcmp (name, "is_var") == 0) return new is_var ();
+	if (strcmp (name, "is_head") == 0) return new is_head ();
+	if (strcmp (name, "is_text") == 0) return new is_text ();
 	if (strcmp (name, "has_machine") == 0) return new has_machine (root);
-	if (strcmp (name, "text_list") == 0) return new text_list (root);
+	if (strcmp (name, "text_list") == 0) return new text_list ();
 	if (strcmp (name, "text_term") == 0) return new text_term (root);
-	if (strcmp (name, "e32") == 0) return new e32 (root);
+	if (strcmp (name, "e32") == 0) return new e32 ();
 	if (strcmp (name, "less") == 0) return new less (root);
 	if (strcmp (name, "less_eq") == 0) return new less_eq (root);
 	if (strcmp (name, "greater") == 0) return new greater (root);
