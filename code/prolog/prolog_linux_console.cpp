@@ -74,7 +74,7 @@ int PrologLinuxConsole :: get (void) {
 char * PrologLinuxConsole :: getPrompt (void) {return prompt;}
 void PrologLinuxConsole :: setPrompt (char * prompt) {prolog_string_copy (this -> prompt, prompt);}
 
-void PrologLinuxConsole :: setColors (int foreground, int background) {
+void PrologLinuxConsole :: setColours (int foreground, int background) {
 	int foreground_red = (foreground >> 16) & 0xff;
 	int foreground_green = (foreground >> 8) & 0xff;
 	int foreground_blue = foreground & 0xff;
