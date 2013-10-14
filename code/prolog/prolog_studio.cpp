@@ -954,30 +954,25 @@ public:
 	}
 };
 
-class add_strings : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * t1 = parameters -> getLeft ();
-		if (! t1 -> isText ()) return false;
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * t2 = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		int length1 = (int) strlen (t1 -> getText ());
-		int length2 = (int) strlen (t2 -> getText ());
-		char * area = new char [length1 + length2 + 20];
-		sprintf (area, "%s%s", t1 -> getText (), t2 -> getText ());
-		parameters -> setText (area);
-		delete area;
-		return true;
-	}
-};
-
 class add : public PrologNativeCode {
 public:
+	char * add_strings (char * area, char * text) {
+		if (area == 0) return create_text (text);
+		char * ret = create_text (strlen (area) + strlen (text) + 8);
+		sprintf (ret, "%s%s", area, text);
+		delete_text (area);
+		return ret;
+	}
+	char * add_strings (char * area, int ind) {
+		char command [128];
+		sprintf (command, "%i", ind);
+		return add_strings (area, command);
+	}
+	char * add_strings (char * area, double ind) {
+		char command [256];
+		sprintf (command, "%f", ind);
+		return add_strings (area, command);
+	}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
 		PrologElement * result = parameters -> getLeft ();
@@ -985,57 +980,55 @@ public:
 		int result_type = 0;
 		int int_result = 0;
 		double double_result = 0.0;
-		AREA area;
-		int area_ind = area_cat (area, 0, "");
+		char * area = 0;
 		bool added = false;
-		PrologElement * e1 = parameters -> getLeft ();
 		while (parameters -> isPair ()) {
+			PrologElement * e1 = parameters -> getLeft ();
 			if (e1 -> isInteger ()) {
 				switch (result_type) {
 				case 0: int_result += e1 -> getInteger (); break;
 				case 1: double_result += (double) e1 -> getInteger (); break;
-				case 2: area_ind = area_cat_number (area, area_ind, e1 -> getInteger ()); break;
+				case 2: area = add_strings (area, e1 -> getInteger ()); break;
 				}
 			}
 			if (e1 -> isDouble ()) {
 				switch (result_type) {
 				case 0: double_result += e1 -> getDouble () + (double) int_result; result_type = 1; break;
 				case 1: double_result += e1 -> getDouble (); break;
-				case 2: area_ind = area_cat_number (area, area_ind, e1 -> getDouble ()); break;
+				case 2: area = add_strings (area, e1 -> getDouble ()); break;
 				}
 			}
 			if (e1 -> isText () || e1 -> isAtom ()) {
 				switch (result_type) {
 				case 0:
-					if (added) area_ind = area_cat_number (area, area_ind, int_result);
-					area_ind = area_cat (area, area_ind, e1 -> isText () ? e1 -> getText () : e1 -> getAtom () -> name ());
+					if (added) area = add_strings (area, int_result);
+					area = add_strings (area, e1 -> isText () ? e1 -> getText () : e1 -> getAtom () -> name ());
 					result_type = 2;
 					break;
 				case 1:
-					area_ind = area_cat_number (area, area_ind, double_result);
-					area_ind = area_cat (area, area_ind, e1 -> isText () ? e1 -> getText () : e1 -> getAtom () -> name ());
+					area = add_strings (area, double_result);
+					area = add_strings (area, e1 -> isText () ? e1 -> getText () : e1 -> getAtom () -> name ());
 					result_type = 2;
 					break;
-				case 2: area_ind = area_cat (area, area_ind, e1 ->  isText () ? e1 -> getText () : e1 -> getAtom () -> name ()); break;
+				case 2: area = add_strings (area, e1 -> isText () ? e1 -> getText () : e1 -> getAtom () -> name ()); break;
 				}
 			}
 			if (e1 -> isVar ()) {
 				switch (result_type) {
 				case 0: e1 -> setInteger (int_result); break;
 				case 1: e1 -> setDouble (double_result); break;
-				case 2: e1 -> setText (area); break;
+				case 2: e1 -> setText (area); if (area != 0) delete_text (area); break;
 				}
 				return true;
 			}
 			parameters = parameters -> getRight ();
-			e1 = parameters -> getLeft ();
 			added = true;
 		}
 		if (parameters -> isVar ()) result = parameters;
 		switch (result_type) {
 		case 0: result -> setInteger (int_result); break;
 		case 1: result -> setDouble (double_result); break;
-		case 2: result -> setText (area); break;
+		case 2: result -> setText (area); if (area != 0) delete_text (area); break;
 		}
 		return true;
 	}
@@ -1172,8 +1165,8 @@ public:
 		int result_type = 0;
 		int int_result = 1;
 		double double_result = 1.0;
-		PrologElement * e1 = parameters -> getLeft ();
 		while (parameters -> isPair ()) {
+			PrologElement * e1 = parameters -> getLeft ();
 			if (e1 -> isInteger ()) {
 				switch (result_type) {
 				case 0: int_result *= e1 -> getInteger (); break;
@@ -1194,7 +1187,6 @@ public:
 				return true;
 			}
 			parameters = parameters -> getRight ();
-			e1 = parameters -> getLeft ();
 		}
 		if (parameters -> isVar ()) result = parameters;
 		switch (result_type) {
@@ -3071,7 +3063,6 @@ void PrologStudio :: init (PrologRoot * root) {
 
 PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "sum") == 0) return new sum ();
-	if (strcmp (name, "add_strings") == 0) return new add_strings ();
 	if (strcmp (name, "add") == 0) return new add ();
 	if (strcmp (name, "sub") == 0) return new sub ();
 	if (strcmp (name, "times") == 0) return new times ();

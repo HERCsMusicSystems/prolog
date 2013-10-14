@@ -64,6 +64,7 @@ extern void drop_stack (PrologQuery * from, PrologQuery * to);
 
 
 extern char * create_text (char * text);
+extern char * create_text (int size);
 extern void delete_text (char * text);
 
 class PrologString {

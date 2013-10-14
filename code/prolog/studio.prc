@@ -18,7 +18,7 @@ program studio #machine := "prolog.studio"
 		cd dir ls DIR ARGS args args_tail edit execute make_file make_directory erase erase_directory move copy
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
 		create_atom search_atom preprocessor prompt
-		add_strings add sub mult div mod and or xor sum times less less_eq greater greater_eq
+		add sub mult div mod and or xor sum times less less_eq greater greater_eq
 		abs cos degrad e exp log2 log10 ln log pi pow sin tan trunc
 		timestamp
 		is_atom is_integer is_double is_number is_var is_head is_text has_machine
@@ -39,7 +39,6 @@ program studio #machine := "prolog.studio"
 	]
 
 #machine sum := "sum"
-#machine add_strings := "add_strings"
 #machine add := "add"
 #machine sub := "sub"
 #machine times := "times"

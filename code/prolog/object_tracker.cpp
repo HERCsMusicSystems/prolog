@@ -113,6 +113,18 @@ char * create_text (char * text) {
 	return ret;
 }
 
+char * create_text (int size) {
+	char * ret = new char [size];
+	ret [0] = '\0';
+#ifndef NO_TRACKING
+	TRACKER_ENTER;
+	object_counter++;
+	text_counter++;
+	TRACKER_LEAVE;
+#endif
+	return ret;
+}
+
 void delete_text (char * text) {
 	delete [] text;
 #ifndef NO_TRACKING

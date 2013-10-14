@@ -85,6 +85,11 @@
     <ul>
         <li><a href="#arithmetic_logic">Arithmetic and Logic</a>
             <br />
+            <a href="#predicate_add">add</a>
+            <a href="#predicate_div">div</a>
+            <a href="#predicate_mod">mod</a>
+            <a href="#predicate_mult">mult</a>
+            <a href="#predicate_sub">sub</a>
             <a href="#predicate_sum">sum</a>
             <a href="#predicate_times">times</a>
         </li>
@@ -143,6 +148,92 @@
 <div class="doc_library"><a id="studio">LIBRARY: <b>studio</b></a></div>
 
 <div class="doc_library_section"><a id="arithmetic_logic">Arithmetic and Logic Predicates</a></div>
+
+<div class="doc_predicate">
+    <a id="predicate_add">
+        <div class="doc_predicate_header">
+            [add *x arg-1 arg-2 .... arg-n]<br />
+            [add arg-1 arg-2 .... arg-n *x]<br />
+            [add arg-1 arg-2 .... arg-n : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Adds all arguments: *x = arg-1 + arg-2 + .... + arg-n.<br />
+            Without arguments: *x = 0.<br />
+            Arguments can be integers, doubles, texts or symbols.
+            If all arguments are integers then the result is integer.
+            If one of the arguments is double and all others are numbers then the result is double as well.
+            If one of the arguments is text or symbol then the result is text.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_div">
+        <div class="doc_predicate_header">
+            [div a b *x]<br />
+            [div a b : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Division: *x = a / b.<br />
+            The arguments can be either integer od double.
+            If both a and b are integer then the result is integral division (i.e. with fractional part discarded).
+            If either a or b is double then the result is double as well.
+            Fails if b is 0 or 0.0.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_mod">
+        <div class="doc_predicate_header">
+            [mod a b *x]<br />
+            [mod a b : *x]<br />
+            [mod a b *x *y]<br />
+            [mod a b *x : *y]
+        </div>
+        <div class="doc_predicate_body">
+            Modulo (or division remainder): *x = a % b.<br />
+            The second variable (if present) becomes the division result, i.e.:<br />
+            *y + *x * b = a.<br />
+            The result is integer if both a and b are integer.
+            Otherwise *x (and *y) are double.
+            Fails if b is 0 or 0.0.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_mult">
+        <div class="doc_predicate_header">
+            [mult *x arg-1 arg-2 .... arg-n]<br />
+            [mult arg-1 arg-2 .... arg-n *x]<br />
+            [mult arg-1 arg-2 .... arg-n : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Multiplies all arguments: *x = arg-1 * arg-2 * .... * arg-n.<br />
+            Without arguments: *x = 1.<br />
+            Arguments can be integers, doubles, texts or symbols.
+            If all arguments are integers then the result is integer.
+            If one of the arguments is double and all others are numbers then the result is double as well.
+            If one of the arguments is text or symbol then the result is text.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_sub">
+        <div class="doc_predicate_header">
+            [sub a b *x]<br />
+            [sub a b : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Subtraction: *x = a - b.<br />
+            The arguments can be either integer or double.
+            If both arguments are integers then the result is integer as well.
+            Otherwise the result is double.
+        </div>
+    </a>
+</div>
 
 <div class="doc_predicate">
     <a id="predicate_sum">
