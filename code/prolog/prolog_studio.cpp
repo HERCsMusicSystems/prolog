@@ -1202,15 +1202,15 @@ public:
 	virtual int operation (int a, int b) {return 0;}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
-		if (! parameters -> getLeft () -> isInteger ()) return false;
-		int a = parameters -> getLeft () -> getInteger ();
+		PrologElement * a = parameters -> getLeft ();
+		if (! a -> isInteger ()) return false;
 		parameters = parameters -> getRight ();
 		if (! parameters -> isPair ()) return false;
-		if (! parameters -> getLeft () -> isInteger ()) return false;
-		int b = parameters -> getLeft () -> getInteger ();
+		PrologElement * b = parameters -> getLeft ();
+		if (! b -> isInteger ()) return false;
 		parameters = parameters -> getRight ();
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		parameters -> setInteger (operation (a, b));
+		parameters -> setInteger (operation (a -> getInteger (), b -> getInteger ()));
 		return true;
 	}
 };
@@ -1229,6 +1229,7 @@ class logical_xor : public logical {
 public:
 	int operation (int a, int b) {return a ^ b;}
 };
+
 class abs_operation : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
