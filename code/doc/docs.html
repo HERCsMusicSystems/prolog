@@ -85,13 +85,19 @@
     <ul>
         <li><a href="#arithmetic_logic">Arithmetic and Logic</a>
             <br />
+            <a href="#predicate_abs">abs</a>
             <a href="#predicate_add">add</a>
+            <a href="#predicate_and">and</a>
+            <a href="#predicate_cos">cos</a>
             <a href="#predicate_div">div</a>
             <a href="#predicate_mod">mod</a>
             <a href="#predicate_mult">mult</a>
+            <a href="#predicate_or">or</a>
+            <a href="#predicate_sin">sin</a>
             <a href="#predicate_sub">sub</a>
             <a href="#predicate_sum">sum</a>
             <a href="#predicate_times">times</a>
+            <a href="#predicate_xor">xor</a>
         </li>
         <li><a href="#input_output">Input / Output</a>
             <br />
@@ -150,6 +156,20 @@
 <div class="doc_library_section"><a id="arithmetic_logic">Arithmetic and Logic Predicates</a></div>
 
 <div class="doc_predicate">
+    <a id="predicate_abs">
+        <div class="doc_predicate_header">
+            [abs a *x]<br />
+            [abs a : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Absolute value: *x = abs (a).<br />
+            The argument can be either integer or double.
+            The result is of the same type as the argument.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_add">
         <div class="doc_predicate_header">
             [add *x arg-1 arg-2 .... arg-n]<br />
@@ -163,6 +183,39 @@
             If all arguments are integers then the result is integer.
             If one of the arguments is double and all others are numbers then the result is double as well.
             If one of the arguments is text or symbol then the result is text.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_and">
+        <div class="doc_predicate_header">
+            [and a b *x]<br />
+            [and a b : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Bitwise AND: *x = a AND b.<br />
+            Both arguments must be integers. The result is integer as well.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_cos">
+        <div class="doc_predicate_header">
+            [cos angle *x]<br />
+            [cos angle : *x]<br />
+            [cos *angle x]<br />
+            [cos *angle : x]
+        </div>
+        <div class="doc_predicate_body">
+            Calculates either cosine or arc-cosine.
+            The input angle can be either integer or double.
+            If it is integer then it is assumed to be expressed in degrees.
+            If it is double then it is assumed to be expressed in radians.
+            The argument for arc-cosine can be either double or integer (-1, 0, 1).
+            The result of arc-cosine is always double and expressed in radians.
+            Fails if arc-cosing argument is out of range.
         </div>
     </a>
 </div>
@@ -221,6 +274,39 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_or">
+        <div class="doc_predicate_header">
+            [or a b *x]<br />
+            [or a b : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Bitwise OR: *x = a OR b.<br />
+            Both arguments must be integers. The result is integer as well.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_sin">
+        <div class="doc_predicate_header">
+            [sin angle *x]<br />
+            [sin angle : *x]<br />
+            [sin *angle x]<br />
+            [sin *angle : x]
+        </div>
+        <div class="doc_predicate_body">
+            Calculates either sine or arc-sine.
+            The input angle can be either integer or double.
+            If it is integer then it is assumed to be expressed in degrees.
+            If it is double then it is assumed to be expressed in radians.
+            The argument for arc-sine can be either double or integer (-1, 0, 1).
+            The result of arc-sine is always double and expressed in radians.
+            Fails if arc-sine argument is out of range.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_sub">
         <div class="doc_predicate_header">
             [sub a b *x]<br />
@@ -265,7 +351,19 @@
     </a>
 </div>
 
-<div class="doc_library_section"><a id="logic">Logic Predicates</a></div>
+<div class="doc_predicate">
+    <a id="predicate_xor">
+        <div class="doc_predicate_header">
+            [xor a b *x]<br />
+            [xor a b : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Bitwise XOR: *x = a XOR b.<br />
+            Both arguments must be integers. The result is integer as well.
+            It can be used as negation, i.e. XOR with -1.
+        </div>
+    </a>
+</div>
 
 <div class="doc_library_section"><a id="input_output">Input / Output Predicates</a></div>
 

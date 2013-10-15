@@ -193,6 +193,34 @@
 [TestEq "xor 0x303003 0xf0d00e *" 0xc0e00d *x [xor 0x303003 0xf0d00e *x]]
 [TestEq "xor 0xf0d00e 0x303003:*" 0xc0e00d *x [xor 0xf0d00e 0x303003 : *x]]
 
+[TestEq "abs 127:*" 127 *x [abs 127 : *x]]
+[TestEq "abs -127 *" 127 *x [abs -127 *x]]
+[TestEq "abs 127.5 *" 127.5 *x [abs 127.5 *x]]
+[TestEq "abs -127.5:*" 127.5 *x [abs 127.5 : *x]]
+
+[TestEq "cos 180 *" -1.0 *x [cos 180 *x]]
+[TestEq "cos 180:*" -1.0 *x [cos 180 : *x]]
+[TestEq "cos 3.1415926535897931 *" -1.0 *x [cos 3.1415926535897931 *x]]
+[TestEq "cos 3.1415926535897931:*" -1.0 *x [cos 3.1415926535897931 : *x]]
+[TestEq "cos * -1" 3.1415926535897931 *x [cos *x -1]]
+[TestEq "cos * : -1.0" 3.1415926535897931 *x [cos *x : -1.0]]
+[TestFails "cos * -2.0" [cos * -2.0]]
+[TestFails "cos * : 2" [cos * : 2]]
+
+[TestEq "sin 90 *" 1.0 *x [sin 90 *x]]
+[TestEq "sin 270:*" -1.0 *x [sin 270 : *x]]
+[TestEq "sin -1.5707963267948966 *" -1.0 *x [sin -1.5707963267948966 *x]]
+[TestEq "sin 1.5707963267948966:*" 1.0 *x [sin 1.5707963267948966 : *x]]
+[TestEq "sin * 1" 1.5707963267948966 *x [sin *x 1]]
+[TestEq "sin * : -1.0" -1.5707963267948966 *x [sin *x : -1.0]]
+[TestFails "sin * -2.0" [sin * -2.0]]
+[TestFails "sin * : 2" [sin * : 2]]
+
+[TestEq "degrad 180 *" 3.1415926535897931 *x [degrad 180 *x]]
+[TestEq "degrad 180:*" 3.1415926535897931 *x [degrad 180 : *x]]
+[TestEq "degrad * 3.1415926535897931" 180.0 *x [degrad *x 3.1415926535897931]]
+[TestEq "degrad *:3.1415926535897931" 180.0 *x [degrad *x : 3.1415926535897931]]
+
 
 
 [nl]
