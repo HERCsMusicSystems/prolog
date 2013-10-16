@@ -1294,6 +1294,8 @@ public:
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
 		if (el -> isDouble ()) {parameters -> setDouble (exp (el -> getDouble ())); return true;}
 		if (el -> isInteger ()) {parameters -> setInteger ((int) (exp ((double) el -> getInteger ()))); return true;}
+		if (parameters -> isDouble ()) {double d = parameters -> getDouble (); if (d <= 0.0) return false; el -> setDouble (log (d)); return true;}
+		if (parameters -> isInteger ()) {int d = parameters -> getInteger (); if (d <= 0) return false; el -> setInteger ((int) log ((double) d)); return true;}
 		return false;
 	}
 };
@@ -1304,15 +1306,11 @@ public:
 		PrologElement * ex = parameters -> getLeft ();
 		parameters = parameters -> getRight ();
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		double x, n;
-		bool integer = true;
-		if (ex -> isDouble ()) {x = ex -> getDouble (); integer = false;}
-		else {if (! ex -> isInteger ()) return false; x = (double) ex -> getInteger ();}
-		if (x <= 0.0) return false;
-		n = log (x) / log (2.0);
-		if (integer) parameters -> setInteger ((int) n);
-		else parameters -> setDouble (n);
-		return true;
+		if (ex -> isDouble ()) {double x = ex -> getDouble (); if (x <= 0.0) return false; parameters -> setDouble (log (x) / 0.69314718055994530941723212145818); return true;}
+		if (ex -> isInteger ()) {int x = ex -> getInteger (); if (x <= 0) return false; parameters -> setInteger ((int) (log ((double) x) / 0.69314718055994530941723212145818)); return true;}
+		if (parameters -> isDouble ()) {ex -> setDouble (pow (2.0, parameters -> getDouble ())); return true;}
+		if (parameters -> isInteger ()) {ex -> setInteger ((int) pow (2.0, (double) parameters -> getInteger ())); return true;}
+		return false;
 	}
 };
 class log10_operation : public PrologNativeCode {
@@ -1322,15 +1320,11 @@ public:
 		PrologElement * ex = parameters -> getLeft ();
 		parameters = parameters -> getRight ();
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		double x, n;
-		bool integer = true;
-		if (ex -> isDouble ()) {x = ex -> getDouble (); integer = false;}
-		else {if (! ex -> isInteger ()) return false; x = (double) ex -> getInteger ();}
-		if (x <= 0.0) return false;
-		n = log10 (x);
-		if (integer) parameters -> setInteger ((int) n);
-		else parameters -> setDouble (n);
-		return true;
+		if (ex -> isDouble ()) {double x = ex -> getDouble (); if (x <= 0.0) return false; parameters -> setDouble (log10 (x)); return true;}
+		if (ex -> isInteger ()) {int x = ex -> getInteger (); if (x <= 0) return false; parameters -> setInteger ((int) log10 ((double) x)); return true;}
+		if (parameters -> isDouble ()) {ex -> setDouble (pow (10.0, parameters -> getDouble ())); return true;}
+		if (parameters -> isInteger ()) {ex -> setInteger ((int) pow (10.0, (double) parameters -> getInteger ())); return true;}
+		return false;
 	}
 };
 class ln_operation : public PrologNativeCode {
@@ -1340,15 +1334,11 @@ public:
 		PrologElement * ex = parameters -> getLeft ();
 		parameters = parameters -> getRight ();
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		double x, n;
-		bool integer = true;
-		if (ex -> isDouble ()) {x = ex -> getDouble (); integer = false;}
-		else {if (! ex -> isInteger ()) return false; x = (double) ex -> getInteger ();}
-		if (x <= 0.0) return false;
-		n = log (x);
-		if (integer) parameters -> setInteger ((int) n);
-		else parameters -> setDouble (n);
-		return true;
+		if (ex -> isDouble ()) {double x = ex -> getDouble (); if (x <= 0.0) return false; parameters -> setDouble (log (x)); return true;}
+		if (ex -> isInteger ()) {int x = ex -> getInteger (); if (x <= 0) return false; parameters -> setInteger ((int) log ((double) x)); return true;}
+		if (parameters -> isDouble ()) {ex -> setDouble (exp (parameters -> getDouble ())); return true;}
+		if (parameters -> isInteger ()) {ex -> setInteger ((int) exp ((double) parameters -> getInteger ())); return true;}
+		return false;
 	}
 };
 class log_operation : public PrologNativeCode {

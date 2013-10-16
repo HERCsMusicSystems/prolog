@@ -89,10 +89,17 @@
             <a href="#predicate_add">add</a>
             <a href="#predicate_and">and</a>
             <a href="#predicate_cos">cos</a>
+            <a href="#predicate_degrad">degrad</a>
             <a href="#predicate_div">div</a>
+            <a href="#predicate_e">e</a>
+            <a href="#predicate_exp">exp</a>
+            <a href="#predicate_log2">log2</a>
+            <a href="#predicate_log10">log10</a>
+            <a href="#predicate_ln">ln</a>
             <a href="#predicate_mod">mod</a>
             <a href="#predicate_mult">mult</a>
             <a href="#predicate_or">or</a>
+            <a href="#predicate_pi">pi</a>
             <a href="#predicate_sin">sin</a>
             <a href="#predicate_sub">sub</a>
             <a href="#predicate_sum">sum</a>
@@ -221,6 +228,21 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_degrad">
+        <div class="doc_predicate_header">
+            [degrad degrees radians]<br />
+            [degrad degrees : radians]<br />
+        </div>
+        <div class="doc_predicate_body">
+            Converts degrees to radians and vice versa.
+            Degrees can be either integer or double.
+            Radians have to be double.
+            Calculated results (both degrees and radians) will be double.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_div">
         <div class="doc_predicate_header">
             [div a b *x]<br />
@@ -232,6 +254,77 @@
             If both a and b are integer then the result is integral division (i.e. with fractional part discarded).
             If either a or b is double then the result is double as well.
             Fails if b is 0 or 0.0.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_e">
+        <div class="doc_predicate_header">
+            [e *e] [e : *e]
+        </div>
+        <div class="doc_predicate_body">
+            Natural number constant: e = 2.7182818284590451.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_exp">
+        <div class="doc_predicate_header">
+            [exp n *x] [exp n : *x]<br />
+            [exp *n x] [exp *n : x]
+        </div>
+        <div class="doc_predicate_body">
+            Calculates exponent or natural logarithm: *x = e ^ n or *n = ln (x).<br />
+            Arguments can be either integer or double.
+            The result is of the same type as argument (integer result is truncated).
+            Fails if x <= 0.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_log2">
+        <div class="doc_predicate_header">
+            [log2 x *n] [log2 x : *n]<br />
+            [log2 *x n] [log2 *x : n]
+        </div>
+        <div class="doc_predicate_body">
+            Calculates 2-based logarithm or 2 to the power of n: *n = log2 (x) or *x = 2 ^ *n.<br />
+            Arguments can be either integer or double.
+            The result is of the same type as argument (integer result is truncated).
+            Fails if x <= 0.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_log10">
+        <div class="doc_predicate_header">
+            [log10 x *n] [log10 x : *n]<br />
+            [log10 *x n] [log10 *x : n]
+        </div>
+        <div class="doc_predicate_body">
+            Calculates 10-based logarithm or 2 to the power of n: *n = log10 (x) or *x = 10 ^ *n.<br />
+            Arguments can be either integer or double.
+            The result is of the same type as argument (integer result is truncated).
+            Fails if x <= 0.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="A1">
+        <div class="doc_predicate_header">
+            [ln x *n] [ln x : *n]<br />
+            [ln *x n] [ln *x : n]
+        </div>
+        <div class="doc_predicate_body">
+            Calculates e-based logarithm or e to the power of n: *n = ln (x) or *x = e ^ *n.<br />
+            Arguments can be either integer or double.
+            The result is of the same type as argument (integer result is truncated).
+            Fails if x <= 0.
         </div>
     </a>
 </div>
@@ -282,6 +375,17 @@
         <div class="doc_predicate_body">
             Bitwise OR: *x = a OR b.<br />
             Both arguments must be integers. The result is integer as well.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_pi">
+        <div class="doc_predicate_header">
+            [pi *pi] [pi : *pi]
+        </div>
+        <div class="doc_predicate_body">
+            PI constant: e = 3.1415926535897931.
         </div>
     </a>
 </div>
