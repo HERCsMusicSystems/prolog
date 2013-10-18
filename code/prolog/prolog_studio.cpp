@@ -1384,42 +1384,37 @@ public:
 		PrologElement * en = parameters -> getLeft ();
 		parameters = parameters -> getRight ();
 		PrologElement * ex = parameters -> isPair () ? parameters -> getLeft () : parameters;
-		double a, n, x;
-		bool integer = true;
-		if (ex -> isVar ()) {
-			if (ea -> isDouble ()) {a = ea -> getDouble (); integer = false;}
-			else {if (! ea -> isInteger ()) return false; a = (double) ea -> getInteger ();}
-			if (en -> isDouble ()) {if (a < 0.0) return false; n = en -> getDouble (); integer = false;}
-			else {if (! en -> isInteger ()) return false; n = (double) en -> getInteger ();}
-			x = pow (a, n);
-			if (integer) ex -> setInteger ((int) x);
-			else ex -> setDouble (x);
-			return true;
+		if (ea -> isDouble ()) {
+			double a = ea -> getDouble ();
+			if (en -> isDouble ()) {ex -> setDouble (pow (a, en -> getDouble ())); return true;}
+			if (en -> isInteger ()) {ex -> setDouble (pow (a, (double) en -> getInteger ())); return true;}
+			if (a <= 0.0 || a == 1.0) return false;
+			if (ex -> isDouble ()) {double x = ex -> getDouble (); if (x <= 0.0) return false; en -> setDouble (log (x) / log (a)); return true;}
+			if (ex -> isInteger ()) {int x = ex -> getInteger (); if (x <= 0) return false; en -> setDouble (log ((double) x) / log (a)); return true;}
 		}
-		if (ea -> isVar ()) {
-			if (ex -> isDouble ()) {a = ex -> getDouble (); integer = false;}
-			else {if (! ex -> isInteger ()) return false; a = (double) ex -> getInteger ();}
-			if (en -> isDouble ()) {n = en -> getDouble (); integer = false;}
-			else {if (! en -> isInteger ()) return false; n = (double) en -> getInteger ();}
+		if (ea -> isInteger ()) {
+			int a = ea -> getInteger ();
+			if (en -> isDouble ()) {ex -> setDouble (pow ((double) a, en -> getDouble ())); return true;}
+			if (en -> isInteger ()) {ex -> setInteger ((int) pow ((double) a, (double) en -> getInteger ())); return true;}
+			if (a <= 0 || a == 1) return false;
+			if (ex -> isDouble ()) {double x = ex -> getDouble (); if (x <= 0.0) return false; en -> setDouble (log (x) / log ((double) a)); return true;}
+			if (ex -> isInteger ()) {int x = ex -> getInteger (); if (x <= 0) return false; en -> setInteger ((int) (log ((double) x) / log ((double) a))); return true;}
+		}
+		if (en -> isDouble ()) {
+			double n = en -> getDouble ();
 			if (n == 0.0) return false;
 			n = 1.0 / n;
-			if ((double) ((int) n) != n) {if (a < 0.0) return false;}
-			x = pow (a, n);
-			if (integer) ea -> setInteger ((int) x);
-			else ea -> setDouble (x);
-			return true;
+			if (ex -> isDouble ()) {ea -> setDouble (pow (ex -> getDouble (), n)); return true;}
+			if (ex -> isInteger ()) {ea -> setDouble (pow ((double) ex -> getInteger (), n)); return true;}
 		}
-		if (ea -> isDouble ()) {a = ea -> getDouble (); integer = false;}
-		else {if (! ea -> isInteger ()) return false; a = (double) ea -> getInteger ();}
-		if (ex -> isDouble ()) {x = ex -> getDouble (); integer = false;}
-		else {if (! ex -> isInteger ()) return false; x = (double) ex -> getInteger ();}
-		if (a <= 0.0) return false;
-		if (a == 1.0) return false;
-		if (x <= 0.0) return false;
-		n = log (x) / log (a);
-		if (integer) en -> setInteger ((int) n);
-		else en -> setDouble (n);
-		return true;
+		if (en -> isInteger ()) {
+			double n = (double) en -> getInteger ();
+			if (n == 0.0) return false;
+			n = 1.0 / n;
+			if (ex -> isDouble ()) {ea -> setDouble (pow (ex -> getDouble (), n)); return true;}
+			if (ex -> isInteger ()) {ea -> setInteger ((int) pow ((double) ex -> getInteger (), n)); return true;}
+		}
+		return false;
 	}
 };
 class sin_operation : public PrologNativeCode {
@@ -1463,14 +1458,8 @@ public:
 		PrologElement * left = parameters -> getLeft ();
 		parameters = parameters -> getRight ();
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (left -> isDouble ()) {
-			parameters -> setInteger ((int) left -> getDouble ());
-			return true;
-		}
-		if (left -> isInteger ()) {
-			parameters -> setDouble ((double) left -> getInteger ());
-			return true;
-		}
+		if (left -> isDouble ()) {parameters -> setInteger ((int) left -> getDouble ()); return true;}
+		if (left -> isInteger ()) {parameters -> setDouble ((double) left -> getInteger ()); return true;}
 		if (left -> isVar ()) {
 			if (parameters -> isInteger ()) {left -> setDouble ((double) parameters -> getInteger ()); return true;}
 			if (parameters -> isDouble ()) {left -> setDouble ((double) ((int) parameters -> getDouble ())); return true;}
@@ -1577,21 +1566,23 @@ public:
 			b = parameters -> getLeft ();
 			if (a -> isInteger ()) {
 				if (b -> isInteger ()) {if (a -> getInteger () >= b -> getInteger ()) return false;}
-				else {
-					if (b -> isDouble ()) {if ((double) a -> getInteger () >= b -> getDouble ()) return false;}
-					else return false;
-				}
+				else if (b -> isDouble ()) {if ((double) a -> getInteger () >= b -> getDouble ()) return false;}
+				else return false;
 			}
 			else if (a -> isDouble ()) {
 				if (b -> isInteger ()) {if (a -> getDouble () >= (double) b -> getInteger ()) return false;}
-				else {
-					if (b -> isDouble ()) {if (a -> getDouble () >= b -> getDouble ()) return false;}
-					else return false;
-				}
+				else if (b -> isDouble ()) {if (a -> getDouble () >= b -> getDouble ()) return false;}
+				else return false;
 			}
 			else if (a -> isText ()) {
-				if (! b -> isText ()) return false;
-				if (strcmp (a -> getText (), b -> getText ()) >= 0) return false;
+				if (b -> isText ()) {if (strcmp (a -> getText (), b -> getText ()) >= 0) return false;}
+				else if (b -> isAtom ()) {if (strcmp (a -> getText (), b -> getAtom () -> name ()) >= 0) return false;}
+				else return false;
+			}
+			else if (a -> isAtom ()) {
+				if (b -> isAtom ()) {if (strcmp (a -> getAtom () -> name (), b -> getAtom () -> name ()) >= 0) return false;}
+				else if (b -> isText ()) {if (strcmp (a -> getAtom () -> name (), b -> getText ()) >= 0) return false;}
+				else return false;
 			}
 			else return false;
 			a = b;
@@ -1613,21 +1604,23 @@ public:
 			b = parameters -> getLeft ();
 			if (a -> isInteger ()) {
 				if (b -> isInteger ()) {if (a -> getInteger () > b -> getInteger ()) return false;}
-				else {
-					if (b -> isDouble ()) {if ((double) a -> getInteger () > b -> getDouble ()) return false;}
-					else return false;
-				}
+				else if (b -> isDouble ()) {if ((double) a -> getInteger () > b -> getDouble ()) return false;}
+				else return false;
 			}
 			else if (a -> isDouble ()) {
 				if (b -> isInteger ()) {if (a -> getDouble () > (double) b -> getInteger ()) return false;}
-				else {
-					if (b -> isDouble ()) {if (a -> getDouble () > b -> getDouble ()) return false;}
-					else return false;
-				}
+				else if (b -> isDouble ()) {if (a -> getDouble () > b -> getDouble ()) return false;}
+				else return false;
 			}
 			else if (a -> isText ()) {
-				if (! b -> isText ()) return false;
-				if (strcmp (a -> getText (), b -> getText ()) > 0) return false;
+				if (b -> isText ()) {if (strcmp (a -> getText (), b -> getText ()) > 0) return false;}
+				else if (b -> isAtom ()) {if (strcmp (a -> getText (), b -> getAtom () -> name ()) > 0) return false;}
+				else return false;
+			}
+			else if (a -> isAtom ()) {
+				if (b -> isAtom ()) {if (strcmp (a -> getAtom () -> name (), b -> getAtom () -> name ()) > 0) return false;}
+				else if (b -> isText ()) {if (strcmp (a -> getAtom () -> name (), b -> getText ()) > 0) return false;}
+				else return false;
 			}
 			else return false;
 			a = b;
@@ -1649,21 +1642,23 @@ public:
 			b = parameters -> getLeft ();
 			if (a -> isInteger ()) {
 				if (b -> isInteger ()) {if (a -> getInteger () <= b -> getInteger ()) return false;}
-				else {
-					if (b -> isDouble ()) {if ((double) a -> getInteger () <= b -> getDouble ()) return false;}
-					else return false;
-				}
+				else if (b -> isDouble ()) {if ((double) a -> getInteger () <= b -> getDouble ()) return false;}
+				else return false;
 			}
 			else if (a -> isDouble ()) {
 				if (b -> isInteger ()) {if (a -> getDouble () <= (double) b -> getInteger ()) return false;}
-				else {
-					if (b -> isDouble ()) {if (a -> getDouble () <= b -> getDouble ()) return false;}
-					else return false;
-				}
+				else if (b -> isDouble ()) {if (a -> getDouble () <= b -> getDouble ()) return false;}
+				else return false;
 			}
 			else if (a -> isText ()) {
-				if (! b -> isText ()) return false;
-				if (strcmp (a -> getText (), b -> getText ()) <= 0) return false;
+				if (b -> isText ()) {if (strcmp (a -> getText (), b -> getText ()) <= 0) return false;}
+				else if (b -> isAtom ()) {if (strcmp (a -> getText (), b -> getAtom () -> name ()) <= 0) return false;}
+				else return false;
+			}
+			else if (a -> isAtom ()) {
+				if (b -> isAtom ()) {if (strcmp (a -> getAtom () -> name (), b -> getAtom () -> name ()) <= 0) return false;}
+				else if (b -> isText ()) {if (strcmp (a -> getAtom () -> name (), b -> getText ()) <= 0) return false;}
+				else return false;
 			}
 			else return false;
 			a = b;
@@ -1685,21 +1680,23 @@ public:
 			b = parameters -> getLeft ();
 			if (a -> isInteger ()) {
 				if (b -> isInteger ()) {if (a -> getInteger () < b -> getInteger ()) return false;}
-				else {
-					if (b -> isDouble ()) {if ((double) a -> getInteger () < b -> getDouble ()) return false;}
-					else return false;
-				}
+				else if (b -> isDouble ()) {if ((double) a -> getInteger () < b -> getDouble ()) return false;}
+				else return false;
 			}
 			else if (a -> isDouble ()) {
 				if (b -> isInteger ()) {if (a -> getDouble () < (double) b -> getInteger ()) return false;}
-				else {
-					if (b -> isDouble ()) {if (a -> getDouble () < b -> getDouble ()) return false;}
-					else return false;
-				}
+				else if (b -> isDouble ()) {if (a -> getDouble () < b -> getDouble ()) return false;}
+				else return false;
 			}
 			else if (a -> isText ()) {
-				if (! b -> isText ()) return false;
-				if (strcmp (a -> getText (), b -> getText ()) < 0) return false;
+				if (b -> isText ()) {if (strcmp (a -> getText (), b -> getText ()) < 0) return false;}
+				else if (b -> isAtom ()) {if (strcmp (a -> getText (), b -> getAtom () -> name ()) < 0) return false;}
+				else return false;
+			}
+			else if (a -> isAtom ()) {
+				if (b -> isAtom ()) {if (strcmp (a -> getAtom () -> name (), b -> getAtom () -> name ()) < 0) return false;}
+				else if (b -> isText ()) {if (strcmp (a -> getAtom () -> name (), b -> getText ()) < 0) return false;}
+				else return false;
 			}
 			else return false;
 			a = b;
