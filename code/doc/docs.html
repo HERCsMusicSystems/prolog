@@ -299,6 +299,68 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_greater">
+        <div class="doc_predicate_header">
+            [greater arg-1 arg-2 .... arg-n]
+        </div>
+        <div class="doc_predicate_body">
+            Checks if the arguments are ordered in ascending order without duplicates.
+            Arguments are expected to be integers, doubles, texts or atoms.
+            Numbers are compared on their value.
+            Texts and atoms are compared on their alphabetical precedence.
+            It always works with just one argument.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_greater_eq">
+        <div class="doc_predicate_header">
+            [greater arg-1 arg-2 .... arg-n]
+        </div>
+        <div class="doc_predicate_body">
+            Checks if the arguments are ordered in ascending order.
+            Duplicates are permitted.
+            Arguments are expected to be integers, doubles, texts or atoms.
+            Numbers are compared on their value.
+            Texts and atoms are compared on their alphabetical precedence.
+            It always works with just one argument.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_less">
+        <div class="doc_predicate_header">
+            [greater arg-1 arg-2 .... arg-n]
+        </div>
+        <div class="doc_predicate_body">
+            Checks if the arguments are ordered in descending order without duplicates.
+            Arguments are expected to be integers, doubles, texts or atoms.
+            Numbers are compared on their value.
+            Texts and atoms are compared on their alphabetical precedence.
+            It always works with just one argument.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_less_eq">
+        <div class="doc_predicate_header">
+            [greater arg-1 arg-2 .... arg-n]
+        </div>
+        <div class="doc_predicate_body">
+            Checks if the arguments are ordered in descending order.
+            Duplicates are permitted.
+            Arguments are expected to be integers, doubles, texts or atoms.
+            Numbers are compared on their value.
+            Texts and atoms are compared on their alphabetical precedence.
+            It always works with just one argument.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_log2">
         <div class="doc_predicate_header">
             [log2 x *n] [log2 x : *n]<br />
