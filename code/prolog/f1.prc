@@ -1,18 +1,9 @@
 import studio
 
-program f1 [# ^ check ck rescheck hash_preprocessor list_preprocessor
+program f1 [# $ check ck rescheck hash_preprocessor list_preprocessor
 		f1 var_preprocessor
 		rescheck_list_tail rescheck_cont var_preprocessor_cont
-		+ - < > <= >= = <>]
-
-[[+ : *tail] [add : *tail]]
-[[- : *tail] [sub : *tail]]
-[[< : *tail] [less : *tail]]
-[[> : *tail] [greater : *tail]]
-[[<= : *tail] [less_eq : *tail]]
-[[>= : *tail] [greater_eq : *tail]]
-[[= *x *x]]
-[[<> *x *y] [not eq *x *y]]
+		]
 
 [[ck *x] [not is_var *x] [eq *x #] /]
 [[ck *x] [is_var *x] / fail]
@@ -52,11 +43,11 @@ program f1 [# ^ check ck rescheck hash_preprocessor list_preprocessor
 
 [[var_preprocessor_cont *t *t] [is_var *t] /]
 [[var_preprocessor_cont *t *t2] [var_preprocessor *t *t2]]
-[[var_preprocessor [*u *array : *tail] [*call : *t2]] [is_atom *u] [eq *u ^]
+[[var_preprocessor [*u *array : *tail] [*call : *t2]] [is_atom *u] [eq *u $]
 	[not is_var *array] [eq *array [*a : *i]]
 	/ [APPEND [*a : *i] # *call]
 	/ [var_preprocessor_cont *tail *t2]]
-[[var_preprocessor [*u *var : *tail] [[*var : #] : *t2]] [is_atom *u] [eq *u ^]
+[[var_preprocessor [*u *var : *tail] [[*var : #] : *t2]] [is_atom *u] [eq *u $]
 	/ [var_preprocessor_cont *tail *t2]]
 [[var_preprocessor [*h : *t] [*h : *t2]] [is_var *h] / [var_preprocessor_cont *t *t2] /]
 [[var_preprocessor [*h : *t] [*h2 : *t2]]
@@ -78,7 +69,7 @@ program f1 [# ^ check ck rescheck hash_preprocessor list_preprocessor
 protect [check ck rescheck hash_preprocessor list_preprocessor
 	f1 var_preprocessor rescheck_list_tail
 	rescheck_cont var_preprocessor_cont
-	+ - < > <= >= = <>]
+	]
 private [check ck rescheck hash_preprocessor list_preprocessor var_preprocessor
 	rescheck_list_tail rescheck_cont var_preprocessor_cont]
 

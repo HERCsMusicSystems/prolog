@@ -91,8 +91,8 @@ void PrologRoot :: set_uap32_captions (void) {
 	prolog_string_copy (var_head_captions, "*");
 	prolog_string_copy (var_tail_captions, "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM");
 	prolog_string_copy (var_caption, "*");
-	prolog_string_copy (atom_head_captions, "_qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM?<>&+-=%#!$^{}");
-	prolog_string_copy (atom_tail_captions, "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM?/<>&+-=%#!");
+	prolog_string_copy (atom_head_captions, "_qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM?<>&|+-=%~#!$^{}");
+	prolog_string_copy (atom_tail_captions, "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM?/<>&|+-=%~#!");
 	prolog_string_copy (at_caption, "@");
 	prolog_string_copy (dot_caption, ".");
 	prolog_string_copy (if_atom_caption, ":=");
@@ -130,8 +130,8 @@ void PrologRoot :: set_standard_captions (void) {
 	prolog_string_copy (var_head_captions, "_XYZxyz");
 	prolog_string_copy (var_tail_captions, "0123456789");
 	prolog_string_copy (var_caption, "_");
-	prolog_string_copy (atom_head_captions, "_qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM?<>&:+-=%#!$^{}");
-	prolog_string_copy (atom_tail_captions, "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM?/<>&:+-=%#!");
+	prolog_string_copy (atom_head_captions, "_qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM?<>&|:+-=%~#!$^{}");
+	prolog_string_copy (atom_tail_captions, "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM?/<>&|:+-=%~#!");
 	prolog_string_copy (at_caption, "@");
 	prolog_string_copy (dot_caption, ".");
 	prolog_string_copy (if_atom_caption, ":-");
@@ -170,8 +170,8 @@ void PrologRoot :: set_edinburg_captions (void) {
 	prolog_string_copy (var_head_captions, "_QWERTYUIOPASDFGHJKLZXCVBNM*");
 	prolog_string_copy (var_tail_captions, "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM");
 	prolog_string_copy (var_caption, "_");
-	prolog_string_copy (atom_head_captions, "_qwertyuiopasdfghjklzxcvbnm?<>&:+-=%#/$^{}");
-	prolog_string_copy (atom_tail_captions, "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM?/<>&:+-=%#");
+	prolog_string_copy (atom_head_captions, "_qwertyuiopasdfghjklzxcvbnm?<>&|:+-=%~#/$^{}");
+	prolog_string_copy (atom_tail_captions, "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM?/<>&|:+-=%~#");
 	prolog_string_copy (at_caption, "@");
 	prolog_string_copy (dot_caption, ".");
 	prolog_string_copy (if_atom_caption, ":-");
@@ -209,8 +209,8 @@ void PrologRoot :: set_marseille_captions (void) {
 	prolog_string_copy (var_head_captions, "*");
 	prolog_string_copy (var_tail_captions, "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM&:+-=");
 	prolog_string_copy (var_caption, "*");
-	prolog_string_copy (atom_head_captions, "_qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM?<>&:+-=%#!$^{}");
-	prolog_string_copy (atom_tail_captions, "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM?/<>&:+-=%#!");
+	prolog_string_copy (atom_head_captions, "_qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM?<>&|:+-=%~#!$^{}");
+	prolog_string_copy (atom_tail_captions, "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM?/<>&|:+-=%~#!");
 	prolog_string_copy (at_caption, "@");
 	prolog_string_copy (dot_caption, ".");
 	prolog_string_copy (if_atom_caption, "+");
@@ -248,8 +248,8 @@ void PrologRoot :: set_functional_captions (void) {
 	prolog_string_copy (var_head_captions, "~");
 	prolog_string_copy (var_tail_captions, "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM");
 	prolog_string_copy (var_caption, "~");
-	prolog_string_copy (atom_head_captions, "_qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM'?<>&+-*=/%#$^{}");
-	prolog_string_copy (atom_tail_captions, "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM'?/<>&+-*=%#");
+	prolog_string_copy (atom_head_captions, "_qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM'?<>&|+-*=/%#$^{}");
+	prolog_string_copy (atom_tail_captions, "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM'?/<>&|+-*=%#");
 	prolog_string_copy (at_caption, "@");
 	prolog_string_copy (dot_caption, ".");
 	prolog_string_copy (if_atom_caption, ":=");

@@ -18,6 +18,7 @@ program studio #machine := "prolog.studio"
 		cd dir ls DIR ARGS args args_tail edit execute make_file make_directory erase erase_directory move copy
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
 		create_atom search_atom preprocessor prompt
+		+ ~ % < = > <=> <= =< >= => <> ! & | ^
 		add sub mult div mod and or xor sum times less less_eq greater greater_eq
 		abs cos degrad e exp log2 log10 ln log pi pow sin tan trunc
 		timestamp
@@ -39,15 +40,21 @@ program studio #machine := "prolog.studio"
 	]
 
 #machine sum := "sum"
+#machine + := "sum"
 #machine add := "add"
 #machine sub := "sub"
 #machine times := "times"
+#machine ~ := "times"
 #machine mult := "mult"
 #machine div := "div"
 #machine mod := "mod"
+#machine % := "mod"
 #machine and := "and"
+#machine & := "and"
 #machine or := "or"
+#machine | := "or"
 #machine xor := "xor"
+#machine ^ := "xor"
 
 #machine abs := "abs"
 #machine cos := "cos"
@@ -81,6 +88,12 @@ program studio #machine := "prolog.studio"
 #machine less_eq := "less_eq"
 #machine greater := "greater"
 #machine greater_eq := "greater_eq"
+#machine < := "less"
+#machine <= := "less_eq"
+#machine =< := "less_eq"
+#machine > := "greater"
+#machine >= := "greater_eq"
+#machine => := "greater_eq"
 #machine set_standard_captions := "set_standard_captions"
 #machine set_uap32_captions := "set_uap32_captions"
 #machine set_edinburg_captions := "set_edinburg_captions"
@@ -166,6 +179,11 @@ program studio #machine := "prolog.studio"
 [[grnd : *parameters] [rnd : *parameters]]
 [[grnd : *parameters] / [grnd : *parameters]]
 [[eq *x *x]]
+[[= *x *x]]
+[[<> *x *x] / fail]
+[[<> * *]]
+[[! : *x] *x / fail]
+[[! : *]]
 [[not :*x] *x / fail]
 [[not :*x]]
 [[res :*x]:*x]
@@ -300,6 +318,13 @@ program studio #machine := "prolog.studio"
 	[divide *less *h *t *lt *lta *gt *gta]/
 	[sort *less *lt *gts [*h : *gs]]/
 	[sort *less *gt *gs *gtsa]/
+]
+
+[[<=> *less [] *gs *gs]/]
+[[<=> *less [*h : *t] *gts *gtsa]
+	[divide *less *h *t *lt *lta *gt *gta] /
+	[<=> *less *lt *gts [*h : *gs]] /
+	[<=> *less *gt *gs *gtsa] /
 ]
 
 
