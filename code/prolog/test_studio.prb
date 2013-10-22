@@ -372,6 +372,28 @@
 [TestFails "greater ln log ln" [greater_eq ln log ln]]
 [TestWorks "greater_eq []" [greater_eq []]]
 
+[TestEq "max * 1 2 7 3 4" 7 *x [max *x 1 2 7 3 4]]
+[TestEq "max * 1 2 7.5 3 4" 7.5 * [max *x 1 2 7.5 3 4]]
+[TestEq "max * 1.0 2.0 7.0 3.0 4.0" 7.0 *x [max *x 1.0 2.0 7.0 3.0 4.0]]
+[TestEq "max * 1.0 2.0 7 3.0 4.0" 7 *x [max *x 1.0 2.0 7 3.0 4.0]]
+[TestEq "max * \"sonda\" \"viking\" \"mariner\"" "viking" *x [max *x "sonda" "viking" "mariner"]]
+[TestEq "max * \"sonda\" write \"mariner\"" write *x [max *x "sonda" write "mariner"]]
+[TestEq "max * abs xor pow" xor *x [max *x abs xor pow]]
+[TestEq "max * abs \"xor\" pow" "xor" *x [max *x abs "xor" pow]]
+[TestWorks "max 4 1 2 4 3" [max 4 1 2 4 3]]
+[TestFails "max 1 1 2 4 3" [max 7 1 2 4 3]]
+
+[TestEq "min *x 7 6 2 4 3" 2 *x [min *x 7 6 2 4 3]]
+[TestEq "min *x 7 6 2.25 4 3" 2.25 *x [min *x 7 6 2.25 4 3]]
+[TestEq "min *x 7.0 6.0 2 4.0 3.0" 2 *x [min *x 7.0 6.0 2 4.0 3.0]]
+[TestEq "min *x 7.0 6.0 2.25 4.0 3.0" 2.25 *x [min *x 7.0 6.0 2.25 4.0 3.0]]
+[TestEq "min * \"sonda\" \"mariner\" \"viking\"" "mariner" *x [min *x "sonda" "mariner" "viking"]]
+[TestEq "min * \"sonda\" min \"viking\"" min *x [min *x "sonda" min "viking"]]
+[TestEq "min *x xor abs pow" abs *x [min *x xor abs pow]]
+[TestEq "min *x xor \"abs\" pow" "abs" *x [min *x xor "abs" pow]]
+[TestWorks "min 2 4 2 3 5" [min 2 4 2 3 5]]
+[TestFails "min 5 4 2 3 5" [min 5 4 2 3 5]]
+
 [nl]
 
 [TestSummary]

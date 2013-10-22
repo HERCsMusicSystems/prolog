@@ -1590,7 +1590,6 @@ public:
 		}
 		return true;
 	}
-	less (PrologRoot * root) {}
 };
 
 class less_eq : public PrologNativeCode {
@@ -1628,7 +1627,6 @@ public:
 		}
 		return true;
 	}
-	less_eq (PrologRoot * root) {}
 };
 
 class greater : public PrologNativeCode {
@@ -1666,7 +1664,6 @@ public:
 		}
 		return true;
 	}
-	greater (PrologRoot * root) {}
 };
 
 class greater_eq : public PrologNativeCode {
@@ -1704,7 +1701,82 @@ public:
 		}
 		return true;
 	}
-	greater_eq (PrologRoot * root) {}
+};
+
+class max_class : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * res = parameters -> getLeft ();
+		parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		PrologElement * maximum = parameters -> getLeft ();
+		parameters = parameters -> getRight ();
+		while (parameters -> isPair ()) {
+			PrologElement * e = parameters -> getLeft ();
+			if (e -> isInteger ()) {
+				if (maximum -> isInteger ()) {if (e -> getInteger () > maximum -> getInteger ()) maximum = e;}
+				else if (maximum -> isDouble ()) {if ((double) e -> getInteger () > maximum -> getDouble ()) maximum = e;}
+				else return false;
+			} else if (e -> isDouble ()) {
+				if (maximum -> isDouble ()) {if (e -> getDouble () > maximum -> getDouble ()) maximum = e;}
+				else if (maximum -> isInteger ()) {if (e -> getDouble () > (double) maximum -> getInteger ()) maximum = e;}
+				else return false;
+			} else if (e -> isText ()) {
+				if (maximum -> isText ()) {if (strcmp (e -> getText (), maximum -> getText ()) > 0) maximum = e;}
+				else if (maximum -> isAtom ()) {if (strcmp (e -> getText (), maximum -> getAtom () -> name ()) > 0) maximum = e;}
+				else return false;
+			} else if (e -> isAtom ()) {
+				if (maximum -> isAtom ()) {if (strcmp (e -> getAtom () -> name (), maximum -> getAtom () -> name ()) > 0) maximum = e;}
+				else if (maximum -> isText ()) {if (strcmp (e -> getAtom () -> name (), maximum -> getText ()) > 0) maximum = e;}
+				else return false;
+			} else return false;
+			parameters = parameters -> getRight ();
+		}
+		if (maximum -> isInteger ()) {res -> setInteger (maximum -> getInteger ()); return true;}
+		if (maximum -> isDouble ()) {res -> setDouble (maximum -> getDouble ()); return true;}
+		if (maximum -> isText ()) {res -> setText (maximum -> getText ()); return true;}
+		if (maximum -> isAtom ()) {res -> setAtom (maximum -> getAtom ()); return true;}
+		return false;
+	}
+};
+
+class min_class : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * res = parameters -> getLeft ();
+		parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		PrologElement * minimum = parameters -> getLeft ();
+		parameters = parameters -> getRight ();
+		while (parameters -> isPair ()) {
+			PrologElement * e = parameters -> getLeft ();
+			if (e -> isInteger ()) {
+				if (minimum -> isInteger ()) {if (e -> getInteger () < minimum -> getInteger ()) minimum = e;}
+				else if (minimum -> isDouble ()) {if ((double) e -> getInteger () < minimum -> getDouble ()) minimum = e;}
+				else return false;
+			} else if (e -> isDouble ()) {
+				if (minimum -> isDouble ()) {if (e -> getDouble () < minimum -> getDouble ()) minimum = e;}
+				else if (minimum -> isInteger ()) {if (e -> getDouble () < (double) minimum -> getInteger ()) minimum = e;}
+				else return false;
+			} else if (e -> isText ()) {
+				if (minimum -> isText ()) {if (strcmp (e -> getText (), minimum -> getText ()) < 0) minimum = e;}
+				else if (minimum -> isAtom ()) {if (strcmp (e -> getText (), minimum -> getAtom () -> name ()) < 0) minimum = e;}
+				else return false;
+			} else if (e -> isAtom ()) {
+				if (minimum -> isAtom ()) {if (strcmp (e -> getAtom () -> name (), minimum -> getAtom () -> name ()) < 0) minimum = e;}
+				else if (minimum -> isText ()) {if (strcmp (e -> getAtom () -> name (), minimum -> getText ()) < 0) minimum = e;}
+				else return false;
+			} else return false;
+			parameters = parameters -> getRight ();
+		}
+		if (minimum -> isInteger ()) {res -> setInteger (minimum -> getInteger ()); return true;}
+		if (minimum -> isDouble ()) {res -> setDouble (minimum -> getDouble ()); return true;}
+		if (minimum -> isText ()) {res -> setText (minimum -> getText ()); return true;}
+		if (minimum -> isAtom ()) {res -> setAtom (minimum -> getAtom ()); return true;}
+		return false;
+	}
 };
 
 class file_write : public PrologNativeCode {
@@ -3089,10 +3161,12 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "text_list") == 0) return new text_list ();
 	if (strcmp (name, "text_term") == 0) return new text_term (root);
 	if (strcmp (name, "e32") == 0) return new e32 ();
-	if (strcmp (name, "less") == 0) return new less (root);
-	if (strcmp (name, "less_eq") == 0) return new less_eq (root);
-	if (strcmp (name, "greater") == 0) return new greater (root);
-	if (strcmp (name, "greater_eq") == 0) return new greater_eq (root);
+	if (strcmp (name, "less") == 0) return new less ();
+	if (strcmp (name, "less_eq") == 0) return new less_eq ();
+	if (strcmp (name, "greater") == 0) return new greater ();
+	if (strcmp (name, "greater_eq") == 0) return new greater_eq ();
+	if (strcmp (name, "max") == 0) return new max_class ();
+	if (strcmp (name, "min") == 0) return new min_class ();
 	if (strcmp (name, "set_uap32_captions") == 0) return new set_uap32_captions (root);
 	if (strcmp (name, "set_standard_captions") == 0) return new set_standard_captions (root);
 	if (strcmp (name, "set_edinburg_captions") == 0) return new set_edinburg_captions (root);

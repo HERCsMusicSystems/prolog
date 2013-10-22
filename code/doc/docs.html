@@ -100,6 +100,8 @@
             <a href="#predicate_log2">log2</a>
             <a href="#predicate_log10">log10</a>
             <a href="#predicate_ln">ln</a>
+            <a href="#predicate_max">max</a>
+            <a href="#predicate_min">min</a>
             <a href="#predicate_mod">mod</a>
             <a href="#predicate_mult">mult</a>
             <a href="#predicate_or">or</a>
@@ -403,6 +405,36 @@
             Arguments can be either integer or double.
             The result is of the same type as argument (integer result is truncated).
             Fails if x <= 0.
+            Can be used for tests.
+        </div>
+    </a>
+</div>
+
+<div>
+    <a id="predicate_max">
+        <div class="doc_predicate_header">
+            [max *max arg-1 arg-2 .... arg-n]
+        </div>
+        <div class="doc_predicate_body">
+            Finds the maximum value.
+            The arguments can be integers, doubles, texts or atoms.
+            However, all arguments must be either numerical or textual.
+            There have to be at least one argument besides the output value.
+            Can be used for tests.
+        </div>
+    </a>
+</div>
+
+<div>
+    <a id="predicate_min">
+        <div class="doc_predicate_header">
+            [min *max arg-1 arg-2 .... arg-n]
+        </div>
+        <div class="doc_predicate_body">
+            Finds the minimum value.
+            The arguments can be integers, doubles, texts or atoms.
+            However, all arguments must be either numerical or textual.
+            There have to be at least one argument besides the output value.
             Can be used for tests.
         </div>
     </a>
