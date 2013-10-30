@@ -3,7 +3,7 @@
         .doc_header {font-family:Arial; font-size:1.5em; font-weight:bold;}
         .doc_library {font-family:Arial; font-size:1.5em;}
         .doc_library_section {font-family:Arial; font-size:1.5em; margin-top:1em;}
-        .doc_predicate{font-family:Arial; padding:1em; width:40em;}
+        .doc_predicate{font-family:Arial; padding:1em; width:50em;}
         .doc_predicate_header {background-color:#eeeeee; font-family:monospace;}
         .doc_predicate_body {font-family:Arial;}
         .doc_predicate_code {font-family:monospace; background-color:#eeeeee;}
@@ -116,7 +116,15 @@
         </li>
         <li><a href="#input_output">Input / Output</a>
             <br />
+            <a href="#predicate_add_search_directory">add_search_directory</a>
+            <a href="#predicate_ARGS">ARGS</a>
+            <a href="#predicate_consult">consult</a>
+            <a href="#predicate_create_module">create_module</a>
+            <a href="#predicate_import">import</a>
             <a href="#predicate_list">list</a>
+            <a href="#predicate_load">load</a>
+            <a href="#predicate_file_reader">file_reader</a>
+            <a href="#predicate_file_writer">file_writer</a>
             <a href="#predicate_nl">nl</a>
             <a href="#predicate_object_counter">object_counter</a>
             <a href="#predicate_pp">pp</a>
@@ -127,6 +135,11 @@
             <a href="#predicate_query_stack">query_stack</a>
             <a href="#predicate_read">read</a>
             <a href="#predicate_readln">readln</a>
+            <a href="#predicate_reload">reload</a>
+            <a href="#predicate_remove_module">remove_module</a>
+            <a href="#predicate_search_directories">search_directories</a>
+            <a href="#predicate_set_machine">set_machine</a>
+            <a href="#predicate_timestamp">timestamp</a>
             <a href="#predicate_write">write</a>
             <a href="#predicate_set_captions">set_...._captions</a>
         </li>
@@ -410,7 +423,7 @@
     </a>
 </div>
 
-<div>
+<div class="doc_predicate">
     <a id="predicate_max">
         <div class="doc_predicate_header">
             [max *max arg-1 arg-2 .... arg-n]
@@ -425,7 +438,7 @@
     </a>
 </div>
 
-<div>
+<div class="doc_predicate">
     <a id="predicate_min">
         <div class="doc_predicate_header">
             [min *max arg-1 arg-2 .... arg-n]
@@ -626,6 +639,81 @@
 <div class="doc_library_section"><a id="input_output">Input / Output Predicates</a></div>
 
 <div class="doc_predicate">
+    <a id="predicate_add_search_directory">
+        <div class="doc_predicate_header">
+            [add_search_directory "path"]<br />
+            [add_search_directory "dir-1" "dir-2" .... "dir-n"]<br />
+            [add_search_directory]
+        </div>
+        <div class="doc_predicate_body">
+            Adds path(s) to the collection of search paths.
+            The path, which was added last is the first location to look for files.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_ARGS">
+        <div class="doc_predicate_header">
+            [ARGS : *args]
+        </div>
+        <div class="doc_predicate_body">
+            Retrives a list of text values representing command-line parameters.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_consult">
+        <div class="doc_predicate_header">
+            [consult "module_name"]
+        </div>
+        <div class="doc_predicate_body">
+            Loads specified module from a file.
+            If the module is present then it will be removed first and the loaded.
+            It will appear as the second module after the root "user!".
+            If the module name has no extension, the default ".prc" extension will be used.
+            Fails if the module can not be found anywhere.
+            The source code will be displayed on the console during the loading process.
+            To avoid it, load (or import) can be used instead.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_create_module">
+        <div class="doc_predicate_header">
+            [create_module "name"]<br />
+            [create_module "name" "service.class"]<br />
+            [create_module]
+        </div>
+        <div class="doc_predicate_body">
+            Creates a new module with the name specified.
+            Optionally a service class name can also be specified.
+            The new module will be added as the root module.
+            All newly created atoms will be placed in this module.
+            Typically it should be swapped with the "user!" module after completion
+            by calling create_module without any parameters.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_import">
+        <div class="doc_predicate_header">
+            [import "module_name"]
+        </div>
+        <div class="doc_predicate_body">
+            Loads specified module from a file.
+            If the module is present then it will not be reloaded.
+            If loaded then it will appear as the second module after the root "user!".
+            If the module name has no extension, the default ".prc" extension will be used.
+            Fails if the module can not be found anywhere.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_list">
         <div class="doc_predicate_header">
             [list] [list *x] [list : *x]<br />
@@ -642,6 +730,71 @@
             <li>none: the list is displayed in the console</li>
             <li>variable (*x): the list is returned as text</li>
             <li>variable tail (:*x): the list is returned as a Prolog term</li>
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_load">
+        <div class="doc_predicate_header">
+            [load "module_name"]
+        </div>
+        <div class="doc_predicate_body">
+            Loads specified module from a file.
+            If the module is present then it will be removed first and the loaded.
+            It will appear as the second module after the root "user!".
+            If the module name has no extension, the default ".prc" extension will be used.
+            Fails if the module can not be found anywhere.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_file_reader">
+        <div class="doc_predicate_header">
+            [file_reader *reader "file_name.extension"]<br />
+            ===========================================<br />
+            [*reader *term] => reads a prolog term<br />
+            [*reader "word" *text] => reads word<br />
+            [*reader "line" *text] => reads entire line<br />
+            [*reader "string" *text] => reads text consisting of specified characters<br />
+            [*reader] => closes the file
+        </div>
+        <div class="doc_predicate_body">
+            Creates a file reader by attaching a machine clause to a symbol.
+            If variable is passed instead of a symbol, then anonymous symbol is created.<br />
+            The reader can read from the file the following objects:
+            <li>Prolog terms.</li>
+            <li>Single words and/or separators.</li>
+            <li>Lines of text.</li>
+            <li>Texts consisting of specified characters.</li><br />
+            Without any parameters the reader closes the file and releases the machine clause binding.
+            If anonymous symbol is garbage collected then the file is also closed (and machine binding released as well).
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_file_writer">
+        <div class="doc_predicate_header">
+            [file_writer *writer "file_name.extension"]<br />
+            ===========================================<br />
+            [*writer a b c d e f] => writers parameters to the file<br />
+            [*writer "text" ....] => writers text to the file<br />
+            [*writer 100 101 102 ....] => writes ASCII characters to the file<br />
+            [*writer [a b c ....] ....] => writes Prolog terms (a b c ....) to the file<br />
+            [*writer] => closes the file.
+        </div>
+        <div class="doc_predicate_body">
+            Creates a file writer by attaching a machine clause to a symbol.
+            if variable is passed instead of a symbol, then anonymous symbol is created.<br />
+            The writer outputs its parameters into the file in textual form.
+            The textualising depend on the parameters:
+            <li>A text is written without quotation marsk.</li>
+            <li>Numbers are written as ASCII characters.</li>
+            <li>Content of a list is written as separate Prolog terms.</li><br />
+            Without any parameters the writer closes the file and releases the machine clause binding.
+            If anonymous symbol is garbage collected then the file is also closed (and machine binding released as well).
         </div>
     </a>
 </div>
@@ -760,6 +913,82 @@
         </div>
         <div class="doc_predicate_body">
             Skips whitespaces and then reads the input text from the console, until a new line is detected.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_reload">
+        <div class="doc_predicate_header">
+            [reload]
+        </div>
+        <div class="doc_predicate_body">
+            Re-loads the second module after the root (i.e. the last loaded module).
+            It assumes that the name of the module is identical
+            as the name of the source file with ".prc" extension.
+            If the source file can not be found anywhere
+            then the module is unloaded and not loaded.<br />
+            Useful in construction and debugging process.
+            Load the source, test, make changes, re-load, test, make changes, re-load again, etc.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_remove_module">
+        <div class="doc_predicate_header">
+            [remove_module "name"]<br />
+            [remove_module "m-1" "m-2" .... "m-n"]<br />
+            [remove_module]
+        </div>
+        <div class="doc_predicate_body">
+            Removes module(s) specified by name(s).
+            Fails if any of the modules does not exist or could not be removed.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_search_directories">
+        <div class="doc_predicate_header">
+            [search_directories] => display<br />
+            [search_directories []] => erase<br />
+            [search_directories *x] => retrive<br />
+            [search_directories ["dir-1" "dir-2" .... "dir-n"]] => set
+        </div>
+        <div class="doc_predicate_body">
+            Retrieves the collection of search paths.
+            It can also reset it or set it.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_set_machine">
+        <div class="doc_predicate_header">
+            [set_machine atom "machine"]<br />
+            [set_machine atom "module" "machine"]
+        </div>
+        <div class="doc_predicate_body">
+            Adds machine clause to the atom (symbol).
+            The machine code is searched in the module specified by module's name.
+            If no module was specified then it searches machine code in the root module.
+            Fails if machine code can not be found or applied (i.e. the symbol has already some definitions attached).
+            Note: machine binding can only be removed if the binding itself allows for it.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_timestamp">
+        <div class="doc_predicate_header">
+            [timestamp stamp year month day dayOfYear dayOfWeek hour minute second]<br />
+            [timestamp stamp : *]
+        </div>
+        <div class="doc_predicate_body">
+            Converts from timestamp to date-time and from date-time to timestamp.
+            If partial information is provided (no timestamp, no year, no hour, etc.)
+            then it will be filled with current time values.
         </div>
     </a>
 </div>

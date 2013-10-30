@@ -127,8 +127,8 @@ void PrologAtom :: unProtect (void) {Protected = false;}
 void PrologAtom :: unPrivate (void) {Privated = false;}
 
 bool PrologAtom :: setMachine (PrologNativeCode * obj) {
-	if (firstClause != 0) return false;
-	Protected = obj != 0;
+	if (firstClause != 0 || (Protected && obj != 0)) return false;
+	Protected = (obj != 0);
 	machine = obj;
 	return true;
 }

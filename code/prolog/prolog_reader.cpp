@@ -117,7 +117,19 @@ int PrologReader :: getString (char * area, int ind, char * char_set) {
 			not_readed = false;
 		}
 		area [ind] = '\0';
-		while (act_znak == 0 || act_znak == 13 || act_znak == 10) act_znak = move_z ();
+		//while (act_znak == 0 || act_znak == 13 || act_znak == 10) act_znak = move_z ();
+		if (act_znak < 0 && not_readed) return -1;
+		return ind;
+	}
+	if (strcmp (char_set, "word") == 0) {
+		while (act_znak >= 0 && act_znak <= 32) act_znak = move_z ();
+		area [ind++] = (char) act_znak; act_znak = move_z ();
+		while (ind < AREA_SIZE_1 && indexOf ("qwertyuiopasdfghjklzxcvbnm_QWERTYUIOPASDFGHJKLZXCVBNM-7894561230\"'`~.", (char) act_znak) >= 0) {
+			area [ind++] = (char) act_znak;
+			act_znak = move_z ();
+			not_readed = false;
+		}
+		area [ind] = '\0';
 		if (act_znak < 0 && not_readed) return -1;
 		return ind;
 	}

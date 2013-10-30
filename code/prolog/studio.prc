@@ -453,7 +453,7 @@ program studio #machine := "prolog.studio"
 [[batch *x *reader][*reader] / fail]
 [[batch *x *reader *head] [eq *head [[* : *] : *]] / [inner_addcl *head] / [batch *head *reader]]
 [[batch *x *reader *head] [is_atom *head] / [*reader *tail] [inner_call [*head : *tail]] / [batch [*head : *tail] *reader]]
-[[batch *x *reader *head] / [inner_call *head] [batch *head *reader]]
+[[batch *x *reader *head] / [inner_call *head] / [batch *head *reader]]
 
 [[reload] [list :*x] [eq *x [*user *loader :*tail]] [add *loader ".prc" *name] [load *name]]
 

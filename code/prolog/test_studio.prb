@@ -4,7 +4,7 @@
 
 [TestEq "list *" "user! capitol test studio" *x [list *x]]
 [TestEq "list : *" ["user!" "capitol" "test" "studio"] *x [list : *x]]
-[TestEq "list \"capitol\" *" "capitol\n" *x [list "capitol" *x]]
+[TestEq "list \"capitol\" *" "capitol" *x [list "capitol" *x]]
 [TestEq "list \"capitol\" : *" [capitol] *x [list "capitol" : *x]]
 [TestEq "list not *" "[[not : *0] *0 / fail]\n[[not : *0]]\n" *x [list not *x]]
 [TestEq "list not : *" [[[not : *i] *i / fail] [[not : *i]]] *x [list not : *x]]
@@ -51,9 +51,9 @@
 [TestFails "create_atom 127 (confirms not atom)" [create_atom 127]]
 [TestWorks "create_atom atom (confirms atom)" [create_atom sonda]]
 [TestEq "create_atom *var (anonymous)" [sonda] *x [create_atom *atom] [list "user!" : *x] [is_atom *atom]]
-[TestEq "create_atom name" "mariner sonda\n" *x [create_atom "mariner"] [list "user!" *x]]
-[TestEq "create_atom name *var" ["mariner sonda\n" "voyager"] [*x *y] [create_atom "voyager" *atom] [add "" *atom *y] [list "user!" *x]]
-[TestEq "create_atom name:*var" ["mariner sonda\n" "voyager"] [*x *y] [create_atom "voyager" *atom] [add "" *atom : *y] [list "user!" *x]]
+[TestEq "create_atom name" "mariner sonda" *x [create_atom "mariner"] [list "user!" *x]]
+[TestEq "create_atom name *var" ["mariner sonda" "voyager"] [*x *y] [create_atom "voyager" *atom] [add "" *atom *y] [list "user!" *x]]
+[TestEq "create_atom name:*var" ["mariner sonda" "voyager"] [*x *y] [create_atom "voyager" *atom] [add "" *atom : *y] [list "user!" *x]]
 
 [TestFails "search_atom directory/atom 1" [search_atom "stdio" "command" *x]]
 [TestFails "search_atom directory/atom 2" [search_atom "studio" "cmmnd" *x]]
@@ -394,6 +394,70 @@
 [TestWorks "min 2 4 2 3 5" [min 2 4 2 3 5]]
 [TestFails "min 5 4 2 3 5" [min 5 4 2 3 5]]
 
+[TestEq "file_writer atom text numbers list" [sonda "mariner" "sonda mariner" [fail / "sonda" ***]] [*x *y *z *t]
+	[file_writer *fw "sonda.txt"] [*fw "sonda" 32 109 97 114 105 110 101 114 "\n" [[fail / "sonda" *x *y *z]]] [*fw]
+	[file_reader *fr "sonda.txt"] [*fr *x] [*fr "word" *y] [*fr]
+	[file_reader sonda "sonda.txt"] [sonda "line" *z] [sonda *t] [sonda]
+]
+
+[TestFails "has_machine sonda" [has_machine sonda]]
+[TestWorks "file_writer sonda \"sonda.txt\"" [file_writer sonda "sonda.txt"]]
+[TestWorks "has_machine sonda" [has_machine sonda]]
+[TestFails "file_writer sonda \"sonda.txt\"" [file_writer sonda "sonda.txt"]]
+[TestWorks "sonda []" [sonda]]
+[TestFails "has_machine sonda" [has_machine sonda]]
+
+[TestEq "timestamp 889621262" [1998 3 11 69 3 23 31 2] *x [timestamp 889621262 : *x]]
+[TestEq "timestamp [1998 3 11 * * 23 31 2]" [889621262 69 3] [*x *a *b] [timestamp *x 1998 3 11 *a *b 23 31 2]]
+
+[TestFails "remove_module \"sonda\"" [remove_module "sonda"]]
+[TestWorks "remove_module \"capitol\"" [remove_module "capitol"]]
+[TestEq "list" ["user!" "test" "studio"] *x [list : *x]]
+[TestEq "create_module \"sonda\"" "sonda user! test studio" *x [create_module "sonda"] [list *x]]
+[TestFails "has_machine \"sonda\"" [has_machine "sonda"]]
+[TestEq "create_module" "user! sonda test studio" *x [create_module] [list *x]]
+[TestEq "remove_module \"sonda\"" "user! test studio" *x [remove_module "sonda"] [list *x]]
+
+[TestEq "create_module \"sonda\" \"prolog.studio\"" "sonda user! test studio" *x [create_module "sonda" "prolog.studio"] [list *x]]
+[TestWorks "has_machine \"sonda\"" [has_machine "sonda"]]
+[TestEq "create_atom \"mariner\"" "mariner" *x [create_atom "mariner"] [list "sonda" *x]]
+[TestEq "create_atom \"viking\"" "viking mariner" *x [create_atom "viking"] [list "sonda" *x]]
+[TestFails "set_machine viking 127" [set_machine viking 127]]
+[TestWorks "set_machine viking \"sum\"" [set_machine viking "sum"]]
+[TestEq "create_module" "user! sonda test studio" *x [create_module] [list *x]]
+
+[TestFails "has_machine mariner" [has_machine mariner]]
+[TestEq "list mariner" "" *x [list mariner *x]]
+[TestWorks "has_machine viking" [has_machine viking]]
+[TestFails "set_machine mariner \"times\"" [set_machine mariner "times"]]
+[TestWorks "set_machine mariner \"studio\" \"times\"" [set_machine mariner "studio" "times"]]
+[TestFails "set_machine mariner \"studio\" \"times\"" [set_machine mariner "studio" "times"]]
+[TestWorks "has_machine mariner" [has_machine mariner]]
+[TestEq "list mariner *" "mariner := #machine\n" *x [list mariner *x]]
+[TestEq "list mariner : *" ["mariner := #machine"] *x [list mariner : *x]]
+[TestWorks "viking 4 8 12" [viking 4 8 12]]
+[TestWorks "mariner 4 8 32" [mariner 4 8 32]]
+
+[TestEq "load \"keyboard\"" "user! keyboard sonda test studio" *x [load "keyboard"] [list *x]]
+[TestEq "import \"capitol\"" "user! capitol keyboard sonda test studio" *x [import "capitol"] [list *x]]
+[TestEq "import \"keyboard\"" "user! capitol keyboard sonda test studio" *x [import "keyboard"] [list *x]]
+[TestEq "load \"keyboard\"" "user! keyboard capitol sonda test studio" *x [load "keyboard"] [list *x]]
+[TestEq "reload" "user! keyboard capitol sonda test studio" *x [reload] [list *x]]
+
+[TestWorks "remove_module \"capitol\" \"keyboard\" \"sonda\"" [remove_module "capitol" "keyboard" "sonda"]]
+[TestFails "remove_module \"sonda\"" [remove_module "sonda"]]
+[TestWorks "remove_module []" [remove_module]]
+
+[TestEq "search_directories []" [] *x [search_directories []] [search_directories *x]]
+[TestEq "search_directories : *" [] *x [search_directories : *x]]
+[TestEq "search_directories [\"mariner\" \"viking\"]" ["mariner" "viking"] *x [search_directories ["mariner" "viking"]] [search_directories *x]]
+[TestEq "add_search_directory" ["mariner" "viking"] *x [add_search_directory] [search_directories *x]]
+[TestEq "add_search_directory \"sonda\"" ["sonda" "mariner" "viking"] *x [add_search_directory "sonda"] [search_directories *x]]
+[TestWorks "search_directories []" [search_directories []]]
+[TestEq "add_search_directory [\"mariner\" \"viking\"]" ["viking" "mariner"] *x [add_search_directory "mariner" "viking"] [search_directories *x]]
+
+[TestEq "ARGS" ["a" "b" "c"] *x [ARGS : *x]]
+
 [nl]
 
 [TestSummary]
@@ -401,5 +465,6 @@
 [nl]
 
 [foreground 0xffff00]
+
 
 [exit]

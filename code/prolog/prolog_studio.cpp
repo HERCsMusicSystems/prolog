@@ -220,7 +220,6 @@ public:
 				return true;
 			}
 			area_ind = root -> list (parameters -> getText (), area, 0);
-			area_ind = area_cat (area, area_ind, root -> new_line_caption);
 			// atom drop list / atom list
 			if (ret -> isPair ()) ret -> getLeft () -> setText (area); else root -> print (area);
 		}
@@ -1469,10 +1468,6 @@ public:
 	}
 };
 
-#ifdef LINUX_OPERATING_SYSTEM
-
-#include <time.h>
-
 class timestamp : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -1543,17 +1538,6 @@ public:
 		return true;
 	}
 };
-
-#else
-
-class timestamp : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		return true;
-	}
-};
-
-#endif
 
 class less : public PrologNativeCode {
 public:
@@ -1988,10 +1972,13 @@ private:
 	PrologRoot * root;
 public:
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (! parameters -> isText ()) return false;
-		return root -> drop (parameters -> getText ());
+		while (parameters -> isPair ()) {
+			PrologElement * drop = parameters -> getLeft ();
+			if (! drop -> isText ()) return false;
+			if (! root -> drop (drop -> getText ())) return false;
+			parameters = parameters -> getRight ();
+		}
+		return true;
 	}
 	remove_module (PrologRoot * root) {this -> root = root;}
 };
@@ -2023,22 +2010,21 @@ private:
 	PrologRoot * root;
 public:
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		PrologNativeCode * native;
-		bool ret;
 		if (! parameters -> isPair ()) return false;
 		PrologElement * ea = parameters -> getLeft ();
 		if (! ea -> isAtom ()) return false;
 		parameters = parameters -> getRight ();
 		if (! parameters -> isPair ()) return false;
 		PrologElement * et = parameters -> getLeft ();
+		if (! et -> isText ()) return false;
 		parameters = parameters -> getRight ();
 		PrologServiceClass * service;
 		if (parameters -> isEarth ()) {
 			service = root -> getServiceClass ();
 			if (service == NULL) return false;
-			native = service -> getNativeCode (et -> getText ());
+			PrologNativeCode * native = service -> getNativeCode (et -> getText ());
 			if (native == NULL) return false;
-			ret = ea -> getAtom () -> setMachine (native);
+			bool ret = ea -> getAtom () -> setMachine (native);
 			if (! ret) delete native;
 			return ret;
 		}
@@ -2047,9 +2033,9 @@ public:
 		if (! parameters -> isText ()) return false;
 		service = root -> getServiceClass (et -> getText ());
 		if (service == NULL) return false;
-		native = service -> getNativeCode (parameters -> getText ());
+		PrologNativeCode * native = service -> getNativeCode (parameters -> getText ());
 		if (native == NULL ) return false;
-		ret = ea -> getAtom () -> setMachine (native);
+		bool ret = ea -> getAtom () -> setMachine (native);
 		if (! ret) delete native;
 		return ret;
 	}
@@ -2060,10 +2046,12 @@ class add_search_directory : public PrologNativeCode {
 public:
 	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (! parameters -> isText ()) return false;
-		root -> addSearchDirectory (parameters -> getText ());
+		while (parameters -> isPair ()) {
+			PrologElement * dir = parameters -> getLeft ();
+			if (! dir -> isText ()) return false;
+			root -> addSearchDirectory (dir -> getText ());
+			parameters = parameters -> getRight ();
+		}
 		return true;
 	}
 	add_search_directory (PrologRoot * root) {this -> root = root;}
