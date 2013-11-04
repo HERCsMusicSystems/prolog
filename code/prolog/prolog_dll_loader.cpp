@@ -162,8 +162,8 @@ bool PrologRoot :: copy_file (char * from, char * to) {
 void PrologRoot :: get_search_directories_from_environment (char * text) {
 }
 
-char * PrologRoot :: getCWD (void) {return "";}
-bool PrologRoot :: change_directory (char * directory) {return false;}
+char * PrologRoot :: getCWD (void) {return _getcwd (NULL, 0);}
+bool PrologRoot :: change_directory (char * directory) {return _chdir (directory) == 0;}
 
 PrologElement * PrologRoot :: dir (char * location) {
 	WIN32_FIND_DATA find_data;
@@ -192,17 +192,7 @@ bool PrologRoot :: edit (char * file_name) {
 	HINSTANCE res = ShellExecute (NULL, "edit", (LPCTSTR) file_name, NULL, NULL, SW_SHOWNORMAL);
 	return res > (HINSTANCE) 32;
 }
-bool PrologRoot :: execute (char * command) {
-	char comm [256];
-	char parameters [256];
-	char * target = comm;
-	while (* command != '\0' && * command != ' ') {* target++ = * command++;} * target++ = '\0';
-	if (* command == ' ') command++;
-	parameters [0] = '\0';
-	if (* command != '\0') strcpy (parameters, command);
-	HINSTANCE res = ShellExecute (NULL, "open", (LPCSTR) comm, parameters, NULL, SW_SHOWNORMAL);
-	return res > (HINSTANCE) 32;
-}
+bool PrologRoot :: execute (char * command) {return system (command) == 0;}
 bool PrologRoot :: make_directory (char * directory) {return _mkdir (directory) == 0;}
 bool PrologRoot :: erase_file (char * file_name) {return DeleteFile (file_name) == TRUE;}
 bool PrologRoot :: erase_directory (char * directory) {return _rmdir (directory) == 0;}

@@ -458,13 +458,27 @@
 
 [TestEq "ARGS" ["a" "b" "c"] *x [ARGS : *x]]
 
+[TestEq "create directory and file" [[["." ".."] ["mariner.txt" "viking.txt"]] [["." ".."] ["mariner.txt" "viking.txt"]]] [*x *y]
+	[make_directory "sonda"]
+	[cd "sonda"]
+	[file_writer *fw "maliner.txt"] [*fw]
+	[move "maliner.txt" "mariner.txt"]
+	[copy "mariner.txt" "viking.txt"]
+	[DIR "*.*" : *x]
+	[cd]
+	[DIR "sonda/*.*" : *y]
+]
+
+[TestFails "erase non-empty directory" [erase_directory "sonda"]]
+[TestWorks "remove files" [erase "sonda/mariner.txt" "sonda/viking.txt"]]
+[TestWorks "erase empty directory" [erase_directory "sonda"]]
+
 [nl]
 
-[TestSummary]
+[FailedTestSummary]
 
 [nl]
 
 [foreground 0xffff00]
-
 
 [exit]

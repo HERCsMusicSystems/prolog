@@ -1,7 +1,7 @@
 
 import studio
 
-program test [TestWorks TestFails TestEq TestNotEq TestSummary Failures Successes ResetCounters]
+program test [TestWorks TestFails TestEq TestNotEq TestSummary FailedTestSummary Failures Successes ResetCounters]
 
 [[ResetCounters]
 	[TRY [has_machine Successes] [Successes]]
@@ -44,5 +44,15 @@ auto := [[ResetCounters]]
 	[foreground 0xffff00]
 	[ResetCounters]
 ]
+
+[[FailedTestSummary]
+	[Failures : *f] [LENGTH *f *length_f]
+	[foreground 0xff0000] [show *length_f " failed"] [show *f]
+	[foreground 0xffff00]
+	[ResetCounters]
+]
+
+private [Successes Failures]
+protect [TestWorks TestFails TestEq TestNotEq TestSummary FailedTestSummary Failures Successes ResetCounters]
 
 end .

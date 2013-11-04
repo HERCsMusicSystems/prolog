@@ -459,7 +459,7 @@ program studio #machine := "prolog.studio"
 
 [[make_file *file_name] [create_atom *atom] [file_writer *atom *file_name] [*atom]]
 
-[[dir] / [DIR "." : *files] [dir : *files]]
+[[dir] / [DIR "*.*" : *files] [dir : *files]]
 [[dir *location] [is_text *location] / [DIR *location : *files] [dir : *files]]
 [[dir *result] [is_var *result] / [DIR "*.*" : *result]]
 [[dir *location *result] [is_text *location] [is_var *result] / [DIR *location : *result]]

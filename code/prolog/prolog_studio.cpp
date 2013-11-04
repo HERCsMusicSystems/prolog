@@ -2174,10 +2174,13 @@ private:
 	PrologRoot * root;
 public:
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (! parameters -> isText ()) return false;
-		return root -> make_directory (parameters -> getText ());
+		while (parameters -> isPair ()) {
+			PrologElement * dir = parameters -> getLeft ();
+			if (! dir -> isText ()) return false;
+			if (! root -> make_directory (dir -> getText ())) return false;
+			parameters = parameters -> getRight ();
+		}
+		return true;
 	}
 	make_directory (PrologRoot * root) {this -> root = root;}
 };
@@ -2187,10 +2190,13 @@ private:
 	PrologRoot * root;
 public:
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (! parameters -> isText ()) return false;
-		return root -> erase_file (parameters -> getText ());
+		while (parameters -> isPair ()) {
+			PrologElement * eraser = parameters -> getLeft ();
+			if (! eraser -> isText ()) return false;
+			if (! root -> erase_file (eraser -> getText ())) return false;
+			parameters = parameters -> getRight ();
+		}
+		return true;
 	}
 	erase_file (PrologRoot * root) {this -> root = root;}
 };
@@ -2200,10 +2206,13 @@ private:
 	PrologRoot * root;
 public:
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (! parameters -> isText ()) return false;
-		return root -> erase_directory (parameters -> getText ());
+		while (parameters -> isPair ()) {
+			PrologElement * eraser = parameters -> getLeft ();
+			if (! eraser -> isText ()) return false;
+			if (! root -> erase_directory (eraser -> getText ())) return false;
+			parameters = parameters -> getRight ();
+		}
+		return true;
 	}
 	erase_directory (PrologRoot * root) {this -> root = root;}
 };

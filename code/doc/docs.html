@@ -118,13 +118,21 @@
             <br />
             <a href="#predicate_add_search_directory">add_search_directory</a>
             <a href="#predicate_ARGS">ARGS</a>
+            <a href="#predicate_cd">cd</a>
             <a href="#predicate_consult">consult</a>
+            <a href="#predicate_copy">copy</a>
             <a href="#predicate_create_module">create_module</a>
+            <a href="#predicate_edit">edit</a>
+            <a href="#predicate_erase">erase</a>
+            <a href="#predicate_erase_directory">erase_directory</a>
+            <a href="#predicate_execute">execute</a>
             <a href="#predicate_import">import</a>
             <a href="#predicate_list">list</a>
             <a href="#predicate_load">load</a>
             <a href="#predicate_file_reader">file_reader</a>
             <a href="#predicate_file_writer">file_writer</a>
+            <a href="#predicate_make_directory">make_directory</a>
+            <a href="#predicate_move">move</a>
             <a href="#predicate_nl">nl</a>
             <a href="#predicate_object_counter">object_counter</a>
             <a href="#predicate_pp">pp</a>
@@ -664,6 +672,31 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_cd">
+        <div class="doc_predicate_header">
+            [cd]<br />
+            [cd "path"] [cd : "path"]<br />
+            [cd *path] [cd : *path]<br />
+        </div>
+        <div class="doc_predicate_body">
+            Changes current working directory or retrieves it.
+            Without parameter it is an equivalent to [cd ".."].
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_copy">
+        <div class="doc_predicate_header">
+            [copy "from" "to"]
+        </div>
+        <div class="doc_predicate_body">
+            Copies a file.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_consult">
         <div class="doc_predicate_header">
             [consult "module_name"]
@@ -694,6 +727,52 @@
             All newly created atoms will be placed in this module.
             Typically it should be swapped with the "user!" module after completion
             by calling create_module without any parameters.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_edit">
+        <div class="doc_predicate_header">
+            [edit "file_name"]
+        </div>
+        <div class="doc_predicate_body">
+            Opens a file for editing.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_erase">
+        <div class="doc_predicate_header">
+            [erase "file-1" "file-2" .... "file-n"]<br />
+            [erase]
+        </div>
+        <div class="doc_predicate_body">
+            Deletes all specified files.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_erase_directory">
+        <div class="doc_predicate_header">
+            [erase_directory "folder-1" "folder-2" .... "folder-n"]<br />
+            [erase_directory]
+        </div>
+        <div class="doc_predicate_body">
+            Deletes all specified folders. It may not be able to delete folders, which are not empty.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_execute">
+        <div class="doc_predicate_header">
+            [execute "command"]
+        </div>
+        <div class="doc_predicate_body">
+            Executes system shell command.
         </div>
     </a>
 </div>
@@ -795,6 +874,29 @@
             <li>Content of a list is written as separate Prolog terms.</li><br />
             Without any parameters the writer closes the file and releases the machine clause binding.
             If anonymous symbol is garbage collected then the file is also closed (and machine binding released as well).
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_make_directory">
+        <div class="doc_predicate_header">
+            [make_directory "folder-1" "folder-2" .... "folder-n"]<br />
+            [make_directory]
+        </div>
+        <div class="doc_predicate_body">
+            Creates all specified folders.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_move">
+        <div class="doc_predicate_header">
+            [move "from" "to"]
+        </div>
+        <div class="doc_predicate_body">
+            Moves (or renames) a file.
         </div>
     </a>
 </div>
