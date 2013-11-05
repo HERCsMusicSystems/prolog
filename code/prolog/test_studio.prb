@@ -473,6 +473,40 @@
 [TestWorks "remove files" [erase "sonda/mariner.txt" "sonda/viking.txt"]]
 [TestWorks "erase empty directory" [erase_directory "sonda"]]
 
+[TestWorks "VARIABLE sonda" [VARIABLE sonda] [has_machine sonda]]
+[TestFails "VARIABLE sonda" [VARIABLE sonda]]
+[TestEq "sonda = " [] *x [sonda : *x]]
+[TestEq "sonda = *" 127 *x [sonda *] [sonda : *x]]
+[TestEq "sonda = " [1 2 3] *x [sonda [1 2 3]] [sonda : *x]]
+[TestWorks "[sonda]" [sonda]]
+[TestFails "has_machine sonda" [has_machine sonda]]
+
+[TestEq "VARIABLE sonda 127" 127 *x [VARIABLE sonda 127] [sonda : *x]]
+[TestWorks "[sonda]" [sonda]]
+[TestFails "has_machine sonda" [has_machine sonda]]
+
+[TestWorks "[var]" [var]]
+[TestWorks "create_atom viking voyager" [create_atom "viking"] [create_atom "voyager"]]
+[TestEq "var voyager [viking 127] * [* viking]" [[] 127 [] viking] [*a *b *c *d]
+	[var voyager [viking 127] *v1 [*v2 viking]]
+	[voyager : *a] [viking : *b] [*v1 : *c] [*v2 : *d]
+]
+[TestWorks "[voyager] [viking]" [voyager] [viking]]
+
+[create_atom "ee"]
+[TestWorks "CONSTANT ee 2.7182" [CONSTANT ee 2.7182]]
+[TestFails "ee *" [ee *x]]
+[TestEq "ee : *" 2.7182 *x [ee : *x]]
+[TestFails "CONSTANT ee" [CONSTANT ee 123]]
+[TestFails "[ee]" [ee]]
+
+[TestWorks "ACCUMULATOR sonda" [ACCUMULATOR sonda]]
+[TestFails "ACCUMULATOR sonda" [ACCUMULATOR sonda]]
+[TestEq "sonda 1 2 3" [3 2 1] *x [sonda 1] [sonda 2] [sonda 3] [sonda : *x]]
+[TestWorks "has_machine sonda" [has_machine sonda]]
+[TestWorks "[sonda]" [sonda]]
+[TestFails "has_machine sonda" [has_machine sonda]]
+
 [nl]
 
 [FailedTestSummary]

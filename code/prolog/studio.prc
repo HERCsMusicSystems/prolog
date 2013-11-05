@@ -28,7 +28,7 @@ program studio #machine := "prolog.studio"
 		res not eq rres ures lazy random_cl explode TRY ONE PROBE SELECT APPEND LENGTH REVERSE ONLIST INLIST NODUP MAP
 		sort divide
 		WHILE FOR FOREVER forever IF
-		CONSTANT VARIABLE ACCUMULATOR CLOSURE ARRAY var inc dec closure call BLOCK ALL ISALL isall isallr
+		CONSTANT VARIABLE ACCUMULATOR ARRAY var inc dec ALL ISALL isall isallr
 		rnd rnd_control grnd series
 		crack wait timeout enter signal semaphore msemaphore mutex accept select critical_section monitor task
 		background foreground OPEN_EDITOR open_editor close_editor
@@ -156,7 +156,6 @@ program studio #machine := "prolog.studio"
 #machine CONSTANT := "CONSTANT"
 #machine VARIABLE := "VARIABLE"
 #machine ACCUMULATOR := "ACCUMULATOR"
-#machine CLOSURE := "CLOSURE"
 #machine ARRAY := "ARRAY"
 
 #machine background := "background"
@@ -237,20 +236,6 @@ program studio #machine := "prolog.studio"
 [[inc *var *inc] [*var : *value] [add *value *inc *new] [*var *new]]
 [[dec *var] [*var : *value] [sub *value 1 *new] [*var *new]]
 [[dec *var *dec] [*var : *value] [sub *value *dec *new] [*var *new]]
-[[closure *atom *locals *parameters *term]
-	[MAP *locals *local *values]
-	[CLOSURE *atom : *values]
-	[*atom : *atoms]
-	[eq *local *atoms]
-	[*atom [*term : *parameters]]]
-[[call *atom : *parameters] [*atom *body : *parameters] : *body]
-[[BLOCK *declarations : *body]
-	[MAP *declarations *local *values]
-	[create_atom *closure]
-	[CLOSURE *closure : *values]
-	[*closure : *atoms]
-	[eq *local *atoms]
-	[TRY : *body]]
 [[ISALL *atom *template : *call]
 	[res : *call]
 	[*atom *template] fail]
@@ -340,7 +325,6 @@ program studio #machine := "prolog.studio"
 	[cl *x2 *y [[*a:*b]:*c]]]
 
 [[lambda *atom *parameters : *body] [create_atom *atom] [addcl [[*atom : *parameters] : *body]]]
-[[lambda *atom *parameters : *body] [addcl [[*atom : *parameters] : *body]]]
 
 [[delcl [[*a:*b]:*c]][cl *x [[*a:*b]:*c]][DELCL *x *a]]
 

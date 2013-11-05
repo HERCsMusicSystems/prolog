@@ -2398,66 +2398,6 @@ public:
 	}
 };
 
-class closure : public PrologNativeCode {
-public:
-	PrologDirectory * directory;
-	PrologElement * container;
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (container) {parameters -> duplicate (container); return true;}
-		else {
-			if (parameters -> isPair ()) {
-				container = parameters -> getLeft () -> duplicate ();
-				return true;
-			}
-		}
-		PrologAtom * atom = directory -> firstAtom;
-		parameters -> setEarth ();
-		while (atom != NULL) {
-			parameters -> setPair ();
-			parameters -> getLeft () -> setAtom (atom);
-			parameters = parameters -> getRight ();
-			parameters -> setEarth ();
-			atom = atom -> next;
-		}
-		return true;
-	}
-	void add_atom (PrologElement * parameters) {
-		if (! parameters -> isPair ()) return;
-		add_atom (parameters -> getRight ());
-		PrologAtom * atom = directory -> createAtom ("#<closed>");
-		atom -> setMachine (new variable (atom, parameters -> getLeft ()));
-	}
-	closure (PrologElement * parameters) {
-		directory = new PrologDirectory ("#<closure>", NULL);
-		add_atom (parameters);
-		container = NULL;
-	}
-	~ closure (void) {
-		if (container) delete container;
-		delete directory;
-	}
-};
-
-class CLOSURE : public PrologNativeCode {
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * ea = parameters -> getLeft ();
-		PrologAtom * atom = NULL;
-		if (ea -> isVar ()) {
-			atom = new PrologAtom ();
-			ea -> setAtom (atom);
-		} else {
-			if (! ea -> isAtom ()) return false;
-			atom = ea -> getAtom ();
-		}
-		closure * cl = new closure (parameters -> getRight ());
-		if (atom -> setMachine (cl)) return true;
-		delete cl;
-		return false;
-	}
-};
-
 typedef void * void_pointer;
 class array_dimension {
 public:
@@ -3224,7 +3164,6 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "CONSTANT") == 0) return new CONSTANT ();
 	if (strcmp (name, "VARIABLE") == 0) return new VARIABLE ();
 	if (strcmp (name, "ACCUMULATOR") == 0) return new ACCUMULATOR ();
-	if (strcmp (name, "CLOSURE") == 0) return new CLOSURE ();
 	if (strcmp (name, "ARRAY") == 0) return new ARRAY ();
 
 	if (strcmp (name, "background") == 0) return new bgcolour (root);
