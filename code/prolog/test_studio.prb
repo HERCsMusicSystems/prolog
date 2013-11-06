@@ -507,6 +507,24 @@
 [TestWorks "[sonda]" [sonda]]
 [TestFails "has_machine sonda" [has_machine sonda]]
 
+[TestEq "lambda" [[0 0] [1.5 -1.5] [3.0 -3.0]] [*a *b *c]
+	[var [*i 0] [*d 0]]
+	[lambda *u [[*x *y]] [*i : *x] [*d : *y] [inc *i] [inc *i 0.5] [dec *d] [dec *d 0.5]]
+	[*u *a] [*u *b] [*u *c]
+]
+
+[TestWorks "ARRAY sonda 2 3" [ARRAY sonda 2 3]]
+[TestFails "ARRAY sonda 2 3" [ARRAY sonda 2 3]]
+[TestWorks "setting values for array"
+	[sonda 0 0 1] [sonda 0 1 2] [sonda 0 2 3]
+	[sonda 1 0 4] [sonda 1 1 5] [sonda 1 2 6]
+]
+[TestEq "getting values from array" [1 2 3 4 5 6] [*a *b *c *d *e *f]
+	[sonda 0 0 : *a] [sonda 0 1 : *b] [sonda 0 2 : *c]
+	[sonda 1 0 : *d] [sonda 1 1 : *e] [sonda 1 2 : *f]
+]
+[TestWorks "[sonda]" [sonda]]
+
 [nl]
 
 [FailedTestSummary]

@@ -177,7 +177,17 @@
             <a href="#predicate_text_list">text_list</a>
         </li>
         <li><a href="#multithreading">Multi-threading</a></li>
-        <li><a href="#metalogical">Metalogical</a></li>
+        <li><a href="#metalogical">Metalogical</a>
+            <br />
+            <a href="#predicate_ACCUMULATOR">ACCUMULATOR</a>
+            <a href="#predicate_ARRAY">ARRAY</a>
+            <a href="#predicate_CONSTANT">CONSTANT</a>
+            <a href="#predicate_dec">dec</a>
+            <a href="#predicate_inc">inc</a>
+            <a href="#predicate_lambda">lambda</a>
+            <a href="#predicate_variable">variable</a>
+            <a href="#predicate_VARIABLE">VARIABLE</a>
+        </li>
     </ul>
     <li><a href="#conductor">conductor</a></li>
     <li><a href="#midi">midi</a></li>
@@ -1425,14 +1435,131 @@
     </a>
 </div>
 
-
-
-
-
-
 <div class="doc_library_section"><a id="multithreading">Multithreading Predicates</a></div>
 
 <div class="doc_library_section"><a id="metalogical">Metalogical Predicates</a></div>
+
+<div class="doc_predicate">
+    <a id="predicate_ACCUMULATOR">
+        <div class="doc_predicate_header">
+            [ACCUMULATOR accu]<br />
+            ==================<br />
+            [accu term] => adds term as head<br />
+            [accu : *term] => retrieves the current list<br />
+            [accu] => destroys the accumulator
+        </div>
+        <div class="doc_predicate_body">
+            Constructs an accumulator.
+            If accu is a variable then an anonymous atom is created.<br />
+            The accumulator is initially an empty list.
+            Every time a value is passed to the accumulator,
+            it is added as the head of the list.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_ARRAY">
+        <div class="doc_predicate_header">
+            [ARRAY array dimension-1 dimension-2 .... dimension-n]<br />
+            ==================<br />
+            [array index-1 index-2 .... index-n value] => set value<br />
+            [array index-1 index-2 .... index-n : *value] => get value<br />
+            [array] => destroys the array
+        </div>
+        <div class="doc_predicate_body">
+            Constructs a multi-dimensional array.
+            If array is a variable then an anonymous atom is created.<br />
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_CONSTANT">
+        <div class="doc_predicate_header">
+            [CONSTANT const value]<br />
+            ==================<br />
+            [const : *term] => retrieves the value
+        </div>
+        <div class="doc_predicate_body">
+            Constructs a constant.
+            If const is a variable then an anonymous atom is created.<br />
+            Once created the constant can not be destroyed.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_dec">
+        <div class="doc_predicate_header">
+            [dec variable]<br />
+            [dec variable decrement]
+        </div>
+        <div class="doc_predicate_body">
+            Decrements variable by decrement.
+            If the decrement is not specified the decrements by one.
+            The variable is expected to be constructed using the VARIABLE predicate.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_inc">
+        <div class="doc_predicate_header">
+            [inc variable]<br />
+            [inc variable increment]
+        </div>
+        <div class="doc_predicate_body">
+            Increments variable by increment.
+            If the increment is not specified the increments by one.
+            The variable is expected to be constructed using the VARIABLE predicate.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_lambda">
+        <div class="doc_predicate_header">
+            [lambda atom [parameters....] [call-1....] [call-2....] ....]
+        </div>
+        <div class="doc_predicate_body">
+            Constructs a clause and attaches it to atom.
+            If atom is a variable then a new anonymous atom is constructed.
+            It is possible to use lambda multiple times with the same atom.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_variable">
+        <div class="doc_predicate_header">
+            [var v1 v2 .... vn]<br />
+            [var [v1 value] [v2 value] .... [vn value]]<br />
+            [var v1 [v2 value] v3 .... etc.]<br />
+            [var]
+        </div>
+        <div class="doc_predicate_body">
+            Creates variables.
+            If variable name is not an atom then a new anonymous atom is constructed.
+            Each variable is initialised with a value.
+            If no value is specified then it will be initialised with [].
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_VARIABLE">
+        <div class="doc_predicate_header">
+            [VARIABLE atom value]<br />
+            [VARIABLE atom]
+        </div>
+        <div class="doc_predicate_body">
+            Creates a variable.
+            If initial value is not specified then it will be initialised with [].
+            If atom is a variable then a new anonymous atom is constructed.
+        </div>
+    </a>
+</div>
 
 <div class="doc_library"><a id="conductor">LIBRARY: <b>conductor</b></a></div>
 
