@@ -2562,18 +2562,31 @@ class rnd : public PrologNativeCode {
 public:
 	PrologNoise * n;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) {parameters -> setInteger (n -> get ()); return true;}
-		PrologElement * result = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isEarth ()) {result -> setInteger (n -> get ()); return true;}
+		if (parameters -> isVar ()) {parameters -> setInteger (n -> get ()); return true;}
 		if (! parameters -> isPair ()) return false;
-		PrologElement * min = parameters -> getLeft ();
-		if (! min -> isInteger ()) return false;
+		PrologElement * a = parameters -> getLeft ();
 		parameters = parameters -> getRight ();
-		PrologElement * max = parameters -> getLeft ();
-		if (! max -> isInteger ()) return false;
-		result -> setInteger (n -> get (min -> getInteger (), max -> getInteger ()));
-		return true;
+		if (parameters -> isEarth ()) {a -> setInteger (n -> get ()); return true;}
+		if (! parameters -> isPair ()) return false;
+		PrologElement * b = parameters -> getLeft ();
+		PrologElement * c = parameters -> getRight ();
+		if (c -> isPair ()) c = c -> getLeft ();
+		if (a -> isInteger ()) {
+			if (b -> isInteger ()) {
+				c -> setInteger (n -> get (a -> getInteger (), b -> getInteger ()));
+				return true;
+			} else if (c -> isInteger ()) {
+				b -> setInteger (n -> get (a -> getInteger (), c -> getInteger ()));
+				return true;
+			} else return false;
+		}
+		if (b -> isInteger ()) {
+			if (c -> isInteger ()) {
+				a -> setInteger (n -> get (b -> getInteger (), c -> getInteger ()));
+				return true;
+			}
+		}
+		return false;
 	}
 	rnd (PrologNoise * n) {this -> n = n;}
 };
@@ -2586,32 +2599,29 @@ public:
 		// rnd_control [a c]
 		// rnd_control [out a c]
 		// rnd_control [out bits a c]
-		if (! parameters -> isPair ()) return false;
-		PrologElement * first_parameter = parameters -> getLeft ();
-		if (! first_parameter -> isInteger ()) return false;
-		parameters = parameters -> getRight ();
-		if (parameters -> isEarth ()) {n -> control (first_parameter -> getInteger ()); return true;}
-		if (! parameters -> isPair ()) return false;
-		PrologElement * second_parameter = parameters -> getLeft ();
-		if (! second_parameter -> isInteger ()) return false;
-		parameters = parameters -> getRight ();
-		if (parameters -> isEarth ()) {n -> control (first_parameter -> getInteger (), second_parameter -> getInteger ()); return true;}
-		if (! parameters -> isPair ()) return false;
-		PrologElement * third_parameter = parameters -> getLeft ();
-		if (! third_parameter -> isInteger ()) return false;
-		parameters = parameters -> getRight ();
-		if (parameters -> isEarth ()) {
-			n -> control (first_parameter -> getInteger ());
-			n -> control (second_parameter -> getInteger (), third_parameter -> getInteger ());
-			return true;
+		int vector [4];
+		int vector_counter = 0;
+		while (parameters -> isPair ()) {
+			if (vector_counter > 3) return false;
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isInteger ()) vector [vector_counter++] = el -> getInteger ();
+			else if (el -> isDouble ()) vector [vector_counter++] = (int) el -> getDouble ();
+			else return false;
+			parameters = parameters -> getRight ();
 		}
-		if (! parameters -> isPair ()) return false;
-		PrologElement * fourth_parameter = parameters -> getLeft ();
-		if (! fourth_parameter -> isInteger ()) return false;
-		n -> resolution (second_parameter -> getInteger ());
-		n -> control (first_parameter -> getInteger ());
-		n -> control (third_parameter -> getInteger (), fourth_parameter -> getInteger ());
-		return true;
+		switch (vector_counter) {
+		case 1: n -> control (vector [0]); return true; break;
+		case 2: n -> control (vector [0], vector [1]); return true; break;
+		case 3: n -> control (vector [0]); n -> control (vector [1], vector [2]); return true; break;
+		case 4:
+			n -> resolution (vector [1]);
+			n -> control (vector [0]);
+			n -> control (vector [2], vector [3]);
+			return true;
+			break;
+		default: return false; break;
+		}
+		return false;
 	}
 	rnd_control (PrologNoise * n) {this -> n = n;}
 };
