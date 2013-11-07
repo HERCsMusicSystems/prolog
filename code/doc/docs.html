@@ -95,6 +95,7 @@
             <a href="#predicate_exp">exp</a>
             <a href="#predicate_greater">greater</a>
             <a href="#predicate_greater_eq">greater_eq</a>
+            <a href="#predicate_grnd">grnd</a>
             <a href="#predicate_less">less</a>
             <a href="#predicate_less_eq">less_eq</a>
             <a href="#predicate_log2">log2</a>
@@ -107,6 +108,8 @@
             <a href="#predicate_or">or</a>
             <a href="#predicate_pi">pi</a>
             <a href="#predicate_pow">pow</a>
+            <a href="#predicate_rnd">rnd</a>
+            <a href="#predicate_rnd_control">rnd_control</a>
             <a href="#predicate_sin">sin</a>
             <a href="#predicate_sub">sub</a>
             <a href="#predicate_sum">sum</a>
@@ -337,7 +340,7 @@
             [greater arg-1 arg-2 .... arg-n]
         </div>
         <div class="doc_predicate_body">
-            Checks if the arguments are ordered in ascending order without duplicates.
+            Checks if the arguments are ordered in descending order without duplicates.
             Arguments are expected to be integers, doubles, texts or atoms.
             Numbers are compared on their value.
             Texts and atoms are compared on their alphabetical precedence.
@@ -349,7 +352,7 @@
 <div class="doc_predicate">
     <a id="predicate_greater_eq">
         <div class="doc_predicate_header">
-            [greater arg-1 arg-2 .... arg-n]
+            [greater_eq arg-1 arg-2 .... arg-n]
         </div>
         <div class="doc_predicate_body">
             Checks if the arguments are ordered in ascending order.
@@ -363,12 +366,24 @@
 </div>
 
 <div class="doc_predicate">
-    <a id="predicate_less">
+    <a id="predicate_grnd">
         <div class="doc_predicate_header">
-            [greater arg-1 arg-2 .... arg-n]
+            [grnd : *parameters]
         </div>
         <div class="doc_predicate_body">
-            Checks if the arguments are ordered in descending order without duplicates.
+            Calculates random number indentically as <a href="#predicate_rnd">rnd</a>
+            except it re-generates another value when backtracking.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_less">
+        <div class="doc_predicate_header">
+            [less arg-1 arg-2 .... arg-n]
+        </div>
+        <div class="doc_predicate_body">
+            Checks if the arguments are ordered in ascending order without duplicates.
             Arguments are expected to be integers, doubles, texts or atoms.
             Numbers are compared on their value.
             Texts and atoms are compared on their alphabetical precedence.
@@ -380,10 +395,10 @@
 <div class="doc_predicate">
     <a id="predicate_less_eq">
         <div class="doc_predicate_header">
-            [greater arg-1 arg-2 .... arg-n]
+            [less_eq arg-1 arg-2 .... arg-n]
         </div>
         <div class="doc_predicate_body">
-            Checks if the arguments are ordered in descending order.
+            Checks if the arguments are ordered in ascending order.
             Duplicates are permitted.
             Arguments are expected to be integers, doubles, texts or atoms.
             Numbers are compared on their value.
@@ -549,6 +564,42 @@
             It can also be used as a test.
             Fails if x <= 0 or a = 1.
             Can be used for tests.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_rnd">
+        <div class="doc_predicate_header">
+            [rnd *rnd] [rnd : *rnd]<br />
+            [rnd *rnd min max] [rnd *rnd min : max]<br />
+            [rnd min *rnd max] [rnd min *rnd : max]<br />
+            [rnd min max *rnd] [rnd min max : *rnd]
+        </div>
+        <div class="doc_predicate_body">
+            Calculates pseudo-random number.
+            The min and max values can be either integer or double.
+            The relationship is: min <= *rnd < max.
+            The default resolution (without min and max) is 24 bits.
+            Consequently the unrestricted result can range from 0 to 16,777,215.
+            To impose other restrictions use rnd_control.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_rnd_control">
+        <div class="doc_predicate_header">
+            [rnd_control out]<br />
+            [rnd_control a c]<br />
+            [rnd_control out a c]<br />
+            [rnd_control out resolution_shift a c]
+        </div>
+        <div class="doc_predicate_body">
+            Controls the pseudo-random number generator.
+            It works in accordance with the following formula:<br />
+            &emsp;&emsp;&emsp;mask = (1 << resolution) - 1;<br />
+            &emsp;&emsp;&emsp;rnd = (rnd * a + c) % mask;<br />
         </div>
     </a>
 </div>
