@@ -110,6 +110,7 @@
             <a href="#predicate_pow">pow</a>
             <a href="#predicate_rnd">rnd</a>
             <a href="#predicate_rnd_control">rnd_control</a>
+            <a href="#predicate_series">series</a>
             <a href="#predicate_sin">sin</a>
             <a href="#predicate_sub">sub</a>
             <a href="#predicate_sum">sum</a>
@@ -150,7 +151,6 @@
             <a href="#predicate_remove_module">remove_module</a>
             <a href="#predicate_search_directories">search_directories</a>
             <a href="#predicate_set_machine">set_machine</a>
-            <a href="#predicate_timestamp">timestamp</a>
             <a href="#predicate_write">write</a>
             <a href="#predicate_set_captions">set_...._captions</a>
         </li>
@@ -179,7 +179,13 @@
             <a href="#predicate_is_var">is_var</a>
             <a href="#predicate_text_list">text_list</a>
         </li>
-        <li><a href="#multithreading">Multi-threading</a></li>
+        <li><a href="#multithreading">Multi-threading</a>
+            <br />
+            <a href="#predicate_crack">crack</a>
+            <a href="#predicate_timeout">timeout</a>
+            <a href="#predicate_timestamp">timestamp</a>
+            <a href="#predicate_wait">wait</a>
+        </li>
         <li><a href="#metalogical">Metalogical</a>
             <br />
             <a href="#predicate_ACCUMULATOR">ACCUMULATOR</a>
@@ -600,6 +606,26 @@
             It works in accordance with the following formula:<br />
             &emsp;&emsp;&emsp;mask = (1 << resolution) - 1;<br />
             &emsp;&emsp;&emsp;rnd = (rnd * a + c) % mask;<br />
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_series">
+        <div class="doc_predicate_header">
+            [series [e-1 e-2 .... e-n] *permutation]<br />
+            [series [e-1 e-2 .... e-n] : *permutation]<br />
+            [series [] *perumation] [series [] : *permutation]<br />
+            [series from length step *permutation]<br />
+            [series from lengt step : *permutation]
+        </div>
+        <div class="doc_predicate_body">
+            Creates a permutation of a list
+            or a randomly ordered series of numbers.
+            The <b>length</b> parameter must be integer.
+            Both <b>from</b> and <b>step</b> can be either integer or double.
+            If either <b>from</b> or <b>step</b> is double then the result will contain
+            double values.
         </div>
     </a>
 </div>
@@ -1143,20 +1169,6 @@
 </div>
 
 <div class="doc_predicate">
-    <a id="predicate_timestamp">
-        <div class="doc_predicate_header">
-            [timestamp stamp year month day dayOfYear dayOfWeek hour minute second]<br />
-            [timestamp stamp : *]
-        </div>
-        <div class="doc_predicate_body">
-            Converts from timestamp to date-time and from date-time to timestamp.
-            If partial information is provided (no timestamp, no year, no hour, etc.)
-            then it will be filled with current time values.
-        </div>
-    </a>
-</div>
-
-<div class="doc_predicate">
     <a id="predicate_write">
         <div class="doc_predicate_header">
             [write : *parameters]
@@ -1487,6 +1499,70 @@
 </div>
 
 <div class="doc_library_section"><a id="multithreading">Multithreading Predicates</a></div>
+
+<div class="doc_predicate">
+    <a id="predicate_crack">
+        <div class="doc_predicate_header">
+            [crack : commands]<br />
+            [crack]
+        </div>
+        <div class="doc_predicate_body">
+            Starts a new thread using <b>commands</b>.
+            In other words: splits (or cracks) the current thread into two.
+            If no commands are specified then nothing will happen.
+            In particular, a new thread (with empty instructions) will not be created.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_timeout">
+        <div class="doc_predicate_header">
+            [timeout miliseconds]<br />
+            [timeout miliseconds : commands]<br />
+            [timeout]<br />
+            [timeout : commands]<br />
+            [timeout []]
+        </div>
+        <div class="doc_predicate_body">
+            Stops current thread after specified amount of <b>miliseconds</b> and perform a series of <b>commands</b>.
+            The <b>commands</b> may not be specified.
+            If no <b>milliseconds</b> are provided then the thread stops immediately (and commands are performed if specified).
+            Empty list in place of <b>milliseconds</b> cancels the timeout.<br />
+            <b>Note:</b> every subsequent call to timeout cancels the possible effecto for the previous calls.<br />
+            <b>Note:</b> if called from the main thread, then it stops the program (immediately if no timeout specified).
+            In this case other threads may crash.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_timestamp">
+        <div class="doc_predicate_header">
+            [timestamp stamp year month day dayOfYear dayOfWeek hour minute second]<br />
+            [timestamp stamp : *]
+        </div>
+        <div class="doc_predicate_body">
+            Converts from timestamp to date-time and from date-time to timestamp.
+            If partial information is provided (no timestamp, no year, no hour, etc.)
+            then it will be filled with current time values.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_wait">
+        <div class="doc_predicate_header">
+            [wait milliseconds]<br />
+            [wait *current_time]<br />
+            [wait : *current_time]
+        </div>
+        <div class="doc_predicate_body">
+            Waits specified number of milliseconds
+            or return the current system time.
+        </div>
+    </a>
+</div>
 
 <div class="doc_library_section"><a id="metalogical">Metalogical Predicates</a></div>
 

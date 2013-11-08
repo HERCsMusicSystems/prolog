@@ -556,6 +556,13 @@
 [TestEq "rnd *" 0 *x [rnd *x]]
 [TestEq "rnd *" 1 *x [rnd *x]]
 
+[TestEq "series integer *" [129 133 131 127] *x [series 127 4 2 *x]]
+[TestEq "series double : *" [127.75 127.5 127.0 127.25] *x [series 127 4 0.25 : *x]]
+[TestEq "series atoms *" [mariner voyager viking sonda] *x [series [sonda mariner viking voyager] *x]]
+[TestEq "series atoms : *" [voyager viking sonda mariner] *x [series [sonda mariner viking voyager] : *x]]
+[create_atom "soyuz"]
+[TestEq "series variable" [mariner soyuz voyager viking sonda] *x [eq *y [*a *b *c *d *e]] [series *y *x] [show [*x *y]] [eq *y [sonda mariner viking voyager soyuz]]]
+
 [nl]
 
 [FailedTestSummary]
