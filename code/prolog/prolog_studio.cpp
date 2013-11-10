@@ -2922,7 +2922,7 @@ public:
 		if (! parameters -> isPair ()) return false;
 		PrologElement * ae = parameters -> getLeft ();
 		PrologAtom * atom = 0;
-		if (ae -> isVar ()) {atom = new PrologAtom (); ae -> setAtom (new PrologAtom ());}
+		if (ae -> isVar ()) {ae -> setAtom (atom = new PrologAtom ());}
 		else {if (! ae -> isAtom ()) return false; atom = ae -> getAtom ();}
 		PrologMutex * mutex = new PrologMutex (atom, waitAtom, enterAtom, signalAtom);
 		if (atom -> setMachine (mutex)) return true;
