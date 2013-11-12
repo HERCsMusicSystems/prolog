@@ -797,7 +797,7 @@ public:
 	}
 };
 
-class increment : public PrologNativeCode {
+class add1 : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
@@ -810,7 +810,7 @@ public:
 	}
 };
 
-class decrement : public PrologNativeCode {
+class sub1 : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
@@ -3104,8 +3104,8 @@ void PrologStudio :: init (PrologRoot * root) {
 }
 
 PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
-	if (strcmp (name, "inc") == 0) return new increment ();
-	if (strcmp (name, "dec") == 0) return new decrement ();
+	if (strcmp (name, "add1") == 0) return new add1 ();
+	if (strcmp (name, "sub1") == 0) return new sub1 ();
 	if (strcmp (name, "sum") == 0) return new sum ();
 	if (strcmp (name, "add") == 0) return new add ();
 	if (strcmp (name, "sub") == 0) return new sub ();

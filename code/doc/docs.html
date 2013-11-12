@@ -87,6 +87,7 @@
             <br />
             <a href="#predicate_abs">abs</a>
             <a href="#predicate_add">add</a>
+            <a href="#predicate_add1">add1</a>
             <a href="#predicate_and">and</a>
             <a href="#predicate_cos">cos</a>
             <a href="#predicate_degrad">degrad</a>
@@ -113,6 +114,7 @@
             <a href="#predicate_series">series</a>
             <a href="#predicate_sin">sin</a>
             <a href="#predicate_sub">sub</a>
+            <a href="#predicate_sub1">sub1</a>
             <a href="#predicate_sum">sum</a>
             <a href="#predicate_times">times</a>
             <a href="#predicate_trunc">trunc</a>
@@ -205,6 +207,7 @@
             <a href="#predicate_eq">eq</a>
             <a href="#predicate_inc">inc</a>
             <a href="#predicate_lambda">lambda</a>
+            <a href="#predicate_not">not</a>
             <a href="#predicate_variable">variable</a>
             <a href="#predicate_VARIABLE">VARIABLE</a>
         </li>
@@ -251,6 +254,18 @@
             If one of the arguments is double and all others are numbers then the result is double as well.
             If one of the arguments is text or symbol then the result is text.
             Can NOT be used for tests.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_add1">
+        <div class="doc_predicate_header">
+            [add1 x y]<br />
+            [add1 x : y]
+        </div>
+        <div class="doc_predicate_body">
+            Adds 1 or 1.0 to x depending on the type of x. Can be used as a test.
         </div>
     </a>
 </div>
@@ -666,14 +681,29 @@
     <a id="predicate_sub">
         <div class="doc_predicate_header">
             [sub a b *x]<br />
-            [sub a b : *x]
+            [sub a b : *x]<br />
+            [sub a -a]<br />
+            [sub a : -a]
         </div>
         <div class="doc_predicate_body">
             Subtraction: *x = a - b.<br />
             The arguments can be either integer or double.
             If both arguments are integers then the result is integer as well.
             Otherwise the result is double.
+            If only two parameters are passed then it changes the sign.
             Can be used for tests.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_sub1">
+        <div class="doc_predicate_header">
+            [sub1 x y]<br />
+            [sub1 x : y]
+        </div>
+        <div class="doc_predicate_body">
+            Subtracts 1 or 1.0 from x depending on the type of x. Can be used as a test.
         </div>
     </a>
 </div>
@@ -1838,6 +1868,23 @@
             Constructs a clause and attaches it to atom.
             If atom is a variable then a new anonymous atom is constructed.
             It is possible to use lambda multiple times with the same atom.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_not">
+        <div class="doc_predicate_header">
+            [not : *command]
+        </div>
+        <div class="doc_predicate_body">
+            Reverses the result of calculation.
+            Does not instantiate variables if succeeds.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[not : *x] *x / fail]<br />
+            [[not : *x]]
         </div>
     </a>
 </div>

@@ -115,15 +115,19 @@
 [TestWorks "e32 cafebabe 0xbe 0xba 0xfe 0xca" [e32 -889275714 0xbe 0xba 0xfe 0xca]]
 [TestFails "e32 cafebabe 0xbe 0xba 0xfe 0xce" [e32 -889275714 0xbe 0xba 0xfe 0xce]]
 
-[TestEq "++ 127 *" 128 *x [++ 127 *x]]
-[TestEq "++ 127 : *" 128 *x [++ 127 : *x]]
-[TestEq "++ 127.5 *" 128.5 *x [++ 127.5 *x]]
-[TestEq "++ 127.5 : *" 128.5 *x [++ 127.5 : *x]]
+[TestEq "add1 127 *" 128 *x [add1 127 *x]]
+[TestEq "add1 127 : *" 128 *x [add1 127 : *x]]
+[TestEq "add1 127.5 *" 128.5 *x [add1 127.5 *x]]
+[TestEq "add1 127.5 : *" 128.5 *x [add1 127.5 : *x]]
+[TestWorks "add1 127.0 128.0" [add1 127.0 128.0]]
+[TestFails "add1 127 : 127" [add1 127 : 127]]
 
-[TestEq "-- 127 *" 126 *x [-- 127 *x]]
-[TestEq "-- 127 : *" 126 *x [-- 127 : *x]]
-[TestEq "-- 127.5 *" 126.5 *x [-- 127.5 *x]]
-[TestEq "-- 127.5 : *" 126.5 *x [-- 127.5 : *x]]
+[TestEq "sub1 127 *" 126 *x [sub1 127 *x]]
+[TestEq "sub1 127 : *" 126 *x [sub1 127 : *x]]
+[TestEq "sub1 127.5 *" 126.5 *x [sub1 127.5 *x]]
+[TestEq "sub1 127.5 : *" 126.5 *x [sub1 127.5 : *x]]
+[TestWorks "sub1 127.5 : 126.5" [sub1 127.5 : 126.5]]
+[TestFails "sub1 127 127" [sub1 127 127]]
 
 [TestEq "sum [1 2 *]" 3 *x [sum 1 2 *x]]
 [TestEq "sum [1 2.0 : *]" 3.0 *x [sum 1 2.0 : *x]]
@@ -199,6 +203,10 @@
 [TestEq "sub 7.0 3.0 *" 4.0 *x [sub 7.0 3.0 *x]]
 [TestWorks "sub 5 4 1" [sub 5 4 1]]
 [TestFails "sub 5 4 3" [sub 5 4 3]]
+[TestEq "sub 4 *" -4 *x [sub 4 *x]]
+[TestEq "sub -6.25 : *" 6.25 *x [sub -6.25 : *x]]
+[TestWorks "sub 5.25 -5.25" [sub 5.25 -5.25]]
+[TestFails "sub 5.0 : -5" [sub 5.0 -5]]
 
 [TestEq "mult * 4 2" 8 *x [mult *x 4 2]]
 [TestEq "mult * 4 2 3.0" 24.0 *x [mult *x 4 2 3.0]]
@@ -576,7 +584,7 @@
 [TestEq "multithreaded accumulator" [3 2 1] *y
 	[ACCUMULATOR *x]
 	[crack [wait 10] [*x 2]]
-	[*x 1] [wait 20] [*x 3]
+	[*x 1] [wait 20] [*x 3] [wait 10]
 	[*x : *y]
 ]
 
@@ -584,7 +592,7 @@
 	[ACCUMULATOR *x]
 	[mutex *m]
 	[crack [wait 10] [*m wait] [*x 2] [*m signal]]
-	[*m wait] [*x 1] [wait 20] [*x 3] [*m signal]
+	[*m wait] [*x 1] [wait 20] [*x 3] [*m signal] [wait 10]
 	[*x : *y]
 ]
 
@@ -592,7 +600,7 @@
 	[ACCUMULATOR *x]
 	[mutex *m]
 	[crack [wait 10] [*m enter] [*x 2] [*m signal]]
-	[*m enter] [*x 1] [wait 20] [*x 3] [*m signal]
+	[*m enter] [*x 1] [wait 20] [*x 3] [*m signal] [wait 10]
 	[*x : *y]
 ]
 
@@ -600,7 +608,7 @@
 	[ACCUMULATOR *x]
 	[semaphore *m]
 	[crack [wait 10] [*m wait] [*x 2] [*m signal]]
-	[*m wait] [*x 1] [wait 20] [*x 3] [*m signal]
+	[*m wait] [*x 1] [wait 20] [*x 3] [*m signal] [wait 10]
 	[*x : *y]
 ]
 
@@ -608,7 +616,7 @@
 	[ACCUMULATOR *x]
 	[semaphore *m 2]
 	[crack [wait 10] [*m wait] [*x 2] [*m signal]]
-	[*m wait] [*x 1] [wait 20] [*x 3] [*m signal]
+	[*m wait] [*x 1] [wait 20] [*x 3] [*m signal] [wait 10]
 	[*x : *y]
 ]
 
@@ -616,7 +624,7 @@
 	[ACCUMULATOR *x]
 	[semaphore *m 2] [*m wait]
 	[crack [wait 10] [*m wait] [*x 2] [*m signal]]
-	[*m wait] [*x 1] [wait 20] [*x 3] [*m signal]
+	[*m wait] [*x 1] [wait 20] [*x 3] [*m signal] [wait 10]
 	[*x : *y]
 ]
 
@@ -624,7 +632,7 @@
 	[ACCUMULATOR *x]
 	[semaphore *m]
 	[crack [wait 10] [*m enter] [*x 2] [*m signal]]
-	[*m enter] [*x 1] [wait 20] [*x 3] [*m signal]
+	[*m enter] [*x 1] [wait 20] [*x 3] [*m signal] [wait 10]
 	[*x : *y]
 ]
 
@@ -632,7 +640,7 @@
 	[ACCUMULATOR *x]
 	[msemaphore *m]
 	[crack [wait 10] [*m wait] [*x 2] [*m signal]]
-	[*m wait] [*x 1] [wait 20] [*x 3] [*m signal]
+	[*m wait] [*x 1] [wait 20] [*x 3] [*m signal] [wait 10]
 	[*x : *y]
 ]
 
@@ -640,7 +648,7 @@
 	[ACCUMULATOR *x]
 	[msemaphore *m 2]
 	[crack [wait 10] [*m wait] [*x 2] [*m signal]]
-	[*m wait] [*x 1] [wait 20] [*x 3] [*m signal]
+	[*m wait] [*x 1] [wait 20] [*x 3] [*m signal] [wait 10]
 	[*x : *y]
 ]
 
@@ -648,7 +656,7 @@
 	[ACCUMULATOR *x]
 	[msemaphore *m 2] [*m wait]
 	[crack [wait 10] [*m wait] [*x 2] [*m signal]]
-	[*m wait] [*x 1] [wait 20] [*x 3] [*m signal]
+	[*m wait] [*x 1] [wait 20] [*x 3] [*m signal] [wait 10]
 	[*x : *y]
 ]
 
@@ -656,7 +664,7 @@
 	[ACCUMULATOR *x]
 	[msemaphore *m]
 	[crack [wait 10] [*m enter] [*x 2] [*m signal]]
-	[*m enter] [*x 1] [wait 20] [*x 3] [*m signal]
+	[*m enter] [*x 1] [wait 20] [*x 3] [*m signal] [wait 10]
 	[*x : *y]
 ]
 
