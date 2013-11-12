@@ -797,6 +797,32 @@ public:
 	}
 };
 
+class increment : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * e = parameters -> getLeft ();
+		parameters = parameters -> getRight ();
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (e -> isInteger ()) {parameters -> setInteger (e -> getInteger () + 1); return true;}
+		if (e -> isDouble ()) {parameters -> setDouble (e -> getDouble () + 1.0); return true;}
+		return false;
+	}
+};
+
+class decrement : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * e = parameters -> getLeft ();
+		parameters = parameters -> getRight ();
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (e -> isInteger ()) {parameters -> setInteger (e -> getInteger () - 1); return true;}
+		if (e -> isDouble ()) {parameters -> setDouble (e -> getDouble () - 1.0); return true;}
+		return false;
+	}
+};
+
 class sum : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -1126,9 +1152,18 @@ public:
 		if (! parameters -> isPair ()) return false;
 		PrologElement * e1 = parameters -> getLeft ();
 		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
+		if (! parameters -> isPair ()) {
+			if (e1 -> isInteger ()) {parameters -> setInteger (- e1 -> getInteger ()); return true;}
+			if (e1 -> isDouble ()) {parameters -> setDouble (- e1 -> getDouble ()); return true;}
+			return false;
+		}
 		PrologElement * e2 = parameters -> getLeft ();
 		parameters = parameters -> getRight ();
+		if (parameters -> isEarth ()) {
+			if (e1 -> isInteger ()) {e2 -> setInteger (- e1 -> getInteger ()); return true;}
+			if (e1 -> isDouble ()) {e2 -> setDouble (- e1 -> getDouble ()); return true;}
+			return false;
+		}
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
 		if (e1 -> isInteger ()) {
 			if (e2 -> isInteger ()) {
@@ -3069,6 +3104,8 @@ void PrologStudio :: init (PrologRoot * root) {
 }
 
 PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
+	if (strcmp (name, "inc") == 0) return new increment ();
+	if (strcmp (name, "dec") == 0) return new decrement ();
 	if (strcmp (name, "sum") == 0) return new sum ();
 	if (strcmp (name, "add") == 0) return new add ();
 	if (strcmp (name, "sub") == 0) return new sub ();

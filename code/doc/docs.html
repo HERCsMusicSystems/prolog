@@ -122,7 +122,9 @@
             <br />
             <a href="#predicate_add_search_directory">add_search_directory</a>
             <a href="#predicate_ARGS">ARGS</a>
+            <a href="#predicate_background">background</a>
             <a href="#predicate_cd">cd</a>
+            <a href="#predicate_close_editor">close_editor</a>
             <a href="#predicate_consult">consult</a>
             <a href="#predicate_copy">copy</a>
             <a href="#predicate_create_module">create_module</a>
@@ -130,6 +132,8 @@
             <a href="#predicate_erase">erase</a>
             <a href="#predicate_erase_directory">erase_directory</a>
             <a href="#predicate_execute">execute</a>
+            <a href="#predicate_foreground">foreground</a>
+            <a href="#predicate_get_volume_serial_number">get_volume_serial_number</a>
             <a href="#predicate_import">import</a>
             <a href="#predicate_list">list</a>
             <a href="#predicate_load">load</a>
@@ -139,6 +143,7 @@
             <a href="#predicate_move">move</a>
             <a href="#predicate_nl">nl</a>
             <a href="#predicate_object_counter">object_counter</a>
+            <a href="#predicate_open_editor">open_editor</a>
             <a href="#predicate_pp">pp</a>
             <a href="#predicate_pr">pr</a>
             <a href="#predicate_preprocessor">preprocessor</a>
@@ -149,7 +154,9 @@
             <a href="#predicate_readln">readln</a>
             <a href="#predicate_reload">reload</a>
             <a href="#predicate_remove_module">remove_module</a>
+            <a href="#predicate_screen_coordinates">screen_coordinates</a>
             <a href="#predicate_search_directories">search_directories</a>
+            <a href="#predicate_security_check">security_check</a>
             <a href="#predicate_set_machine">set_machine</a>
             <a href="#predicate_write">write</a>
             <a href="#predicate_set_captions">set_...._captions</a>
@@ -195,6 +202,7 @@
             <a href="#predicate_ARRAY">ARRAY</a>
             <a href="#predicate_CONSTANT">CONSTANT</a>
             <a href="#predicate_dec">dec</a>
+            <a href="#predicate_eq">eq</a>
             <a href="#predicate_inc">inc</a>
             <a href="#predicate_lambda">lambda</a>
             <a href="#predicate_variable">variable</a>
@@ -762,6 +770,19 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_background">
+        <div class="doc_predicate_header">
+            [background bgcolour]<br />
+            [background : bgcolour]
+        </div>
+        <div class="doc_predicate_body">
+            Sets or retrieves the current background colour of the console.
+            The parameter should be either integer or variable.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_cd">
         <div class="doc_predicate_header">
             [cd]<br />
@@ -771,6 +792,20 @@
         <div class="doc_predicate_body">
             Changes current working directory or retrieves it.
             Without parameter it is an equivalent to [cd ".."].
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_close_editor">
+        <div class="doc_predicate_header">
+            [close_editor]<br />
+            [close_editor x]<br />
+            [close_editor x y]
+        </div>
+        <div class="doc_predicate_body">
+            Closes the editor on embedded systems.
+            The meaning of the optional parameters depends on the embedded system..
         </div>
     </a>
 </div>
@@ -863,6 +898,30 @@
         </div>
         <div class="doc_predicate_body">
             Executes system shell command.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_foreground">
+        <div class="doc_predicate_header">
+            [foreground fgcolour]<br />
+            [foreground : fgcolour]
+        </div>
+        <div class="doc_predicate_body">
+            Sets or retrieves the current pen (or foreground) colour of the console.
+            The parameter should be either integer or variable.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_get_volume_serial_number">
+        <div class="doc_predicate_header">
+            [get_volume_serial_number *text]
+        </div>
+        <div class="doc_predicate_body">
+            Retrieves serial number of embedded platform (if exist).
         </div>
     </a>
 </div>
@@ -1015,6 +1074,20 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_open_editor">
+        <div class="doc_predicate_header">
+            [open_editor]<br />
+            [open_editor x]<br />
+            [open_editor x y]
+        </div>
+        <div class="doc_predicate_body">
+            Opens the editor on embedded systems.
+            The meaning of the optional parameters depends on the embedded system..
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_pp">
         <div class="doc_predicate_header">
             [pp : *parameters]
@@ -1141,6 +1214,18 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_screen_coordinates">
+        <div class="doc_predicate_header">
+            [screen_coordinates x y]
+        </div>
+        <div class="doc_predicate_body">
+            Controls the screen coordinates of the editor on embedded system.
+            The exact behaviour depends on the embedded system.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_search_directories">
         <div class="doc_predicate_header">
             [search_directories] => display<br />
@@ -1151,6 +1236,17 @@
         <div class="doc_predicate_body">
             Retrieves the collection of search paths.
             It can also reset it or set it.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_security_check">
+        <div class="doc_predicate_header">
+            [security_check]
+        </div>
+        <div class="doc_predicate_body">
+            On embedded platforms checks if serial number and security key match.
         </div>
     </a>
 </div>
@@ -1700,6 +1796,21 @@
             Decrements variable by decrement.
             If the decrement is not specified the decrements by one.
             The variable is expected to be constructed using the VARIABLE predicate.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_eq">
+        <div class="doc_predicate_header">
+            [eq *x *y]
+        </div>
+        <div class="doc_predicate_body">
+            Checks if the two parameters are equal and assigns them to each other.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[eq *x *x]]
         </div>
     </a>
 </div>

@@ -115,6 +115,16 @@
 [TestWorks "e32 cafebabe 0xbe 0xba 0xfe 0xca" [e32 -889275714 0xbe 0xba 0xfe 0xca]]
 [TestFails "e32 cafebabe 0xbe 0xba 0xfe 0xce" [e32 -889275714 0xbe 0xba 0xfe 0xce]]
 
+[TestEq "++ 127 *" 128 *x [++ 127 *x]]
+[TestEq "++ 127 : *" 128 *x [++ 127 : *x]]
+[TestEq "++ 127.5 *" 128.5 *x [++ 127.5 *x]]
+[TestEq "++ 127.5 : *" 128.5 *x [++ 127.5 : *x]]
+
+[TestEq "-- 127 *" 126 *x [-- 127 *x]]
+[TestEq "-- 127 : *" 126 *x [-- 127 : *x]]
+[TestEq "-- 127.5 *" 126.5 *x [-- 127.5 *x]]
+[TestEq "-- 127.5 : *" 126.5 *x [-- 127.5 : *x]]
+
 [TestEq "sum [1 2 *]" 3 *x [sum 1 2 *x]]
 [TestEq "sum [1 2.0 : *]" 3.0 *x [sum 1 2.0 : *x]]
 [TestEq "sum [1 * 3]" 2 *x [sum 1 *x 3]]
@@ -649,6 +659,15 @@
 	[*m enter] [*x 1] [wait 20] [*x 3] [*m signal]
 	[*x : *y]
 ]
+
+[TestEq "get_volume_serial_number *" "" *x [get_volume_serial_number *x]]
+[TestFails "security_check" [security_check]]
+
+[TestEq "eq 127 *" 127 *x [eq 127 *x]]
+[TestWorks "not eq 127 128" [not eq 127 128]]
+[TestFails "not eq 127 127" [not eq 127 127]]
+[TestWorks "not not eq 127 127" [not not eq 127 127]]
+[TestFails "not not eq 127 128" [not not eq 127 128]]
 
 [nl]
 

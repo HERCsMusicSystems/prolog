@@ -18,7 +18,7 @@ program studio #machine := "prolog.studio"
 		cd dir ls DIR ARGS args args_tail edit execute make_file make_directory erase erase_directory move copy
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
 		create_atom search_atom preprocessor prompt
-		+ ~ % < = > <=> <= =< >= => <> ! & | ^
+		+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^
 		add sub mult div mod and or xor sum times less less_eq greater greater_eq max min
 		abs cos degrad e exp log2 log10 ln log pi pow sin tan trunc
 		timestamp
@@ -31,20 +31,21 @@ program studio #machine := "prolog.studio"
 		CONSTANT VARIABLE ACCUMULATOR ARRAY var inc dec ALL ISALL isall isallr
 		rnd rnd_control grnd series
 		crack wait timeout enter signal semaphore msemaphore mutex accept select critical_section monitor task
-		background foreground OPEN_EDITOR open_editor close_editor
-		screen_coordinates
-		open_keyboard open_oscilloscope
+		background foreground open_editor close_editor screen_coordinates
 		get_volume_serial_number security_check
 
 		computer-do-this define-this show
 	]
 
+#machine ++ := "inc"
+#machine -- := "dec"
 #machine sum := "sum"
-#machine + := "sum"
+#machine + := "add"
 #machine add := "add"
+#machine - := "sub"
 #machine sub := "sub"
 #machine times := "times"
-#machine ~ := "times"
+#machine ~ := "mult"
 #machine mult := "mult"
 #machine div := "div"
 #machine mod := "mod"
@@ -160,22 +161,12 @@ program studio #machine := "prolog.studio"
 
 #machine background := "background"
 #machine foreground := "foreground"
-#machine OPEN_EDITOR := "open_editor"
+#machine open_editor := "open_editor"
 #machine close_editor := "close_editor"
 #machine screen_coordinates := "screen_coordinates"
 
 #machine get_volume_serial_number := "get_volume_serial_number"
 #machine security_check := "security_check"
-
-[[open_editor] [OPEN_EDITOR]]
-[[open_editor *id] [OPEN_EDITOR *id]]
-[[open_editor *x *y] [screen_coordinates *x *y] [OPEN_EDITOR]]
-[[open_editor *id *x *y] [screen_coordinates *x *y] [OPEN_EDITOR *id]]
-[[open_keyboard] [OPEN_EDITOR 1]]
-[[open_keyboard *x *y] [screen_coordinates *x *y] [OPEN_EDITOR 1]]
-[[open_oscilloscope] [OPEN_EDITOR 3]]
-[[open_oscilloscope *x *y] [screen_coordinates *x *y] [OPEN_EDITOR 3]]
-
 
 [[grnd : *parameters] [rnd : *parameters]]
 [[grnd : *parameters] / [grnd : *parameters]]
