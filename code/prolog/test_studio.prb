@@ -677,6 +677,35 @@
 [TestWorks "not not eq 127 127" [not not eq 127 127]]
 [TestFails "not not eq 127 128" [not not eq 127 128]]
 
+[import "capitol"]
+
+[TestEq "ALL capitol" [["England" "London"] ["USA" "Cupertino"] ["Poland" "Warsaw"] ["France" "Paris"] ["New Zealand" "Wellington"] ["Australia" "Canberra"]] *x
+	[ACCUMULATOR *accu]
+	[SELECT
+		[[ALL [capitol : *c] [*accu *c]] fail]
+		[[*accu ["England" "London"]]]
+	]
+	[*accu : *x]
+]
+[TestEq "ONE capitol" [["England" "London"] ["Australia" "Canberra"]] *x
+	[ACCUMULATOR *accu]
+	[SELECT
+		[[ONE [capitol : *c] [*accu *c]] fail]
+		[[*accu ["England" "London"]]]
+	]
+	[*accu : *x]
+]
+
+[TestWorks "TRY eq 127 127" [TRY [eq 127 127]]]
+[TestWorks "TRY eq 127 128" [TRY [eq 127 128]]]
+[TestWorks "PROBE"
+	[var [*v var]]
+	[*v : *v1] [is_atom *v1]
+	[PROBE [eq *x 127] [*v *x]]
+	[is_var *x]
+	[*v : *v2] [is_integer *v2]
+]
+
 [nl]
 
 [FailedTestSummary]

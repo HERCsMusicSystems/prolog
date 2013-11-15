@@ -201,6 +201,7 @@
         <li><a href="#metalogical">Metalogical</a>
             <br />
             <a href="#predicate_ACCUMULATOR">ACCUMULATOR</a>
+            <a href="#predicate_ALL">ALL</a>
             <a href="#predicate_ARRAY">ARRAY</a>
             <a href="#predicate_CONSTANT">CONSTANT</a>
             <a href="#predicate_dec">dec</a>
@@ -208,6 +209,10 @@
             <a href="#predicate_inc">inc</a>
             <a href="#predicate_lambda">lambda</a>
             <a href="#predicate_not">not</a>
+            <a href="#predicate_ONE">ONE</a>
+            <a href="#predicate_PROBE">PROBE</a>
+            <a href="#predicate_res">res</a>
+            <a href="#predicate_TRY">TRY</a>
             <a href="#predicate_variable">variable</a>
             <a href="#predicate_VARIABLE">VARIABLE</a>
         </li>
@@ -1786,6 +1791,23 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_ALL">
+        <div class="doc_predicate_header">
+            [ALL : *commands]
+        </div>
+        <div class="doc_predicate_body">
+            Checks all possible solutions to <b>*commands</b> with implicit fail.
+            Hence, variables are not instantiated.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[ALL :*o][res : *o] fail]<br />
+            [[ALL :*]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_ARRAY">
         <div class="doc_predicate_header">
             [ARRAY array dimension-1 dimension-2 .... dimension-n]<br />
@@ -1825,7 +1847,12 @@
         <div class="doc_predicate_body">
             Decrements variable by decrement.
             If the decrement is not specified the decrements by one.
-            The variable is expected to be constructed using the VARIABLE predicate.
+            The variable is expected to be constructed using the VARIABLE predicate.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[dec *var] [*var : *value] [sub *value 1 *new] [*var *new]]<br />
+            [[dec *var *dec] [*var : *value] [sub *value *dec *new] [*var *new]]
         </div>
     </a>
 </div>
@@ -1854,7 +1881,12 @@
         <div class="doc_predicate_body">
             Increments variable by increment.
             If the increment is not specified the increments by one.
-            The variable is expected to be constructed using the VARIABLE predicate.
+            The variable is expected to be constructed using the VARIABLE predicate.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[inc *var] [*var : *value] [add *value 1 *new] [*var *new]]<br />
+            [[inc *var *inc] [*var : *value] [add *value *inc *new] [*var *new]]
         </div>
     </a>
 </div>
@@ -1867,7 +1899,11 @@
         <div class="doc_predicate_body">
             Constructs a clause and attaches it to atom.
             If atom is a variable then a new anonymous atom is constructed.
-            It is possible to use lambda multiple times with the same atom.
+            It is possible to use lambda multiple times with the same atom.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[lambda *atom *parameters : *body] [create_atom *atom] [addcl [[*atom : *parameters] : *body]]]
         </div>
     </a>
 </div>
@@ -1890,6 +1926,68 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_ONE">
+        <div class="doc_predicate_header">
+            [ONE : *commands]
+        </div>
+        <div class="doc_predicate_body">
+            Only one soultion. Guards agains backtracking with implicit cut.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[ONE :*o][res :*o]/]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_PROBE">
+        <div class="doc_predicate_header">
+            [PROBE : *commands]
+        </div>
+        <div class="doc_predicate_body">
+            Always works. However, variable instantiation is cancelled by implicit backtracking.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[PROBE :*o][ONE :*o] fail]<br />
+            [[PROBE :*o]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_res">
+        <div class="doc_predicate_header">
+            [res : *commands]
+        </div>
+        <div class="doc_predicate_body">
+            Groups several (or none) commands into one block.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[res : *commands] : *commands]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_TRY">
+        <div class="doc_predicate_header">
+            [TRY : *commands]
+        </div>
+        <div class="doc_predicate_body">
+            Always works.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[TRY :*o]:*o]<br />
+            [[TRY :*o]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_variable">
         <div class="doc_predicate_header">
             [var v1 v2 .... vn]<br />
@@ -1902,6 +2000,13 @@
             If variable name is not an atom then a new anonymous atom is constructed.
             Each variable is initialised with a value.
             If no value is specified then it will be initialised with [].
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[var]]<br />
+            [[var *var : *vars] [is_var *var] / [VARIABLE *var] / [var : *vars]]<br />
+            [[var [*var *value] : *vars] / [VARIABLE *var *value] / [var : *vars]]<br />
+            [[var *var : *vars] [VARIABLE *var] / [var : *vars]]
         </div>
     </a>
 </div>
