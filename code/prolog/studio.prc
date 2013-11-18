@@ -462,9 +462,10 @@ program studio #machine := "prolog.studio"
 [[show *x : *show] [pp *x] / [show : *show]]
 
 protect [
-	not
+	+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^
+	eq grnd
+	not res ONE ALL TRY PROBE SELECT APPEND LENGTH REVERSE ONLIST INLIST NODUP MAP
 	exit command inner inner_addcl inner_call random_cl explode
-	APPEND REVERSE LENGTH ONLIST NODUP
 	sort divide
 	]
 private [inner inner_addcl inner_call random_cl explode divide args_tail]

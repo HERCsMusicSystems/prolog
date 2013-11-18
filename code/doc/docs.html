@@ -212,6 +212,7 @@
             <a href="#predicate_ONE">ONE</a>
             <a href="#predicate_PROBE">PROBE</a>
             <a href="#predicate_res">res</a>
+            <a href="#predicate_SELECT">SELECT</a>
             <a href="#predicate_TRY">TRY</a>
             <a href="#predicate_variable">variable</a>
             <a href="#predicate_VARIABLE">VARIABLE</a>
@@ -1967,6 +1968,26 @@
         </div>
         <div class="doc_predicate_code">
             [[res : *commands] : *commands]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_SELECT">
+        <div class="doc_predicate_header">
+            [SELECT commands-1 commands-2 .... commands-n]
+        </div>
+        <div class="doc_predicate_body">
+            Inline clause definition.<br />
+            Tries to executed the first list of commands.
+            If it fails the tries the next one and so on.
+            The cut (/) operator works as expected, i.e. block backtracking to another list of commands.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[SELECT] / fail]<br />
+            [[SELECT *branch : *] : *branch]<br />
+            [[SELECT * : *branches] / [SELECT : *branches]]
         </div>
     </a>
 </div>
