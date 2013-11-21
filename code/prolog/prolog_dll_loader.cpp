@@ -138,14 +138,13 @@ static bool system_commander (char * command, char * parameters) {
 	if (strlen (parameters) > 240) return false;
 	char com [256];
 	sprintf (com, "%s %s", command, parameters);
-	system (com);
-	return true;
+	return system (com) == 0;
 }
 bool PrologRoot :: edit (char * file_name) {return system_commander ("edit", file_name);}
 bool PrologRoot :: execute (char * command) {system (command); return true;}
 bool PrologRoot :: make_directory (char * directory) {return system_commander ("mkdir", directory);}
 bool PrologRoot :: erase_file (char * file_name) {return system_commander ("rm", file_name);}
-bool PrologRoot :: erase_directory (char * directory) {return system_commander ("rm -r", directory);}
+bool PrologRoot :: erase_directory (char * directory) {return system_commander ("rmdir", directory);}
 bool PrologRoot :: move_file (char * from, char * to) {return rename (from, to) == 0 ? true : false;}
 bool PrologRoot :: copy_file (char * from, char * to) {
 	if (strlen (from) + strlen (to) > 240) return false;
