@@ -476,7 +476,7 @@
 
 [TestEq "ARGS" ["a" "b" "c"] *x [ARGS : *x]]
 
-[TestEq "create directory and file" [[["." ".."] ["mariner.txt" "viking.txt"]] [["." ".."] ["mariner.txt" "viking.txt"]]] [*x *y]
+[TestEq "create directory and file" [[*dir ["mariner.txt" "viking.txt"]] [*dir ["mariner.txt" "viking.txt"]]] [*x *y]
 	[make_directory "sonda"]
 	[cd "sonda"]
 	[file_writer *fw "maliner.txt"] [*fw]
@@ -484,7 +484,7 @@
 	[copy "mariner.txt" "viking.txt"]
 	[DIR "*.*" : *x]
 	[cd]
-	[DIR "sonda/*.*" : *y]
+	[DIR "sonda" : *y]
 ]
 
 [TestFails "erase non-empty directory" [erase_directory "sonda"]]
@@ -579,7 +579,7 @@
 [TestEq "series atoms *" [mariner voyager viking sonda] *x [series [sonda mariner viking voyager] *x]]
 [TestEq "series atoms : *" [voyager viking sonda mariner] *x [series [sonda mariner viking voyager] : *x]]
 [create_atom "soyuz"]
-[TestEq "series variable" [mariner soyuz voyager viking sonda] *x [eq *y [*a *b *c *d *e]] [series *y *x] [show [*x *y]] [eq *y [sonda mariner viking voyager soyuz]]]
+[TestEq "series variable" [mariner soyuz voyager viking sonda] *x [eq *y [*a *b *c *d *e]] [series *y *x] [eq *y [sonda mariner viking voyager soyuz]]]
 
 [TestEq "multithreaded accumulator" [3 2 1] *y
 	[ACCUMULATOR *x]
