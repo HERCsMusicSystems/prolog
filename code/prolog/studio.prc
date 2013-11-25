@@ -16,6 +16,7 @@ program studio #machine := "prolog.studio"
 		remove_module create_module set_machine
 		add_search_directory search_directories
 		cd dir ls DIR ARGS args args_tail edit execute make_file make_directory erase erase_directory move copy
+		operating_system
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
 		create_atom search_atom preprocessor prompt
 		+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^
@@ -155,6 +156,7 @@ program studio #machine := "prolog.studio"
 #machine move := "move"
 #machine copy := "copy"
 #machine execute := "execute"
+#machine operating_system := "operating_system"
 
 #machine CONSTANT := "CONSTANT"
 #machine VARIABLE := "VARIABLE"

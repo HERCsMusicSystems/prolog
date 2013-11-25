@@ -2287,6 +2287,37 @@ public:
 	copy_file (PrologRoot * root) {this -> root = root;}
 };
 
+class operating_system : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+#ifdef WINDOWS_OPERATING_SYSTEM
+		if (parameters -> isText ()) {
+			if (_stricmp (parameters -> getText (), "windows") == 0) return true;
+			return false;
+		}
+		parameters -> setText ("windows");
+#endif
+#ifdef LINUX_OPERATING_SYSTEM
+		if (parameters -> isText ()) {
+			if (strcasecmp (parameters -> getText (), "linux") == 0) return true;
+			return false;
+		}
+		parameters -> setText ("linux");
+#endif
+#ifdef OSX_OPERATING_SYSTEM
+		if (parameters -> isText ()) {
+			if (strcasecmp (parameters -> getText (), "osx") == 0) return true;
+			if (strcasecmp (parameters -> getText (), "apple") == 0) return true;
+			if (strcasecmp (parameters -> getText (), "mac") == 0) return true;
+			return false;
+		}
+		parameters -> setText ("osx");
+#endif
+		return true;
+	}
+};
+
 //////////
 // META //
 //////////
@@ -3203,6 +3234,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "erase_directory") == 0) return new erase_directory (root);
 	if (strcmp (name, "move") == 0) return new move_file (root);
 	if (strcmp (name, "copy") == 0) return new copy_file (root);
+	if (strcmp (name, "operating_system") == 0) return new operating_system ();
 
 	if (strcmp (name, "rnd") == 0) return new rnd (& n);
 	if (strcmp (name, "rnd_control") == 0) return new rnd_control (& n);

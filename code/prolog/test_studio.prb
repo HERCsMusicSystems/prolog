@@ -484,8 +484,14 @@
 	[copy "mariner.txt" "viking.txt"]
 	[DIR "*.*" : *x]
 	[cd]
-	[DIR "sonda" : *y]
+	[SELECT
+		[[operating_system "linux"] [DIR "sonda" : *y]]
+		[[operating_system "windows"] [DIR "sonda/*.*" : *y]]
+	]
 ]
+
+[TestWorks "operating_system *" [operating_system *name] [is_text *name]]
+[TestWorks "operating_system : *" [operating_system : *name] [is_text *name]]
 
 [TestFails "erase non-empty directory" [erase_directory "sonda"]]
 [TestWorks "remove files" [erase "sonda/mariner.txt" "sonda/viking.txt"]]
