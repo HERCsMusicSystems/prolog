@@ -202,6 +202,7 @@
             <br />
             <a href="#predicate_ACCUMULATOR">ACCUMULATOR</a>
             <a href="#predicate_ALL">ALL</a>
+            <a href="#predicate_APPEND">APPEND</a>
             <a href="#predicate_ARRAY">ARRAY</a>
             <a href="#predicate_CONSTANT">CONSTANT</a>
             <a href="#predicate_dec">dec</a>
@@ -212,6 +213,7 @@
             <a href="#predicate_ONE">ONE</a>
             <a href="#predicate_PROBE">PROBE</a>
             <a href="#predicate_res">res</a>
+            <a href="#predicate_REVERSE">REVERSE</a>
             <a href="#predicate_SELECT">SELECT</a>
             <a href="#predicate_TRY">TRY</a>
             <a href="#predicate_variable">variable</a>
@@ -1809,6 +1811,24 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_append">
+        <div class="doc_predicate_header">
+            [APPEND list-1 list-2 list-1+2]
+        </div>
+        <div class="doc_predicate_body">
+            Joins two lists together. Can be used for splitting lists and checking.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[APPEND [] *l *l]]<br />
+            [[APPEND [*head : *tail] *l [*head : *new]]/<br />
+	            [APPEND *tail *l *new]<br />
+            ]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_ARRAY">
         <div class="doc_predicate_header">
             [ARRAY array dimension-1 dimension-2 .... dimension-n]<br />
@@ -1968,6 +1988,25 @@
         </div>
         <div class="doc_predicate_code">
             [[res : *commands] : *commands]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_REVERSE">
+        <div class="doc_predicate_header">
+            [REVERSE list-1 list-2]<br />
+            [REVERSE list-1 accumulator list-2]
+        </div>
+        <div class="doc_predicate_body">
+            Reverses a list. It is implemented with accumulator, which becomes the tail of the revesed list.
+            Can be used for testing.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[REVERSE *l1 *l2] [REVERSE *l1 [] *l2]]<br />
+            [[REVERSE [] *x *x]]<br />
+            [[REVERSE [*head : *tail] *l0 *list] [REVERSE *tail [*head : *l0] *list]]
         </div>
     </a>
 </div>

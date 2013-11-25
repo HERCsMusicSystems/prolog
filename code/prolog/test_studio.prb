@@ -706,6 +706,20 @@
 	[*v : *v2] [is_integer *v2]
 ]
 
+[TestEq "APPEND [1 2 3] 127" [1 2 3 : 127] *x [APPEND [1 2 3] 127 *x]]
+[TestEq "APPEND * [4 5] [1 2 3 4 5]" [1 2 3] *x [APPEND *x [4 5] [1 2 3 4 5]]]
+[TestEq "APPEND [1 2 3] [4 5]" [1 2 3 4 5] *x [APPEND [1 2 3] [4 5] *x]]
+[TestEq "APPEMD [1 2 3] * [1 2 3 4 5]" [4 5] *x [APPEND [1 2 3] *x [1 2 3 4 5]]]
+[TestWorks "APPEND [1 2 3] [4 5] [1 2 3 4 5]" [APPEND [1 2 3] [4 5] [1 2 3 4 5]]]
+[TestFails "APPEND [1 2] [3 4] [1 2 3 4 5]" [APPEND [1 2] [3 4] [1 2 3 4 5]]]
+
+[TestEq "REVERSE [1 2 3 4]" [4 3 2 1] *x [REVERSE [1 2 3 4] *x]]
+[TestEq "REVERSE * [1 2 3 4]" [4 3 2 1] *x [REVERSE *x [1 2 3 4]]]
+[TestWorks "REVERSE [1 2 3] [3 2 1]" [REVERSE [1 2 3] [3 2 1]]]
+[TestFails "REVERSE [1 2 3] [3 2 1 1]" [REVERSE [1 2 3] [3 2 1 1]]]
+[TestEq "REVERSE [1 2 3] 127 *" [3 2 1 : 127] *x [REVERSE [1 2 3] 127 *x]]
+[TestEq "REVERSE * 127 [1 2 3 : 127]" [3 2 1] *x [REVERSE *x 127 [1 2 3 : 127]]]
+
 [nl]
 
 [FailedTestSummary]
