@@ -726,6 +726,12 @@
 [TestEq "REVERSE [1 2 3] 127 *" [3 2 1 : 127] *x [REVERSE [1 2 3] 127 *x]]
 [TestEq "REVERSE * 127 [1 2 3 : 127]" [3 2 1] *x [REVERSE *x 127 [1 2 3 : 127]]]
 
+[TestEq "LENGTH [1 2 3]" 3 *x [LENGTH [1 2 3] *x]]
+[TestEq "LENGTH *x 3" [1 2 3] *x [LENGTH *x 3]]
+[TestWorks "LENGTH [1 2 3] 3" [LENGTH [1 2 3] 3]]
+[TestFails "LENGTH [1 2 3] 4" [LENGTH [1 2 3] 4]]
+[TestFails "LENGTH 127" [LENGTH 127 *x]]
+
 [nl]
 
 [FailedTestSummary]

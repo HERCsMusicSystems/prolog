@@ -210,6 +210,7 @@
             <a href="#predicate_eq">eq</a>
             <a href="#predicate_inc">inc</a>
             <a href="#predicate_lambda">lambda</a>
+            <a href="#predicate_LENGTH">LENGTH</a>
             <a href="#predicate_not">not</a>
             <a href="#predicate_ONE">ONE</a>
             <a href="#predicate_PROBE">PROBE</a>
@@ -1939,6 +1940,24 @@
         </div>
         <div class="doc_predicate_code">
             [[lambda *atom *parameters : *body] [create_atom *atom] [addcl [[*atom : *parameters] : *body]]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_LENGTH">
+        <div class="doc_predicate_header">
+            [LENGTH list length]
+        </div>
+        <div class="doc_predicate_body">
+            Counts the number of elements on the list.
+            It can also construct a list of variables with specified length.
+            Can be also used for tests.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[LENGTH [] 0]]<br />
+            [[LENGTH [*head : *tail] *length] [LENGTH *tail *l] [sum *l 1 *length]]
         </div>
     </a>
 </div>
