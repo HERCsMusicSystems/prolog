@@ -209,10 +209,13 @@
             <a href="#predicate_dec">dec</a>
             <a href="#predicate_eq">eq</a>
             <a href="#predicate_inc">inc</a>
+            <a href="#predicate_INLIST">INLIST</a>
             <a href="#predicate_lambda">lambda</a>
             <a href="#predicate_LENGTH">LENGTH</a>
+            <a href="#predicate_NODUP">NODUP</a>
             <a href="#predicate_not">not</a>
             <a href="#predicate_ONE">ONE</a>
+            <a href="#predicate_ONLINST">ONLIST</a>
             <a href="#predicate_PROBE">PROBE</a>
             <a href="#predicate_res">res</a>
             <a href="#predicate_REVERSE">REVERSE</a>
@@ -1928,6 +1931,26 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_INLIST">
+        <div class="doc_predicate_header">
+            [INLIST list-1 element list-2]
+        </div>
+        <div class="doc_predicate_body">
+            Inserts the element into list-1 thus producing list-2.
+            The element is first inserted at the beginning of the list-1.
+            On a sub-sequent backtracking it is re-position as second, third and so on.
+            INLIST can also be used for checking if list-2 is a version of list-1 with element inserted at some position.
+            It can also take out the element from list-2 thus producing list-1.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[INLIST *l *x [*x : *l]]]<br />
+            [[INLIST [*h : *l] *x [*h : *ll]] [INLIST *l *x *ll]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_lambda">
         <div class="doc_predicate_header">
             [lambda atom [parameters....] [call-1....] [call-2....] ....]
@@ -1963,6 +1986,25 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_NODUP">
+        <div class="doc_predicate_header">
+            [NODUP list-1 list-2]
+        </div>
+        <div class="doc_predicate_body">
+            Constructs list-2 by taking the duplicates out from list-1.
+            Works only one way with list-1 being the input and list-2 the output.
+            Can be used for testing if list-1 is provided.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[NODUP [] []]/]<br />
+            [[NODUP [*x : *t] *result] [ONLIST *x *t] / [NODUP *t *result]]<br />
+            [[NODUP [*x : *t] [*x : *result]] / [NODUP *t *result]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_not">
         <div class="doc_predicate_header">
             [not : *command]
@@ -1990,6 +2032,25 @@
         </div>
         <div class="doc_predicate_code">
             [[ONE :*o][res :*o]/]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_ONLIST">
+        <div class="doc_predicate_header">
+            [ONLIST element list]
+        </div>
+        <div class="doc_predicate_body">
+            Checks if the element is on the list.
+            If list contains variables then they become the element.
+            If element is a variable then it become the first element of the list and on sub-sequent backtracking
+            second, third and so on.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[ONLIST *x [*x : *]]]<br />
+            [[ONLIST *x [* : *l]] [ONLIST *x *l]]
         </div>
     </a>
 </div>
