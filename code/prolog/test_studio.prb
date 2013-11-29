@@ -745,10 +745,14 @@
 [TestEq "INLIST * 127 [1 2 127 3]" [1 2 3] *x [INLIST *x 127 [1 2 127 3]]]
 [TestFails "INLIST * 127 [1 2 3]" [INLIST * 127 [1 2 3]]]
 [TestEq "isall INLIST * 127 [1 127 2 127 3]" [[1 127 2 3] [1 2 127 3]] *x [isall *x *y [INLIST *y 127 [1 127 2 127 3]]]]
+[TestEq "isallr INLIST [1 2 3] 127" [[127 1 2 3] [1 127 2 3] [1 2 127 3] [1 2 3 127]] *x [isallr *x *y [INLIST [1 2 3] 127 *y]]]
 
 [TestEq "isall NODUP [1 127 2 127 3] *" [[1 2 127 3]] *x [isall *x *y [NODUP [1 127 2 127 3] *y]]]
 [TestEq "NODUP [1 127 2 127 3]" [1 2 127 3] *x [NODUP [1 127 2 127 3] *x]]
 [TestEq "NODUP [1 2 3]" [1 2 3] *x [NODUP [1 2 3] *x]]
+
+[TestEq "MAP [[1 11] [2 22] [3 33]] * *" [[1 2 3] [11 22 33]] *x [MAP [[1 11] [2 22] [3 33]] : *x]]
+[TestEq "MAP * [1 2 3] [4 5 6]" [[1 4] [2 5] [3 6]] *x [MAP *x [1 2 3] [4 5 6]]]
 
 [nl]
 

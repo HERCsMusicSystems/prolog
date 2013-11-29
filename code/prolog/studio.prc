@@ -15,7 +15,7 @@ program studio #machine := "prolog.studio"
 		file_writer import load consult batch file_reader reload
 		remove_module create_module set_machine
 		add_search_directory search_directories
-		cd dir ls DIR ARGS args args_tail edit execute make_file make_directory erase erase_directory move copy
+		cd dir ls DIR ARGS args args_tail edit execute make_directory erase erase_directory move copy
 		operating_system
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
 		create_atom search_atom preprocessor prompt
@@ -236,12 +236,10 @@ program studio #machine := "prolog.studio"
 	[*atom *template] fail]
 [[ISALL :*]]
 [[isall *list *template : *call]
-	[create_atom *atom]
 	[ACCUMULATOR *atom]
 	[ISALL *atom *template : *call]
 	[*atom : *list] /]
 [[isallr *list *template : *call]
-	[create_atom *atom]
 	[ACCUMULATOR *atom]
 	[ISALL *atom *template : *call]
 	[*atom : *reversed_list]
@@ -308,10 +306,6 @@ program studio #machine := "prolog.studio"
 	[<=> *less *lt *gts [*h : *gs]] /
 	[<=> *less *gt *gs *gtsa] /
 ]
-
-
-
-
 
 [[cl *x]/[cl 0 *y *x]]
 [[cl *x *y]/[cl 0 *x *y]]
@@ -426,7 +420,7 @@ program studio #machine := "prolog.studio"
 [[command *x *y] [inner_call [*x : *y]]]
 
 
-[[batch *text] [create_atom *atom] [file_reader *atom *text] / [batch [batch] *atom]]
+[[batch *text] [file_reader *atom *text] / [batch [batch] *atom]]
 [[batch [exit] *reader][*reader]]
 [[batch *x *reader][*reader *head]/[batch *x *reader *head]] ;[*reader *tail][*head :*tail] / [batch [*head :*tail] *reader]]
 [[batch *x *reader][*reader] / fail]
@@ -435,8 +429,6 @@ program studio #machine := "prolog.studio"
 [[batch *x *reader *head] / [inner_call *head] / [batch *head *reader]]
 
 [[reload] [list :*x] [eq *x [*user *loader :*tail]] [add *loader ".prc" *name] [load *name]]
-
-[[make_file *file_name] [create_atom *atom] [file_writer *atom *file_name] [*atom]]
 
 [[dir] / [DIR "*.*" : *files] [dir : *files]]
 [[dir *location] [is_text *location] / [DIR *location : *files] [dir : *files]]

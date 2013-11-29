@@ -210,8 +210,12 @@
             <a href="#predicate_eq">eq</a>
             <a href="#predicate_inc">inc</a>
             <a href="#predicate_INLIST">INLIST</a>
+            <a href="#predicate_isall">isall</a>
+            <a href="#predicate_ISALL">ISALL</a>
+            <a href="#predicate_isallr">isallr</a>
             <a href="#predicate_lambda">lambda</a>
             <a href="#predicate_LENGTH">LENGTH</a>
+            <a href="#predicate_MAP">MAP</a>
             <a href="#predicate_NODUP">NODUP</a>
             <a href="#predicate_not">not</a>
             <a href="#predicate_ONE">ONE</a>
@@ -1951,6 +1955,68 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_isall">
+        <div class="doc_predicate_header">
+            [isall list template : instructions]
+        </div>
+        <div class="doc_predicate_body">
+            Collects all the results of instructions into a list of elements specified by the template.
+            Uses <a href="#predicate_ISALL">ISALL</a> internally.
+            The result is in reversed order (as per accumulator).<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[isall *list *template : *call]<br />
+            	[ACCUMULATOR *atom]<br />
+            	[ISALL *atom *template : *call]<br />
+            	[*atom : *list] /<br />
+            ]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_ISALL">
+        <div class="doc_predicate_header">
+            [ISALL accumulator template : instructions]
+        </div>
+        <div class="doc_predicate_body">
+            Collects all the results of instructions into an accumulator.
+            The elements are specified by the template.
+            The result is in reversed order (as per accumulator).<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[ISALL *atom *template : *call]<br />
+            	[res : *call]<br />
+            	[*atom *template] fail<br />
+            ]<br />
+            [[ISALL :*]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_isallr">
+        <div class="doc_predicate_header">
+            [isallr list template : instructions]
+        </div>
+        <div class="doc_predicate_body">
+            Similar to <a href="predicate_isall">isall</a> but the resulting list is un-reversed.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[isallr *list *template : *call]<br />
+	            [ACCUMULATOR *atom]<br />
+	            [ISALL *atom *template : *call]<br />
+	            [*atom : *reversed_list]<br />
+	            [REVERSE *reversed_list *list] /<br />
+            ]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_lambda">
         <div class="doc_predicate_header">
             [lambda atom [parameters....] [call-1....] [call-2....] ....]
@@ -1981,6 +2047,24 @@
         <div class="doc_predicate_code">
             [[LENGTH [] 0]]<br />
             [[LENGTH [*head : *tail] *length] [LENGTH *tail *l] [sum *l 1 *length]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_MAP">
+        <div class="doc_predicate_header">
+            [MAP combined-list list-1 list-2]
+        </div>
+        <div class="doc_predicate_body">
+            Combines elements from two lists into a list of pairs.
+            Can be used both ways, i.e. to decompose a list of pairs into two lists.
+            Can be also used for tests.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[MAP [] [] []]]<br />
+            [[MAP [[*x *y] : *xyt] [*x : *xt] [*y : *yt]] / [MAP *xyt *xt *yt]]
         </div>
     </a>
 </div>
