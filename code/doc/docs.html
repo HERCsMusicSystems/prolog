@@ -208,6 +208,10 @@
             <a href="#predicate_CONSTANT">CONSTANT</a>
             <a href="#predicate_dec">dec</a>
             <a href="#predicate_eq">eq</a>
+            <a href="#predicate_FOR">FOR</a>
+            <a href="#predicate_forever">forever</a>
+            <a href="#predicate_FOREVER">FOREVER</a>
+            <a href="#predicate_IF">IF</a>
             <a href="#predicate_inc">inc</a>
             <a href="#predicate_INLIST">INLIST</a>
             <a href="#predicate_isall">isall</a>
@@ -227,6 +231,7 @@
             <a href="#predicate_TRY">TRY</a>
             <a href="#predicate_variable">variable</a>
             <a href="#predicate_VARIABLE">VARIABLE</a>
+            <a href="#predicate_WHILE">WHILE</a>
         </li>
     </ul>
     <li><a href="#conductor">conductor</a></li>
@@ -1916,6 +1921,83 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_FOR">
+        <div class="doc_predicate_header">
+            [FOR *x [.....] : instructions]<br />
+            [FOR *x from to step : instructions>
+        </div>
+        <div class="doc_predicate_body">
+            Syntactic sugar implementing FOR and FOREACH construction.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[FOR * [] : *] /]<br />
+            [[FOR *head [*head : *] : *call] [ONE : *call] fail]<br />
+            [[FOR *head [* : *tail] : *call] / [FOR *head *tail : *call]]<br />
+            [[FOR *index *index *index *step : *call] [TRY : *call]/]<br />
+            [[FOR *index *index *to *step : *call] [ONE : *call] fail]<br />
+            [[FOR *index *from *to *step : *call]<br />
+            	[add *from *step *next] /<br />
+            	[FOR *index *next *to *step : *call]<br />
+            ]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_forever">
+        <div class="doc_predicate_header">
+            [forever : instructions]
+        </div>
+        <div class="doc_predicate_body">
+            Syntactic sugar implementing forever construction.
+            Repeats instructions until they backtrack.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[forever : *instructions] [res : *instructions] / [forever : *instructions]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_FOREVER">
+        <div class="doc_predicate_header">
+            [FOREVER : instructions]
+        </div>
+        <div class="doc_predicate_body">
+            Syntactic sugar implementing forever construction.
+            Repeats instructions forever.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[FOREVER : *instructions] [PROBE : *instructions] / [FOREVER : *instructions]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_IF">
+        <div class="doc_predicate_header">
+            [IF condition then]<br />
+            [IF condition then else]
+        </div>
+        <div class="doc_predicate_body">
+            Syntactic sugar implementing IF construction.
+            All sections (condition, then and else) are expected to be single calls.
+            Use <a href="#predicate_res">res</a> to construct blocks of instructions inside.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[IF *condition *then] *condition / [TRY *then] /]<br />
+            [[IF *condition *then] /]<br />
+            [[IF *condition *then *else] *condition / [TRY *then] /]<br />
+            [[IF *condition *then *else] [TRY *else] /]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_inc">
         <div class="doc_predicate_header">
             [inc variable]<br />
@@ -2259,6 +2341,22 @@
             Creates a variable.
             If initial value is not specified then it will be initialised with [].
             If atom is a variable then a new anonymous atom is constructed.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_WHILE">
+        <div class="doc_predicate_header">
+            [WHILE condition : instructions]
+        </div>
+        <div class="doc_predicate_body">
+            Syntactic sugar implementing WHILE construction.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[WHILE *condition : *call] [not not : *condition] / [PROBE : *call] / [WHILE *condition : *call]]<br />
+            [[WHILE : *]]
         </div>
     </a>
 </div>
