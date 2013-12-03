@@ -517,6 +517,11 @@
 ]
 [TestWorks "[voyager] [viking]" [voyager] [viking]]
 
+[TestEq "inc" 128 *x [var [*a 127]] [inc *a] [*a : *x]]
+[TestEq "inc 1270" "1270" *x [var [*a 127]] [inc *a "0"] [*a : *x]]
+[TestEq "dec" 126 *x [var [*a 127]] [dec *a] [*a : *x]]
+[TestEq "dec 125.5" 125.5 *x [var [*a 127]] [dec *a 1.5] [*a : *x]]
+
 [create_atom "ee"]
 [TestWorks "CONSTANT ee 2.7182" [CONSTANT ee 2.7182]]
 [TestFails "ee *" [ee *x]]
@@ -762,6 +767,14 @@
 [TestEq "IF false" 127 *xv [var [*v 127]] [IF [eq 1 2] [inc *v]] [*v : *xv]]
 [TestEq "IF true else" 128 *xv [var [*v 127]] [IF [eq 1 1] [inc *v] [dec *v]] [*v : *xv]]
 [TestEq "IF true else" 126 *xv [var [*v 127]] [IF [eq 1 2] [inc *v] [dec *v]] [*v : *xv]]
+
+[TestEq "minimise" [5 4 3 2 1] *x [ACCUMULATOR *v] [ALL [minimise *m 1 5] [*v *m]] [*v : *x]]
+[TestEq "minimise" [3.0 2.5 2.0 1.5 1] *x [ACCUMULATOR *v] [ALL [minimise *m 1 3 0.5] [*v *m]] [*v : *x]]
+[TestEq "maximise" [1 2 3 4 5] *x [ACCUMULATOR *v] [ALL [maximise *m 1 5] [*v *m]] [*v : *x]]
+[TestEq "maximise" [1.0 1.5 2.0 2.5 3] *x [ACCUMULATOR *v] [ALL [maximise *m 1 3 0.5] [*v *m]] [*v : *x]]
+
+[TestFails "res  [sum *x *y 3] [eq *x 1]"      [res  [sum *x *y 3] [eq *x 1]]]
+[TestEq    "lazy [sum *x *y 3] [eq *x 1]" 2 *y [lazy [sum *x *y 3] [eq *x 1]]]
 
 [nl]
 
