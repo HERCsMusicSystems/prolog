@@ -302,7 +302,9 @@ program studio #machine := "prolog.studio"
 	[sort *less *lt *gts [*h : *gs]]/
 	[sort *less *gt *gs *gtsa]/
 ]
+[[sort *in *out] / [sort less *in *out []]]
 
+[[<=> *in *out] / [<=> < *in *out []]]
 [[<=> *less [] *gs *gs]/]
 [[<=> *less [*h : *t] *gts *gtsa]
 	[divide *less *h *t *lt *lta *gt *gta] /

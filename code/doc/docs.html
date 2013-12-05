@@ -169,8 +169,12 @@
             <a href="#predicate_addcl">addcl</a>
             <a href="#predicate_addcl0">addcl0</a>
             <a href="#predicate_auto_atoms">auto_atoms</a>
+            <a href="#predicate_cl">cl</a>
             <a href="#predicate_CL">CL</a>
+            <a href="#predicate_delallcl">delallcl</a>
+            <a href="#predicate_delcl">delcl</a>
             <a href="#predicate_DELCL">DELCL</a>
+            <a href="#predicate_let">let</a>
             <a href="#predicate_overwrite">overwrite</a>
             <a href="#predicate_OVERWRITE">OVERWRITE</a>
             <a href="#predicate_search_atom">search_atom</a>
@@ -230,8 +234,11 @@
             <a href="#predicate_PROBE">PROBE</a>
             <a href="#predicate_res">res</a>
             <a href="#predicate_REVERSE">REVERSE</a>
+            <a href="#predicate_rres">rres</a>
             <a href="#predicate_SELECT">SELECT</a>
+            <a href="#predicate_sort">sort</a>
             <a href="#predicate_TRY">TRY</a>
+            <a href="#predicate_ures">ures</a>
             <a href="#predicate_var">var</a>
             <a href="#predicate_VARIABLE">VARIABLE</a>
             <a href="#predicate_WHILE">WHILE</a>
@@ -1421,6 +1428,29 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_cl">
+        <div class="doc_predicate_header">
+            [cl index [[atom : parameters] : body]]<br />
+            [cl [[atom : parameters] : body]]
+        </div>
+        <div class="doc_predicate_body">
+            Retrieves a <b>clause</b>, which is optionally specified by index.
+            On backtracking retrieves the next clause
+            if index is variable or if index is not supplied.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[cl *x]/[cl 0 *y *x]]<br />
+            [[cl *x *y]/[cl 0 *x *y]]<br />
+            [[cl *x *x [[*a:*b]:*c]][CL *x *a [[*a:*b]:*c]]]<br />
+            [[cl *x *y [[*a:*b]:*c]][add *x 1 *x2]/[CL *x2 *a *X]<br />
+            &emsp;&emsp;&emsp;[cl *x2 *y [[*a:*b]:*c]]<br />
+            ]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_CL">
         <div class="doc_predicate_header">
             [CL atom index : *clause] [CL atom index *clause]<br />
@@ -1456,6 +1486,37 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_delallcl">
+        <div class="doc_predicate_header">
+            [delallcl atom]
+        </div>
+        <div class="doc_predicate_body">
+            Deletes all clauses attached to atom.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[delallcl *a] [DELCL 0 *a] / [delallcl *a]]<br />
+            [[delallcl *a]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_delcl">
+        <div class="doc_predicate_header">
+            [delcl [[atom : parameters] : body]]
+        </div>
+        <div class="doc_predicate_body">
+            Deletes a clause, which matches the parameter.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[delcl [[*a:*b]:*c]][cl *x [[*a:*b]:*c]][DELCL *x *a]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_DELCL">
         <div class="doc_predicate_header">
             [DELCL index atom] [DELCL atom index]
@@ -1463,6 +1524,23 @@
         <div class="doc_predicate_body">
             Deletes a <b>clause</b> attached to the <b>atom</b> and specified by the <b>index</b>.
             Fails if the <b>atom</b> is <b>protected</b> or if the <b>clause</b> does not exist.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_let">
+        <div class="doc_predicate_header">
+            [let atom selector : value]
+        </div>
+        <div class="doc_predicate_body">
+            Obsolete method for simulating global variables (with optional selector for tables).<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[let *name *selector : *value]
+            &emsp;&emsp;&emsp;[overwrite [[*name *selector : *] : *] [[*name *selector : *value]]]
+            ]
         </div>
     </a>
 </div>
@@ -1852,7 +1930,7 @@
         <div class="doc_predicate_code">
             [[APPEND [] *l *l]]<br />
             [[APPEND [*head : *tail] *l [*head : *new]]/<br />
-	            [APPEND *tail *l *new]<br />
+	        &emsp;&emsp;&emsp;[APPEND *tail *l *new]<br />
             ]
         </div>
     </a>
@@ -1940,8 +2018,8 @@
             [[FOR *index *index *index *step : *call] [TRY : *call]/]<br />
             [[FOR *index *index *to *step : *call] [ONE : *call] fail]<br />
             [[FOR *index *from *to *step : *call]<br />
-            	[add *from *step *next] /<br />
-            	[FOR *index *next *to *step : *call]<br />
+            &emsp;&emsp;&emsp;[add *from *step *next] /<br />
+            &emsp;&emsp;&emsp;[FOR *index *next *to *step : *call]<br />
             ]
         </div>
     </a>
@@ -2052,9 +2130,9 @@
         </div>
         <div class="doc_predicate_code">
             [[isall *list *template : *call]<br />
-            	[ACCUMULATOR *atom]<br />
-            	[ISALL *atom *template : *call]<br />
-            	[*atom : *list] /<br />
+            &emsp;&emsp;&emsp;[ACCUMULATOR *atom]<br />
+            &emsp;&emsp;&emsp;[ISALL *atom *template : *call]<br />
+            &emsp;&emsp;&emsp;[*atom : *list] /<br />
             ]
         </div>
     </a>
@@ -2073,8 +2151,8 @@
         </div>
         <div class="doc_predicate_code">
             [[ISALL *atom *template : *call]<br />
-            	[res : *call]<br />
-            	[*atom *template] fail<br />
+            &emsp;&emsp;&emsp;[res : *call]<br />
+            &emsp;&emsp;&emsp;[*atom *template] fail<br />
             ]<br />
             [[ISALL :*]]
         </div>
@@ -2092,10 +2170,10 @@
         </div>
         <div class="doc_predicate_code">
             [[isallr *list *template : *call]<br />
-	            [ACCUMULATOR *atom]<br />
-	            [ISALL *atom *template : *call]<br />
-	            [*atom : *reversed_list]<br />
-	            [REVERSE *reversed_list *list] /<br />
+	        &emsp;&emsp;&emsp;[ACCUMULATOR *atom]<br />
+	        &emsp;&emsp;&emsp;[ISALL *atom *template : *call]<br />
+	        &emsp;&emsp;&emsp;[*atom : *reversed_list]<br />
+	        &emsp;&emsp;&emsp;[REVERSE *reversed_list *list] /<br />
             ]
         </div>
     </a>
@@ -2130,9 +2208,9 @@
         <div class="doc_predicate_code">
             [[lazy]]<br />
             [[lazy : *commands]<br />
-                [INLIST *next *command *commands]<br />
-                *command<br />
-                [lazy : *next]<br />
+            &emsp;&emsp;&emsp;[INLIST *next *command *commands]<br />
+            &emsp;&emsp;&emsp;*command<br />
+            &emsp;&emsp;&emsp;[lazy : *next]<br />
             ]
         </div>
     </a>
@@ -2337,6 +2415,27 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_rres">
+        <div class="doc_predicate_header">
+            [rres [command : parameters]]
+        </div>
+        <div class="doc_predicate_body">
+            Random clause. Modifies the order of clause selection for calling
+            by choosing one with eqal probability.
+            On backtracking chooses another one until all possible choices are explored.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[rres [*atom : *parameters]]<br />
+            &emsp;&emsp;&emsp;[CL *atom *clauses]<br />
+            &emsp;&emsp;&emsp;[series 0 *clauses 1 *serie]<br />
+            &emsp;&emsp;&emsp;/ [random_cl *serie *atom : *parameters]<br />
+            ]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_SELECT">
         <div class="doc_predicate_header">
             [SELECT commands-1 commands-2 .... commands-n]
@@ -2357,6 +2456,34 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_sort">
+        <div class="doc_predicate_header">
+            [sort less in out tail]<br />
+            [sort in out]
+        </div>
+        <div class="doc_predicate_body">
+            Sorts the input list producing the output list.
+            Version one allows for supplying the comparison operation
+            and also generates the differential tail list of the output list
+            (i.e. out = [1 2 3 4 : *tail] / tail = *tail).<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[divide *less *x [] *lt *lt *gt *gt]/]<br />
+            [[divide *less *x [*h : *t] *lt *lta [*h : *gt] *gta] [*less *x *h] / [divide *less *x *t *lt *lta *gt *gta]]<br />
+            [[divide *less *x [*h : *t] [*h : *lt] *lta *gt *gta] / [divide *less *x *t *lt *lta *gt *gta]]<br />
+            [[sort *less [] *gs *gs]/]<br />
+            [[sort *less [*h : *t] *gts *gtsa]<br />
+            &emsp;&emsp;&emsp;[divide *less *h *t *lt *lta *gt *gta]/<br />
+            &emsp;&emsp;&emsp;[sort *less *lt *gts [*h : *gs]]/<br />
+            &emsp;&emsp;&emsp;[sort *less *gt *gs *gtsa]/<br />
+            ]<br />
+            [[sort *in *out] / [sort less *in *out []]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_TRY">
         <div class="doc_predicate_header">
             [TRY : *commands]
@@ -2368,6 +2495,36 @@
         <div class="doc_predicate_code">
             [[TRY :*o]:*o]<br />
             [[TRY :*o]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_ures">
+        <div class="doc_predicate_header">
+            [ures [command : parameters]]<br />
+            ===============================<br />
+            Clause form:<br />
+            [[atom probability : parameters] : body]
+        </div>
+        <div class="doc_predicate_body">
+            Random clause. Modifies the order of clause selection for calling
+            by choosing one with non-eqal probability.
+            The probability is controlled by clauses itself using the <b>probability</b> value.
+            The probability value greater than one indicates that the clause can be used on backtracking
+            multiple times, as if the definition was duplicated as many times as the <b>probability</b>
+            value indicates.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[ures [*atom : *parameters]]<br />
+            &emsp;&emsp;&emsp;[isall *probabilities *ind [cl [[*atom *ind :*] :*]]]<br />
+            &emsp;&emsp;&emsp;[LENGTH *probabilities *length]<br />
+            &emsp;&emsp;&emsp;[sub *length 1 *next]<br />
+            &emsp;&emsp;&emsp;[explode *probabilities *next *full_list]<br />
+            &emsp;&emsp;&emsp;[series *full_list *permutated]<br />
+            &emsp;&emsp;&emsp;/ [random_cl *permutated *atom : *parameters]<br />
+            ]
         </div>
     </a>
 </div>

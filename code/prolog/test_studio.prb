@@ -776,6 +776,21 @@
 [TestFails "res  [sum *x *y 3] [eq *x 1]"      [res  [sum *x *y 3] [eq *x 1]]]
 [TestEq    "lazy [sum *x *y 3] [eq *x 1]" 2 *y [lazy [sum *x *y 3] [eq *x 1]]]
 
+[TestEq "<=> 4 3 6 1 7 5 9 8 2" [1 2 3 4 5 6 7 8 9] *x [<=> [4 3 6 1 7 5 9 8 2] *x]]
+[TestEq "<=> > 4 3 6 1 7 5 9 8 2" [9 8 7 6 5 4 3 2 1] *x [<=> > [4 3 6 1 7 5 9 8 2] *x []]]
+[TestEq "sort greater 4 3 6 1 7 5 9 8 2" [9 8 7 6 5 4 3 2 1] *x [sort greater [4 3 6 1 7 5 9 8 2] *x []]]
+[TestEq "sort 4 3 6 1 7 5 9 8 2" [1 2 3 4 5 6 7 8 9] *x [sort [4 3 6 1 7 5 9 8 2] *x]]
+
+[TestEq "isall cl index capitol" [[4 ["USA" "Cupertino"]] [3 ["Poland" "Warsaw"]] [2 ["France" "Paris"]] [1 ["New Zealand" "Wellington"]] [0 ["Australia" "Canberra"]]] *x
+	[isall *x [*index *parameters] [cl *index [[capitol : *parameters]]]]
+]
+[TestEq "isall cl capitol" [["USA" "Cupertino"] ["Poland" "Warsaw"] ["France" "Paris"] ["New Zealand" "Wellington"] ["Australia" "Canberra"]] *x [isall *x *p [cl [[capitol : *p]]]]]
+
+[TestEq "delcl capitol New Zealand" [[[capitol "Australia" "Canberra"]] [[capitol "France" "Paris"]] [[capitol "Poland" "Warsaw"]] [[capitol "USA" "Cupertino"]]] *x
+	[delcl [[capitol "New Zealand" *]]] [list capitol : *x]
+]
+[TestEq "delallcl capitol" [] *x [delallcl capitol] [list capitol : *x]]
+
 [nl]
 
 [FailedTestSummary]
