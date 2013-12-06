@@ -171,6 +171,7 @@
             <a href="#predicate_auto_atoms">auto_atoms</a>
             <a href="#predicate_cl">cl</a>
             <a href="#predicate_CL">CL</a>
+            <a href="#predicate_create_atom">create_atom</a>
             <a href="#predicate_delallcl">delallcl</a>
             <a href="#predicate_delcl">delcl</a>
             <a href="#predicate_DELCL">DELCL</a>
@@ -196,6 +197,8 @@
         <li><a href="#multithreading">Multi-threading</a>
             <br />
             <a href="#predicate_crack">crack</a>
+            <a href="#predicate_critical_section">critical_section</a>
+            <a href="#predicate_monitor">monitor</a>
             <a href="#predicate_msemaphore">msemaphore</a>
             <a href="#predicate_mutex">mutex</a>
             <a href="#predicate_semaphore">semaphore</a>
@@ -1756,6 +1759,44 @@
             In other words: splits (or cracks) the current thread into two.
             If no commands are specified then nothing will happen.
             In particular, a new thread (with empty instructions) will not be created.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_critical_section">
+        <div class="doc_predicate_header">
+            [critical_section [atom : parameters] : commands]
+        </div>
+        <div class="doc_predicate_body">
+            Creates a new clause attached to <b>atom</b>, which is guarded internally by an anonymouse mutex.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[critical_section [*atom : *parameters] : *commands]<br />
+            &emsp;&emsp;&emsp;[is_atom *atom]<br />
+            &emsp;&emsp;&emsp;[mutex *m]<br />
+            &emsp;&emsp;&emsp;[addcl [[*atom : *parameters] [*m wait] [TRY : *commands] [*m signal] [wait 0]]]<br />
+            ]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_monitor">
+        <div class="doc_predicate_header">
+            [monitor atom]
+        </div>
+        <div class="doc_predicate_body">
+            Creates a monitor guarded internally by an anonymous mutex.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[critical_section [*atom : *parameters] : *commands]<br />
+            &emsp;&emsp;&emsp;[is_atom *atom]<br />
+            &emsp;&emsp;&emsp;[mutex *m]<br />
+            &emsp;&emsp;&emsp;[addcl [[*atom : *parameters] [*m wait] [TRY : *commands] [*m signal] [wait 0]]]<br />
+            ]
         </div>
     </a>
 </div>

@@ -334,15 +334,15 @@ program studio #machine := "prolog.studio"
 ; multithreading and synchronization
 
 [[monitor *atom]
-	[is_atom *atom]
-	[semaphore *s]
-	[addcl [[*atom *mode : *commands] [*s *mode] [TRY : *commands] [*s signal] [wait 0]]]
+	[create_atom *atom]
+	[mutex *m]
+	[addcl [[*atom *mode : *commands] [*m *mode] [TRY : *commands] [*m signal] [wait 0]]]
 	]
 
 [[critical_section [*atom : *parameters] : *commands]
-	[is_atom *atom]
-	[semaphore *s]
-	[addcl [[*atom : *parameters] [*s wait] [TRY : *commands] [*s signal] [wait 0]]]
+	[create_atom *atom]
+	[mutex *m]
+	[addcl [[*atom : *parameters] [*m wait] [TRY : *commands] [*m signal] [wait 0]]]
 	]
 
 ;;;;;;;;;;;;;;

@@ -791,6 +791,29 @@
 ]
 [TestEq "delallcl capitol" [] *x [delallcl capitol] [list capitol : *x]]
 
+[TestEq "monitor" [1 2 3 4] *x
+	[ACCUMULATOR *accu]
+	[monitor *monitor]
+	[crack [*monitor wait [*accu 4] [wait 50] [*accu 3]]]
+	[wait 10] [*monitor wait [*accu 2] [wait 50] [*accu 1]]
+	[*accu : *x]
+]
+
+[TestEq "monitor as res" [1 3 2 4] *x
+	[ACCUMULATOR *accu]
+	[crack [res [*accu 4] [wait 50] [*accu 3]]]
+	[wait 10] [res [*accu 2] [wait 50] [*accu 1]]
+	[*accu : *x]
+]
+
+[TestEq "critical section" [1 2 3 4] *x
+	[ACCUMULATOR *accu]
+	[critical_section [*critical *x] [*accu *x] [wait 50] [sub *x 1 *x1] [*accu *x1]]
+	[crack [*critical 4]]
+	[wait 10] [*critical 2]
+	[*accu : *x]
+]
+
 [nl]
 
 [FailedTestSummary]
