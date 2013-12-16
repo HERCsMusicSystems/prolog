@@ -12,7 +12,7 @@ program randezvous #auto
 			[pieczywo : *p] [mieso : *m]
 			[SELECT
 				[[*task select status [*p *m] [show "pieczywo = " *p] [show "mieso = " *m]]]
-				[[*task select exit []] [timeout]]
+				[[*task select exit []] [*task] [timeout]]
 				[[*task select dostarczpieczywo [*pieczywo] [pieczywo *pieczywo] [show "Dostalem pieczywo [" *pieczywo "]"]]]
 				[[*task select dostarczmieso [*mieso] [mieso *mieso] [show "Dostalem mieso [" *mieso "]"]]]
 				[[greater *p 0] [greater *m 0] [*task select gospoda [*pk]

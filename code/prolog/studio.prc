@@ -392,8 +392,9 @@ program studio #machine := "prolog.studio"
 	[task accept *atom *trigger *entries]
 	[addcl [[*atom wait]   [*trigger wait]]   ]                ; stop actively pooling until trigger
 	[addcl [[*atom signal] [*trigger signal]] ]                ; re-activate active pooling
+	[addcl [[*atom]        [delallcl *atom]]  ]                ; remove all task definitions
 	[crack : *commands]
-]	
+]
 
 ; command processor
 

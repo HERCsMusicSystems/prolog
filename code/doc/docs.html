@@ -202,6 +202,7 @@
             <a href="#predicate_msemaphore">msemaphore</a>
             <a href="#predicate_mutex">mutex</a>
             <a href="#predicate_semaphore">semaphore</a>
+            <a href="#predicate_task">task</a>
             <a href="#predicate_timeout">timeout</a>
             <a href="#predicate_timestamp">timestamp</a>
             <a href="#predicate_wait">wait</a>
@@ -1852,7 +1853,7 @@
             [semaphore *s index]<br />
             [semaphore s]<br />
             [semaphore *s]<br />
-            ==========
+            ==========<br />
             [s wait] => wait for semaphore<br />
             [s enter] => fail if semaphore closed<br />
             [s signal] => signal the semaphore<br />
@@ -1868,6 +1869,71 @@
             <li><b>enter</b> (check if semaphore is open or fail otherwise)</li>
             <li><b>signal</b> (signal the semaphore)</li>
             <li><b>close</b> (destroy the semaphore)</li>
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="A1">
+        <div class="doc_predicate_header">
+            [task t [entry-1 entry-2 .... entry-n] : commands]<br />
+            ===========================<br />
+            <b>from external thread:</b><br />
+            [t enter entry-x : parameters]<br />
+            [t] => close / destroy (if the thread stopped and did not remove its own definitions)<br />
+            <b>from internal commands:</b><br />
+            [*task accept atom [*parameters:...] : *body]<br />
+            [SELECT<br />
+                [.... conditions ..... [*task select atom [*parameters:...] : *body] ..... body .... ]<br />
+                [.... conditions ..... [*task select sonda [*parameters:...] : *body] ..... body .... ]<br />
+                [.... conditions ..... [*task select extra [*parameters:...] : *body] ..... body .... ]<br />
+                [[*task wait]]     ; this prevents active pooling by a waiting for a semaphore activated by either [*task enter....] or [*task signal]<br />
+            ]<br />
+            [t] (and possibly [timeout]) => close / destroy
+        </div>
+        <div class="doc_predicate_body">
+            Checks all possible solutions to <b>*commands</b> with implicit fail.
+            Hence, variables are not instantiated.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[task accept *atom *trigger []]]<br />
+            [[task accept *atom *trigger [*entry : *entries]]<br />
+                [semaphore *enter 0] [semaphore *accept 0] [semaphore *complete 0]<br />
+                [var *data]<br />
+                [addcl [[*atom accept *entry : *body]<br />
+                    [*enter wait]                                  ; wait for the enter trigger<br />
+                    [*data *body]                                  ; transfer parameters and body<br />
+                    [*accept signal]                               ; indicate transfer complete<br />
+                    [*complete wait]                               ; wait for completion on the other side<br />
+                    ]<br />
+                ]<br />
+                [addcl [[*atom enter *entry : *parameters]<br />
+                    [*enter signal]                                ; trigger entry<br />
+                    [*trigger signal]                              ; just in case if the task is suspended on default wait<br />
+                    [*accept wait]                                 ; wait for parameters and body<br />
+                    [*data : *d]                                   ; get them<br />
+                    [TRY [eq [*parameters : *body] *d] : *body]    ; and perform<br />
+                    [*complete signal]                             ; indicate the completion<br />
+                    ]<br />
+                ]<br />
+                [addcl [[*atom select *entry : *body]<br />
+                    [*enter enter]                                 ; main trigger has already been passed, so just wait for the particular trigger<br />
+                    [*data *body]                                  ; transfer parameters and body<br />
+                    [*accept signal]                               ; indicate transfer complete<br />
+                    [*complete wait]                               ; wait for completion on the other side<br />
+                    ]<br />
+                ]<br />
+                / [task accept *atom *trigger *entries]<br />
+            ]<br />
+            [[task *atom *entries : *commands]<br />
+                [create_atom *atom] [semaphore *trigger 0]<br />
+                [task accept *atom *trigger *entries]<br />
+                [addcl [[*atom wait]   [*trigger wait]]   ]                ; stop actively pooling until trigger<br />
+                [addcl [[*atom signal] [*trigger signal]] ]                ; re-activate active pooling<br />
+                [addcl [[*atom]        [delallcl *atom]]  ]                ; remove all task definitions<br />
+                [crack : *commands]<br />
+            ]
         </div>
     </a>
 </div>
