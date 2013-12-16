@@ -31,18 +31,26 @@
 
 PrologLinuxConsole :: PrologLinuxConsole (void) {
 	strcpy (prompt, "");
-	char command [256];
-	sprintf (command, "%s/.prc_history", getenv ("HOME"));
-	stifle_history (128);
-	read_history (command);
 }
 
 PrologLinuxConsole :: ~ PrologLinuxConsole (void) {
 	insert (area);
 	insert ("\n");
+}
+
+void PrologLinuxConsole :: save_history (int size, char * file_name) {
+	if (file_name != 0) {write_history (file_name); return;}
 	char command [256];
 	sprintf (command, "%s/.prc_history", getenv ("HOME"));
 	write_history (command);
+}
+
+void PrologLinuxConsole :: read_history (int size, char * file_name) {
+	stiffle_history (size <= 0 ? 128 : size);
+	if (file_name != 0) read_history (file_name); return;}
+	char command [256];
+	sprintf (command, "%s/.prc_history", getenv ("HOME"));
+	read_history (command);
 }
 
 void PrologLinuxConsole :: print (char * text) {

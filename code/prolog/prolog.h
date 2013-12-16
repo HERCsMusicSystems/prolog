@@ -536,6 +536,8 @@ public:
 	virtual void setScreenCoordinates (int x, int y);
 	virtual char * getPrompt ();
 	virtual void setPrompt (char * prompt);
+	virtual void save_history (int size, char * file_name);
+	virtual void read_history (int size, char * file_name);
 	PrologCommand (void);
 	virtual ~ PrologCommand (void);
 };

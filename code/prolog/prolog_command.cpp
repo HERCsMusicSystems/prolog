@@ -57,4 +57,6 @@ void PrologCommand :: closeEditor3 (int selector, int sub_selector) {}
 void PrologCommand :: setScreenCoordinates (int x, int y) {}
 char * PrologCommand :: getPrompt (void) {return NULL;}
 void PrologCommand :: setPrompt (char * prompt) {}
+void PrologCommand :: save_history (int size, char * file_name) {}
+void PrologCommand :: read_history (int size, char * file_name) {}
 
