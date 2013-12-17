@@ -1,0 +1,10 @@
+
+[batch "test_studio.prb"]
+[batch "test_io.prb"]
+
+[nl]
+[FailedTestSummary]
+[nl]
+[foreground 0xffff00]
+
+[exit]

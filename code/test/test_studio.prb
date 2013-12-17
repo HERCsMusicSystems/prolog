@@ -412,19 +412,6 @@
 [TestWorks "min 2 4 2 3 5" [min 2 4 2 3 5]]
 [TestFails "min 5 4 2 3 5" [min 5 4 2 3 5]]
 
-[TestEq "file_writer atom text numbers list" [sonda "mariner" "sonda mariner" [fail / "sonda" ***]] [*x *y *z *t]
-	[file_writer *fw "sonda.txt"] [*fw "sonda" 32 109 97 114 105 110 101 114 "\n" [[fail / "sonda" *x *y *z]]] [*fw]
-	[file_reader *fr "sonda.txt"] [*fr *x] [*fr "word" *y] [*fr]
-	[file_reader sonda "sonda.txt"] [sonda "line" *z] [sonda *t] [sonda]
-]
-
-[TestFails "has_machine sonda" [has_machine sonda]]
-[TestWorks "file_writer sonda \"sonda.txt\"" [file_writer sonda "sonda.txt"]]
-[TestWorks "has_machine sonda" [has_machine sonda]]
-[TestFails "file_writer sonda \"sonda.txt\"" [file_writer sonda "sonda.txt"]]
-[TestWorks "sonda []" [sonda]]
-[TestFails "has_machine sonda" [has_machine sonda]]
-
 [TestEq "timestamp 889621262" [1998 3 11 69 3 23 31 2] *x [timestamp 889621262 : *x]]
 [TestEq "timestamp [1998 3 11 * * 23 31 2]" [889621262 69 3] [*x *a *b] [timestamp *x 1998 3 11 *a *b 23 31 2]]
 
@@ -476,26 +463,8 @@
 
 [TestEq "ARGS" ["a" "b" "c"] *x [ARGS : *x]]
 
-[TestEq "create directory and file" [[*dir ["mariner.txt" "viking.txt"]] [*dir ["mariner.txt" "viking.txt"]]] [*x *y]
-	[make_directory "sonda"]
-	[cd "sonda"]
-	[file_writer *fw "maliner.txt"] [*fw]
-	[move "maliner.txt" "mariner.txt"]
-	[copy "mariner.txt" "viking.txt"]
-	[DIR "*.*" : *x]
-	[cd]
-	[SELECT
-		[[operating_system "linux"] [DIR "sonda" : *y]]
-		[[operating_system "windows"] [DIR "sonda/*.*" : *y]]
-	]
-]
-
 [TestWorks "operating_system *" [operating_system *name] [is_text *name]]
 [TestWorks "operating_system : *" [operating_system : *name] [is_text *name]]
-
-[TestFails "erase non-empty directory" [erase_directory "sonda"]]
-[TestWorks "remove files" [erase "sonda/mariner.txt" "sonda/viking.txt"]]
-[TestWorks "erase empty directory" [erase_directory "sonda"]]
 
 [TestWorks "VARIABLE sonda" [VARIABLE sonda] [has_machine sonda]]
 [TestFails "VARIABLE sonda" [VARIABLE sonda]]
@@ -541,6 +510,8 @@
 	[lambda *u [[*x *y]] [*i : *x] [*d : *y] [inc *i] [inc *i 0.5] [dec *d] [dec *d 0.5]]
 	[*u *a] [*u *b] [*u *c]
 ]
+
+[TestEq "define-this" [[[*atom 1 2 3] 4 5 6 / fail]] *x [create_atom *atom] [define-this [*atom 1 2 3] 4 5 6 / fail] [list *atom : *x]]
 
 [TestWorks "ARRAY sonda 2 3" [ARRAY sonda 2 3]]
 [TestFails "ARRAY sonda 2 3" [ARRAY sonda 2 3]]
@@ -679,9 +650,6 @@
 	[*x : *y]
 ]
 
-[TestEq "get_volume_serial_number *" "" *x [get_volume_serial_number *x]]
-[TestFails "security_check" [security_check]]
-
 [TestEq "eq 127 *" 127 *x [eq 127 *x]]
 [TestWorks "not eq 127 128" [not eq 127 128]]
 [TestFails "not eq 127 127" [not eq 127 127]]
@@ -814,12 +782,18 @@
 	[*accu : *x]
 ]
 
-[nl]
+[task voyager [list exit]
+	[FOREVER [SELECT
+		[[voyager select exit []] [voyager] [timeout]]
+		[[voyager select list [*count] [CL voyager *count]]]
+		[[voyager wait]]
+	]]
+]
 
-[FailedTestSummary]
+[TestEq "active task cl count" 9 *x [voyager enter list *x]]
 
-[nl]
+[voyager enter exit] [wait 10]
 
-[foreground 0xffff00]
+[TestEq "inactive task cl count" 0 *x [CL voyager : *x]]
 
 [exit]

@@ -321,6 +321,10 @@ program studio #machine := "prolog.studio"
 	[cl *x2 *y [[*a:*b]:*c]]]
 
 [[lambda *atom *parameters : *body] [create_atom *atom] [addcl [[*atom : *parameters] : *body]]]
+[[define-this : *x] [addcl *x]]
+[[show] [nl] /]
+[[show *text : *show] [is_text *text] [write *text] / [show : *show]]
+[[show *x : *show] [pp *x] / [show : *show]]
 
 [[delcl [[*a:*b]:*c]][cl *x [[*a:*b]:*c]][DELCL *x *a]]
 
@@ -455,13 +459,6 @@ program studio #machine := "prolog.studio"
 [[args : *args] [ARGS : *texts] / [args_tail *texts *args]]
 [[args_tail [] []] /]
 [[args_tail [*t1 : *t] *a] [text_term *t1 : *b] [APPEND *b *c *a] / [args_tail *t *c]]
-
-; demo
-[[computer-do-this : *x] : *x]
-[[define-this : *x] [addcl *x]]
-[[show] [nl] /]
-[[show *text : *show] [is_text *text] [write *text] / [show : *show]]
-[[show *x : *show] [pp *x] / [show : *show]]
 
 protect [
 	+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^

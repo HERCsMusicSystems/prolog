@@ -3,7 +3,7 @@
         .doc_header {font-family:Arial; font-size:1.5em; font-weight:bold;}
         .doc_library {font-family:Arial; font-size:1.5em;}
         .doc_library_section {font-family:Arial; font-size:1.5em; margin-top:1em;}
-        .doc_predicate{font-family:Arial; padding:1em; width:50em;}
+        .doc_predicate{font-family:Arial; padding:1em; width:70em;}
         .doc_predicate_header {background-color:#eeeeee; font-family:monospace;}
         .doc_predicate_body {font-family:Arial;}
         .doc_predicate_code {font-family:monospace; background-color:#eeeeee;}
@@ -125,15 +125,20 @@
             <a href="#predicate_add_search_directory">add_search_directory</a>
             <a href="#predicate_ARGS">ARGS</a>
             <a href="#predicate_background">background</a>
+            <a href="#predicate_batch">batch</a>
             <a href="#predicate_cd">cd</a>
             <a href="#predicate_close_editor">close_editor</a>
+            <a href="#predicate_command">command</a>
             <a href="#predicate_consult">consult</a>
             <a href="#predicate_copy">copy</a>
             <a href="#predicate_create_module">create_module</a>
+            <a href="#predicate_dir">dir</a>
+            <a href="#predicate_DIR">DIR</a>
             <a href="#predicate_edit">edit</a>
             <a href="#predicate_erase">erase</a>
             <a href="#predicate_erase_directory">erase_directory</a>
             <a href="#predicate_execute">execute</a>
+            <a href="#predicate_exit">exit</a>
             <a href="#predicate_foreground">foreground</a>
             <a href="#predicate_get_volume_serial_number">get_volume_serial_number</a>
             <a href="#predicate_import">import</a>
@@ -154,13 +159,16 @@
             <a href="#predicate_pt">pt</a>
             <a href="#predicate_query_stack">query_stack</a>
             <a href="#predicate_read">read</a>
+            <a href="#predicate_read_history">read_history</a>
             <a href="#predicate_readln">readln</a>
             <a href="#predicate_reload">reload</a>
             <a href="#predicate_remove_module">remove_module</a>
+            <a href="#predicate_save_history">save_history</a>
             <a href="#predicate_screen_coordinates">screen_coordinates</a>
             <a href="#predicate_search_directories">search_directories</a>
             <a href="#predicate_security_check">security_check</a>
             <a href="#predicate_set_machine">set_machine</a>
+            <a href="#predicate_show">show</a>
             <a href="#predicate_write">write</a>
             <a href="#predicate_set_captions">set_...._captions</a>
         </li>
@@ -215,6 +223,7 @@
             <a href="#predicate_ARRAY">ARRAY</a>
             <a href="#predicate_CONSTANT">CONSTANT</a>
             <a href="#predicate_dec">dec</a>
+            <a href="#predicate_define-this">define-this</a>
             <a href="#predicate_eq">eq</a>
             <a href="#predicate_FOR">FOR</a>
             <a href="#predicate_forever">forever</a>
@@ -849,6 +858,21 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_batch">
+        <div class="doc_predicate_header">
+            [batch "file_name.prb"]
+        </div>
+        <div class="doc_predicate_body">
+            Run the specified file as if it was a series of interactive commands.
+            The file is expected to be terminated by [exit] command
+            (as if in a real interactive session).
+            If any of the commands fail or if the series of commands is not terminated with [exit]
+            then the entire batch fails.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_cd">
         <div class="doc_predicate_header">
             [cd]<br />
@@ -877,12 +901,12 @@
 </div>
 
 <div class="doc_predicate">
-    <a id="predicate_copy">
+    <a id="predicate_command">
         <div class="doc_predicate_header">
-            [copy "from" "to"]
+            [command]
         </div>
         <div class="doc_predicate_body">
-            Copies a file.
+            Starts an interactive session. It can be finished by [exit].
         </div>
     </a>
 </div>
@@ -905,6 +929,17 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_copy">
+        <div class="doc_predicate_header">
+            [copy "from" "to"]
+        </div>
+        <div class="doc_predicate_body">
+            Copies a file.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_create_module">
         <div class="doc_predicate_header">
             [create_module "name"]<br />
@@ -918,6 +953,36 @@
             All newly created atoms will be placed in this module.
             Typically it should be swapped with the "user!" module after completion
             by calling create_module without any parameters.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_dir">
+        <div class="doc_predicate_header">
+            [dir]<br />
+            [dir "path"]<br />
+            [dir *result]<br />
+            [dir "path" *result]
+        </div>
+        <div class="doc_predicate_body">
+            Retrieves and/or displays the content of a folder on a file system.
+            The "path" parameter specifies the directory relative to the current working directory.
+            If the "path" is omitted then the current working directory is used.
+            The *result is the retrieved content.
+            If the *result is omitted then the content is displayed rather than retrieved.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_DIR">
+        <div class="doc_predicate_header">
+            [DIR "path" : *result]
+        </div>
+        <div class="doc_predicate_body">
+            Retrieves the content of the folder on the file system,
+            which is specified by the "path".
         </div>
     </a>
 </div>
@@ -964,6 +1029,17 @@
         </div>
         <div class="doc_predicate_body">
             Executes system shell command.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_exit">
+        <div class="doc_predicate_header">
+            [exit]
+        </div>
+        <div class="doc_predicate_body">
+            Stops the interactive session.
         </div>
     </a>
 </div>
@@ -1251,6 +1327,25 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_read_history">
+        <div class="doc_predicate_header">
+            [read_history]<br />
+            [read_history size]<br />
+            [read_history "file_name"]<br />
+            [read_history size "file_name"]<br />
+            [read_history "file_name" size]
+        </div>
+        <div class="doc_predicate_body">
+            Reads the previously saved history of commands for interactive session.
+            The size specifies the number of commands.
+            The "file_name" specifies the file in which history is stored.
+            If no parameters are passed (default option) then the behaviour is OS specific.
+            The functionality depends on the Operating System.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_readln">
         <div class="doc_predicate_header">
             [readln *text]
@@ -1288,6 +1383,25 @@
         <div class="doc_predicate_body">
             Removes module(s) specified by name(s).
             Fails if any of the modules does not exist or could not be removed.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_save_history">
+        <div class="doc_predicate_header">
+            [save_history]<br />
+            [save_history size]<br />
+            [save_history "file_name"]<br />
+            [save_history size "file_name"]<br />
+            [save_history "file_name" size]
+        </div>
+        <div class="doc_predicate_body">
+            Saves the history of commands for interactive session.
+            The size specifies the number of commands.
+            The "file_name" specifies the file in which history is stored.
+            If no parameters are passed (default option) then the behaviour is OS-specific.
+            The functionality depends on the Operating System.
         </div>
     </a>
 </div>
@@ -1342,6 +1456,27 @@
             If no module was specified then it searches machine code in the root module.
             Fails if machine code can not be found or applied (i.e. the symbol has already some definitions attached).
             Note: machine binding can only be removed if the binding itself allows for it.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_show">
+        <div class="doc_predicate_header">
+            [show : parameters]
+        </div>
+        <div class="doc_predicate_body">
+            Convenient output predicate in one line.
+            Display parameters in a fashion depending on their type:
+            <li>Texts are displayed using <b>write</b>.</li>
+            <li>All other types are displayed using <b>pp</b>.</li>
+            <li>At the end a newline character is inserted.</li>
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[show] [nl] /]<br />
+            [[show *text : *show] [is_text *text] [write *text] / [show : *show]]<br />
+            [[show *x : *show] [pp *x] / [show : *show]]<br />
         </div>
     </a>
 </div>
@@ -1874,7 +2009,7 @@
 </div>
 
 <div class="doc_predicate">
-    <a id="A1">
+    <a id="predicate_task">
         <div class="doc_predicate_header">
             [task t [entry-1 entry-2 .... entry-n] : commands]<br />
             ===========================<br />
@@ -1884,10 +2019,10 @@
             <b>from internal commands:</b><br />
             [*task accept atom [*parameters:...] : *body]<br />
             [SELECT<br />
-                [.... conditions ..... [*task select atom [*parameters:...] : *body] ..... body .... ]<br />
-                [.... conditions ..... [*task select sonda [*parameters:...] : *body] ..... body .... ]<br />
-                [.... conditions ..... [*task select extra [*parameters:...] : *body] ..... body .... ]<br />
-                [[*task wait]]     ; this prevents active pooling by a waiting for a semaphore activated by either [*task enter....] or [*task signal]<br />
+            &emsp;&emsp;&emsp;[.... conditions ..... [*task select atom [*parameters:...] : *body] ..... body .... ]<br />
+            &emsp;&emsp;&emsp;[.... conditions ..... [*task select sonda [*parameters:...] : *body] ..... body .... ]<br />
+            &emsp;&emsp;&emsp;[.... conditions ..... [*task select extra [*parameters:...] : *body] ..... body .... ]<br />
+            &emsp;&emsp;&emsp;[[*task wait]]     ; this prevents active pooling by a waiting for internal semaphore<br />
             ]<br />
             [t] (and possibly [timeout]) => close / destroy
         </div>
@@ -1899,40 +2034,40 @@
         <div class="doc_predicate_code">
             [[task accept *atom *trigger []]]<br />
             [[task accept *atom *trigger [*entry : *entries]]<br />
-                [semaphore *enter 0] [semaphore *accept 0] [semaphore *complete 0]<br />
-                [var *data]<br />
-                [addcl [[*atom accept *entry : *body]<br />
-                    [*enter wait]                                  ; wait for the enter trigger<br />
-                    [*data *body]                                  ; transfer parameters and body<br />
-                    [*accept signal]                               ; indicate transfer complete<br />
-                    [*complete wait]                               ; wait for completion on the other side<br />
-                    ]<br />
-                ]<br />
-                [addcl [[*atom enter *entry : *parameters]<br />
-                    [*enter signal]                                ; trigger entry<br />
-                    [*trigger signal]                              ; just in case if the task is suspended on default wait<br />
-                    [*accept wait]                                 ; wait for parameters and body<br />
-                    [*data : *d]                                   ; get them<br />
-                    [TRY [eq [*parameters : *body] *d] : *body]    ; and perform<br />
-                    [*complete signal]                             ; indicate the completion<br />
-                    ]<br />
-                ]<br />
-                [addcl [[*atom select *entry : *body]<br />
-                    [*enter enter]                                 ; main trigger has already been passed, so just wait for the particular trigger<br />
-                    [*data *body]                                  ; transfer parameters and body<br />
-                    [*accept signal]                               ; indicate transfer complete<br />
-                    [*complete wait]                               ; wait for completion on the other side<br />
-                    ]<br />
-                ]<br />
-                / [task accept *atom *trigger *entries]<br />
+            &emsp;&emsp;&emsp;[semaphore *enter 0] [semaphore *accept 0] [semaphore *complete 0]<br />
+            &emsp;&emsp;&emsp;[var *data]<br />
+            &emsp;&emsp;&emsp;[addcl [[*atom accept *entry : *body]<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[*enter wait]                                  ; wait for the enter trigger<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[*data *body]                                  ; transfer parameters and body<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[*accept signal]                               ; indicate transfer complete<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[*complete wait]                               ; wait for completion on the other side<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;]<br />
+            &emsp;&emsp;&emsp;]<br />
+            &emsp;&emsp;&emsp;[addcl [[*atom enter *entry : *parameters]<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[*enter signal]                                ; trigger entry<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[*trigger signal]                              ; just in case if the task is suspended on default wait<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[*accept wait]                                 ; wait for parameters and body<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[*data : *d]                                   ; get them<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[TRY [eq [*parameters : *body] *d] : *body]    ; and perform<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[*complete signal]                             ; indicate the completion<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;]<br />
+            &emsp;&emsp;&emsp;]<br />
+            &emsp;&emsp;&emsp;[addcl [[*atom select *entry : *body]<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[*enter enter]                                 ; main trigger has already been passed, so just wait for the particular trigger<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[*data *body]                                  ; transfer parameters and body<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[*accept signal]                               ; indicate transfer complete<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[*complete wait]                               ; wait for completion on the other side<br />
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;]<br />
+            &emsp;&emsp;&emsp;]<br />
+            &emsp;&emsp;&emsp;/ [task accept *atom *trigger *entries]<br />
             ]<br />
             [[task *atom *entries : *commands]<br />
-                [create_atom *atom] [semaphore *trigger 0]<br />
-                [task accept *atom *trigger *entries]<br />
-                [addcl [[*atom wait]   [*trigger wait]]   ]                ; stop actively pooling until trigger<br />
-                [addcl [[*atom signal] [*trigger signal]] ]                ; re-activate active pooling<br />
-                [addcl [[*atom]        [delallcl *atom]]  ]                ; remove all task definitions<br />
-                [crack : *commands]<br />
+            &emsp;&emsp;&emsp;[create_atom *atom] [semaphore *trigger 0]<br />
+            &emsp;&emsp;&emsp;[task accept *atom *trigger *entries]<br />
+            &emsp;&emsp;&emsp;[addcl [[*atom wait]   [*trigger wait]]   ]                ; stop actively pooling until trigger<br />
+            &emsp;&emsp;&emsp;[addcl [[*atom signal] [*trigger signal]] ]                ; re-activate active pooling<br />
+            &emsp;&emsp;&emsp;[addcl [[*atom]        [delallcl *atom]]  ]                ; remove all task definitions<br />
+            &emsp;&emsp;&emsp;[crack : *commands]<br />
             ]
         </div>
     </a>
@@ -2089,6 +2224,21 @@
         <div class="doc_predicate_code">
             [[dec *var] [*var : *value] [sub *value 1 *new] [*var *new]]<br />
             [[dec *var *dec] [*var : *value] [sub *value *dec *new] [*var *new]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_define-this">
+        <div class="doc_predicate_header">
+            [define-this [atom : parameters] : body]
+        </div>
+        <div class="doc_predicate_body">
+            Similar to <a href="#predicate_lambda">lambda</a> but does not create anonymous atoms.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[define-this : *x] [addcl *x]]
         </div>
     </a>
 </div>

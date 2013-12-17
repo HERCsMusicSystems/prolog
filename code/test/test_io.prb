@@ -1,0 +1,40 @@
+
+[import "test"]
+[import "capitol"]
+
+[TestEq "file_writer atom text numbers list" [sonda "mariner" "sonda mariner" [fail / "sonda" ***]] [*x *y *z *t]
+	[file_writer *fw "sonda.txt"] [*fw "sonda" 32 109 97 114 105 110 101 114 "\n" [[fail / "sonda" *x *y *z]]] [*fw]
+	[file_reader *fr "sonda.txt"] [*fr *x] [*fr "word" *y] [*fr]
+	[file_reader sonda "sonda.txt"] [sonda "line" *z] [sonda *t] [sonda]
+]
+
+[TestFails "has_machine sonda" [has_machine sonda]]
+[TestWorks "file_writer sonda \"sonda.txt\"" [file_writer sonda "sonda.txt"]]
+[TestWorks "has_machine sonda" [has_machine sonda]]
+[TestFails "file_writer sonda \"sonda.txt\"" [file_writer sonda "sonda.txt"]]
+[TestWorks "sonda []" [sonda]]
+[TestFails "has_machine sonda" [has_machine sonda]]
+[TestWorks "erase sonda.txt" [erase "sonda.txt"]]
+
+[TestEq "create directory and file" [[*dir ["mariner.txt" "viking.txt"]] [*dir ["mariner.txt" "viking.txt"]]] [*x *y]
+	[make_directory "sonda"]
+	[cd "sonda"]
+	[file_writer *fw "maliner.txt"] [*fw]
+	[move "maliner.txt" "mariner.txt"]
+	[copy "mariner.txt" "viking.txt"]
+	[DIR "*.*" : *x]
+	[cd]
+	[SELECT
+		[[operating_system "linux"] [DIR "sonda" : *y]]
+		[[operating_system "windows"] [DIR "sonda/*.*" : *y]]
+	]
+]
+
+[TestFails "erase non-empty directory" [erase_directory "sonda"]]
+[TestWorks "remove files" [erase "sonda/mariner.txt" "sonda/viking.txt"]]
+[TestWorks "erase empty directory" [erase_directory "sonda"]]
+
+[TestEq "get_volume_serial_number *" "" *x [get_volume_serial_number *x]]
+[TestFails "security_check" [security_check]]
+
+[exit]
