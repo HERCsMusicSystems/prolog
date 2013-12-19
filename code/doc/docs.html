@@ -259,6 +259,30 @@
     </ul>
     <li><a href="#conductor">conductor</a></li>
     <li><a href="#midi">midi</a></li>
+    <ul>
+        <li>
+            <a href="#midi_network">MIDI network</a>
+            <br />
+            <a href="#predicate_connectThru">connectThru</a>
+            <a href="#predicate_createDestination">createDestination</a>
+            <a href="#predicate_createLine">createLine</a>
+            <a href="#predicate_createSource">createSource</a>
+            <a href="#predicate_defaultDestination">defaultDestination</a>
+        </li>
+        <li>
+            <a href="#midi_commands">MIDI commands</a>
+            <br />
+            <a href="#predicate_chex">chex</a>
+            <a href="#predicate_midi_message">midi_message</a>
+            <a href="#predicate_sysex">sysex</a>
+            <a href="#predicate_SYSEX">SYSEX</a>
+            <a href="#predicate_sysexch">sysexch</a>
+            <a href="#predicate_SYSEXCH">SYSEXCH</a>
+        </li>
+        <li>
+            <a href="#musical_processing">Musical processing</a>
+        </li>
+    </ul>
     <li><a href="#neural">neural</a></li>
     <li><a href="#http">http</a></li>
     <li><a href="sql">sql</a></li>
@@ -2842,6 +2866,124 @@
 
 <div class="doc_library"><a id="conductor">LIBRARY: <b>conductor</b></a></div>
 
+<div class="doc_library"><a id="midi">LIBRARY: <b>midi</b></a></div>
+
+<div class="doc_library_section"><a id="midi_network">MIDI network predicates</a></div>
+
+<div class="doc_predicate">
+    <a id="predicate_connectThru">
+        <div class="doc_predicate_header">
+            [connectThru line_from line_to]<br />
+            [connectThru line] ; disconnect
+        </div>
+        <div class="doc_predicate_body">
+            Connect two MIDI lines as thru.
+            Version with single parameter disconnects thru.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_createDestination">
+        <div class="doc_predicate_header">
+            [createDestination line "name"]<br />
+            [createDestination "name" line]<br />
+            ===============================
+            [line] ; closes the line
+        </div>
+        <div class="doc_predicate_body">
+            Creates a MIDI destination.
+            The "name" parameters specifies physical MIDI output or device.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_createLine">
+        <div class="doc_predicate_header">
+            [createLine line]<br />
+            [createLine line callback]<br />
+            [createLine line size]<br />
+            [createLine line callback size]<br />
+            [createLine line size callback]<br />
+            ===================================
+            [connectThru line another_line] ; connect another line as thru<br />
+            [connectThru line] ; disconnect thru<br />
+            [line] ; closes the line
+        </div>
+        <div class="doc_predicate_body">
+            Creates a MIDI source line.
+            The "name" parameter specifies physical MIDI input port or device.
+            The optional callback will be activated on every MIDI message after arrival.
+            Once created, the line can be closed or connected / disconnected with other lines.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_createSource">
+        <div class="doc_predicate_header">
+            [createSource line "name"]<br />
+            [createSource "name" line]<br />
+            [createSource line callback "name"]<br />
+            [createSource line "name" callback]<br />
+            [createSource "name" line callback]<br />
+            ===================================
+            [connectThru line another_line] ; connect another line as thru<br />
+            [connectThru line] ; disconnect thru<br />
+            [line] ; closes the line
+        </div>
+        <div class="doc_predicate_body">
+            Creates a MIDI source line.
+            The "name" parameter specifies physical MIDI input port or device.
+            The optional callback will be activated on every MIDI message after arrival.
+            Once created, the line can be closed or connected / disconnected with other lines.
+            Both line and callback can be variables. In such case anonymous atoms are created.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_defaultDestination">
+        <div class="doc_predicate_header">
+            [defaultDestination line]<br />
+            [defaultDestination]
+        </div>
+        <div class="doc_predicate_body">
+            Selects one particular MIDI line as the default destination of MIDI commands.
+            When no line is specified the default destination is removed.
+        </div>
+    </a>
+</div>
+
+<div class="doc_library_section"><a id="midi_commands">MIDI commands</a></div>
+
+<div class="doc_predicate">
+    <a id="predicate_chex">
+        <div class="doc_predicate_header">
+            [chex (line) channel_11_bit (:) *channel]<br />
+            [chex (line) channel_11_bit offset (:) *offsetted_channel]
+        </div>
+        <div class="doc_predicate_body">
+            Inserts channel extension message: <b>0xF3 extension</b>.
+            This MIDI message has been invented for the purpose of the HERCs system.
+            It extends the number of available MIDI channels to 2048.
+            All MIDI commands are designed within this system to transmit
+            channel extension message automatically if the MIDI channel specified
+            int the command is out of the current range.<br />
+            Example:<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;[keyon 19 60 100] will emit => F3 01 93 3C 64<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;the subsequent:
+            &nbsp;&nbsp;&nbsp;&nbsp;[keyon 4 60 100] will emit => F3 00 94 3C 64<br />
+            The <b>chex</b> command emits just the channel extension message
+            and returns the lowest 4 bits of the extended channel.
+            If the offset is specified then this offset is added to the lowest 4 bits
+            of the extended channel and returned.<br />
+            The purpose of <b>chex</b> is to be used in connection with <b>sysex</b>
+            for programming HERCs native MIDI transmission.
+        </div>
+    </a>
+</div>
 
 <div class="doc_predicate">
     <a id="###">

@@ -193,7 +193,7 @@ public:
 		if (! parameters -> isPair ()) return false;
 		PrologElement * el = parameters -> getLeft (); parameters = parameters -> getRight ();
 		if (! el -> isAtom ()) return false;
-		PrologNativeCode * machine = parameters -> getAtom () -> getMachine ();
+		PrologNativeCode * machine = el -> getAtom () -> getMachine ();
 		if (machine != 0 && machine -> codeName () == PrologMidiNativeCode :: name ()) return connectThru ((PrologMidiNativeCode *) machine);
 		if (el -> getAtom () == servo -> midi_manufacturers_id_atom) {
 			if (parameters -> isEarth ()) {line -> set_manufacturers_id (); return true;}
@@ -225,6 +225,7 @@ public:
 			if (! parameters -> isPair ()) return false;
 			parameters = parameters -> getLeft ();
 			if (! parameters -> isAtom ()) return false;
+			machine = parameters -> getAtom () -> getMachine ();
 			if (machine == 0 || machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
 			return connectThru ((PrologMidiNativeCode *) machine);
 		}
@@ -697,6 +698,7 @@ public:
 	PrologRoot * root;
 	PrologMidiServiceClass * servo;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (root == 0 || servo == 0) return false;
 		PrologAtom * line = 0;
 		PrologAtom * income = 0;
 		char * file_name = 0;
@@ -710,6 +712,7 @@ public:
 			if (el -> isText ()) file_name = el -> getText ();
 			parameters = parameters -> getRight ();
 		}
+		if (file_name == 0 || line == 0) return false;
 		int midi_input_id = open (file_name, O_RDONLY);
 		if (midi_input_id < 0) return false;
 		PrologMidiSourceCode * source = new PrologMidiSourceCode (root, servo, line, income, midi_input_id);
