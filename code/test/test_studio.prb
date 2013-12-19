@@ -796,4 +796,6 @@
 
 [TestEq "inactive task cl count" 0 *x [CL voyager : *x]]
 
+[auto_atoms]
+
 [exit]

@@ -1,6 +1,8 @@
 
 [batch "test_studio.prb"]
-[batch "test_io.prb"]
+;[batch "test_io.prb"]
+[auto_atoms]
+[batch "test_midi.prb"]
 
 [nl]
 [FailedTestSummary]
