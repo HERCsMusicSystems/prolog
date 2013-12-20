@@ -45,9 +45,9 @@ void PrologLinuxConsole :: save_history (int size, char * file_name) {
 	write_history (command);
 }
 
-void PrologLinuxConsole :: read_history (int size, char * file_name) {
-	stiffle_history (size <= 0 ? 128 : size);
-	if (file_name != 0) read_history (file_name); return;}
+void PrologLinuxConsole :: load_history (int size, char * file_name) {
+	stifle_history (size <= 0 ? 128 : size);
+	if (file_name != 0) {read_history (file_name); return;}
 	char command [256];
 	sprintf (command, "%s/.prc_history", getenv ("HOME"));
 	read_history (command);

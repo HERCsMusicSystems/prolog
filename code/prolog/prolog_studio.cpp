@@ -2305,7 +2305,7 @@ public:
 			parameters = parameters -> getRight ();
 		}
 		if (save) commander -> save_history (history_size != 0 ? history_size -> getInteger () : 0, history_file != 0 ? history_file -> getText () : 0);
-		else commander -> read_history (history_size != 0 ? history_size -> getInteger () : 0, history_file != 0 ? history_file -> getText () : 0);
+		else commander -> load_history (history_size != 0 ? history_size -> getInteger () : 0, history_file != 0 ? history_file -> getText () : 0);
 		return true;
 	}
 	history (PrologRoot * root, bool save) {this -> root = root; this -> save = save;}
@@ -3259,7 +3259,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "move") == 0) return new move_file (root);
 	if (strcmp (name, "copy") == 0) return new copy_file (root);
 	if (strcmp (name, "save_history") == 0) return new history (root, true);
-	if (strcmp (name, "read_history") == 0) return new history (root, false);
+	if (strcmp (name, "load_history") == 0) return new history (root, false);
 	if (strcmp (name, "operating_system") == 0) return new operating_system ();
 
 	if (strcmp (name, "rnd") == 0) return new rnd (& n);

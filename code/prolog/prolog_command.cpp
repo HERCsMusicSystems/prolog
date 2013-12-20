@@ -58,5 +58,5 @@ void PrologCommand :: setScreenCoordinates (int x, int y) {}
 char * PrologCommand :: getPrompt (void) {return NULL;}
 void PrologCommand :: setPrompt (char * prompt) {}
 void PrologCommand :: save_history (int size, char * file_name) {}
-void PrologCommand :: read_history (int size, char * file_name) {}
+void PrologCommand :: load_history (int size, char * file_name) {}
 

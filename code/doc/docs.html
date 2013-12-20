@@ -159,7 +159,7 @@
             <a href="#predicate_pt">pt</a>
             <a href="#predicate_query_stack">query_stack</a>
             <a href="#predicate_read">read</a>
-            <a href="#predicate_read_history">read_history</a>
+            <a href="#predicate_load_history">load_history</a>
             <a href="#predicate_readln">readln</a>
             <a href="#predicate_reload">reload</a>
             <a href="#predicate_remove_module">remove_module</a>
@@ -1352,16 +1352,16 @@
 </div>
 
 <div class="doc_predicate">
-    <a id="predicate_read_history">
+    <a id="predicate_load_history">
         <div class="doc_predicate_header">
-            [read_history]<br />
-            [read_history size]<br />
-            [read_history "file_name"]<br />
-            [read_history size "file_name"]<br />
-            [read_history "file_name" size]
+            [load_history]<br />
+            [load_history size]<br />
+            [load_history "file_name"]<br />
+            [load_history size "file_name"]<br />
+            [load_history "file_name" size]
         </div>
         <div class="doc_predicate_body">
-            Reads the previously saved history of commands for interactive session.
+            Loads the previously saved history of commands for interactive session.
             The size specifies the number of commands.
             The "file_name" specifies the file in which history is stored.
             If no parameters are passed (default option) then the behaviour is OS specific.
