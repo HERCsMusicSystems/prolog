@@ -78,12 +78,17 @@ void prolog_midi_reader :: midi_system_exclusive (midi_stream * line) {
 	// prolog command sysex filter
 	line -> mark ();
 	PrologAtom * atom = servo -> SYSEX_atom;
-	if (line -> check_system_exclusive ()) atom = servo -> sysex_atom;
+	int extension_position = 1;
+	if (line -> check_system_exclusive ()) {atom = servo -> sysex_atom; extension_position = 0;}
 	else line -> restore ();
 	PrologElement * query = root -> pair (root -> atom (atom), root -> earth ());
 	PrologElement * el = query -> getRight ();
 	int ind = line -> get ();
 	while (ind < 247) {
+		if (extension_position >= 0) {
+			if (extension_position == 0 && 0 < midi_channel_extension && midi_channel_extension < 127) ind += midi_channel_extension << 8;
+			extension_position--;
+		}
 		el -> setPair (root -> integer (ind), root -> earth ());
 		el = el -> getRight ();
 		ind = line -> get ();
@@ -321,11 +326,23 @@ public:
 	PrologMidiServiceClass * servo;
 	bool generic_sysex;
 	bool checksum;
+	int correction (int v) {return ((v >> 8) << 4) | (v & 0xf);}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		FIND_MIDI_DESTINATION;
+		PrologElement * v1 = 0;
+		PrologElement * v2 = 0;
+		if (parameters -> isPair ()) {v1 = parameters -> getLeft (); parameters = parameters -> getRight ();}
+		if (parameters -> isPair ()) {v2 = parameters -> getLeft (); parameters = parameters -> getRight ();}
 		destination -> lock ();
-		if (generic_sysex) destination -> open_generic_system_exclusive ();
-		else destination -> open_system_exclusive ();
+		if (generic_sysex) {
+			if (v2 != 0 && v2 -> isInteger ()) destination -> chex (correction (v2 -> getInteger ()));
+			destination -> open_generic_system_exclusive ();
+		} else {
+			if (v1 != 0 && v1 -> isInteger ()) destination -> chex (correction (v1 -> getInteger ()));
+			destination -> open_system_exclusive ();
+		}
+		if (v1 != 0) {if (v1 -> isInteger ()) destination -> insert (v1 -> getInteger () & 0x7f); if (v1 -> isText ()) destination -> insert (v1 -> getText ());}
+		if (v2 != 0) {if (v2 -> isInteger ()) destination -> insert (v2 -> getInteger () & 0x7f); if (v2 -> isText ()) destination -> insert (v2 -> getText ());}
 		while (parameters -> isPair ()) {
 			PrologElement * el = parameters -> getLeft ();
 			if (el -> isInteger ()) destination -> insert (el -> getInteger ());
@@ -347,8 +364,10 @@ public:
 	int chexer (midi_stream * line, int channel, int offset) {line -> lock (); int chx = offset + line -> chex (channel); line -> unlock (); return chx;}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		FIND_MIDI_DESTINATION;
+		if (parameters -> isVar ()) {parameters -> setInteger (destination -> get_channel_extension ()); return true;}
 		if (! parameters -> isPair ()) return false;
 		PrologElement * channel = parameters -> getLeft ();
+		if (channel -> isVar ()) {channel -> setInteger (destination -> get_channel_extension ()); return true;}
 		if (! channel -> isInteger ()) return false;
 		parameters = parameters -> getRight ();
 		if (parameters -> isVar ()) {parameters -> setInteger (chexer (destination, channel -> getInteger (), 0)); return true;}
@@ -362,6 +381,31 @@ public:
 		return true;
 	}
 	chex (PrologMidiServiceClass * servo) {this -> servo = servo;}
+};
+
+class chexer : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * v = parameters -> getLeft (); parameters = parameters -> getRight ();
+		if (v -> isInteger ()) {
+			int iv = v -> getInteger ();
+			parameters -> setPair (); parameters -> getLeft () -> setInteger (iv >> 8); parameters = parameters -> getRight ();
+			parameters -> setPair (); parameters -> getLeft () -> setInteger (iv & 0xf0); parameters = parameters -> getRight ();
+			parameters -> setPair (); parameters -> getLeft () -> setInteger (iv & 0xf);
+			return true;
+		}
+		if (! v -> isVar ()) return false;
+		if (! parameters -> isPair ()) return false;
+		int iv = 0;
+		PrologElement * el = parameters -> getLeft (); if (! el -> isInteger ()) return false; iv = el -> getInteger () << 8; parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		el = parameters -> getLeft (); if (! el -> isInteger ()) return false; iv += el -> getInteger () & 0xf0; parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		el = parameters -> getLeft (); if (! el -> isInteger ()) return false; iv += el -> getInteger () & 0xf;
+		v -> setInteger (iv);
+		return true;
+	}
 };
 
 class keyoff_command : public PrologNativeCode {
@@ -587,6 +631,7 @@ public:
 		while (parameters -> isPair ()) {
 			PrologElement * el = parameters -> getLeft ();
 			if (el -> isInteger ()) destination -> insert (el -> getInteger ());
+			if (el -> isText ()) destination -> insert (el -> getText ());
 			parameters = parameters -> getRight ();
 		}
 		destination -> close_message ();
@@ -1369,6 +1414,7 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "SYSEX") == 0) return new sysex (this, true, false);
 	if (strcmp (name, "SYSEXCH") == 0) return new sysex (this, true, true);
 	if (strcmp (name, "chex") == 0) return new chex (this);
+	if (strcmp (name, "chexer") == 0) return new chexer ();
 	if (strcmp (name, "timingclock") == 0) return new timingclock_command (this);
 	if (strcmp (name, "START") == 0) return new START_command (this);
 	if (strcmp (name, "STOP") == 0) return new STOP_command (this);

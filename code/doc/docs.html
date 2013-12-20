@@ -273,6 +273,7 @@
             <a href="#midi_commands">MIDI commands</a>
             <br />
             <a href="#predicate_chex">chex</a>
+            <a href="#predicate_chexer">chexer</a>
             <a href="#predicate_midi_message">midi_message</a>
             <a href="#predicate_sysex">sysex</a>
             <a href="#predicate_SYSEX">SYSEX</a>
@@ -2962,10 +2963,12 @@
     <a id="predicate_chex">
         <div class="doc_predicate_header">
             [chex (line) channel_11_bit (:) *channel]<br />
-            [chex (line) channel_11_bit offset (:) *offsetted_channel]
+            [chex (line) channel_11_bit offset (:) *offsetted_channel]<br />
+            [chex (line) (:) *extension]
         </div>
         <div class="doc_predicate_body">
-            Inserts channel extension message: <b>0xF3 extension</b>.
+            Inserts channel extension message: <b>0xF3 extension</b> or retrieves
+            the current channel extension from a MIDI line.
             This MIDI message has been invented for the purpose of the HERCs system.
             It extends the number of available MIDI channels to 2048.
             All MIDI commands are designed within this system to transmit
@@ -2978,9 +2981,27 @@
             The <b>chex</b> command emits just the channel extension message
             and returns the lowest 4 bits of the extended channel.
             If the offset is specified then this offset is added to the lowest 4 bits
-            of the extended channel and returned.<br />
+            of the extended channel and returned.
+            If no parameters are specified (only variable) then chex retrieves the current extension channel.<br />
             The purpose of <b>chex</b> is to be used in connection with <b>sysex</b>
             for programming HERCs native MIDI transmission.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_chexer">
+        <div class="doc_predicate_header">
+            [chexer value *extension *offset *channel]<br />
+            [chexer *value extension offset channel]<br />
+            [chexer value extension offset channel]
+        </div>
+        <div class="doc_predicate_body">
+            Combines extension, offset and channel into one value
+            or reconstructs them from the value supplied.
+            It is designed to be used in MIDI system exclusive messages
+            where channel extension is involved.
+            It can also be used for testing.
         </div>
     </a>
 </div>

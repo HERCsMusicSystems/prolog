@@ -11,7 +11,7 @@ program midi #machine := "prolog.midi"
 		noteon noteoff
 
 		income_midi drag_and_drop keyoff keyon polyaftertouch control programchange aftertouch pitch
-		sysex sysexch SYSEX SYSEXCH chex timingclock START CONTINUE STOP activesensing
+		sysex sysexch SYSEX SYSEXCH chex chexer timingclock START CONTINUE STOP activesensing
 		attack release cutoff resonance mono poly bank banklsb portaon portaoff portatime
 		volume reverb chorus foot breath pan modulation holdon holdoff
 		PITCH CONTROL ATTACK RELEASE CUTOFF RESONANCE PORTATIME
@@ -52,6 +52,7 @@ program midi #machine := "prolog.midi"
 #machine SYSEX := "SYSEX"
 #machine SYSEXCH := "SYSEXCH"
 #machine chex := "chex"
+#machine chexer := "chexer"
 
 ; demo
 [[noteon *key] [keyon 0 *key 100]]
