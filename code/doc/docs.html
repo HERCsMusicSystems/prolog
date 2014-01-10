@@ -272,13 +272,25 @@
         <li>
             <a href="#midi_commands">MIDI commands</a>
             <br />
+            <a href="#predicate_activesensing">activesensing</a>
+            <a href="#predicate_aftertouch">aftertouch</a>
             <a href="#predicate_chex">chex</a>
             <a href="#predicate_chexer">chexer</a>
+            <a href="#predicate_CONTINUE">CONTINUE</a>
+            <a href="#predicate_control">control</a>
+            <a href="#predicate_keyoff">keyoff</a>
+            <a href="#predicate_keyon">keyon</a>
             <a href="#predicate_midi_message">midi_message</a>
+            <a href="#predicate_pitch">pitch</a>
+            <a href="#predicate_polyaftertouch">polyaftertouch</a>
+            <a href="#predicate_programchange">programchange</a>
+            <a href="#predicate_START">START</a>
+            <a href="#predicate_STOP">STOP</a>
             <a href="#predicate_sysex">sysex</a>
             <a href="#predicate_SYSEX">SYSEX</a>
             <a href="#predicate_sysexch">sysexch</a>
             <a href="#predicate_SYSEXCH">SYSEXCH</a>
+            <a href="#predicate_timingclock">timingclock</a>
         </li>
         <li>
             <a href="#musical_processing">Musical processing</a>
@@ -2960,6 +2972,36 @@
 <div class="doc_library_section"><a id="midi_commands">MIDI commands</a></div>
 
 <div class="doc_predicate">
+    <a id="predicate_activesensing">
+        <div class="doc_predicate_header">
+            [activesensing (line)]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>activesensing</b> MIDI message <b>= 0xFE</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_aftertouch">
+        <div class="doc_predicate_header">
+            [aftertouch (line) ch vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>aftertouch</b> MIDI message <b>= 0xDc vv</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_chex">
         <div class="doc_predicate_header">
             [chex (line) channel_11_bit (:) *channel]<br />
@@ -3002,6 +3044,118 @@
             It is designed to be used in MIDI system exclusive messages
             where channel extension is involved.
             It can also be used for testing.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_CONTINUE">
+        <div class="doc_predicate_header">
+            [CONTINUE (line)]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>continue</b> MIDI message <b>= 0xFB</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_control">
+        <div class="doc_predicate_header">
+            [control (line) ch cc vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>control</b> MIDI message <b>= 0xBc cc vv</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_keyoff">
+        <div class="doc_predicate_header">
+            [keyoff (line) ch kk]<br />
+            [keyoff (line) ch kk vv]<br />
+            [keyoff (line) ch]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>keyoff</b> MIDI message <b>= 0x8c kk vv</b> or <b>all-keys-off</b> control MIDI message <b>= 0xBc 123 0</b>.
+            If the velocity value is omitted then the default ZERO is used instead.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_keyon">
+        <div class="doc_predicate_header">
+            [keyon (line) ch kk vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>keyon</b> MIDI message <b>= 0x9c kk vv</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_midi_message">
+        <div class="doc_predicate_header">
+            [midi_message (line) v1 v2 .... vn]
+        </div>
+        <div class="doc_predicate_body">
+            Sends an arbitrary sequence of numbers into a MIDI line as they are.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_pitch">
+        <div class="doc_predicate_header">
+            [pitch (line) ch hh]<br />
+            [pitch (line) ch ll hh]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>pitch</b> MIDI message <b>= 0xEc ll hh</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_polyaftertouch">
+        <div class="doc_predicate_header">
+            [polyaftertouch (line) ch kk vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>polyaftertouch</b> MIDI message <b>= 0xAc kk vv</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
         </div>
     </a>
 </div>
