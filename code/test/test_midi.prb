@@ -69,6 +69,7 @@
 [mdt "YAMAHA sysex with channel extension" [[SYSEX 0x43 2049 2 3]] [midi_message 0xf3 8 240 0x43 1 2 3 247]]
 [mdt "YAMAHA-based HERCs sysex" [[sysex 1 2 3]] [midi_message 0xf3 0 240 0x43 "HRCs" 1 2 3 247]]
 [mdt "YAMAHA-based HERCs sysex with channel extension" [[sysex 4097 2 3]] [midi_message 0xf3 16 240 0x43 "HRCs" 1 2 3 247]]
+[mdt "YAMAHA-based HERCs sysex with channel extension above 16" [[sysex 0x567 2 3]] [midi_message 0xf3 0x5 240 0x43 "HRCs" 0x67 2 3 247]]
 
 [mdt "keyon 4 60 100, keyon 75 61 101" [[keyon 4 60 100] [keyon 75 61 101]] [keyon 4 60 100] [keyon 75 61 101]]
 [mdt "keyon 5 76 56, keyon 5 77 88, keyon 21 44 55" [[keyon 5 76 56] [keyon 5 77 88] [keyon 21 44 55]] [midi_message 0xf3 0 0x95 76 56 77 88 0xf3 1 0x95 44 55]]
@@ -88,6 +89,8 @@
 [mdt "0xfx...." [[timingclock] [START] [STOP] [CONTINUE] [activesensing]] [midi_message 0xf8 0xfa 0xfc 0xfb 0xfe]]
 [mdt "activesensing (line)" [[activesensing]] [activesensing line3]]
 [TestFails "activesensing command" [activesensing command]]
+
+[mdt "attack...." [[control 173 73 45]] [attack 173 45]]
 
 ;[keyon 0 60 100]
 ;[attack 0 76]

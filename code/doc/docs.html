@@ -3177,6 +3177,127 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_programchange">
+        <div class="doc_predicate_header">
+            [programchange (line) ch pp]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>programchange</b> MIDI message <b>= 0xCc pp</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_START">
+        <div class="doc_predicate_header">
+            [START (line)]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>start</b> MIDI message <b>= 0xFA</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_STOP">
+        <div class="doc_predicate_header">
+            [STOP (line)]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>stop</b> MIDI message <b>= 0xFC</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_sysex">
+        <div class="doc_predicate_header">
+            [sysex (line) cvv dd .... dd]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>system exclusive</b> MIDI message <b>= (0xF3 c) 0xF0 manufacturers_id product_id vv dd .... dd 0xF7</b>.
+            Channel extension <b>c</b> (if differs), manufacturers_id (1 or 3 bytes) and product_id (up to 4 bytes)
+            are automatically inserted.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_SYSEX">
+        <div class="doc_predicate_header">
+            [SYSEX (line) id cvv dd .... dd]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>system exclusive</b> MIDI message <b>= (0xF3 c) 0xF0 id vv dd .... dd 0xF7</b>.
+            Channel extension <b>c</b> (if differs) is automatically inserted.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_sysexch">
+        <div class="doc_predicate_header">
+            [sysexch (line) cvv dd .... dd]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>system exclusive</b> MIDI message <b>= (0xF3 c) 0xF0 manufacturers_id product_id vv dd .... dd cs 0xF7</b>.
+            Channel extension <b>c</b> (if differs), manufacturers_id (1 or 3 bytes), product_id (up to 4 bytes)
+            and checksum <b>cs</b> (calculated)
+            are automatically inserted.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_SYSEXCH">
+        <div class="doc_predicate_header">
+            [SYSEXCH (line) id cvv dd .... dd]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>system exclusive</b> MIDI message <b>= (0xF3 c) 0xF0 id vv dd .... dd cs 0xF7</b>.
+            Channel extension <b>c</b> (if differs) and checksum <b>cs</b> (calculated) are automatically inserted.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_timingclock">
+        <div class="doc_predicate_header">
+            [timingclock (line)]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>timingclock</b> MIDI message <b>= 0xF8</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="###">
         <div class="doc_predicate_header">
             ###
