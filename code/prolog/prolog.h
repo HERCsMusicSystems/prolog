@@ -59,6 +59,7 @@ extern int area_cat (char * area, int ind, char * from);
 extern int area_cat (char * area, int ind, char c);
 extern int area_cat_number (char * area, int ind, int sub);
 extern int area_cat_number (char * area, int ind, double db);
+extern void relativise (char * path, char * pwd, char * relative);
 extern int indexOf (char * text, char c);
 extern void drop_stack (PrologQuery * from, PrologQuery * to);
 

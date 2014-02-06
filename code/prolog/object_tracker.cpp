@@ -192,6 +192,21 @@ int area_cat_number (char * area, int ind, double db) {
 	return area_cat (area, ind, text);
 }
 
+void relativise (char * path, char * pwd, char * relative) {
+	if (pwd == 0 || path == 0 || relative == 0) return;
+	while (* pwd != '\0' && * pwd == * path) {pwd++; path++;}
+	if (* path == '/' || * path == '\\') path++;
+	int rpt = 0;
+	bool should_escape = false;
+	while (* pwd != '\0') {
+		if (* pwd == '/' || * pwd == '\\') {should_escape = false; rpt = area_cat (relative, rpt, "../");}
+		else should_escape = true;
+		pwd++;
+	}
+	if (should_escape) rpt = area_cat (relative, rpt, "../");
+	rpt = area_cat (relative, rpt, path);
+}
+
 int indexOf (char * text, char c) {
 	int ind = 0;
 	char cx = text [ind];

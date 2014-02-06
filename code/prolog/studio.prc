@@ -15,7 +15,7 @@ program studio #machine := "prolog.studio"
 		file_writer import load consult batch file_reader reload
 		remove_module create_module set_machine
 		add_search_directory search_directories
-		cd dir ls DIR ARGS args args_tail edit execute make_directory erase erase_directory move copy
+		cd relativise_path dir ls DIR ARGS args args_tail edit execute make_directory erase erase_directory move copy
 		operating_system
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
 		create_atom search_atom preprocessor prompt
@@ -147,6 +147,7 @@ program studio #machine := "prolog.studio"
 #machine add_search_directory := "add_search_directory"
 #machine search_directories := "search_directories"
 #machine cd := "cd"
+#machine relativise_path := "relativise_path"
 #machine DIR := "DIR"
 #machine ARGS := "ARGS"
 #machine edit := "edit"

@@ -161,6 +161,7 @@
             <a href="#predicate_read">read</a>
             <a href="#predicate_load_history">load_history</a>
             <a href="#predicate_readln">readln</a>
+            <a href="#predicate_relativise_path">relativise_path</a>
             <a href="#predicate_reload">reload</a>
             <a href="#predicate_remove_module">remove_module</a>
             <a href="#predicate_save_history">save_history</a>
@@ -1389,6 +1390,21 @@
         </div>
         <div class="doc_predicate_body">
             Skips whitespaces and then reads the input text from the console, until a new line is detected.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_relativise_path">
+        <div class="doc_predicate_header">
+            [relativise_path path *relative]<br />
+            [relativise_path path : *relative]<br />
+            [relativise_path path working_directory *relative]<br />
+            [relativise_path path working_directory : *relative]
+        </div>
+        <div class="doc_predicate_body">
+            Calculates path, which is relative to working directory.
+            If working directory is omitted then the current working directory is used.
         </div>
     </a>
 </div>

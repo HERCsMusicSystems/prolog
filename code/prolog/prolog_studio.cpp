@@ -2149,6 +2149,39 @@ public:
 	cd (PrologRoot * root) {this -> root = root;}
 };
 
+class relativise_path : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * path = parameters -> getLeft ();
+		if (! path -> isText ()) return false; parameters = parameters -> getRight ();
+		AREA area;
+		if (parameters -> isVar ()) {
+			relativise (path -> getText (), root -> getCWD (), area);
+			parameters -> setText (area);
+			return true;
+		}
+		if (! parameters -> isPair ()) return false;
+		PrologElement * argument = parameters -> getLeft ();
+		if (argument -> isVar ()) {
+			relativise (path -> getText (), root -> getCWD (), area);
+			argument -> setText (area);
+			return true;
+		}
+		if (! argument -> isText ()) return false;
+		parameters = parameters -> getRight ();
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (parameters -> isVar ()) {
+			relativise (path -> getText (), argument -> getText (), area);
+			parameters -> setText (area);
+			return true;
+		}
+		return false;
+	}
+	relativise_path (PrologRoot * root) {this -> root = root;}
+};
+
 class DIR : public PrologNativeCode {
 private:
 	PrologRoot * root;
@@ -3249,6 +3282,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "add_search_directory") == 0) return new add_search_directory (root);
 	if (strcmp (name, "search_directories") == 0) return new search_directories (root);
 	if (strcmp (name, "cd") == 0) return new cd (root);
+	if (strcmp (name, "relativise_path") == 0) return new relativise_path (root);
 	if (strcmp (name, "DIR") == 0) return new DIR (root);
 	if (strcmp (name, "ARGS") == 0) return new ARGS (root);
 	if (strcmp (name, "edit") == 0) return new edit (root);
