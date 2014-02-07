@@ -799,7 +799,7 @@ class control_command : public MidiShortCommand {
 public: control_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 3, 176) {}};
 
 class banklsb_command : public MidiShortCommand {
-public: banklsb_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 0) {}};
+public: banklsb_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 32) {}};
 
 class attack_command : public MidiShortCommand {
 public: attack_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 73) {}};
