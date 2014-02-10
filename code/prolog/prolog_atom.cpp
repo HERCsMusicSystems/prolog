@@ -29,7 +29,8 @@ PrologAtom :: PrologAtom (void) TRACKING (14) {
 	firstClause = NULL;
 	machine = NULL;
 	PROLOG_STRING name;
-	sprintf (name, "<Atom:=%p>", (void *) this);
+	time_t time_stamp = time (0);
+	sprintf (name, "<Atom=%p#%p>", (void *) this, time_stamp);
 	atomName = create_text (name);
 	next = NULL;
 	COLLECTOR_RESET (0)
