@@ -110,6 +110,9 @@ public:
 	void unProtect (void);
 	void unPrivate (void);
 	bool setMachine (PrologNativeCode * obj);
+	bool isTypeOf (PrologAtom * atom);
+	bool isTypeOf (PrologNativeCode * code);
+	char * machineType (void);
 	PrologNativeCode * getMachine (void);
 };
 
@@ -225,6 +228,7 @@ class PrologNativeCode TRACK {
 public:
 	char * name (void);
 	virtual char * codeName (void);
+	virtual bool isTypeOf (PrologNativeCode * code);
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution);
 	PrologNativeCode (void);
 	virtual ~ PrologNativeCode (void);

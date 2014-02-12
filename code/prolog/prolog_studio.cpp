@@ -2077,6 +2077,27 @@ public:
 	set_machine (PrologRoot * root) {this -> root = root;}
 };
 
+class machine_type : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * argument = parameters -> getLeft ();
+		if (! argument -> isAtom ()) return false;
+		PrologAtom * atom = argument -> getAtom ();
+		parameters = parameters -> getRight ();
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (parameters -> isVar ()) {
+			char * machine_name = atom -> machineType ();
+			if (machine_name == 0) return false;
+			parameters -> setText (machine_name);
+			return true;
+		}
+		if (parameters -> isAtom ()) return atom -> isTypeOf (parameters -> getAtom ());
+		if (parameters -> isEarth ()) return atom -> isTypeOf (this);
+		return false;
+	}
+};
+
 class add_search_directory : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -3278,6 +3299,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "consult_loader") == 0) return new consult_loader (root);
 	if (strcmp (name, "remove_module") == 0) return new remove_module (root);
 	if (strcmp (name, "set_machine") == 0) return new set_machine (root);
+	if (strcmp (name, "machine_type") == 0) return new machine_type ();
 	if (strcmp (name, "create_module") == 0) return new create_module (root);
 	if (strcmp (name, "add_search_directory") == 0) return new add_search_directory (root);
 	if (strcmp (name, "search_directories") == 0) return new search_directories (root);

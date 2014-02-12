@@ -13,7 +13,7 @@ program studio #machine := "prolog.studio"
 		pr read readln
 		write nl pp pt list
 		file_writer import load consult batch file_reader reload
-		remove_module create_module set_machine
+		remove_module create_module set_machine machine_type
 		add_search_directory search_directories
 		cd relativise_path dir ls DIR ARGS args args_tail edit execute make_directory erase erase_directory move copy
 		operating_system
@@ -144,6 +144,7 @@ program studio #machine := "prolog.studio"
 #machine remove_module := "remove_module"
 #machine create_module := "create_module"
 #machine set_machine := "set_machine"
+#machine machine_type := "machine_type"
 #machine add_search_directory := "add_search_directory"
 #machine search_directories := "search_directories"
 #machine cd := "cd"
