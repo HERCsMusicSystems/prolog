@@ -212,6 +212,7 @@ void midi_stream :: insert_keyon (int channel, int key, int velocity) {lock (); 
 void midi_stream :: insert_pat (int channel, int key, int value) {lock (); insert (0xa0 + chex (channel), key, value); unlock ();}
 void midi_stream :: insert_control (int channel, int control, int value) {
 	lock ();
+	if (value < 0) value = 128 + value;
 	if (value >= 128) {
 		channel = 0xb0 + chex (channel);
 		insert (channel, control + 32, 127);
@@ -236,6 +237,7 @@ void midi_stream :: insert_nrpn (int channel) {
 void midi_stream :: insert_nrpn (int channel, int msb_data) {
 	lock ();
 	channel = 0xb0 + chex (channel);
+	if (msb_data < 0) msb_data = 128 + msb_data;
 	if (msb_data >= 128) {
 		insert (channel, 38, 127);
 		insert (channel, 6, 127);
@@ -254,6 +256,7 @@ void midi_stream :: insert_nrpn (int channel, int msb, int lsb, int msb_data) {
 	channel = 0xb0 + chex (channel);
 	insert (channel, 99, msb);
 	insert (channel, 98, lsb);
+	if (msb_data < 0) msb_data = 128 + msb_data;
 	if (msb_data >= 128) {
 		insert (channel, 38, 127);
 		insert (channel, 6, 127);
@@ -272,6 +275,7 @@ void midi_stream :: insert_nrpn (int channel, int msb, int lsb, int msb_data, in
 void midi_stream :: insert_nrpn_14 (int channel, int data) {
 	lock ();
 	channel = 0xb0 + chex (channel);
+	if (data < 0) data = 16384 + data;
 	insert (channel, 38, data & 0x7f);
 	insert (channel, 6, (data >> 7) & 0x7f);
 	unlock ();
@@ -281,6 +285,7 @@ void midi_stream :: insert_nrpn_14 (int channel, int msb, int lsb, int data) {
 	channel = 0xb0 + chex (channel);
 	insert (channel, 99, msb);
 	insert (channel, 98, lsb);
+	if (data < 0) data = 16384 + data;
 	insert (channel, 38, data & 0x7f);
 	insert (channel, 6, (data >> 7) & 0x7f);
 	unlock ();
