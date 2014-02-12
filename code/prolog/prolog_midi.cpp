@@ -585,7 +585,8 @@ public:
 		FIND_MIDI_DESTINATION;
 		int numbers [5];
 		int ind = 0;
-		while (parameters -> isPair () && ind < 5) {
+		while (parameters -> isPair ()) {
+			if (ind >= 5) return false;
 			PrologElement * el = parameters -> getLeft ();
 			if (! el -> isInteger ()) return false;
 			numbers [ind++] = el -> getInteger ();
@@ -614,7 +615,7 @@ public:
 			else destination -> insert_nrpn (numbers [0], numbers [1], numbers [2], numbers [3]);
 			break;
 		case 5: destination -> insert_nrpn (numbers [0], numbers [1], numbers [2], numbers [3], numbers [4]); break;
-		default: return false;
+		default: return false; break;
 		}
 		destination -> ready ();
 		return true;
@@ -791,129 +792,6 @@ public:
 		this -> extended = extended;
 	}
 };
-
-class keyon_command : public MidiShortCommand {
-public: keyon_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 3, 144) {}};
-
-class control_command : public MidiShortCommand {
-public: control_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 3, 176) {}};
-
-class banklsb_command : public MidiShortCommand {
-public: banklsb_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 32) {}};
-
-class attack_command : public MidiShortCommand {
-public: attack_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 73) {}};
-
-class release_command : public MidiShortCommand {
-public: release_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 72) {}};
-
-class cutoff_command : public MidiShortCommand {
-public: cutoff_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 74) {}};
-
-class resonance_command : public MidiShortCommand {
-public: resonance_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 71) {}};
-
-class portatime_command : public MidiShortCommand {
-public: portatime_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 5) {}};
-
-class volume_command : public MidiShortCommand {
-public: volume_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 7) {}};
-
-class reverb_command : public MidiShortCommand {
-public: reverb_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 91) {}};
-
-class chorus_command : public MidiShortCommand {
-public: chorus_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 93) {}};
-
-class foot_command : public MidiShortCommand {
-public: foot_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 4) {}};
-
-class breath_command : public MidiShortCommand {
-public: breath_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 2) {}};
-
-class pan_command : public MidiShortCommand {
-public: pan_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 10) {}};
-
-class modulation_command : public MidiShortCommand {
-public: modulation_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 1) {}};
-
-class mono_command : public MidiShortCommand {
-public: mono_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 1, 126, 0) {}};
-
-class poly_command : public MidiShortCommand {
-public: poly_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 1, 127, 0) {}};
-
-class portaon_command : public MidiShortCommand {
-public: portaon_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 1, 65, 127) {}};
-
-class portaoff_command : public MidiShortCommand {
-public: portaoff_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 1, 65, 0) {}};
-
-class holdon_command : public MidiShortCommand {
-public: holdon_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 1, 64, 127) {}};
-
-class holdoff_command : public MidiShortCommand {
-public: holdoff_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 1, 64, 0) {}};
-
-class CONTROL_command : public MidiShortCommand {
-public: CONTROL_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 3, 176, true) {}};
-
-class ATTACK_command : public MidiShortCommand {
-public: ATTACK_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 73, true) {}};
-
-class RELEASE_command : public MidiShortCommand {
-public: RELEASE_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 72, true) {}};
-
-class CUTOFF_command : public MidiShortCommand {
-public: CUTOFF_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 74, true) {}};
-
-class RESONANCE_command : public MidiShortCommand {
-public: RESONANCE_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 71, true) {}};
-
-class PORTATIME_command : public MidiShortCommand {
-public: PORTATIME_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 5, true) {}};
-
-class VOLUME_command : public MidiShortCommand {
-public: VOLUME_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 7, true) {}};
-
-class REVERB_command : public MidiShortCommand {
-public: REVERB_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 91, true) {}};
-
-class CHORUS_command : public MidiShortCommand {
-public: CHORUS_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 93, true) {}};
-
-class FOOT_command : public MidiShortCommand {
-public: FOOT_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 4, true) {}};
-
-class BREATH_command : public MidiShortCommand {
-public: BREATH_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 2, true) {}};
-
-class PAN_command : public MidiShortCommand {
-public: PAN_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 10, true) {}};
-
-class MODULATION_command : public MidiShortCommand {
-public: MODULATION_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 176, 1, true) {}};
-
-class polyaftertouch_command : public MidiShortCommand {
-public: polyaftertouch_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 3, 160) {}};
-
-class aftertouch_command : public MidiShortCommand {
-public: aftertouch_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 2, 208) {}};
-
-class timingclock_command : public MidiShortCommand {
-public: timingclock_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 0, 248) {}};
-
-class START_command : public MidiShortCommand {
-public: START_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 0, 250) {}};
-
-class STOP_command : public MidiShortCommand {
-public: STOP_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 0, 252) {}};
-
-class CONTINUE_command : public MidiShortCommand {
-public: CONTINUE_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 0, 251) {}};
-
-class activesensing_command : public MidiShortCommand {
-public: activesensing_command (PrologMidiServiceClass * servo) : MidiShortCommand (servo, 0, 254) {}};
 
 class interval_processor : public PrologNativeCode {
 public:
@@ -1376,9 +1254,9 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "defaultDestination") == 0) return new DefaultDestination (this);
 	if (strcmp (name, "midi_message") == 0) return new midi_message_command (this);
 	if (strcmp (name, "keyoff") == 0) return new keyoff_command (this);
-	if (strcmp (name, "keyon") == 0) return new keyon_command (this);
-	if (strcmp (name, "polyaftertouch") == 0) return new polyaftertouch_command (this);
-	if (strcmp (name, "aftertouch") == 0) return new aftertouch_command (this);
+	if (strcmp (name, "keyon") == 0) return new MidiShortCommand (this, 3, 144);
+	if (strcmp (name, "polyaftertouch") == 0) return new MidiShortCommand (this, 3, 160);
+	if (strcmp (name, "aftertouch") == 0) return new MidiShortCommand (this, 2, 208);
 	if (strcmp (name, "programchange") == 0) return new programchange_command (this);
 	if (strcmp (name, "pitch") == 0) return new pitch_command (this, false);
 	if (strcmp (name, "bank") == 0) return new bank_command (this);
@@ -1387,53 +1265,53 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "egcopy_amp") == 0) return new egcopy (this, 32);
 	if (strcmp (name, "egcopy_pan") == 0) return new egcopy (this, 48);
 	if (strcmp (name, "egcopy") == 0) return new egcopy (this, 32);
-	if (strcmp (name, "control") == 0) return new control_command (this);
-	if (strcmp (name, "banklsb") == 0) return new banklsb_command (this);
-	if (strcmp (name, "attack") == 0) return new attack_command (this);
-	if (strcmp (name, "release") == 0) return new release_command (this);
-	if (strcmp (name, "cutoff") == 0) return new cutoff_command (this);
-	if (strcmp (name, "resonance") == 0) return new resonance_command (this);
-	if (strcmp (name, "portatime") == 0) return new portatime_command (this);
-	if (strcmp (name, "volume") == 0) return new volume_command (this);
-	if (strcmp (name, "reverb") == 0) return new reverb_command (this);
-	if (strcmp (name, "chorus") == 0) return new chorus_command (this);
-	if (strcmp (name, "foot") == 0) return new foot_command (this);
-	if (strcmp (name, "breath") == 0) return new breath_command (this);
-	if (strcmp (name, "pan") == 0) return new pan_command (this);
-	if (strcmp (name, "modulation") == 0) return new modulation_command (this);
+	if (strcmp (name, "control") == 0) return new MidiShortCommand (this, 3, 176);
+	if (strcmp (name, "banklsb") == 0) return new MidiShortCommand (this, 2, 176, 32);
+	if (strcmp (name, "attack") == 0) return new MidiShortCommand (this, 2, 176, 73);
+	if (strcmp (name, "release") == 0) return new MidiShortCommand (this, 2, 176, 72);
+	if (strcmp (name, "cutoff") == 0) return new MidiShortCommand (this, 2, 176, 74);
+	if (strcmp (name, "resonance") == 0) return new MidiShortCommand (this, 2, 176, 71);
+	if (strcmp (name, "portatime") == 0) return new MidiShortCommand (this, 2, 176, 5);
+	if (strcmp (name, "volume") == 0) return new MidiShortCommand (this, 2, 176, 7);
+	if (strcmp (name, "reverb") == 0) return new MidiShortCommand (this, 2, 176, 91);
+	if (strcmp (name, "chorus") == 0) return new MidiShortCommand (this, 2, 176, 93);
+	if (strcmp (name, "foot") == 0) return new MidiShortCommand (this, 2, 176, 4);
+	if (strcmp (name, "breath") == 0) return new MidiShortCommand (this, 2, 176, 2);
+	if (strcmp (name, "pan") == 0) return new MidiShortCommand (this, 2, 176, 10);
+	if (strcmp (name, "modulation") == 0) return new MidiShortCommand (this, 2, 176, 1);
 	if (strcmp (name, "nrpn") == 0) return new nrpn_rpn_command (this);
 	if (strcmp (name, "rpn") == 0) return new nrpn_rpn_command (this, true);
-	if (strcmp (name, "mono") == 0) return new mono_command (this);
-	if (strcmp (name, "poly") == 0) return new poly_command (this);
-	if (strcmp (name, "portaon") == 0) return new portaon_command (this);
-	if (strcmp (name, "portaoff") == 0) return new portaoff_command (this);
-	if (strcmp (name, "holdon") == 0) return new holdon_command (this);
-	if (strcmp (name, "holdoff") == 0) return new holdoff_command (this);
+	if (strcmp (name, "mono") == 0) return new MidiShortCommand (this, 1, 126, 0);
+	if (strcmp (name, "poly") == 0) return new MidiShortCommand (this, 1, 127, 0);
+	if (strcmp (name, "portaon") == 0) return new MidiShortCommand (this, 1, 65, 127);
+	if (strcmp (name, "portaoff") == 0) return new MidiShortCommand (this, 1, 65, 0);
+	if (strcmp (name, "holdon") == 0) return new MidiShortCommand (this, 1, 64, 127);
+	if (strcmp (name, "holdoff") == 0) return new MidiShortCommand (this, 1, 64, 0);
 	if (strcmp (name, "sysex") == 0) return new sysex (this, false, false);
 	if (strcmp (name, "sysexch") == 0) return new sysex (this, false, true);
 	if (strcmp (name, "SYSEX") == 0) return new sysex (this, true, false);
 	if (strcmp (name, "SYSEXCH") == 0) return new sysex (this, true, true);
 	if (strcmp (name, "chex") == 0) return new chex (this);
 	if (strcmp (name, "chexer") == 0) return new chexer ();
-	if (strcmp (name, "timingclock") == 0) return new timingclock_command (this);
-	if (strcmp (name, "START") == 0) return new START_command (this);
-	if (strcmp (name, "STOP") == 0) return new STOP_command (this);
-	if (strcmp (name, "CONTINUE") == 0) return new CONTINUE_command (this);
-	if (strcmp (name, "activesensing") == 0) return new activesensing_command (this);
+	if (strcmp (name, "timingclock") == 0) return new MidiShortCommand (this, 0, 248);
+	if (strcmp (name, "START") == 0) return new MidiShortCommand (this, 0, 250);
+	if (strcmp (name, "STOP") == 0) return new MidiShortCommand (this, 0, 252);
+	if (strcmp (name, "CONTINUE") == 0) return new MidiShortCommand (this, 0, 251);
+	if (strcmp (name, "activesensing") == 0) return new MidiShortCommand (this, 0, 254);
 	if (strcmp (name, "PITCH") == 0) return new pitch_command (this, true);
-	if (strcmp (name, "CONTROL") == 0) return new CONTROL_command (this);
-	if (strcmp (name, "ATTACK") == 0) return new ATTACK_command (this);
-	if (strcmp (name, "RELEASE") == 0) return new RELEASE_command (this);
-	if (strcmp (name, "CUTOFF") == 0) return new CUTOFF_command (this);
-	if (strcmp (name, "RESONANCE") == 0) return new RESONANCE_command (this);
-	if (strcmp (name, "PORTATIME") == 0) return new PORTATIME_command (this);
-	if (strcmp (name, "VOLUME") == 0) return new VOLUME_command (this);
-	if (strcmp (name, "REVERB") == 0) return new REVERB_command (this);
-	if (strcmp (name, "CHORUS") == 0) return new CHORUS_command (this);
-	if (strcmp (name, "FOOT") == 0) return new FOOT_command (this);
-	if (strcmp (name, "BREATH") == 0) return new BREATH_command (this);
-	if (strcmp (name, "PAN") == 0) return new PAN_command (this);
-	if (strcmp (name, "MODULATION") == 0) return new MODULATION_command (this);
+	if (strcmp (name, "CONTROL") == 0) return new MidiShortCommand (this, 3, 176, -1, true);
+	if (strcmp (name, "ATTACK") == 0) return new MidiShortCommand (this, 2, 176, 73, true);
+	if (strcmp (name, "RELEASE") == 0) return new MidiShortCommand (this, 2, 176, 72, true);
+	if (strcmp (name, "CUTOFF") == 0) return new MidiShortCommand (this, 2, 176, 74, true);
+	if (strcmp (name, "RESONANCE") == 0) return new MidiShortCommand (this, 2, 176, 71, true);
+	if (strcmp (name, "PORTATIME") == 0) return new MidiShortCommand (this, 2, 176, 5, true);
+	if (strcmp (name, "VOLUME") == 0) return new MidiShortCommand (this, 2, 176, 7, true);
+	if (strcmp (name, "REVERB") == 0) return new MidiShortCommand (this, 2, 176, 91, true);
+	if (strcmp (name, "CHORUS") == 0) return new MidiShortCommand (this, 2, 176, 93, true);
+	if (strcmp (name, "FOOT") == 0) return new MidiShortCommand (this, 2, 176, 4, true);
+	if (strcmp (name, "BREATH") == 0) return new MidiShortCommand (this, 2, 176, 2, true);
+	if (strcmp (name, "PAN") == 0) return new MidiShortCommand (this, 2, 176, 10, true);
+	if (strcmp (name, "MODULATION") == 0) return new MidiShortCommand (this, 2, 176, 1, true);
 	if (strcmp (name, "NRPN") == 0) return new nrpn_rpn_command (this, false, true);
 	if (strcmp (name, "DCMOD") == 0) return new DCMOD ();
 	if (strcmp (name, "INTERVAL") == 0) return new interval_processor (root, this);
