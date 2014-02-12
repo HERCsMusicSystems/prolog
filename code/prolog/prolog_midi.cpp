@@ -184,7 +184,10 @@ SourceMidiLine :: SourceMidiLine (PrologRoot * root, PrologAtom * atom, PrologMi
 SourceMidiLine :: ~ SourceMidiLine (void) {if (reader) delete reader; reader = 0; printf ("SOURCE LINE DELETED.\n");}
 
 char * PrologMidiNativeCode :: name (void) {return midi_internal_line_name;}
-char * PrologMidiNativeCode :: codeName (void) {return midi_internal_line_name;}
+char * PrologMidiNativeCode :: codeName (void) {return name ();}
+bool PrologMidiNativeCode :: isTypeOf (char * code_name) {return name () == code_name ? true : PrologNativeCode :: isTypeOf (code_name);}
+
+class MidiLineType : public PrologNativeCode {public: char * codeName (void) {return PrologMidiNativeCode :: name ();}};
 
 class PrologMidiLineNativeCode : public PrologMidiNativeCode {
 public:
@@ -199,7 +202,7 @@ public:
 		PrologElement * el = parameters -> getLeft (); parameters = parameters -> getRight ();
 		if (! el -> isAtom ()) return false;
 		PrologNativeCode * machine = el -> getAtom () -> getMachine ();
-		if (machine != 0 && machine -> codeName () == PrologMidiNativeCode :: name ()) return connectThru ((PrologMidiNativeCode *) machine);
+		if (machine != 0 && machine -> isTypeOf (PrologMidiNativeCode :: name ())) return connectThru ((PrologMidiNativeCode *) machine);
 		if (el -> getAtom () == servo -> midi_manufacturers_id_atom) {
 			if (parameters -> isEarth ()) {line -> set_manufacturers_id (); return true;}
 			if (! parameters -> isPair ()) return false;
@@ -231,7 +234,7 @@ public:
 			parameters = parameters -> getLeft ();
 			if (! parameters -> isAtom ()) return false;
 			machine = parameters -> getAtom () -> getMachine ();
-			if (machine == 0 || machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
+			if (machine == 0 || (! machine -> isTypeOf (PrologMidiNativeCode :: name ()))) return false;
 			return connectThru ((PrologMidiNativeCode *) machine);
 		}
 		if (el -> getAtom () == servo -> default_destination_atom) {
@@ -278,13 +281,13 @@ public:
 		if (! parameters -> isPair ()) return false;
 		PrologElement * source = parameters -> getLeft (); if (! source -> isAtom ()) return false; parameters = parameters -> getRight ();
 		PrologNativeCode * machine = source -> getAtom () -> getMachine ();
-		if (machine == 0 || machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
+		if (machine == 0 || (! machine -> isTypeOf (PrologMidiNativeCode :: name ()))) return false;
 		PrologMidiNativeCode * source_code = (PrologMidiNativeCode *)  machine;
 		if (parameters -> isEarth ()) {source_code -> connectThru (0); return false;}
 		if (! parameters -> isPair ()) return false;
 		PrologElement * destination = parameters -> getLeft (); if (! destination -> isAtom ()) return false;
 		machine = destination -> getAtom () -> getMachine ();
-		if (machine == 0 || machine -> codeName () != PrologMidiNativeCode :: name ()) return false;
+		if (machine == 0 || (! machine -> isTypeOf (PrologMidiNativeCode :: name ()))) return false;
 		PrologMidiNativeCode * destination_code = (PrologMidiNativeCode *) machine;
 		return source_code -> connectThru (destination_code);
 	}
@@ -300,7 +303,7 @@ public:
 		parameters = parameters -> getLeft ();
 		if (! parameters -> isAtom ()) return false;
 		PrologNativeCode * code = parameters -> getAtom () -> getMachine ();
-		if (code == 0 || code -> codeName () != PrologMidiNativeCode :: name ()) return false;
+		if (code == 0 || (! code -> isTypeOf (PrologMidiNativeCode :: name ()))) return false;
 		servo -> default_destination = ((PrologMidiNativeCode *) code) -> getLine ();
 		return true;
 	}
@@ -314,7 +317,7 @@ public:
 			if (el -> isAtom ()) {\
 				PrologNativeCode * machine = el -> getAtom () -> getMachine ();\
 				if (machine == 0) return false;\
-				if (machine -> codeName () != PrologMidiNativeCode :: name ()) return false;\
+				if (! machine -> isTypeOf (PrologMidiNativeCode :: name ())) return false;\
 				destination = ((PrologMidiNativeCode *) machine) -> getLine ();\
 				parameters = parameters -> getRight ();\
 			}\
@@ -1252,6 +1255,7 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "createDestination") == 0) return new CreateDestination ();
 	if (strcmp (name, "connectThru") == 0) return new ConnectThru ();
 	if (strcmp (name, "defaultDestination") == 0) return new DefaultDestination (this);
+	if (strcmp (name, "MidiLineType") == 0) return new MidiLineType ();
 	if (strcmp (name, "midi_message") == 0) return new midi_message_command (this);
 	if (strcmp (name, "keyoff") == 0) return new keyoff_command (this);
 	if (strcmp (name, "keyon") == 0) return new MidiShortCommand (this, 3, 144);

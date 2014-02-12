@@ -24,9 +24,9 @@
 
 static char * native_code_name = "PrologNativeCode";
 char * PrologNativeCode :: name (void) {return native_code_name;}
-char * PrologNativeCode :: codeName (void) {return native_code_name;}
+char * PrologNativeCode :: codeName (void) {return name ();}
 bool PrologNativeCode :: code (PrologElement * parameter, PrologResolution * resolution) {return true;}
-bool PrologNativeCode :: isTypeOf (PrologNativeCode * machine) {return machine == 0 ? false : codeName () == machine -> codeName ();}
+bool PrologNativeCode :: isTypeOf (char * code_name) {return name () == code_name;}
 PrologNativeCode :: PrologNativeCode (void) TRACKING (16) {}
 PrologNativeCode :: ~ PrologNativeCode (void) {}
 

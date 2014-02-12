@@ -138,13 +138,13 @@ bool PrologAtom :: isTypeOf (PrologAtom * atom) {
 	if (machine == 0) return false;
 	PrologNativeCode * machine_type = atom -> getMachine ();
 	if (machine_type == 0) return false;
-	return machine -> isTypeOf (machine_type);
+	return machine -> isTypeOf (machine_type -> codeName ());
 }
 
 bool PrologAtom :: isTypeOf (PrologNativeCode * code) {
 	if (machine == 0) return false;
 	if (code == 0) return false;
-	return machine -> isTypeOf (code);
+	return machine -> isTypeOf (code -> codeName ());
 }
 
 char * PrologAtom :: machineType (void) {return machine == 0 ? 0 : machine -> codeName ();}
