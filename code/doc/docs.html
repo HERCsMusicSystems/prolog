@@ -146,6 +146,7 @@
             <a href="#predicate_load">load</a>
             <a href="#predicate_file_reader">file_reader</a>
             <a href="#predicate_file_writer">file_writer</a>
+            <a href="#predicate_machine_type">machine_type</a>
             <a href="#predicate_make_directory">make_directory</a>
             <a href="#predicate_move">move</a>
             <a href="#predicate_nl">nl</a>
@@ -1203,6 +1204,29 @@
             <li>Content of a list is written as separate Prolog terms.</li><br />
             Without any parameters the writer closes the file and releases the machine clause binding.
             If anonymous symbol is garbage collected then the file is also closed (and machine binding released as well).
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_machine_type">
+        <div class="doc_predicate_header">
+            [machine_type atom *x]<br />
+            [machine_type atom : *x]<br />
+            [machine_type atom type_atom]<br />
+            [machine_type atom : type_atom]<br />
+            [machine_type]
+        </div>
+        <div class="doc_predicate_body">
+            Checke or retrieves machine code type.<br />
+            It succeeds if the <b>atom</b> has machine clause attached and if it is of the same type as the machine clause attached to the <b>type_atom</b>.
+            If <b>type_atom</b> is not provided, then the type name string of the <b>atom's</b> machine clause is retrieved.
+            The version without <b>type_atom</b> checks if the <b>atom's</b> machine clause is of <b>machine_type</b>.<br />
+            Explanation:<br />
+            Each machine clause reports its name as a unique pointer to <b>char</b> through virtual <b>codeName</b> method.
+            Also, each machine clause can be interrogated if it is of a particular type, by calling another virtual <b>isTypeOf</b> method.
+            In essence, if <b>isTypeOf</b> return true, then it is safe to type cast machine clause to different type (as it is of the same type).<br />
+            Typically, the <b>type_atom's</b> machine clause returns a name, but it fails with <b>isTypeOf</b>, hence it is used only for checking the type.
         </div>
     </a>
 </div>
