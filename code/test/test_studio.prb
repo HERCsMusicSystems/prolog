@@ -4,6 +4,8 @@
 
 [TestEq "list *" "user! capitol test studio" *x [list *x]]
 [TestEq "list : *" ["user!" "capitol" "test" "studio"] *x [list : *x]]
+[TestEq "list \"sonda\" *" "" *x [list "sonda" *x]]
+[TestFails "list \"sonda\" : *" [list "sonda" : *x]]
 [TestEq "list \"capitol\" *" "capitol" *x [list "capitol" *x]]
 [TestEq "list \"capitol\" : *" [capitol] *x [list "capitol" : *x]]
 [TestEq "list not *" "[[not : *0] *0 / fail]\n[[not : *0]]\n" *x [list not *x]]

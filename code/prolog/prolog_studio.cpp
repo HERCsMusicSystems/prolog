@@ -134,6 +134,7 @@ public:
 	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		AREA area;
+		area [0] = '\0';
 		int area_ind;
 		if (parameters -> isEarth ()) {
 			// directory list
