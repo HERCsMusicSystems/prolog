@@ -197,6 +197,12 @@
 [mdt "NRPN line...." [[control 0 99 31] [control 0 98 32] [control 0 38 34] [control 0 6 33]] [NRPN line3 0 31 32 33 34]]
 [TestFails "NRPN line too long" [NRPN line3 2 21 22 23 24 25]]
 
+[mdt "egcopy...." [[SYSEX 125 72 82 67 115 68 72 37 38]] [egcopy 4 5 6]]
+[mdt "egcopy_freq...." [[SYSEX 125 72 82 67 115 68 72 21 22]] [egcopy_freq 4 5 6]]
+[mdt "egcopy_amp...." [[SYSEX 125 72 82 67 115 68 72 37 38]] [egcopy_amp 4 5 6]]
+[mdt "egcopy_index...." [[SYSEX 125 72 82 67 115 68 72 5 6]] [egcopy_index 4 5 6]]
+[mdt "egcopy_pan...." [[SYSEX 125 72 82 67 115 68 72 53 54]] [egcopy_pan 4 5 6]]
+
 [TestWorks "delete mdt" [delallcl mdt]]
 
 [exit]
