@@ -295,6 +295,30 @@
             <a href="#predicate_timingclock">timingclock</a>
         </li>
         <li>
+            <a href="#midi_controllers">MIDI pre-defined controllers</a>
+            <br />
+            <a href="#predicate_attack_controller">attack</a>
+            <a href="#predicate_bank_controller">bank</a>
+            <a href="#predicate_bank_lsb_controller">bank_lsb</a>
+            <a href="#predicate_breath_controller">breath</a>
+            <a href="#predicate_chorus_controller">chorus</a>
+            <a href="#predicate_cutoff_controller">cutoff</a>
+            <a href="#predicate_foot_controller">foot</a>
+            <a href="#predicate_holdoff_controller">holdoff</a>
+            <a href="#predicate_holdon_controller">holdon</a>
+            <a href="#predicate_modulation_controller">modulation</a>
+            <a href="#predicate_mono_controller">mono</a>
+            <a href="#predicate_pan_controller">pan</a>
+            <a href="#predicate_poly_controller">poly</a>
+            <a href="#predicate_portaoff_controller">portaoff</a>
+            <a href="#predicate_portaon_controller">portaon</a>
+            <a href="#predicate_portatime_controller">portatime</a>
+            <a href="#predicate_release_controller">release</a>
+            <a href="#predicate_resonance_controller">resonance</a>
+            <a href="#predicate_reverb_controller">reverb</a>
+            <a href="#predicate_volume_controller">volume</a>
+        </li>
+        <li>
             <a href="#musical_processing">Musical processing</a>
         </li>
     </ul>
@@ -3321,8 +3345,292 @@
     </a>
 </div>
 
+<div class="doc_library_section"><a id="midi_controllers">MIDI commands</a></div>
+
 <div class="doc_predicate">
-    <a id="###">
+    <a id="predicate_attack_controller">
+        <div class="doc_predicate_header">
+            [attack (line) channel vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>attack</b> pre-definded MIDI controller message <b>= 0xBc 73 vv</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_bank_controller">
+        <div class="doc_predicate_header">
+            [bank (line) channel vv]<br />
+            [bank (line) channel msb lsb]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>bank change</b> pre-definded MIDI controller message <b>= 0xBc 0 vv</b>
+            or two consecutive messages <b>= 0xBc 32 lsb 0xBc 0 msb</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_bank_lsb_controller">
+        <div class="doc_predicate_header">
+            [banklsb (line) channel vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>bank change lsb</b> pre-definded MIDI controller message <b>= 0xBc 32 vv</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_breath_controller">
+        <div class="doc_predicate_header">
+            [breath (line) channel vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>breath</b> pre-definded MIDI controller message <b>= 0xBc 2 vv</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_chorus_controller">
+        <div class="doc_predicate_header">
+            [chorus (line) channel vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>chorus</b> pre-definded MIDI controller message <b>= 0xBc 91 vv</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_cutoff_controller">
+        <div class="doc_predicate_header">
+            [cutoff (line) channel vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>cutoff</b> pre-definded MIDI controller message <b>= 0xBc 74 vv</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_foot_controller">
+        <div class="doc_predicate_header">
+            [foot (line) channel vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>foot</b> pre-definded MIDI controller message <b>= 0xBc 4 vv</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_holdoff_controller">
+        <div class="doc_predicate_header">
+            [holdoff (line) channel]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>hold off</b> pre-definded MIDI controller message <b>= 0xBc 64 0</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_holdon_controller">
+        <div class="doc_predicate_header">
+            [holdon (line) channel]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>hold on</b> pre-definded MIDI controller message <b>= 0xBc 64 127</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_modulation_controller">
+        <div class="doc_predicate_header">
+            [modulation (line) channel vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>modulation</b> pre-definded MIDI controller message <b>= 0xBc 1 vv</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_mono_controller">
+        <div class="doc_predicate_header">
+            [mono (line) channel]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>mono</b> pre-definded MIDI controller message <b>= 0xBc 126 0</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_pan_controller">
+        <div class="doc_predicate_header">
+            [pan (line) channel vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>pan</b> pre-definded MIDI controller message <b>= 0xBc 10 vv</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_poly_controller">
+        <div class="doc_predicate_header">
+            [poly (line) channel vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>poly</b> pre-definded MIDI controller message <b>= 0xBc 127 0</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_portaoff_controller">
+        <div class="doc_predicate_header">
+            [portaoff (line) channel]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>porta off</b> pre-definded MIDI controller message <b>= 0xBc 65 0</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_portaon_controller">
+        <div class="doc_predicate_header">
+            [portaon (line) channel vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>porta on</b> pre-definded MIDI controller message <b>= 0xBc 65 127</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_portatime_controller">
+        <div class="doc_predicate_header">
+            [portatime (line) channel vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>porta time</b> pre-definded MIDI controller message <b>= 0xBc 5 vv</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_release_controller">
+        <div class="doc_predicate_header">
+            [release (line) channel vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>release</b> pre-definded MIDI controller message <b>= 0xBc 72 vv</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_resonance_controller">
+        <div class="doc_predicate_header">
+            [resonance (line) channel vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>resonance</b> pre-definded MIDI controller message <b>= 0xBc 71 vv</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_reverb_controller">
+        <div class="doc_predicate_header">
+            [reverb (line) channel vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>reverb</b> pre-definded MIDI controller message <b>= 0xBc 93 vv</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_volume_controller">
+        <div class="doc_predicate_header">
+            [volume (line) channel vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>volume</b> pre-definded MIDI controller message <b>= 0xBc 7 vv</b>.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="A1">
         <div class="doc_predicate_header">
             ###
         </div>
@@ -3332,6 +3640,7 @@
     </a>
 </div>
 
+<div class="doc_library_section"><a id="musical_processing">Musical Processing</a></div>
 
 </div></div>
 </body>
