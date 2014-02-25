@@ -2,7 +2,8 @@
 
 ;[batch "test_studio.prb"]
 ;[batch "test_io.prb"]
-[batch "test_midi.prb"]
+;[batch "test_midi.prb"]
+[batch "test_xml.prb"]
 
 [nl]
 [FailedTestSummary]

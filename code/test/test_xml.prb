@@ -1,0 +1,12 @@
+
+[import "xml"]
+[import "test"]
+
+[TestEq "XML...." "sonda" *x [xml "plant_catalog.xml" sonda : *x]]
+
+[list sonda]
+[res [sonda CATALOG *x] [*x PLANT *y] [*y BOTANICAL *name] [list *y] [list *name]]
+[nl] [nl]
+[list "user!"]
+
+[exit]
