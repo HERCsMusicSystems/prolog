@@ -23,45 +23,60 @@
 #include "prolog_xml.h"
 #include "../tinyxml2/tinyxml2.h"
 
-void drop_level (int level) {while (level-- > 0) printf (" ");}
-
-PrologAtom * drop_node (int level, tinyxml2 :: XMLElement * node, PrologRoot * root, PrologAtom * atom, PrologAtom * node_atom) {
-	PrologAtom * machine_atom = new PrologAtom ();
-	PrologElement * clause = root -> pair (root -> pair (root -> atom (atom),
-		root -> pair (root -> atom (node_atom), root -> pair (root -> atom (machine_atom), root -> earth ()
-		))), root -> earth ());
-	root -> attachClause (clause);
-	drop_level (level); printf ("node [%s] = \"%s\"\n", node -> Value (), node -> GetText ());
-	level += 2;
-	const tinyxml2 :: XMLAttribute * attr = node -> FirstAttribute ();
-	while (attr != 0) {
-		PrologAtom * attribute_atom = root -> search ((char *) attr -> Name ());
-		if (attribute_atom == 0) attribute_atom = root -> createAtom ((char *) attr -> Name ());
-		clause = root -> pair (root -> pair (root -> atom (machine_atom),
-			root -> pair (root -> atom (attribute_atom), root -> pair (root -> text ((char *) attr -> Value ()), root -> earth ()
-			))), root -> earth ());
-		root -> attachClause (clause);
-		drop_level (level); printf ("attr [%s] = [%s]\n", attr -> Name (), attr -> Value ());
-		attr = attr -> Next ();
+class xml_term_reader : public PrologReader {
+public:
+	char * text;
+	virtual void message (char * text) {}
+	virtual int move_z (void) {
+		if (text == 0) return -1;
+		if (* text == '\0') return -1;
+		return * text++;
 	}
-	//clause = root -> pair (root -> pair (root -> atom (machine_atom), root -> pair (root -> text ((char *) node -> GetText ()), root -> earth ())), root -> earth ());
-	char * text = (char *) node -> GetText ();
-	clause = root -> pair (root -> pair (root -> atom (machine_atom), root -> pair (root -> text (text != 0 ? text : ""), root -> earth ())), root -> earth ());
-	root -> attachClause (clause);
-	return machine_atom;
-}
+	void init (char * text) {this -> text = text; act_znak = '\0';}
+};
 
 class xml_native_class : public PrologNativeCode {
 public:
 	PrologRoot * root;
-	PrologAtom * drop_nodes (int level, tinyxml2 :: XMLElement * node, PrologRoot * root, PrologAtom * atom) {
+	PrologAtom * drop_node (int level, tinyxml2 :: XMLElement * node, xml_term_reader * reader, PrologAtom * atom, PrologAtom * node_atom) {
+		PrologAtom * machine_atom = new PrologAtom ();
+		PrologElement * clause = root -> pair (root -> pair (root -> atom (atom),
+			root -> pair (root -> atom (node_atom), root -> pair (root -> atom (machine_atom), root -> earth ()
+			))), root -> earth ());
+		root -> attachClause (clause);
+		level += 2;
+		const tinyxml2 :: XMLAttribute * attr = node -> FirstAttribute ();
+		while (attr != 0) {
+			PrologAtom * attribute_atom = reader -> searchAtomC ((char *) attr -> Name ());
+			if (attribute_atom == 0) return 0;
+			reader -> init ((char *) attr -> Value ());
+			PrologElement * el = reader -> readElement ();
+			if (el == 0) {
+				el = root -> text ((char *) attr -> Value ());
+			}
+			if (el -> isAtom () && strcmp (el -> getAtom () -> name (), (char *) attr -> Value ()) != 0) {
+				delete el;
+				el = root -> text ((char *) attr -> Value ());
+			}
+			clause = root -> pair (root -> pair (root -> atom (machine_atom),
+				root -> pair (root -> atom (attribute_atom), root -> pair (el, root -> earth ()
+				))), root -> earth ());
+			root -> attachClause (clause);
+			attr = attr -> Next ();
+		}
+		char * text = (char *) node -> GetText ();
+		clause = root -> pair (root -> pair (root -> atom (machine_atom), root -> pair (root -> text (text != 0 ? text : ""), root -> earth ())), root -> earth ());
+		root -> attachClause (clause);
+		return machine_atom;
+	}
+	PrologAtom * drop_nodes (int level, tinyxml2 :: XMLElement * node, xml_term_reader * reader, PrologAtom * atom) {
 		PrologAtom * node_atom = 0;
 		while (node != 0) {
-			node_atom = root -> search ((char *) node -> Value ());
-			if (node_atom == 0) node_atom = root -> createAtom ((char *) node -> Value ());
-			PrologAtom * machine_atom = drop_node (level, node, root, atom, node_atom);
-			tinyxml2 :: XMLElement * el = node -> FirstChildElement ();
-			drop_nodes (level + 2, el, root, machine_atom);
+			node_atom = reader -> searchAtomC ((char *) node -> Value ());
+			if (node_atom == 0) return 0;
+			PrologAtom * machine_atom = drop_node (level, node, reader, atom, node_atom);
+			tinyxml2 :: XMLElement * nel = node -> FirstChildElement ();
+			drop_nodes (level + 2, nel, reader, machine_atom);
 			node = node -> NextSiblingElement ();
 		}
 		return node_atom;
@@ -82,7 +97,9 @@ public:
 			if (tinyxml2 :: XML_NO_ERROR != doc . LoadFile ((const char *) path -> getText ())) return false;
 			tinyxml2 :: XMLElement * node = doc . FirstChildElement ();
 			if (node == 0) return false;
-			PrologAtom * node_atom = drop_nodes (0, node, root, atom -> getAtom ());
+			xml_term_reader reader;
+			reader . setRoot (root);
+			PrologAtom * node_atom = drop_nodes (0, node, & reader, atom -> getAtom ());
 			if (node_atom == 0) return false;
 			parameters -> setAtom (node_atom);
 			return true;
