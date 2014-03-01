@@ -179,7 +179,8 @@ prc_objects = \
 	$(pc)neural.prc\
 	$(pc)keyboard.prc\
 	$(pc)sql.prc\
-	$(pc)test.prc
+	$(pc)test.prc\
+	$(pc)xml.prc
 
 objects = \
 	$(pi)prolog_dll_loader.o\
@@ -190,7 +191,8 @@ objects = \
 	$(pi)prolog_studio.o $(pi)prolog_conductor.o $(pi)prolog_midi.o $(pi)prolog_neural.o $(pi)prolog_http.o \
 	$(pi)prolog_transport.o \
 	$(pi)prolog_variable.o \
-	$(pi)prolog_linux_console.o
+	$(pi)prolog_linux_console.o \
+	$(pi)prolog_xml.o
 
 resource_maker.exe: $(pc)resource_maker.cpp
 	g++ $(pc)resource_maker.cpp -o resource_maker.exe
@@ -246,6 +248,8 @@ prolog_variable.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_v
 	g++ -Wno-write-strings -I. $(pc)prolog_variable.cpp -c -o prolog_variable.o
 prolog_neural.o: $(pc)prolog_neural.h $(pc)prolog_neural.cpp
 	g++ -Wno-write-strings -I. $(pc)prolog_neural.cpp -c -o prolog_neural.o
+prolog_xml.o: $(pc)prolog_xml.h $(pc)prolog_xml.cpp $(pc)prolog.h
+	g++ -Wno-write-strings -I. $(pc)prolog_xml.cpp -c -o prolog_xml.o
 prolog_mysql.o: $(pc)prolog_mysql.cpp
 	g++ -Wno-write-strings `mysql_config --cflags` -I. $(pc)prolog_mysql.cpp -c -o prolog_mysql.o
 
