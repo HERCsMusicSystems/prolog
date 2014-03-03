@@ -65,7 +65,9 @@ public:
 			attr = attr -> Next ();
 		}
 		char * text = (char *) node -> GetText ();
-		clause = root -> pair (root -> pair (root -> atom (machine_atom), root -> pair (root -> text (text != 0 ? text : ""), root -> earth ())), root -> earth ());
+		clause = root -> pair (root -> pair (root -> atom (machine_atom), root -> pair (
+			root -> text (text != 0 ? text : (char *) ""),
+			root -> earth ())), root -> earth ());
 		root -> attachClause (clause);
 		return machine_atom;
 	}

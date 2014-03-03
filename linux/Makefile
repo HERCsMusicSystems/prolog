@@ -192,7 +192,7 @@ objects = \
 	$(pi)prolog_transport.o \
 	$(pi)prolog_variable.o \
 	$(pi)prolog_linux_console.o \
-	$(pi)prolog_xml.o
+	$(pi)prolog_xml.o $(pi)tinyxml.o
 
 resource_maker.exe: $(pc)resource_maker.cpp
 	g++ $(pc)resource_maker.cpp -o resource_maker.exe
@@ -250,6 +250,8 @@ prolog_neural.o: $(pc)prolog_neural.h $(pc)prolog_neural.cpp
 	g++ -Wno-write-strings -I. $(pc)prolog_neural.cpp -c -o prolog_neural.o
 prolog_xml.o: $(pc)prolog_xml.h $(pc)prolog_xml.cpp $(pc)prolog.h
 	g++ -Wno-write-strings -I. $(pc)prolog_xml.cpp -c -o prolog_xml.o
+tinyxml.o: $(pc)../tinyxml2/tinyxml2.cpp $(pc)../tinyxml2/tinyxml2.h
+	g++ -Wno-write-strings $(pc)../tinyxml2/tinyxml2.cpp -c -o tinyxml.o
 prolog_mysql.o: $(pc)prolog_mysql.cpp
 	g++ -Wno-write-strings `mysql_config --cflags` -I. $(pc)prolog_mysql.cpp -c -o prolog_mysql.o
 
