@@ -1,5 +1,5 @@
 
-program xml #machine := "prolog.xml" [xml xml_attribute xml_text xml_node xml_text]
+program xml #machine := "prolog.xml" [xml xml_text xml_node]
 
 #machine xml := "xml"
 
