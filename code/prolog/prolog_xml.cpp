@@ -39,7 +39,9 @@ class xml_native_class : public PrologNativeCode {
 public:
 	PrologRoot * root;
 	PrologAtom * drop_node (int level, tinyxml2 :: XMLElement * node, xml_term_reader * reader, PrologAtom * atom, PrologAtom * node_atom) {
-		PrologAtom * machine_atom = new PrologAtom ();
+		AREA area;
+		int ap = area_cat (area, 0, "<"); ap = area_cat (area, ap, (char *) node -> Name ()); ap = area_cat (area, ap, ">");
+		PrologAtom * machine_atom = new PrologAtom (area);
 		PrologElement * clause = root -> pair (root -> pair (root -> atom (atom),
 			root -> pair (root -> atom (node_atom), root -> pair (root -> atom (machine_atom), root -> earth ()
 			))), root -> earth ());
@@ -93,20 +95,16 @@ public:
 			if (el -> isVar ()) atom = el;
 			parameters = parameters -> getRight ();
 		}
-		if (atom == 0) return false;
-		if (atom -> isVar ()) atom -> setAtom (path != 0 ? new PrologAtom (path -> getText ()) : new PrologAtom ());
-		if (path != 0) {
-			tinyxml2 :: XMLDocument doc;
-			if (tinyxml2 :: XML_NO_ERROR != doc . LoadFile ((const char *) path -> getText ())) return false;
-			tinyxml2 :: XMLElement * node = doc . FirstChildElement ();
-			if (node == 0) return false;
-			xml_term_reader reader;
-			reader . setRoot (root);
-			PrologAtom * node_atom = drop_nodes (0, node, & reader, atom -> getAtom ());
-			if (node_atom == 0) return false;
-			parameters -> setAtom (node_atom);
-			return true;
-		}
+		if (atom == 0 || path == 0) return false;
+		tinyxml2 :: XMLDocument doc;
+		if (tinyxml2 :: XML_NO_ERROR != doc . LoadFile ((const char *) path -> getText ())) return false;
+		tinyxml2 :: XMLElement * node = doc . FirstChildElement ();
+		if (node == 0) return false;
+		if (atom -> isVar ()) atom -> setAtom (path != 0 ? new PrologAtom ((char *) node -> Name ()) : new PrologAtom ());
+		xml_term_reader reader;
+		reader . setRoot (root);
+		PrologAtom * node_atom = drop_nodes (0, node, & reader, atom -> getAtom ());
+		if (node_atom == 0) return false;
 		return true;
 	}
 	xml_native_class (PrologRoot * root) {this -> root = root;}

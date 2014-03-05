@@ -12,5 +12,4 @@
 	[xml_node sonda CATALOG PLANT *plant] [*plant ID 2] [*plant NAME *name] [*plant PRICE *price] [xml_text *plant BOTANICAL *botanical]
 ]
 
-
 [exit]
