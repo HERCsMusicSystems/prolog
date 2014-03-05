@@ -93,6 +93,7 @@ public:
 			if (el -> isVar ()) atom = el;
 			parameters = parameters -> getRight ();
 		}
+		if (atom == 0) return false;
 		if (atom -> isVar ()) atom -> setAtom (path != 0 ? new PrologAtom (path -> getText ()) : new PrologAtom ());
 		if (path != 0) {
 			tinyxml2 :: XMLDocument doc;
