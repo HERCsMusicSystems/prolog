@@ -546,7 +546,6 @@ public:
 			//[[bank *channel *value] [control *channel 0 *value]]
 			if (msb -> isInteger ()) {destination -> insert_control (channel -> getInteger (), 0, msb -> getInteger ()); destination -> ready (); return true;}
 			//[[bank *channel *msb] [add *channel 64 *selector] [sysex *selector 82 *msb]]
-			// To do.... double check
 			if (msb -> isText ()) {
 				destination -> lock ();
 				int ch = destination -> chex (channel -> getInteger ());
