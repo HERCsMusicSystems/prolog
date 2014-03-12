@@ -63,6 +63,7 @@ MIDI_PRC                RCDATA                  "../code/prolog/midi.prc"
 HTTP_PRC                RCDATA                  "../code/prolog/http.prc"
 TEST_PRC                RCDATA                  "../code/prolog/test.prc"
 XML_PRC                 RCDATA                  "../code/prolog/xml.prc"
+DISTRIBUTION_PRC        RCDATA                  "../code/prolog/distribution.prc"
 #endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////
 
