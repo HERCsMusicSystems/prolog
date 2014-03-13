@@ -102,7 +102,6 @@ public:
 		virtual void random_code (PrologElement * var) {var -> setInteger (uniform (engine));}
 		integer_distribution_code (PrologAtom * atom, int from, int to)
 			: generic_distributal_code (atom), uniform (from, to) {}
-		~ integer_distribution_code (void) {printf ("Uniform destroyed (integer).\n");}
 	};
 	class real_distribution_code : public generic_distributal_code {
 	public:
@@ -111,7 +110,6 @@ public:
 		real_distribution_code (PrologAtom * atom, double from, double to)
 			: generic_distributal_code (atom), uniform (from, to) {}
 		real_distribution_code (PrologAtom * atom) : generic_distributal_code (atom) {}
-		~ real_distribution_code (void) {printf ("Uniform destroyed (real).\n");}
 	};
 	virtual generic_distributal_code * coder (PrologAtom * atom, PrologElement * * integers, PrologElement * * doubles) {
 		if (integers [0] != 0 && integers [1] != 0) return new integer_distribution_code (atom, integers [0] -> getInteger (), integers [1] -> getInteger ());
@@ -133,7 +131,6 @@ public:
 		distribution_code (PrologAtom * atom, double mean, double std)
 			: generic_distributal_code (atom), normal (mean, std) {}
 		distribution_code (PrologAtom * atom) : generic_distributal_code (atom) {}
-		~ distribution_code (void) {printf ("Normal destroyed.\n");}
 	};
 	virtual generic_distributal_code * coder (PrologAtom * atom, PrologElement * * integers, PrologElement * * doubles) {
 		if (doubles [0] != 0 && doubles [1] != 0) return new distribution_code (atom, doubles [0] -> getDouble (), doubles [1] -> getDouble ());
@@ -150,7 +147,6 @@ public:
 		distribution_code (PrologAtom * atom, double p)
 			: generic_distributal_code (atom), bernoulli (p) {}
 		distribution_code (PrologAtom * atom) : generic_distributal_code (atom) {}
-		~ distribution_code (void) {printf ("Bernoulli destroyed.\n");}
 	};
 	virtual generic_distributal_code * coder (PrologAtom * atom, PrologElement * * integers, PrologElement * * doubles) {
 		if (doubles [0] != 0) return new distribution_code (atom, doubles [0] -> getDouble ());
@@ -167,7 +163,6 @@ public:
 		distribution_code (PrologAtom * atom, int n, double p)
 			: generic_distributal_code (atom), binomial (n, p) {}
 		distribution_code (PrologAtom * atom) : generic_distributal_code (atom) {}
-		~ distribution_code (void) {printf ("Binomial destroyed.\n");}
 	};
 	virtual generic_distributal_code * coder (PrologAtom * atom, PrologElement * * integers, PrologElement * * doubles) {
 		if (integers [0] != 0 && doubles [0] != 0) return new distribution_code (atom, integers [0] -> getInteger (), doubles [0] -> getDouble ());
@@ -188,7 +183,6 @@ public:
 		distribution_code (PrologAtom * atom, int n, double p)
 			: generic_distributal_code (atom), binomial (n, p) {}
 		distribution_code (PrologAtom * atom) : generic_distributal_code (atom) {}
-		~ distribution_code (void) {printf ("Binomial (negative) destroyed.\n");}
 	};
 	virtual generic_distributal_code * coder (PrologAtom * atom, PrologElement * * integers, PrologElement * * doubles) {
 		if (integers [0] != 0 && doubles [0] != 0) return new distribution_code (atom, integers [0] -> getInteger (), doubles [0] -> getDouble ());
@@ -209,7 +203,6 @@ public:
 		distribution_code (PrologAtom * atom, double mean)
 			: generic_distributal_code (atom), exponential (mean) {}
 		distribution_code (PrologAtom * atom) : generic_distributal_code (atom) {}
-		~ distribution_code (void) {printf ("Exponential destroyed.\n");}
 	};
 	virtual generic_distributal_code * coder (PrologAtom * atom, PrologElement * * integers, PrologElement * * doubles) {
 		if (doubles [0] != 0) {
@@ -239,7 +232,6 @@ public:
 		distribution_code (PrologAtom * atom, double alpha, double beta)
 			: generic_distributal_code (atom), gamma (alpha, beta) {}
 		distribution_code (PrologAtom * atom) : generic_distributal_code (atom) {}
-		~ distribution_code (void) {printf ("Gamma destroyed.\n");}
 	};
 	virtual generic_distributal_code * coder (PrologAtom * atom, PrologElement * * integers, PrologElement * * doubles) {
 		if (doubles [0] != 0 && doubles [1] != 0) return new distribution_code (atom, doubles [0] -> getDouble (), doubles [1] -> getDouble ());
@@ -256,7 +248,6 @@ public:
 		distribution_code (PrologAtom * atom, double p)
 			: generic_distributal_code (atom), geometric (p) {}
 		distribution_code (PrologAtom * atom) : generic_distributal_code (atom) {}
-		~ distribution_code (void) {printf ("Geometric destroyed.\n");}
 	};
 	virtual generic_distributal_code * coder (PrologAtom * atom, PrologElement * * integers, PrologElement * * doubles) {
 		if (doubles [0] != 0) return new distribution_code (atom, doubles [0] -> getDouble ());
@@ -273,7 +264,6 @@ public:
 		distribution_code (PrologAtom * atom, double mean)
 			: generic_distributal_code (atom), poisson (mean) {}
 		distribution_code (PrologAtom * atom) : generic_distributal_code (atom) {}
-		~ distribution_code (void) {printf ("Poisson destroyed.\n");}
 	};
 	virtual generic_distributal_code * coder (PrologAtom * atom, PrologElement * * integers, PrologElement * * doubles) {
 		if (doubles [0] != 0) return new distribution_code (atom, doubles [0] -> getDouble ());
@@ -290,7 +280,6 @@ public:
 		distribution_code (PrologAtom * atom, double alpha, double beta)
 			: generic_distributal_code (atom), cauchy (alpha, beta) {}
 		distribution_code (PrologAtom * atom) : generic_distributal_code (atom) {}
-		~ distribution_code (void) {printf ("Cauchy destroyed.\n");}
 	};
 	virtual generic_distributal_code * coder (PrologAtom * atom, PrologElement * * integers, PrologElement * * doubles) {
 		if (doubles [0] != 0 && doubles [1] != 0) return new distribution_code (atom, doubles [0] -> getDouble (), doubles [1] -> getDouble ());
@@ -307,7 +296,6 @@ public:
 		distribution_code (PrologAtom * atom, double n)
 			: generic_distributal_code (atom), chi_squared (n) {}
 		distribution_code (PrologAtom * atom) : generic_distributal_code (atom) {}
-		~ distribution_code (void) {printf ("Chi-squared destroyed.\n");}
 	};
 	virtual generic_distributal_code * coder (PrologAtom * atom, PrologElement * * integers, PrologElement * * doubles) {
 		if (doubles [0] != 0) return new distribution_code (atom, doubles [0] -> getDouble ());
@@ -324,7 +312,6 @@ public:
 		distribution_code (PrologAtom * atom, double n)
 			: generic_distributal_code (atom), student_t (n) {}
 		distribution_code (PrologAtom * atom) : generic_distributal_code (atom) {}
-		~ distribution_code (void) {printf ("Student t destroyed.\n");}
 	};
 	virtual generic_distributal_code * coder (PrologAtom * atom, PrologElement * * integers, PrologElement * * doubles) {
 		if (doubles [0] != 0) return new distribution_code (atom, doubles [0] -> getDouble ());
@@ -341,7 +328,6 @@ public:
 		distribution_code (PrologAtom * atom, double alpha, double beta)
 			: generic_distributal_code (atom), weibull (alpha, beta) {}
 		distribution_code (PrologAtom * atom) : generic_distributal_code (atom) {}
-		~ distribution_code (void) {printf ("Weibull destroyed.\n");}
 	};
 	virtual generic_distributal_code * coder (PrologAtom * atom, PrologElement * * integers, PrologElement * * doubles) {
 		if (doubles [0] != 0 && doubles [1] != 0) return new distribution_code (atom, doubles [0] -> getDouble (), doubles [1] -> getDouble ());
