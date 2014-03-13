@@ -28,7 +28,7 @@ program studio #machine := "prolog.studio"
 		exit command save_history load_history inner inner_addcl inner_call minimise maximise
 		res not eq rres ures lazy random_cl explode TRY ONE PROBE SELECT APPEND LENGTH REVERSE ONLIST INLIST NODUP MAP
 		sort divide
-		WHILE FOR FOREVER forever IF
+		WHILE FOR FOREVER forever REPEAT IF
 		CONSTANT VARIABLE ACCUMULATOR ARRAY var inc dec ALL ISALL isall isallr
 		rnd rnd_control grnd series
 		crack wait timeout enter signal semaphore msemaphore mutex accept select critical_section monitor task
@@ -218,6 +218,8 @@ program studio #machine := "prolog.studio"
 [[WHILE : *]]
 [[FOREVER : *instructions] [PROBE : *instructions] / [FOREVER : *instructions]]
 [[forever : *instructions] [res : *instructions] / [forever : *instructions]]
+[[REPEAT *ind : *instructions] [less 0 *ind] [PROBE : *instructions] [sub1 *ind *next] / [REPEAT *next : *instructions]]
+[[REPEAT : *]]
 [[FOR * [] : *] /]
 [[FOR *head [*head : *] : *call] [ONE : *call] fail]
 [[FOR *head [* : *tail] : *call] / [FOR *head *tail : *call]]
