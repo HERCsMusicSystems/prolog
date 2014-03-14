@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "prolog_distribution.h"
-
+#include "string.h"
 #include <random>
 
 class generic_distributal_code : public PrologNativeCode {
@@ -98,14 +98,14 @@ class distribution_uniform : public generic_distributor {
 public:
 	class integer_distribution_code : public generic_distributal_code {
 	public:
-		std :: uniform_int <> uniform;
+		std :: uniform_int_distribution <> uniform;
 		virtual void random_code (PrologElement * var) {var -> setInteger (uniform (engine));}
 		integer_distribution_code (PrologAtom * atom, int from, int to)
 			: generic_distributal_code (atom), uniform (from, to) {}
 	};
 	class real_distribution_code : public generic_distributal_code {
 	public:
-		std :: uniform_real <double> uniform;
+		std :: uniform_real_distribution <double> uniform;
 		virtual void random_code (PrologElement * var) {var -> setDouble (uniform (engine));}
 		real_distribution_code (PrologAtom * atom, double from, double to)
 			: generic_distributal_code (atom), uniform (from, to) {}

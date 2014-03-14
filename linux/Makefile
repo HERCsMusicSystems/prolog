@@ -255,7 +255,7 @@ prolog_xml.o: $(pc)prolog_xml.h $(pc)prolog_xml.cpp $(pc)prolog.h
 tinyxml.o: $(pc)../tinyxml2/tinyxml2.cpp $(pc)../tinyxml2/tinyxml2.h
 	g++ -Wno-write-strings $(pc)../tinyxml2/tinyxml2.cpp -c -o tinyxml.o
 prolog_distribution.o: $(pc)prolog_distribution.h $(pc)prolog_distribution.cpp $(pc)prolog.h
-	g++ -Wno-write-strings -I. $(pc)prolog_distribution.cpp -c -o prolog_distribution.o
+	g++ -Wno-write-strings -std=c++11 -I. $(pc)prolog_distribution.cpp -c -o prolog_distribution.o
 prolog_mysql.o: $(pc)prolog_mysql.cpp
 	g++ -Wno-write-strings `mysql_config --cflags` -I. $(pc)prolog_mysql.cpp -c -o prolog_mysql.o
 
