@@ -33,6 +33,7 @@ private:
 	int ticks_per_beat, beats_per_bar;
 	double delay;
 	double beats_per_minute;
+	int beats_per_seconds, beat_seconds;
 	void broadcast (WaitFor * * waiter);
 	void broadcastStop (void);
 public:
@@ -56,7 +57,9 @@ public:
 	int getBeat (void);
 	int getBar (void);
 	bool isActive (void);
+	void tempo (void);
 	void tempo (double beatsPerMinute);
+	void tempo (int beats, int seconds);
 	void accelerando (void);
 	void accelerando (int steps);
 	void accelerando (int steps, int ticks);
@@ -73,5 +76,7 @@ public:
 	double getBeatsPerMinute (void);
 	int getBeatsPerBar (void);
 	int getTicksPerBeat (void);
+	int getBeatsPerSeconds (void);
+	int getBeatSeconds (void);
 };
 

@@ -29,6 +29,7 @@
 class PrologConductorServiceClass : public PrologServiceClass {
 private:
 	PrologRoot * root;
+public:
 	PrologTransport t;
 public:
 	virtual void init (PrologRoot * root);

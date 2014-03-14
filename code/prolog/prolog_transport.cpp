@@ -120,8 +120,7 @@ PrologTransport :: PrologTransport (void) TRACKING (3) {
 	processRunning = processPaused = processStopping = false;
 	metrum (4, 4);
 	reset ();
-	tempo (140);
-	beats_per_minute = 140.0;
+	tempo (140.0);
 	lock = PTHREAD_MUTEX_INITIALIZER;
 }
 
@@ -194,11 +193,23 @@ int PrologTransport :: getBeat (void) {return beat;}
 int PrologTransport :: getBar (void) {return bar;}
 int PrologTransport :: getBeatsPerBar (void) {return beats_per_bar;}
 int PrologTransport :: getTicksPerBeat (void) {return ticks_per_beat;}
+int PrologTransport :: getBeatsPerSeconds (void) {return beats_per_seconds;}
+int PrologTransport :: getBeatSeconds (void) {return beat_seconds;}
 double PrologTransport :: getBeatsPerMinute (void) {return beats_per_minute;}
+void PrologTransport :: tempo (void) {
+	delay = 60000000.0 / (beats_per_minute * (double) ticks_per_beat);
+}
 void PrologTransport :: tempo (double beatsPerMinute) {
 	if (beatsPerMinute <= 0.0) beatsPerMinute = 1.0;
-	beats_per_minute = beatsPerMinute;
-	delay = 60000000.0 / (beats_per_minute * (double) ticks_per_beat);
+	beats_per_minute = beatsPerMinute; beats_per_seconds = (int) beatsPerMinute; beat_seconds = 60;
+	tempo ();
+}
+void PrologTransport :: tempo (int beats, int seconds) {
+	if (beats <= 0) beats = 1;
+	if (seconds <= 0) seconds = 1;
+	beats_per_seconds = beats; beat_seconds = seconds;
+	beats_per_minute = (double) beats * 60.0 / (double) seconds;
+	tempo ();
 }
 void PrologTransport :: division (int beatsPerBar) {
 	if (sub_beat > 0) sub_beat += beatsPerBar - beats_per_bar;
@@ -220,7 +231,7 @@ void PrologTransport :: accelerando (void) {}
 void PrologTransport :: accelerando (int steps) {}
 void PrologTransport :: accelerando (int steps, int ticks) {}
 void PrologTransport :: accelerando (int steps, int ticks, int sentinel) {}
-void PrologTransport :: atempo (void) {tempo (beats_per_minute);}
+void PrologTransport :: atempo (void) {tempo ();}
 
 void PrologTransport :: ritardando (void) {accelerando ();}
 void PrologTransport :: ritardando (int steps) {accelerando (- steps);}
