@@ -91,9 +91,23 @@ static bool signal_bar_function (PrologElement * parameters, PrologTransport * t
 }
 
 static bool tempo_function (PrologElement * parameters, PrologTransport * transport) {
-	if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-	if (parameters -> isVar ()) {parameters -> setDouble (transport -> getBeatsPerMinute ()); return true;}
-	if (parameters -> isInteger ()) {transport -> tempo (parameters -> getInteger ()); return true;}
+	PrologElement * right = 0;
+	if (parameters -> isPair ()) {right = parameters -> getRight (); parameters = parameters -> getLeft ();}
+	if (parameters -> isVar ()) {
+		if (right != 0 && right -> isPair ()) {
+			right -> getLeft () -> setInteger (transport -> getBeatSeconds ());
+			parameters -> setInteger (transport -> getBeatsPerSeconds ());
+		}
+		else parameters -> setDouble (transport -> getBeatsPerMinute ());
+		return true;
+	}
+	if (parameters -> isInteger ()) {
+		if (right != 0 && right -> isPair () && right -> getLeft () -> isInteger ()) {
+			transport -> tempo (parameters -> getInteger (), right -> getLeft () -> getInteger ());
+		}
+		else transport -> tempo ((double) parameters -> getInteger ());
+		return true;
+	}
 	if (parameters -> isDouble ()) {transport -> tempo (parameters -> getDouble ()); return true;}
 	return false;
 }
