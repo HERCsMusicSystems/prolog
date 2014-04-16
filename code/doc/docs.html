@@ -280,10 +280,12 @@
             <a href="#predicate_chexer">chexer</a>
             <a href="#predicate_CONTINUE">CONTINUE</a>
             <a href="#predicate_control">control</a>
+            <a href="#predicate_CONTROL">CONTROL</a>
             <a href="#predicate_keyoff">keyoff</a>
             <a href="#predicate_keyon">keyon</a>
             <a href="#predicate_midi_message">midi_message</a>
             <a href="#predicate_pitch">pitch</a>
+            <a href="#predicate_PITCH">PITCH</a>
             <a href="#predicate_polyaftertouch">polyaftertouch</a>
             <a href="#predicate_programchange">programchange</a>
             <a href="#predicate_START">START</a>
@@ -298,6 +300,7 @@
             <a href="#midi_controllers">MIDI pre-defined controllers</a>
             <br />
             <a href="#predicate_attack_controller">attack</a>
+            <a href="#predicate_ATTACK_controller">ATTACK</a>
             <a href="#predicate_bank_controller">bank</a>
             <a href="#predicate_bank_lsb_controller">bank_lsb</a>
             <a href="#predicate_breath_controller">breath</a>
@@ -3133,6 +3136,24 @@
         </div>
         <div class="doc_predicate_body">
             Sends the <b>control</b> MIDI message <b>= 0xBc cc vv</b>.
+            If vv is negative then vv := 128 + vv.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_CONTROL">
+        <div class="doc_predicate_header">
+            [CONTROL (line) ch cc vv]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>control</b> MIDI message <b>= 0xBc cc+32 ll 0xBc cc hh</b> where <b>hhll</b> is a 14-bit-value.
+            If vv is negative then vv := 16384 + vv.
             <br />
             The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
@@ -3199,6 +3220,22 @@
         </div>
         <div class="doc_predicate_body">
             Sends the <b>pitch</b> MIDI message <b>= 0xEc ll hh</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_PITCH">
+        <div class="doc_predicate_header">
+            [PITCH (line) ch 14-bit-value]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>pitch</b> MIDI message <b>= 0xEc ll hh</b> where <b>hhll</b> is a 14-bit value.
             <br />
             The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
@@ -3350,10 +3387,30 @@
 <div class="doc_predicate">
     <a id="predicate_attack_controller">
         <div class="doc_predicate_header">
-            [attack (line) channel vv]
+            [attack (line) ch vv]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>attack</b> pre-definded MIDI controller message <b>= 0xBc 73 vv</b>.
+            If vv is negative then vv := 128 + vv.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
+            <br />
+            If the line parameter is omitted then the deault MIDI destination is used (if present).
+            Fails otherwise.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_ATTACK_controller">
+        <div class="doc_predicate_header">
+            [ATTACK (line) ch 14-bit-value]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the <b>attack</b> pre-definded MIDI controller message <b>= 0xBc 105 ll 0xBc 73 hh</b> where <b>hhll</b> is a 14-bit-value.
+            If vv is negative then vv := 16384 + vv.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3364,12 +3421,14 @@
 <div class="doc_predicate">
     <a id="predicate_bank_controller">
         <div class="doc_predicate_header">
-            [bank (line) channel vv]<br />
-            [bank (line) channel msb lsb]
+            [bank (line) ch vv]<br />
+            [bank (line) ch msb lsb]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>bank change</b> pre-definded MIDI controller message <b>= 0xBc 0 vv</b>
             or two consecutive messages <b>= 0xBc 32 lsb 0xBc 0 msb</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3380,10 +3439,12 @@
 <div class="doc_predicate">
     <a id="predicate_bank_lsb_controller">
         <div class="doc_predicate_header">
-            [banklsb (line) channel vv]
+            [banklsb (line) ch vv]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>bank change lsb</b> pre-definded MIDI controller message <b>= 0xBc 32 vv</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3394,10 +3455,12 @@
 <div class="doc_predicate">
     <a id="predicate_breath_controller">
         <div class="doc_predicate_header">
-            [breath (line) channel vv]
+            [breath (line) ch vv]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>breath</b> pre-definded MIDI controller message <b>= 0xBc 2 vv</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3408,10 +3471,12 @@
 <div class="doc_predicate">
     <a id="predicate_chorus_controller">
         <div class="doc_predicate_header">
-            [chorus (line) channel vv]
+            [chorus (line) ch vv]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>chorus</b> pre-definded MIDI controller message <b>= 0xBc 91 vv</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3422,10 +3487,12 @@
 <div class="doc_predicate">
     <a id="predicate_cutoff_controller">
         <div class="doc_predicate_header">
-            [cutoff (line) channel vv]
+            [cutoff (line) cha vv]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>cutoff</b> pre-definded MIDI controller message <b>= 0xBc 74 vv</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3436,10 +3503,12 @@
 <div class="doc_predicate">
     <a id="predicate_foot_controller">
         <div class="doc_predicate_header">
-            [foot (line) channel vv]
+            [foot (line) ch vv]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>foot</b> pre-definded MIDI controller message <b>= 0xBc 4 vv</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3450,10 +3519,12 @@
 <div class="doc_predicate">
     <a id="predicate_holdoff_controller">
         <div class="doc_predicate_header">
-            [holdoff (line) channel]
+            [holdoff (line) ch]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>hold off</b> pre-definded MIDI controller message <b>= 0xBc 64 0</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3464,10 +3535,12 @@
 <div class="doc_predicate">
     <a id="predicate_holdon_controller">
         <div class="doc_predicate_header">
-            [holdon (line) channel]
+            [holdon (line) ch]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>hold on</b> pre-definded MIDI controller message <b>= 0xBc 64 127</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3478,10 +3551,12 @@
 <div class="doc_predicate">
     <a id="predicate_modulation_controller">
         <div class="doc_predicate_header">
-            [modulation (line) channel vv]
+            [modulation (line) ch vv]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>modulation</b> pre-definded MIDI controller message <b>= 0xBc 1 vv</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3492,10 +3567,12 @@
 <div class="doc_predicate">
     <a id="predicate_mono_controller">
         <div class="doc_predicate_header">
-            [mono (line) channel]
+            [mono (line) ch]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>mono</b> pre-definded MIDI controller message <b>= 0xBc 126 0</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3506,10 +3583,12 @@
 <div class="doc_predicate">
     <a id="predicate_pan_controller">
         <div class="doc_predicate_header">
-            [pan (line) channel vv]
+            [pan (line) ch vv]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>pan</b> pre-definded MIDI controller message <b>= 0xBc 10 vv</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3520,10 +3599,12 @@
 <div class="doc_predicate">
     <a id="predicate_poly_controller">
         <div class="doc_predicate_header">
-            [poly (line) channel vv]
+            [poly (line) ch vv]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>poly</b> pre-definded MIDI controller message <b>= 0xBc 127 0</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3534,10 +3615,12 @@
 <div class="doc_predicate">
     <a id="predicate_portaoff_controller">
         <div class="doc_predicate_header">
-            [portaoff (line) channel]
+            [portaoff (line) ch]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>porta off</b> pre-definded MIDI controller message <b>= 0xBc 65 0</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3548,10 +3631,12 @@
 <div class="doc_predicate">
     <a id="predicate_portaon_controller">
         <div class="doc_predicate_header">
-            [portaon (line) channel vv]
+            [portaon (line) ch vv]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>porta on</b> pre-definded MIDI controller message <b>= 0xBc 65 127</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3562,10 +3647,12 @@
 <div class="doc_predicate">
     <a id="predicate_portatime_controller">
         <div class="doc_predicate_header">
-            [portatime (line) channel vv]
+            [portatime (line) ch vv]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>porta time</b> pre-definded MIDI controller message <b>= 0xBc 5 vv</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3576,10 +3663,12 @@
 <div class="doc_predicate">
     <a id="predicate_release_controller">
         <div class="doc_predicate_header">
-            [release (line) channel vv]
+            [release (line) ch vv]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>release</b> pre-definded MIDI controller message <b>= 0xBc 72 vv</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3590,10 +3679,12 @@
 <div class="doc_predicate">
     <a id="predicate_resonance_controller">
         <div class="doc_predicate_header">
-            [resonance (line) channel vv]
+            [resonance (line) ch vv]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>resonance</b> pre-definded MIDI controller message <b>= 0xBc 71 vv</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3604,10 +3695,12 @@
 <div class="doc_predicate">
     <a id="predicate_reverb_controller">
         <div class="doc_predicate_header">
-            [reverb (line) channel vv]
+            [reverb (line) ch vv]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>reverb</b> pre-definded MIDI controller message <b>= 0xBc 93 vv</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
@@ -3618,10 +3711,12 @@
 <div class="doc_predicate">
     <a id="predicate_volume_controller">
         <div class="doc_predicate_header">
-            [volume (line) channel vv]
+            [volume (line) ch vv]
         </div>
         <div class="doc_predicate_body">
             Sends the <b>volume</b> pre-definded MIDI controller message <b>= 0xBc 7 vv</b>.
+            <br />
+            The channel parameter (ch) can be greater than 15. The system automatically inserts channel extension message if necessary.
             <br />
             If the line parameter is omitted then the deault MIDI destination is used (if present).
             Fails otherwise.
