@@ -31,6 +31,7 @@
 #include "prolog_xml.h"
 #include "prolog_distribution.h"
 #include "prolog_control.h"
+#include "prolog_irrklang.h"
 
 #ifdef WINDOWS_OPERATING_SYSTEM
 #include "resource.h"
@@ -53,6 +54,7 @@ public:
 		if (strcmp (name, "xml") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (XML_PRC), RT_RCDATA);
 		if (strcmp (name, "distribution") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (DISTRIBUTION_PRC), RT_RCDATA);
 		if (strcmp (name, "control") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (CONTROL_PRC), RT_RCDATA);
+		if (strcmp (name, "irrklang") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (IRRKLANG_PRC), RT_RCDATA);
 		if (strcmp (name, "studio.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (STUDIO_PRC), RT_RCDATA);
 		if (strcmp (name, "conductor.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (CONDUCTOR_PRC), RT_RCDATA);
 		if (strcmp (name, "midi.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (MIDI_PRC), RT_RCDATA);
@@ -68,6 +70,7 @@ public:
 		if (strcmp (name, "xml.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (XML_PRC), RT_RCDATA);
 		if (strcmp (name, "distribution.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (DISTRIBUTION_PRC), RT_RCDATA);
 		if (strcmp (name, "control.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (CONTROL_PRC), RT_RCDATA);
+		if (strcmp (name, "irrklang.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (IRRKLANG_PRC), RT_RCDATA);
 		if (! resource) return NULL;
 		HGLOBAL loader = LoadResource (NULL, resource);
 		if (! loader) return NULL;
@@ -144,6 +147,7 @@ public:
 		if (strcmp (name, "prolog.xml") == 0) return new PrologXMLServiceClass ();
 		if (strcmp (name, "prolog.distribution") == 0) return new PrologDistributionServiceClass ();
 		if (strcmp (name, "prolog.control") == 0) return new PrologControlServiceClass ();
+		if (strcmp (name, "prolog.irrklang") == 0) return new PrologIrrKlangServiceClass ();
 		return NULL;
 	}
 } service_class_loader;

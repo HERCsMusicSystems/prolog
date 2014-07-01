@@ -54,7 +54,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.;../../pthread;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;../../pthread;../../irrKlang-1.5.0/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>PTW32_STATIC_LIB;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -64,12 +64,12 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>pthread.lib;winmm.lib;dinput8.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>pthread.lib;winmm.lib;dinput8.lib;dxguid.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalLibraryDirectories>..\..\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\Debug;..\..\irrKlang-1.5.0\lib\Win32-visualStudio</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -105,6 +105,7 @@
     <ClCompile Include="..\code\prolog\prolog_distribution.cpp" />
     <ClCompile Include="..\code\prolog\prolog_dll_loader.cpp" />
     <ClCompile Include="..\code\prolog\prolog_element.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_irrklang.cpp" />
     <ClCompile Include="..\code\prolog\prolog_loader.cpp" />
     <ClCompile Include="..\code\prolog\prolog_match.cpp" />
     <ClCompile Include="..\code\prolog\prolog_midi.cpp" />
@@ -131,6 +132,7 @@
     <ClInclude Include="..\code\prolog\prolog_conductor.h" />
     <ClInclude Include="..\code\prolog\prolog_control.h" />
     <ClInclude Include="..\code\prolog\prolog_distribution.h" />
+    <ClInclude Include="..\code\prolog\prolog_irrklang.h" />
     <ClInclude Include="..\code\prolog\prolog_midi.h" />
     <ClInclude Include="..\code\prolog\prolog_neural.h" />
     <ClInclude Include="..\code\prolog\prolog_xml.h" />
@@ -155,6 +157,7 @@
     <None Include="..\code\prolog\f1.prc" />
     <None Include="..\code\prolog\help.prc" />
     <None Include="..\code\prolog\http.prc" />
+    <None Include="..\code\prolog\irrklang.prc" />
     <None Include="..\code\prolog\keyboard.prc" />
     <None Include="..\code\prolog\lisp.prc" />
     <None Include="..\code\prolog\main_course.prc" />
