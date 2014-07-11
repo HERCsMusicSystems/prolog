@@ -46,8 +46,8 @@ public:
 			}
 			parameters = parameters -> getRight ();
 		}
-		if (volume != 0) ctrl -> setVolume (volume -> getDouble ());
-		if (frequency != 0) ctrl -> setPlaybackSpeed (frequency -> getDouble ());
+		if (volume != 0) ctrl -> setVolume ((irrklang :: ik_f32) volume -> getDouble ());
+		if (frequency != 0) ctrl -> setPlaybackSpeed ((irrklang :: ik_f32) frequency -> getDouble ());
 		if (command != 0) {
 			PrologAtom * atom = command -> getAtom ();
 			if (atom == irrpause) ctrl -> setIsPaused (true);
@@ -105,7 +105,7 @@ public:
 			parameters = parameters -> getRight ();
 		}
 		if (frequency != 0) default_frequency = frequency -> getDouble ();
-		if (volume != 0) irrklang_source -> setDefaultVolume (volume -> getDouble ());
+		if (volume != 0) irrklang_source -> setDefaultVolume ((irrklang :: ik_f32) volume -> getDouble ());
 		irrklang :: ISound * sound_control = 0;
 		if (command != 0) {
 			PrologAtom * atom = command -> getAtom ();
@@ -121,7 +121,7 @@ public:
 				irrklang_control_class * icc = new irrklang_control_class (dir, ctrl -> getAtom (), sound_control);
 				if (! ctrl -> getAtom () -> setMachine (icc)) {delete icc; return false;}
 			}
-			if (default_frequency != 1.0) sound_control -> setPlaybackSpeed (default_frequency);
+			if (default_frequency != 1.0) sound_control -> setPlaybackSpeed ((irrklang :: ik_f32) default_frequency);
 			sound_control -> setIsPaused (false);
 		}
 		return true;
