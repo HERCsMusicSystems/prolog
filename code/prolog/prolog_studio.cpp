@@ -3204,6 +3204,53 @@ public:
 	security_check (PrologRoot * root) {this -> root = root;}
 };
 
+class encoder_class : public PrologNativeCode {
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		PrologElement * el [4] = {0, 0, 0, 0};
+		int element_counter = 0;
+		encoder e;
+		char serial [32];
+		char key [32];
+		while (parameters -> isPair () && element_counter < 4) {
+			el [element_counter++] = parameters -> getLeft ();
+			parameters = parameters -> getRight ();
+		}
+		if (element_counter == 3 && el [0] -> isText () && el [1] -> isText () && el [2] -> isText ()) {
+			if (strlen (el [2] -> getText ()) < 2) return false;
+			FILE * fr = fopen (el [0] -> getText (), "rb");
+			if (fr == 0) return false;
+			FILE * tc = fopen (el [1] -> getText (), "wb");
+			if (tc == 0) {fclose (fr); return false;}
+			char * pp = el [2] -> getText ();
+			int ch = fgetc (fr);
+			while (ch >= 0) {
+				ch ^= (int) (* pp++);
+				fputc (ch, tc);
+				if (* pp == '\0') pp = el [2] -> getText ();
+				ch = fgetc (fr);
+			}
+			fclose (fr); fclose (tc);
+			return true;
+		}
+		if (element_counter == 3 && el [0] -> isText ()) {
+			e . normalize_serial (serial, el [0] -> getText ());
+			e . calculate_key (key, serial);
+			el [1] -> setText (serial);
+			el [2] -> setText (key);
+			return true;
+		}
+		if (element_counter == 4 && el [0] -> isText () && el [1] -> isInteger ()) {
+			e . normalize_serial (serial, el [0] -> getText ());
+			e . calculate_key (key, serial, el [1] -> getInteger ());
+			el [2] -> setText (serial);
+			el [3] -> setText (key);
+			return true;
+		}
+		return false;
+	}
+};
+
 ///////////////////
 // SERVICE CLASS //
 ///////////////////
@@ -3336,6 +3383,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 
 	if (strcmp (name, "get_volume_serial_number") == 0) return new get_volume_serial_number (root);
 	if (strcmp (name, "security_check") == 0) return new security_check (root);
+	if (strcmp (name, "encoder") == 0) return new encoder_class ();
 
 	return NULL;
 }
