@@ -31,9 +31,9 @@
 #include "prolog_xml.h"
 #include "prolog_distribution.h"
 #include "prolog_control.h"
-#include "prolog_irrklang.h"
 
 #ifdef WINDOWS_OPERATING_SYSTEM
+#include "prolog_irrklang.h"
 #include "resource.h"
 class resource_loader_class : public PrologResourceLoader {
 public:
@@ -147,7 +147,9 @@ public:
 		if (strcmp (name, "prolog.xml") == 0) return new PrologXMLServiceClass ();
 		if (strcmp (name, "prolog.distribution") == 0) return new PrologDistributionServiceClass ();
 		if (strcmp (name, "prolog.control") == 0) return new PrologControlServiceClass ();
+#ifdef WINDOWS_OPERATING_SYSTEM
 		if (strcmp (name, "prolog.irrklang") == 0) return new PrologIrrKlangServiceClass ();
+#endif
 		return NULL;
 	}
 } service_class_loader;

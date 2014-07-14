@@ -181,7 +181,8 @@ prc_objects = \
 	$(pc)sql.prc\
 	$(pc)test.prc\
 	$(pc)xml.prc\
-	$(pc)distribution.prc
+	$(pc)distribution.prc\
+	$(pc)control.prc
 
 objects = \
 	$(pi)prolog_dll_loader.o\
@@ -194,7 +195,7 @@ objects = \
 	$(pi)prolog_variable.o \
 	$(pi)prolog_linux_console.o \
 	$(pi)prolog_xml.o $(pi)tinyxml.o \
-	$(pi)prolog_distribution.o
+	$(pi)prolog_distribution.o $(pi)prolog_control.o $(pi)joystick_linux.o
 
 resource_maker.exe: $(pc)resource_maker.cpp
 	g++ $(pc)resource_maker.cpp -o resource_maker.exe
@@ -256,6 +257,10 @@ tinyxml.o: $(pc)../tinyxml2/tinyxml2.cpp $(pc)../tinyxml2/tinyxml2.h
 	g++ -Wno-write-strings $(pc)../tinyxml2/tinyxml2.cpp -c -o tinyxml.o
 prolog_distribution.o: $(pc)prolog_distribution.h $(pc)prolog_distribution.cpp $(pc)prolog.h
 	g++ -Wno-write-strings -std=c++11 -I. $(pc)prolog_distribution.cpp -c -o prolog_distribution.o
+prolog_control.o: $(pc)prolog_control.h $(pc)prolog_control.cpp $(pc)prolog.h
+	g++ -Wno-write-strings -I. $(pc)prolog_control.cpp -c -o prolog_control.o
+joystick_linux.o: $(pc)joystick_linux.h $(pc)joystick_linux.cpp
+	g++ -Wno-write-strings -I. $(pc)joystick_linux.cpp -c -o joystick_linux.o
 prolog_mysql.o: $(pc)prolog_mysql.cpp
 	g++ -Wno-write-strings `mysql_config --cflags` -I. $(pc)prolog_mysql.cpp -c -o prolog_mysql.o
 
