@@ -70,36 +70,11 @@ public:
 		root -> resolution (query);
 		delete query;
 	}
-	friend static void * joystick_runner (void * parameters);
 public:
 	void axis (int ind, double value) {if (callback != 0) call_axis (ind, value);}
 	void button (int ind, bool value) {if (callback != 0) call_button (ind, value);}
-	prolog_joystick (char * path, PrologRoot * root, PrologAtom * callback, double freq) : joystick (path) {
-		should_continue = false;
-		this -> root = root;
-		this -> callback = callback;
-		if (callback != 0) {COLLECTOR_REFERENCE_INC (callback);}
-		this -> freq = freq;
-		delay = -1.0;
-		if (freq < 0.0) return;
-		if (callback == 0) return;
-		#ifdef LINUX_OPERATING_SYSTEM
-		delay = freq > 0.0 ? 1000000.0 / freq : 0.0;
-		#endif
-		#ifdef WINDOWS_OPERATING_SYSTEM
-		delay = freq > 0.0 ? 1000.0 / freq : 0.0;
-		#endif
-		pthread_create (& thread, 0, joystick_runner, this);
-		pthread_detach (thread);
-	}
-	~ prolog_joystick (void) {
-		if (should_continue) {
-			should_continue = false;
-			while (! should_continue) Sleep ((int) delay);
-			should_continue = false;
-		}
-		if (callback != 0) callback -> removeAtom (); callback = 0;
-	}
+	prolog_joystick (char * path, PrologRoot * root, PrologAtom * callback, double freq);
+	~ prolog_joystick (void);
 };
 
 static void * joystick_runner (void * parameters) {
@@ -110,6 +85,34 @@ static void * joystick_runner (void * parameters) {
 	}
 	js -> should_continue = true;
 	return 0;
+}
+
+prolog_joystick :: prolog_joystick (char * path, PrologRoot * root, PrologAtom * callback, double freq) : joystick (path) {
+	should_continue = false;
+	this -> root = root;
+	this -> callback = callback;
+	if (callback != 0) {COLLECTOR_REFERENCE_INC (callback);}
+	this -> freq = freq;
+	delay = -1.0;
+	if (freq < 0.0) return;
+	if (callback == 0) return;
+	#ifdef LINUX_OPERATING_SYSTEM
+	delay = freq > 0.0 ? 1000000.0 / freq : 0.0;
+	#endif
+	#ifdef WINDOWS_OPERATING_SYSTEM
+	delay = freq > 0.0 ? 1000.0 / freq : 0.0;
+	#endif
+	pthread_create (& thread, 0, joystick_runner, this);
+	pthread_detach (thread);
+}
+
+prolog_joystick :: ~ prolog_joystick (void) {
+	if (should_continue) {
+		should_continue = false;
+		while (! should_continue) usleep ((int) delay);
+		should_continue = false;
+	}
+	if (callback != 0) callback -> removeAtom (); callback = 0;
 }
 
 class joystick_code : public PrologNativeCode {
