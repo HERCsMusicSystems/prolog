@@ -16,12 +16,12 @@
 [TestFails "has_machine sonda" [has_machine sonda]]
 [TestWorks "erase sonda.txt" [erase "sonda.txt"]]
 
-[TestEq "create directory and file" [[*dir ["mariner.txt" "viking.txt"]] [*dir ["mariner.txt" "viking.txt"]]] [*x *y]
+[TestEq "create directory and file" [[*dir ["luna.txt" "mariner.txt"]] [*dir ["luna.txt" "mariner.txt"]]] [*x *y]
 	[make_directory "sonda"]
 	[cd "sonda"]
 	[file_writer *fw "maliner.txt"] [*fw]
 	[move "maliner.txt" "mariner.txt"]
-	[copy "mariner.txt" "viking.txt"]
+	[copy "mariner.txt" "luna.txt"]
 	[DIR "*.*" : *x]
 	[cd]
 	[SELECT
@@ -31,7 +31,7 @@
 ]
 
 [TestFails "erase non-empty directory" [erase_directory "sonda"]]
-[TestWorks "remove files" [erase "sonda/mariner.txt" "sonda/viking.txt"]]
+[TestWorks "remove files" [erase "sonda/mariner.txt" "sonda/luna.txt"]]
 [TestWorks "erase empty directory" [erase_directory "sonda"]]
 
 [TestEq "get_volume_serial_number *" "" *x [get_volume_serial_number *x]]
