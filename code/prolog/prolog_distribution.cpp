@@ -82,6 +82,7 @@ public:
 			if (atom -> isVar ()) atom -> setAtom (new PrologAtom ());
 			if (! atom -> isAtom ()) return false;
 			PrologAtom * machine = atom -> getAtom ();
+			if (machine -> getMachine () != 0) return false;
 			generic_distributal_code * code = coder (machine, integers, doubles);
 			if (code == 0) return false;
 			if (earth_present) code -> seeder ();

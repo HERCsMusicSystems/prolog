@@ -118,6 +118,7 @@ public:
 		}
 		if (sound_control != 0) {
 			if (ctrl != 0) {
+				if (ctrl -> getAtom () -> getMachine () != 0) return false;
 				irrklang_control_class * icc = new irrklang_control_class (dir, ctrl -> getAtom (), sound_control);
 				if (! ctrl -> getAtom () -> setMachine (icc)) {delete icc; return false;}
 			}
@@ -159,6 +160,7 @@ public:
 		if (path == 0) return false;
 		irrklang_source = irrklang_engine -> getSoundSource (path -> getText ());
 		if (irrklang_source == 0) return false;
+		if (atom -> getAtom () -> getMachine () != 0) return false;
 		irrklang_source_class * source = new irrklang_source_class (dir, atom -> getAtom (), irrklang_engine, irrklang_source);
 		if (atom -> getAtom () -> setMachine (source)) return true;
 		delete source;

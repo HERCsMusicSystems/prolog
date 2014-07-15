@@ -61,7 +61,7 @@ public:
 		root -> resolution (query);
 		delete query;
 	}
-	friend void * joystick_runner (void * parameters);
+	friend static void * joystick_runner (void * parameters);
 public:
 	void axis (int ind, double value) {if (callback != 0) call_axis (ind, value);}
 	void button (int ind, bool value) {if (callback != 0) call_button (ind, value);}
@@ -165,6 +165,7 @@ public:
 			parameters = parameters -> getRight ();
 		}
 		if (atom == 0) return false;
+		if (atom -> getAtom () -> getMachine () != 0) return false;
 		joystick_code * jc = new joystick_code (path != 0 ? path -> getText () : 0, root, atom -> getAtom (), callback != 0 ? callback -> getAtom () : 0, freq);
 		if (atom -> getAtom () -> setMachine (jc)) return true;
 		delete jc;

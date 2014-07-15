@@ -1855,6 +1855,7 @@ public:
 		if (! parameters -> isPair ()) return false;
 		PrologElement * et = parameters -> getLeft ();
 		if (! et -> isText ()) return false;
+		if (atom -> getMachine () != 0) return false;
 		file_write * fw = new file_write (atom, root, et -> getText ());
 		if (atom -> setMachine (fw)) return true;
 		delete fw;
@@ -1943,6 +1944,7 @@ public:
 		if (! parameters -> isPair ()) return false;
 		PrologElement * et = parameters -> getLeft ();
 		if (! et -> isText ()) return false;
+		if (atom -> getMachine () != 0) return false;
 		file_read * fr = new file_read (atom, root, et -> getText ());
 		if (fr -> fi == NULL) {delete fr; return false;}
 		if (atom -> setMachine (fr)) return true;
@@ -2049,6 +2051,7 @@ public:
 		if (! parameters -> isPair ()) return false;
 		PrologElement * ea = parameters -> getLeft ();
 		if (! ea -> isAtom ()) return false;
+		if (ea -> getAtom () -> getMachine () != 0) return false;
 		parameters = parameters -> getRight ();
 		if (! parameters -> isPair ()) return false;
 		PrologElement * et = parameters -> getLeft ();
@@ -2428,6 +2431,7 @@ public:
 		}
 		parameters = parameters -> getRight ();
 		if (! parameters -> isPair ()) return false;
+		if (atom -> getMachine () != 0) return false;
 		constant * c = new constant (parameters -> getLeft ());
 		if (atom -> setMachine (c)) return true;
 		delete c;
@@ -2482,6 +2486,7 @@ public:
 			if (! parameters -> isAtom ()) return false;
 			atom = parameters -> getAtom ();
 		}
+		if (atom -> getMachine () != 0) return false;
 		variable * v;
 		if (initial_value -> isPair ()) v = new variable (atom, initial_value -> getLeft ());
 		else v = new variable (atom);
@@ -2536,6 +2541,7 @@ public:
 			if (! parameters -> isAtom ()) return false;
 			atom = parameters -> getAtom ();
 		}
+		if (atom -> getMachine () != 0) return false;
 		accumulator * accu = new accumulator (atom);
 		if (atom -> setMachine (accu)) return true;
 		delete accu;
@@ -2670,6 +2676,7 @@ public:
 			if (! left -> isAtom ()) return false;
 			atom = left -> getAtom ();
 		}
+		if (atom -> getMachine () != 0) return false;
 		array * a = new array (atom);
 		parameters = parameters -> getRight ();
 		while (parameters -> isPair ()) {
@@ -3010,6 +3017,7 @@ public:
 			ind = parameters -> getInteger ();
 			if (ind < 0) return false;
 		}
+		if (atom -> getMachine () != 0) return false;
 		PrologNativeCode * s;
 		if (mutexed) s = new semaphore_mutex (atom, waitAtom, enterAtom, signalAtom, ind);
 		else s = new semaphore_posix (atom, waitAtom, enterAtom, signalAtom, ind);
@@ -3069,6 +3077,7 @@ public:
 		PrologAtom * atom = 0;
 		if (ae -> isVar ()) {ae -> setAtom (atom = new PrologAtom ());}
 		else {if (! ae -> isAtom ()) return false; atom = ae -> getAtom ();}
+		if (atom -> getMachine () != 0) return false;
 		PrologMutex * mutex = new PrologMutex (atom, waitAtom, enterAtom, signalAtom);
 		if (atom -> setMachine (mutex)) return true;
 		delete mutex;

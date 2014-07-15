@@ -209,9 +209,7 @@ public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		expectation_provided = false;
 		if (parameters -> isEarth ()) {
-			atom -> unProtect ();
-			atom -> setMachine (NULL);
-			atom -> unProtect ();
+			atom -> setMachine (0);
 			delete this;
 			return true;
 		}
@@ -247,6 +245,7 @@ public:
 			PrologElement * new_layer_size = parameters -> getLeft ();
 			if (! new_layer_size -> isInteger ()) return false;
 			parameters = parameters -> getRight ();
+			if (p1 -> getAtom () -> getMachine () != 0) return false;
 			PrologNeuralLayer * l = new PrologNeuralLayer (p1 -> getAtom (), new_layer_size -> getInteger (), neurons);
 			if (p1 -> getAtom () -> setMachine (l)) {
 				this -> next = l;
@@ -403,6 +402,7 @@ public:
 		if (! parameters -> isPair ()) return false;
 		PrologElement * synapses = parameters -> getLeft ();
 		if (! synapses -> isInteger ()) return false;
+		if (atom -> getAtom () -> getMachine () != 0) return false;
 		PrologNeuralLayer * l = NULL;
 		switch (type) {
 		case NORMALISED: l = new PrologNormalisedLayer (atom -> getAtom (), neurons -> getInteger (), synapses -> getInteger ()); break;

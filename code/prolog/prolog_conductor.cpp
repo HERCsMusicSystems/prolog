@@ -354,9 +354,7 @@ public:
 	PrologAtom * stop_atom;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (parameters -> isEarth ()) {
-			atom -> unProtect ();
-			atom -> setMachine (NULL);
-			atom -> unProtect ();
+			atom -> setMachine (0);
 			delete this;
 			return true;
 		}
@@ -440,6 +438,7 @@ public:
 			if (! ea -> isAtom ()) return false;
 			atom = ea -> getAtom ();
 		}
+		if (atom -> getMachine () != 0) return false;
 		conductor * c = new conductor (atom, wt_atom, beat_atom, bar_atom, signal_atom, signal_beat_atom, signal_bar_atom, reset_atom, tempo_atom, atempo_atom, accel_atom, rit_atom, metrum_atom, division_atom, start_atom, pause_atom, stop_atom);
 		if (atom -> setMachine (c)) return true;
 		delete c;

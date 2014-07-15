@@ -250,6 +250,12 @@ bool PrologLoader :: LOAD (char * file_name) {
 					close ();
 					return false;
 				}
+				if (atom -> getMachine () != 0) {
+					message_v ("Atom has already machine code attached: ", symbol);
+					root -> drop ();
+					close ();
+					return false;
+				}
 				get_symbol ();
 				if (symbol_control != 11 || strcmp (root -> if_atom_caption, symbol) != 0) {
 					message ("Syntax error: machine assignment expected.");

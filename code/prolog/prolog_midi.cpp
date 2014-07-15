@@ -733,6 +733,7 @@ public:
 			if (el -> isInteger ()) size = el -> getInteger ();
 			parameters = parameters -> getRight ();
 		}
+		if (line_atom -> getAtom () -> getMachine () != 0) return false;
 		PrologMidiLineNativeCode * line = new PrologMidiLineNativeCode (line_atom -> getAtom (), root, income_midi, servo, size);
 		if (line_atom -> getAtom () -> setMachine (line)) {if (servo -> default_destination == 0) servo -> default_destination = line -> getLine (); return true;}
 		delete line;
@@ -763,6 +764,7 @@ public:
 		if (file_name == 0 || line == 0) return false;
 		int midi_input_id = open (file_name, O_RDONLY);
 		if (midi_input_id < 0) return false;
+		if (line -> getMachine () != 0) return false;
 		PrologMidiSourceCode * source = new PrologMidiSourceCode (root, servo, line, income, midi_input_id);
 		if (line -> setMachine (source)) return true;
 		delete source;
