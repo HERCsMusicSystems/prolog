@@ -21,8 +21,17 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "prolog_control.h"
-#include "joystick_windows.h"
 #include "pthread.h"
+
+#ifdef WINDOWS_OPERATING_SYSTEM
+#include "joystick_windows.h"
+static void usleep (int delay) {Sleep (delay);}
+#endif
+#ifdef LINUX_OPERATING_SYSTEM
+#include "joystick_linux.h"
+#include <string.h>
+#include <unistd.h>
+#endif
 
 /*********************************************************
 
@@ -69,14 +78,17 @@ public:
 		should_continue = false;
 		this -> root = root;
 		this -> callback = callback;
-		if (callback != 0) {
-			COLLECTOR_REFERENCE_INC (callback);
-		}
+		if (callback != 0) {COLLECTOR_REFERENCE_INC (callback);}
 		this -> freq = freq;
 		delay = -1.0;
 		if (freq < 0.0) return;
 		if (callback == 0) return;
+		#ifdef LINUX_OPERATING_SYSTEM
+		delay = freq > 0.0 ? 1000000.0 / freq : 0.0;
+		#endif
+		#ifdef WINDOWS_OPERATING_SYSTEM
 		delay = freq > 0.0 ? 1000.0 / freq : 0.0;
+		#endif
 		pthread_create (& thread, 0, joystick_runner, this);
 		pthread_detach (thread);
 	}
