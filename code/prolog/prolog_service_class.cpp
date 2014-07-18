@@ -23,6 +23,7 @@
 #include "prolog.h"
 
 void PrologServiceClass :: init (PrologRoot * root) {}
+void PrologServiceClass :: init_directory (PrologDirectory * directory) {}
 
 PrologNativeCode * PrologServiceClass :: getNativeCode (char * name) {return NULL;}
 

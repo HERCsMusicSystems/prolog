@@ -2037,7 +2037,8 @@ public:
 		if (! parameters -> isText ()) return false;
 		PrologServiceClass * service = root -> loadServiceClass (parameters -> getText ());
 		if (service == NULL) return false;
-		root -> createDirectory (em -> getText (), service);
+		PrologDirectory * directory = root -> createDirectory (em -> getText (), service);
+		service -> init_directory (directory);
 		return true;
 	}
 	create_module (PrologRoot * root) {this -> root = root;}

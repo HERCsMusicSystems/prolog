@@ -1218,9 +1218,7 @@ int PrologMidiServiceClass :: chromatic (PrologAtom * atom) {
 }
 
 void PrologMidiServiceClass :: set_atoms (void) {
-	if (dir != NULL) return;
-	dir = root -> searchDirectory ("midi");
-	if (dir == NULL) return;
+	if (keyon_atom != NULL) return;
 	c = dir -> searchAtom ("C"); cb = dir -> searchAtom ("Cb"); cbb = dir -> searchAtom ("Cbb"); cx = dir -> searchAtom ("C#"); cxx = dir -> searchAtom ("Cx");
 	d = dir -> searchAtom ("D"); db = dir -> searchAtom ("Db"); dbb = dir -> searchAtom ("Dbb"); dx = dir -> searchAtom ("D#"); dxx = dir -> searchAtom ("Dx");
 	e = dir -> searchAtom ("E"); eb = dir -> searchAtom ("Eb"); ebb = dir -> searchAtom ("Ebb"); ex = dir -> searchAtom ("E#"); exx = dir -> searchAtom ("Ex");
@@ -1324,6 +1322,7 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 }
 
 void PrologMidiServiceClass :: init (PrologRoot * root) {this -> root = root; default_destination = 0;}
+void PrologMidiServiceClass :: init_directory (PrologDirectory * dir) {this -> dir = dir; keyon_atom = 0;}
 PrologMidiServiceClass :: PrologMidiServiceClass (void) {this -> root = NULL; dir = 0;}
 PrologMidiServiceClass :: ~ PrologMidiServiceClass (void) {}
 

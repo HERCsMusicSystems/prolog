@@ -172,6 +172,7 @@ bool PrologLoader :: LOAD (char * file_name) {
 		if (service_class == NULL) {message_v ("Service class crashed or not found: ", symbol); close (); return false;}
 		get_symbol ();
 		directory = root -> createDirectory (program_name, service_class);
+		service_class -> init_directory (directory);
 	} else directory = root -> createDirectory (program_name);
 	root -> auto_atoms = false;
 	switch (symbol_control) {
