@@ -46,6 +46,7 @@ public:
 class PrologStudio : public PrologServiceClass {
 private:
 	PrologRoot * root;
+	PrologDirectory * directory;
 	standard_in_reader stdr;
 	PrologNoise n;
 public:

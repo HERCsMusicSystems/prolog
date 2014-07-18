@@ -2995,7 +2995,6 @@ public:
 
 class semaphore_maker : public PrologNativeCode {
 public:
-	PrologRoot * root;
 	PrologAtom * waitAtom, * enterAtom, * signalAtom;
 	bool mutexed;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -3026,10 +3025,10 @@ public:
 		delete s;
 		return false;
 	}
-	semaphore_maker (PrologRoot * root, bool mutexed = false) {
-		this -> root = root;
+	semaphore_maker (PrologDirectory * dir, bool mutexed = false) {
 		this -> mutexed = mutexed;
-		PrologDirectory * dir = root -> searchDirectory ("studio");
+		waitAtom = enterAtom = signalAtom = 0;
+		if (dir == 0) return;
 		waitAtom = dir -> searchAtom ("wait");
 		enterAtom = dir -> searchAtom ("enter");
 		signalAtom = dir -> searchAtom ("signal");
@@ -3067,7 +3066,6 @@ public:
 
 class MutexMaker : public PrologNativeCode {
 public:
-	PrologRoot * root;
 	PrologAtom * waitAtom;
 	PrologAtom * enterAtom;
 	PrologAtom * signalAtom;
@@ -3084,8 +3082,9 @@ public:
 		delete mutex;
 		return false;
 	}
-	MutexMaker (PrologRoot * root) {
-		PrologDirectory * dir = root -> searchDirectory ("studio");
+	MutexMaker (PrologDirectory * dir) {
+		waitAtom = enterAtom = signalAtom = 0;
+		if (dir == 0) return;
 		waitAtom = dir -> searchAtom ("wait");
 		enterAtom = dir -> searchAtom ("enter");
 		signalAtom = dir -> searchAtom ("signal");
@@ -3267,6 +3266,7 @@ public:
 
 void PrologStudio :: init (PrologRoot * root, PrologDirectory * directory) {
 	this -> root = root;
+	this -> directory = directory;
 	stdr . setRoot (root);
 }
 
@@ -3347,9 +3347,9 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "crack") == 0) return new crack (root);
 	if (strcmp (name, "wait") == 0) return new wait (root);
 	if (strcmp (name, "timeout") == 0) return new timeout_class (root);
-	if (strcmp (name, "semaphore") == 0) return new semaphore_maker (root);
-	if (strcmp (name, "msemaphore") == 0) return new semaphore_maker (root, true);
-	if (strcmp (name, "mutex") == 0) return new MutexMaker (root);
+	if (strcmp (name, "semaphore") == 0) return new semaphore_maker (directory);
+	if (strcmp (name, "msemaphore") == 0) return new semaphore_maker (directory, true);
+	if (strcmp (name, "mutex") == 0) return new MutexMaker (directory);
 	if (strcmp (name, "file_writer") == 0) return new file_writer (root);
 	if (strcmp (name, "file_reader") == 0) return new file_reader (root);
 	if (strcmp (name, "import_loader") == 0) return new import_loader (root);
