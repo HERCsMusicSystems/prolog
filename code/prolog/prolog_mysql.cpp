@@ -649,7 +649,7 @@ public:
 	mysql (PrologRoot * root, bool fast = false) {this -> root = root; this -> fast = fast;}
 };
 
-void MySQLServiceClass :: init (PrologRoot * root) {this -> root = root;}
+void MySQLServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {this -> root = root;}
 PrologNativeCode * MySQLServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "mysql") == 0) return new mysql (root);
 	if (strcmp (name, "mysql_fast") == 0) return new mysql (root, true);

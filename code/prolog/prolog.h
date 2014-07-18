@@ -236,8 +236,7 @@ public:
 
 class PrologServiceClass TRACK {
 public:
-	virtual void init (PrologRoot * root);
-	virtual void init_directory (PrologDirectory * directory);
+	virtual void init (PrologRoot * root, PrologDirectory * directory);
 	virtual PrologNativeCode * getNativeCode (char * name);
 	PrologServiceClass (void);
 	virtual ~ PrologServiceClass (void);

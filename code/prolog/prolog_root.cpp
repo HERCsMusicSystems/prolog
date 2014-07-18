@@ -765,8 +765,6 @@ PrologServiceClass * PrologRoot :: loadServiceClass (char * name) {
 		service_class = load_plugin_service_class (search_directory -> text, name);
 		search_directory = search_directory -> next;
 	}
-	//if (service_class == NULL) service_class = load_plugin_service_class ("", name);
-	if (service_class != NULL) service_class -> init (this);
 	return service_class;
 }
 

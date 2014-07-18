@@ -110,7 +110,7 @@ public:
 	xml_native_class (PrologRoot * root) {this -> root = root;}
 };
 
-void PrologXMLServiceClass :: init (PrologRoot * root) {
+void PrologXMLServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {
 	this -> root = root;
 }
 

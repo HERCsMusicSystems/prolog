@@ -31,7 +31,7 @@ public:
 	irrklang :: ISoundEngine * irrklang_engine;
 	PrologRoot * root;
 	PrologDirectory * dir;
-	void init (PrologRoot * root);
+	void init (PrologRoot * root, PrologDirectory * directory);
 	PrologNativeCode * getNativeCode (char * name);
 	PrologIrrKlangServiceClass (void);
 	~ PrologIrrKlangServiceClass (void);

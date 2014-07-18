@@ -28,7 +28,7 @@
 class PrologXMLServiceClass : public PrologServiceClass {
 public:
 	PrologRoot * root;
-	virtual void init (PrologRoot * root);
+	virtual void init (PrologRoot * root, PrologDirectory * directory);
 	virtual PrologNativeCode * getNativeCode (char * name);
 	PrologXMLServiceClass (void) {root = 0;}
 };

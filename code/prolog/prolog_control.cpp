@@ -189,7 +189,7 @@ public:
 	create_joystick (PrologRoot * root) {this -> root = root;}
 };
 
-void PrologControlServiceClass :: init (PrologRoot * root) {this -> root = root;}
+void PrologControlServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {this -> root = root;}
 
 PrologNativeCode * PrologControlServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "joystick") == 0) return new create_joystick (root);

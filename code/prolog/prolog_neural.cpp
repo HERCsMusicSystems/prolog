@@ -424,7 +424,4 @@ PrologNativeCode * PrologNeuralServiceClass :: getNativeCode (char * name) {
 	return NULL;
 }
 
-void PrologNeuralServiceClass :: init (PrologRoot * root) {this -> root = root;}
-PrologNeuralServiceClass :: PrologNeuralServiceClass (void) {root = NULL;}
-PrologNeuralServiceClass :: ~ PrologNeuralServiceClass (void) {}
 

@@ -169,12 +169,13 @@ public:
 	irrklang_class (PrologDirectory * dir, irrklang :: ISoundEngine * irrklang_engine) {this -> dir = dir; this -> irrklang_engine = irrklang_engine; irrklang_source = 0;}
 };
 
-void PrologIrrKlangServiceClass :: init (PrologRoot * root) {
+void PrologIrrKlangServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {
 	this -> root = root;
+	this -> dir = directory;
 }
 
 PrologNativeCode * PrologIrrKlangServiceClass :: getNativeCode (char * name) {
-	if (dir == 0) dir = root -> searchDirectory ("irrklang");
+	if (dir == 0) return 0;
 	if (strcmp (name, "irrklang") == 0) return new irrklang_class (dir, irrklang_engine);
 	return 0;
 }

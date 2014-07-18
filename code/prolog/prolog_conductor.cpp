@@ -486,7 +486,7 @@ PrologNativeCode * PrologConductorServiceClass :: getNativeCode (char * name) {
 	return NULL;
 }
 
-void PrologConductorServiceClass :: init (PrologRoot * root) {this -> root = root;}
+void PrologConductorServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {this -> root = root;}
 PrologConductorServiceClass :: PrologConductorServiceClass (void) {this -> root = NULL;}
 PrologConductorServiceClass :: ~ PrologConductorServiceClass (void) {}
 

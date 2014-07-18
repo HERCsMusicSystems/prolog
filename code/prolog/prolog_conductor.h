@@ -32,7 +32,7 @@ private:
 public:
 	PrologTransport t;
 public:
-	virtual void init (PrologRoot * root);
+	virtual void init (PrologRoot * root, PrologDirectory * directory);
 	virtual PrologNativeCode * getNativeCode (char * name);
 	PrologConductorServiceClass (void);
 	~ PrologConductorServiceClass (void);

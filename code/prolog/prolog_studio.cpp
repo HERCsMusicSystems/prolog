@@ -2038,7 +2038,7 @@ public:
 		PrologServiceClass * service = root -> loadServiceClass (parameters -> getText ());
 		if (service == NULL) return false;
 		PrologDirectory * directory = root -> createDirectory (em -> getText (), service);
-		service -> init_directory (directory);
+		service -> init (root, directory);
 		return true;
 	}
 	create_module (PrologRoot * root) {this -> root = root;}
@@ -3265,7 +3265,7 @@ public:
 // SERVICE CLASS //
 ///////////////////
 
-void PrologStudio :: init (PrologRoot * root) {
+void PrologStudio :: init (PrologRoot * root, PrologDirectory * directory) {
 	this -> root = root;
 	stdr . setRoot (root);
 }

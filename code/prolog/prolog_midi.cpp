@@ -1321,8 +1321,12 @@ PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	return NULL;
 }
 
-void PrologMidiServiceClass :: init (PrologRoot * root) {this -> root = root; default_destination = 0;}
-void PrologMidiServiceClass :: init_directory (PrologDirectory * dir) {this -> dir = dir; keyon_atom = 0;}
+void PrologMidiServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {
+	this -> root = root;
+	default_destination = 0;
+	this -> dir = directory;
+	keyon_atom = 0;
+}
 PrologMidiServiceClass :: PrologMidiServiceClass (void) {this -> root = NULL; dir = 0;}
 PrologMidiServiceClass :: ~ PrologMidiServiceClass (void) {}
 

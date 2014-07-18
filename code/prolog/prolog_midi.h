@@ -75,8 +75,7 @@ public:
 	int chromatic (PrologAtom * atom);
 	PrologAtom * note (int diatonic, int chromatic);
 	void set_atoms (void);
-	virtual void init (PrologRoot * root);
-	virtual void init_directory (PrologDirectory * directory);
+	virtual void init (PrologRoot * root, PrologDirectory * directory);
 	virtual PrologNativeCode * getNativeCode (char * name);
 	PrologMidiServiceClass (void);
 	~ PrologMidiServiceClass (void);

@@ -26,13 +26,8 @@
 #include "prolog.h"
 
 class PrologNeuralServiceClass : public PrologServiceClass {
-private:
-	PrologRoot * root;
 public:
-	virtual void init (PrologRoot * root);
 	virtual PrologNativeCode * getNativeCode (char * name);
-	PrologNeuralServiceClass (void);
-	~ PrologNeuralServiceClass (void);
 };
 
 #endif

@@ -49,7 +49,7 @@ private:
 	standard_in_reader stdr;
 	PrologNoise n;
 public:
-	virtual void init (PrologRoot * root);
+	virtual void init (PrologRoot * root, PrologDirectory * directory);
 	virtual PrologNativeCode * getNativeCode (char * name);
 };
 

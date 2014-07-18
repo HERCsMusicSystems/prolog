@@ -275,7 +275,7 @@ while (analyser . get_param ()) {
 	webserver (PrologHttpServiceClass * service) {this -> service = service;}
 };
 
-void PrologHttpServiceClass :: init (PrologRoot * root) {
+void PrologHttpServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {
 	this -> root = root;
 	http_directory = 0;
 	full_text_atom = route_atom = protocol_atom = header_atom = param_atom = 0;

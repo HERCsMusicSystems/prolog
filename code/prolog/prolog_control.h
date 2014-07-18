@@ -29,7 +29,7 @@ class PrologControlServiceClass : public PrologServiceClass {
 private:
 	PrologRoot * root;
 public:
-	virtual void init (PrologRoot * root);
+	virtual void init (PrologRoot * root, PrologDirectory * directory);
 	virtual PrologNativeCode * getNativeCode (char * name);
 };
 

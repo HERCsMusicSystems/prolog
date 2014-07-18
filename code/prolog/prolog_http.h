@@ -33,7 +33,7 @@ public:
 	PrologAtom * get_atom, * post_atom, * put_atom, * patch_atom, * delete_atom, * copy_atom;
 	PrologAtom * head_atom, * options_atom, * link_atom, * unlink_atom, * purge_atom;
 	void set_atoms (void);
-	virtual void init (PrologRoot * root);
+	virtual void init (PrologRoot * root, PrologDirectory * directory);
 	virtual PrologNativeCode * getNativeCode (char * name);
 };
 
