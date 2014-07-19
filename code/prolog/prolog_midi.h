@@ -41,7 +41,7 @@ public:
 	virtual bool message_waiting (void);
 	virtual int internal_get (void);
 	virtual int internal_get_command (void);
-	SourceMidiLine (PrologRoot * root, PrologAtom * atom, PrologMidiServiceClass * servo, int midi_input_id);
+	SourceMidiLine (PrologRoot * root, PrologDirectory * directory, PrologAtom * atom, PrologMidiServiceClass * servo, int midi_input_id);
 	virtual ~ SourceMidiLine (void);
 };
 

@@ -28,7 +28,7 @@
 
 class PrologConductorServiceClass : public PrologServiceClass {
 private:
-	PrologRoot * root;
+	PrologDirectory * directory;
 public:
 	PrologTransport t;
 public:

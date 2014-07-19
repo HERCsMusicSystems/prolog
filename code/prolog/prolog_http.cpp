@@ -277,16 +277,14 @@ while (analyser . get_param ()) {
 
 void PrologHttpServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {
 	this -> root = root;
-	http_directory = 0;
+	http_directory = directory;
 	full_text_atom = route_atom = protocol_atom = header_atom = param_atom = 0;
 	get_atom = post_atom = put_atom = patch_atom = delete_atom = copy_atom = 0;
 	head_atom = options_atom = link_atom = unlink_atom = purge_atom = 0;
 }
 
 void PrologHttpServiceClass :: set_atoms (void) {
-	if (http_directory != 0) return;
-	http_directory = root -> searchDirectory ("http");
-	if (http_directory == 0) return;
+	if (full_text_atom != 0 || http_directory == 0) return;
 	full_text_atom = http_directory -> searchAtom ("FULL_HEADER_TEXT");
 	route_atom = http_directory -> searchAtom ("HTTP_URI");
 	protocol_atom = http_directory -> searchAtom ("HTTP_PROTOCOL");

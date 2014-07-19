@@ -444,8 +444,10 @@ public:
 		delete c;
 		return false;
 	}
-	conductor_maker (PrologRoot * root) {
-		PrologDirectory * dir = root -> searchDirectory ("conductor");
+	conductor_maker (PrologDirectory * dir) {
+		wt_atom = beat_atom = bar_atom = signal_atom = signal_beat_atom = signal_bar_atom = reset_atom = tempo_atom = atempo_atom
+		= accel_atom = rit_atom = metrum_atom = division_atom = start_atom = pause_atom = stop_atom = 0;
+		if (dir == 0) return;
 		wt_atom = dir -> searchAtom ("wt");
 		beat_atom = dir -> searchAtom ("beat");
 		bar_atom = dir -> searchAtom ("bar");
@@ -482,11 +484,11 @@ PrologNativeCode * PrologConductorServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "rit") == 0) return new rit (& t);
 	if (strcmp (name, "tempo_division") == 0) return new tempo_division (& t);
 	if (strcmp (name, "metrum") == 0) return new metrum (& t);
-	if (strcmp (name, "conductor") == 0) return new conductor_maker (root);
+	if (strcmp (name, "conductor") == 0) return new conductor_maker (directory);
 	return NULL;
 }
 
-void PrologConductorServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {this -> root = root;}
-PrologConductorServiceClass :: PrologConductorServiceClass (void) {this -> root = NULL;}
+void PrologConductorServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {this -> directory = directory;}
+PrologConductorServiceClass :: PrologConductorServiceClass (void) {this -> directory = NULL;}
 PrologConductorServiceClass :: ~ PrologConductorServiceClass (void) {}
 

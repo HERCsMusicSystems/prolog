@@ -46,7 +46,7 @@ public:
 	virtual void midi_continue (void);
 	virtual void midi_stop (void);
 	virtual void midi_active_sensing (void);
-	prolog_midi_reader (PrologRoot * root, PrologAtom * atom, PrologMidiServiceClass * servo);
+	prolog_midi_reader (PrologRoot * root, PrologDirectory * directory, PrologAtom * atom, PrologMidiServiceClass * servo);
 	~ prolog_midi_reader (void);
 };
 
@@ -100,14 +100,12 @@ void prolog_midi_reader :: midi_start (void) {call (root -> pair (root -> atom (
 void prolog_midi_reader :: midi_continue (void) {call (root -> pair (root -> atom (servo -> continue_atom), root -> earth ()));}
 void prolog_midi_reader :: midi_stop (void) {call (root -> pair (root -> atom (servo -> stop_atom), root -> earth ()));}
 void prolog_midi_reader :: midi_active_sensing (void) {call (root -> pair (root -> atom (servo -> activesensing_atom), root -> earth ()));}
-prolog_midi_reader :: prolog_midi_reader (PrologRoot * root, PrologAtom * atom, PrologMidiServiceClass * servo) {
+prolog_midi_reader :: prolog_midi_reader (PrologRoot * root, PrologDirectory * directory, PrologAtom * atom, PrologMidiServiceClass * servo) {
 	this -> root = root;
-	midi_dir = 0;
+	midi_dir = directory;
 	income_midi_atom = atom;
 	if (income_midi_atom) {COLLECTOR_REFERENCE_INC (income_midi_atom);}
 	this -> servo = servo;
-	if (root == 0) return;
-	midi_dir = root -> searchDirectory ("midi");
 }
 prolog_midi_reader :: ~ prolog_midi_reader (void) {if (income_midi_atom) income_midi_atom -> removeAtom (); income_midi_atom = 0;}
 
@@ -117,7 +115,8 @@ class InternalMidiLine : public buffered_midi_stream {
 public:
 	prolog_midi_reader * reader;
 	virtual void internal_ready (void) {if (reader != 0) reader -> read (this);}
-	InternalMidiLine (PrologRoot * root, PrologAtom * atom, PrologMidiServiceClass * servo, int size) : buffered_midi_stream (size) {reader = atom == 0 ? 0 : new prolog_midi_reader (root, atom, servo);}
+	InternalMidiLine (PrologRoot * root, PrologDirectory * directory, PrologAtom * atom, PrologMidiServiceClass * servo, int size)
+		: buffered_midi_stream (size) {reader = atom == 0 ? 0 : new prolog_midi_reader (root, directory, atom, servo);}
 	virtual ~ InternalMidiLine (void) {if (reader) delete reader; reader = 0;}
 };
 
@@ -170,8 +169,8 @@ int SourceMidiLine :: internal_get_command (void) {
 	return command;
 }
 
-SourceMidiLine :: SourceMidiLine (PrologRoot * root, PrologAtom * atom, PrologMidiServiceClass * servo, int midi_input_id) {
-	reader = new prolog_midi_reader (root, atom, servo);
+SourceMidiLine :: SourceMidiLine (PrologRoot * root, PrologDirectory * directory, PrologAtom * atom, PrologMidiServiceClass * servo, int midi_input_id) {
+	reader = new prolog_midi_reader (root, directory, atom, servo);
 	this -> midi_input_id = midi_input_id;
 	command = 0;
 	prefetch = -1;
@@ -244,10 +243,10 @@ public:
 		}
 		return false;
 	}
-	PrologMidiLineNativeCode (PrologAtom * atom, PrologRoot * root, PrologAtom * income_midi, PrologMidiServiceClass * servo, int size) {
+	PrologMidiLineNativeCode (PrologAtom * atom, PrologRoot * root, PrologDirectory * directory, PrologAtom * income_midi, PrologMidiServiceClass * servo, int size) {
 		this -> atom = atom;
 		this -> servo = servo;
-		line = new InternalMidiLine (root, income_midi, servo, size);
+		line = new InternalMidiLine (root, directory, income_midi, servo, size);
 	}
 	~ PrologMidiLineNativeCode (void) {if (line) delete line; line = 0;}
 };
@@ -267,10 +266,10 @@ public:
 		}
 		return false;
 	}
-	PrologMidiSourceCode (PrologRoot * root, PrologMidiServiceClass * servo, PrologAtom * atom, PrologAtom * income, int midi_input_id) {
+	PrologMidiSourceCode (PrologRoot * root, PrologDirectory * directory, PrologMidiServiceClass * servo, PrologAtom * atom, PrologAtom * income, int midi_input_id) {
 		this -> atom = atom;
 		this -> midi_input_id = midi_input_id;
-		line = new SourceMidiLine (root, income, servo, midi_input_id);
+		line = new SourceMidiLine (root, directory, income, servo, midi_input_id);
 	}
 	~ PrologMidiSourceCode (void) {if (line) delete line; line = 0; printf ("SOURCE CODE DELETED.\n");}
 };
@@ -719,6 +718,7 @@ bool short_message_processor (int required, int command, PrologElement * paramet
 class CreateLine : public PrologNativeCode {
 public:
 	PrologRoot * root;
+	PrologDirectory * directory;
 	PrologMidiServiceClass * servo;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
@@ -734,17 +734,22 @@ public:
 			parameters = parameters -> getRight ();
 		}
 		if (line_atom -> getAtom () -> getMachine () != 0) return false;
-		PrologMidiLineNativeCode * line = new PrologMidiLineNativeCode (line_atom -> getAtom (), root, income_midi, servo, size);
+		PrologMidiLineNativeCode * line = new PrologMidiLineNativeCode (line_atom -> getAtom (), root, directory, income_midi, servo, size);
 		if (line_atom -> getAtom () -> setMachine (line)) {if (servo -> default_destination == 0) servo -> default_destination = line -> getLine (); return true;}
 		delete line;
 		return false;
 	}
-	CreateLine (PrologRoot * root, PrologMidiServiceClass * servo) {this -> root = root; this -> servo = servo;}
+	CreateLine (PrologRoot * root, PrologDirectory * directory, PrologMidiServiceClass * servo) {
+		this -> root = root;
+		this -> directory = directory;
+		this -> servo = servo;
+	}
 };
 
 class CreateSource : public PrologNativeCode {
 public:
 	PrologRoot * root;
+	PrologDirectory * directory;
 	PrologMidiServiceClass * servo;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (root == 0 || servo == 0) return false;
@@ -765,12 +770,16 @@ public:
 		int midi_input_id = open (file_name, O_RDONLY);
 		if (midi_input_id < 0) return false;
 		if (line -> getMachine () != 0) return false;
-		PrologMidiSourceCode * source = new PrologMidiSourceCode (root, servo, line, income, midi_input_id);
+		PrologMidiSourceCode * source = new PrologMidiSourceCode (root, directory, servo, line, income, midi_input_id);
 		if (line -> setMachine (source)) return true;
 		delete source;
 		return false;
 	}
-	CreateSource (PrologRoot * root, PrologMidiServiceClass * servo) {this -> root = root; this -> servo = servo;}
+	CreateSource (PrologRoot * root, PrologDirectory * directory, PrologMidiServiceClass * servo) {
+		this -> root = root;
+		this -> directory = directory;
+		this -> servo = servo;
+	}
 };
 
 class CreateDestination : public PrologNativeCode {
@@ -1249,8 +1258,8 @@ void PrologMidiServiceClass :: set_atoms (void) {
 
 PrologNativeCode * PrologMidiServiceClass :: getNativeCode (char * name) {
 	set_atoms ();
-	if (strcmp (name, "createLine") == 0) return new CreateLine (root, this);
-	if (strcmp (name, "createSource") == 0) return new CreateSource (root, this);
+	if (strcmp (name, "createLine") == 0) return new CreateLine (root, dir, this);
+	if (strcmp (name, "createSource") == 0) return new CreateSource (root, dir, this);
 	if (strcmp (name, "createDestination") == 0) return new CreateDestination ();
 	if (strcmp (name, "connectThru") == 0) return new ConnectThru ();
 	if (strcmp (name, "defaultDestination") == 0) return new DefaultDestination (this);
