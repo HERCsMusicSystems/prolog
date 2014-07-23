@@ -226,7 +226,7 @@ public:
 
 class PrologNativeCode TRACK {
 public:
-	char * name (void);
+	static char * name (void);
 	virtual char * codeName (void);
 	virtual bool isTypeOf (char * code_name);
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution);
