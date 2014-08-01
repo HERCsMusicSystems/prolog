@@ -50,6 +50,7 @@ bool PrologElement :: isText (void) {return type == 6;}
 bool PrologElement :: isHead (void) {return type == 7;}
 bool PrologElement :: isInteger (void) {return type == 8;}
 bool PrologElement :: isDouble (void) {return type == 9;}
+bool PrologElement :: isNumber (void) {return type == 8 || type == 9;}
 
 void PrologElement :: setEarth (void) {DESTROYER; type = 0;}
 void PrologElement :: setPair (PrologElement * l, PrologElement * r) {
@@ -90,6 +91,7 @@ char * PrologElement :: getText (void) {return text;}
 void * PrologElement :: getHead (void) {return head;}
 int PrologElement :: getInteger (void) {return integer;}
 double PrologElement :: getDouble (void) {return floating_point;}
+double PrologElement :: getNumber (void) {return type == 8 ? (double) integer : floating_point;}
 
 int PrologElement :: getType (void) {return type;}
 

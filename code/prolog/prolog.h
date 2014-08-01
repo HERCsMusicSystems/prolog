@@ -172,6 +172,7 @@ public:
 	bool isHead (void);
 	bool isInteger (void);
 	bool isDouble (void);
+	bool isNumber (void);
 	void setEarth (void);
 	void setPair (PrologElement * l, PrologElement * r);
 	void setLeft (PrologElement * l);
@@ -193,6 +194,7 @@ public:
 	void * getHead (void);
 	int getInteger (void);
 	double getDouble (void);
+	double getNumber (void);
 	int getType (void);
 	PrologElement * duplicate (void);
 	void duplicate (PrologElement * e);
