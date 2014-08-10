@@ -93,7 +93,7 @@ LOCAL_LIBS =
 LIBS = $(LIBRUBYARG_SHARED)  -lpthread -lrt -ldl -lcrypt -lm `mysql_config --libs` -lc -lreadline
 # MODIFICATION Source code locations added in the beginning of every source code
 SRCS = $(pc)object_tracker.cpp $(pc)prolog_midi_command.cpp $(pc)prolog_reader.cpp $(pc)midi_stream.cpp $(pc)prolog_directory.cpp $(pc)prolog_service_class.cpp $(pc)prolog_dll_loader.cpp $(pc)linux_midi.cpp $(pc)prolog_query.cpp $(pc)hercs_gem.cpp $(pc)prolog_loader.cpp $(pc)prolog_match.cpp $(pc)prolog_element.cpp $(pc)prolog_transport.cpp $(pc)prolog_command.cpp $(pc)midi_command_prompt.cpp $(pc)prolog_native_code.cpp $(pc)prolog_neural.cpp $(pc)encoder.cpp $(pc)prolog_root.cpp $(pc)prolog_resolution.cpp $(pc)prolog_variable.cpp $(pc)prolog_resources.cpp $(pc)prolog_linux_console.cpp $(pc)prolog_studio.cpp $(pc)prolog_conductor.cpp $(pc)prolog_midi.cpp $(pc)prolog_http.cpp $(pc)prolog_atom.cpp
-OBJS = object_tracker.o prolog_midi_command.o prolog_reader.o midi_stream.o prolog_directory.o prolog_service_class.o prolog_dll_loader.o linux_midi.o prolog_query.o hercs_gem.o prolog_loader.o prolog_match.o prolog_element.o prolog_transport.o prolog_command.o midi_command_prompt.o prolog_native_code.o prolog_neural.o encoder.o prolog_root.o prolog_resolution.o prolog_variable.o prolog_resources.o prolog_linux_console.o prolog_studio.o prolog_conductor.o prolog_midi.o prolog_http.o prolog_neural.o prolog_atom.o
+OBJS = object_tracker.o prolog_midi_command.o prolog_reader.o midi_stream.o prolog_directory.o prolog_service_class.o prolog_dll_loader.o linux_midi.o prolog_query.o hercs_gem.o prolog_loader.o prolog_match.o prolog_element.o prolog_transport.o prolog_command.o midi_command_prompt.o prolog_native_code.o prolog_neural.o encoder.o prolog_root.o prolog_resolution.o prolog_variable.o prolog_linux_console.o prolog_studio.o prolog_conductor.o prolog_midi.o prolog_http.o prolog_neural.o prolog_atom.o
 TARGET = HERCs
 DLLIB = $(TARGET).so
 EXTSTATIC = 
@@ -167,23 +167,6 @@ $(DLLIB): $(OBJS) Makefile
 
 
 # MODIFICATION
-prc_objects = \
-	$(pc)studio.prc\
-	$(pc)conductor.prc\
-	$(pc)midi.prc\
-	$(pc)http.prc\
-	$(pc)store.prc\
-	$(pc)f1.prc\
-	$(pc)help.prc\
-	$(pc)record.prc\
-	$(pc)neural.prc\
-	$(pc)keyboard.prc\
-	$(pc)sql.prc\
-	$(pc)test.prc\
-	$(pc)xml.prc\
-	$(pc)distribution.prc\
-	$(pc)control.prc
-
 objects = \
 	$(pi)prolog_dll_loader.o\
 	$(pi)midi_stream.o $(pi)object_tracker.o $(pi)prolog_atom.o $(pi)prolog_command.o $(pi)prolog_directory.o \
@@ -197,14 +180,9 @@ objects = \
 	$(pi)prolog_xml.o $(pi)tinyxml.o \
 	$(pi)prolog_distribution.o $(pi)prolog_control.o $(pi)joystick_linux.o
 
-resource_maker.exe: $(pc)resource_maker.cpp
-	g++ $(pc)resource_maker.cpp -o resource_maker.exe
+prc_resources = studio_prc.o conductor_prc.o midi_prc.o http_prc.o store_prc.o f1_prc.o help_prc.o record_prc.o\
+	neural_prc.o keyboard_prc.o sql_prc.o test_prc.o xml_prc.o distribution_prc.o control_prc.o
 
-prolog_resources.cpp: $(prc_objects) resource_maker.exe
-	./resource_maker.exe prolog_resources.cpp $(prc_objects)
-
-prolog_resources.o: prolog_resources.cpp
-	g++ prolog_resources.cpp -c -o prolog_resources.o
 hercs_gem.o: $(pc)hercs_gem.cpp
 	g++ -Wno-write-strings -I. $(INCFLAGS) $(pc)hercs_gem.cpp -c -o hercs_gem.o
 midi_stream.o: $(pc)midi_stream.h $(pc)midi_stream.cpp
@@ -296,8 +274,83 @@ prc.o: $(pc)linux_midi.h $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)pr
 
 mysql: /usr/lib/prolog_mysql.so ~/bin/mysql.prc
 
-~/bin/studio: encoder.o $(objects) prolog_resources.o $(prc_objects) prc.o prolog_neural.o prolog_conductor.o midi_command_prompt.o
-	g++ -Wl,--export-dynamic encoder.o prolog_resources.o $(objects) prc.o \
+studio_prc.o: $(pc)studio.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_studio_prc_start=resource_studio\
+		$(pc)studio.prc studio_prc.o
+
+conductor_prc.o: $(pc)conductor.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_conductor_prc_start=resource_conductor\
+		$(pc)conductor.prc conductor_prc.o
+
+midi_prc.o: $(pc)midi.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_midi_prc_start=resource_midi\
+		$(pc)midi.prc midi_prc.o
+
+http_prc.o: $(pc)http.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_http_prc_start=resource_http\
+		$(pc)http.prc http_prc.o
+
+store_prc.o: $(pc)store.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_store_prc_start=resource_store\
+		$(pc)store.prc store_prc.o
+
+f1_prc.o: $(pc)f1.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_f1_prc_start=resource_f1\
+		$(pc)f1.prc f1_prc.o
+
+help_prc.o: $(pc)help.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_help_prc_start=resource_help\
+		$(pc)help.prc help_prc.o
+
+record_prc.o: $(pc)record.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_record_prc_start=resource_record\
+		$(pc)record.prc record_prc.o
+
+neural_prc.o: $(pc)neural.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_neural_prc_start=resource_neural\
+		$(pc)neural.prc neural_prc.o
+
+keyboard_prc.o: $(pc)keyboard.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_keyboard_prc_start=resource_keyboard\
+		$(pc)keyboard.prc keyboard_prc.o
+
+sql_prc.o: $(pc)sql.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_sql_prc_start=resource_sql\
+		$(pc)sql.prc sql_prc.o
+
+test_prc.o: $(pc)test.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_test_prc_start=resource_test\
+		$(pc)test.prc test_prc.o
+
+xml_prc.o: $(pc)xml.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_xml_prc_start=resource_xml\
+		$(pc)xml.prc xml_prc.o
+
+distribution_prc.o: $(pc)distribution.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_distribution_prc_start=resource_distribution\
+		$(pc)distribution.prc distribution_prc.o
+
+control_prc.o: $(pc)control.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_control_prc_start=resource_control\
+		$(pc)control.prc control_prc.o
+
+~/bin/studio: encoder.o $(objects) prc.o prolog_neural.o prolog_conductor.o midi_command_prompt.o $(prc_resources)
+	g++ -Wl,--export-dynamic encoder.o $(objects) $(prc_resources) prc.o \
 	-o ~/bin/studio -lreadline -lpthread -ldl
 
 studio: ~/bin/studio

@@ -81,55 +81,40 @@ public:
 
 #ifdef LINUX_OPERATING_SYSTEM
 #include "prolog_http.h"
-extern char resource_0 [];
-extern char resource_1 [];
-extern char resource_2 [];
-extern char resource_3 [];
-extern char resource_4 [];
-extern char resource_5 [];
-extern char resource_6 [];
-extern char resource_7 [];
-extern char resource_8 [];
-extern char resource_9 [];
-extern char resource_10 [];
-extern char resource_11 [];
-extern char resource_12 [];
-extern char resource_13 [];
-extern char resource_14 [];
+extern char resource_studio;
+extern char resource_conductor;
+extern char resource_midi;
+extern char resource_http;
+extern char resource_store;
+extern char resource_f1;
+extern char resource_help;
+extern char resource_record;
+extern char resource_neural;
+extern char resource_keyboard;
+extern char resource_sql;
+extern char resource_test;
+extern char resource_xml;
+extern char resource_distribution;
+extern char resource_control;
 class resource_loader_class : public PrologResourceLoader {
 public:
 	char * load (char * name) {
-		char * ret = NULL;
-		if (strcmp (name, "studio") == 0) ret = resource_0;
-		if (strcmp (name, "conductor") == 0) ret = resource_1;
-		if (strcmp (name, "midi") == 0) ret = resource_2;
-		if (strcmp (name, "http") == 0) ret = resource_3;
-		if (strcmp (name, "store") == 0) ret = resource_4;
-		if (strcmp (name, "f1") == 0) ret = resource_5;
-		if (strcmp (name, "help") == 0) ret = resource_6;
-		if (strcmp (name, "record") == 0) ret = resource_7;
-		if (strcmp (name, "neural") == 0) ret = resource_8;
-		if (strcmp (name, "keyboard") == 0) ret = resource_9;
-		if (strcmp (name, "sql") == 0) ret = resource_10;
-		if (strcmp (name, "test") == 0) ret = resource_11;
-		if (strcmp (name, "xml") == 0) ret = resource_12;
-		if (strcmp (name, "distribution") == 0) ret = resource_13;
-		if (strcmp (name, "control") == 0) ret = resource_14;
-		if (strcmp (name, "studio.prc") == 0) ret = resource_0;
-		if (strcmp (name, "conductor.prc") == 0) ret = resource_1;
-		if (strcmp (name, "midi.prc") == 0) ret = resource_2;
-		if (strcmp (name, "http.prc") == 0) ret = resource_3;
-		if (strcmp (name, "store.prc") == 0) ret = resource_4;
-		if (strcmp (name, "f1.prc") == 0) ret = resource_5;
-		if (strcmp (name, "help.prc") == 0) ret = resource_6;
-		if (strcmp (name, "record.prc") == 0) ret = resource_7;
-		if (strcmp (name, "neural.prc") == 0) ret = resource_8;
-		if (strcmp (name, "keyboard.prc") == 0) ret = resource_9;
-		if (strcmp (name, "sql.prc") == 0) ret = resource_10;
-		if (strcmp (name, "test.prc") == 0) ret = resource_11;
-		if (strcmp (name, "xml.prc") == 0) ret = resource_12;
-		if (strcmp (name, "distribution.prc") == 0) ret = resource_13;
-		if (strcmp (name, "control.prc") == 0) ret = resource_14;
+		char * ret = 0;
+		if (strcmp (name, "studio.prc") == 0) ret = & resource_studio;
+		if (strcmp (name, "conductor.prc") == 0) ret = & resource_conductor;
+		if (strcmp (name, "midi.prc") == 0) ret = & resource_midi;
+		if (strcmp (name, "http.prc") == 0) ret = & resource_http;
+		if (strcmp (name, "store.prc") == 0) ret = & resource_store;
+		if (strcmp (name, "f1.prc") == 0) ret = & resource_f1;
+		if (strcmp (name, "help.prc") == 0) ret = & resource_help;
+		if (strcmp (name, "record.prc") == 0) ret = & resource_record;
+		if (strcmp (name, "neural.prc") == 0) ret = & resource_neural;
+		if (strcmp (name, "keyboard.prc") == 0) ret = & resource_keyboard;
+		if (strcmp (name, "sql.prc") == 0) ret = & resource_sql;
+		if (strcmp (name, "test.prc") == 0) ret = & resource_test;
+		if (strcmp (name, "xml.prc") == 0) ret = & resource_xml;
+		if (strcmp (name, "distribution.prc") == 0) ret = & resource_distribution;
+		if (strcmp (name, "control.prc") == 0) ret = & resource_control;
 		return ret;
 	}
 } resource_loader;
