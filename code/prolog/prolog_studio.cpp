@@ -1840,23 +1840,21 @@ class file_writer : public PrologNativeCode {
 public:
 	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * ea = parameters -> getLeft ();
-		PrologAtom * atom = NULL;
-		if (ea -> isVar ()) {
-			atom = new PrologAtom ();
-			ea -> setAtom (atom);
+		PrologElement * symbol = 0;
+		PrologElement * name = 0;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isAtom ()) symbol = el;
+			if (el -> isVar ()) symbol = el;
+			if (el -> isText ()) name = el;
+			parameters = parameters -> getRight ();
 		}
-		else {
-			if (! ea -> isAtom ()) return false;
-			atom = ea -> getAtom ();
-		}
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * et = parameters -> getLeft ();
-		if (! et -> isText ()) return false;
+		if (symbol == 0 || name == 0) return false;
+		if (symbol -> isVar ()) symbol -> setAtom (new PrologAtom ());
+		PrologAtom * atom = symbol -> getAtom ();
 		if (atom -> getMachine () != 0) return false;
-		file_write * fw = new file_write (atom, root, et -> getText ());
+		file_write * fw = new file_write (atom, root, name -> getText ());
+		if (fw -> fw == 0) {delete fw; return false;}
 		if (atom -> setMachine (fw)) return true;
 		delete fw;
 		return false;
@@ -1930,23 +1928,21 @@ class file_reader : public PrologNativeCode {
 public:
 	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * ea = parameters -> getLeft ();
-		PrologAtom * atom = NULL;
-		if (ea -> isVar ()) {
-			atom = new PrologAtom ();
-			ea -> setAtom (atom);
-		} else {
-			if (! ea -> isAtom ()) return false;
-			atom = ea -> getAtom ();
+		PrologElement * symbol = 0;
+		PrologElement * name = 0;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isAtom ()) symbol = el;
+			if (el -> isVar ()) symbol = el;
+			if (el -> isText ()) name = el;
+			parameters = parameters -> getRight ();
 		}
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * et = parameters -> getLeft ();
-		if (! et -> isText ()) return false;
+		if (symbol == 0 || name == 0) return false;
+		if (symbol -> isVar ()) symbol -> setAtom (new PrologAtom ());
+		PrologAtom * atom = symbol -> getAtom ();
 		if (atom -> getMachine () != 0) return false;
-		file_read * fr = new file_read (atom, root, et -> getText ());
-		if (fr -> fi == NULL) {delete fr; return false;}
+		file_read * fr = new file_read (atom, root, name -> getText ());
+		if (fr -> fi == 0) {delete fr; return false;}
 		if (atom -> setMachine (fr)) return true;
 		delete fr;
 		return false;
