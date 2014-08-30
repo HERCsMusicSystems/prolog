@@ -181,7 +181,10 @@ public:
 		}
 		if (atom == 0) return false;
 		if (atom -> getAtom () -> getMachine () != 0) return false;
-		joystick_code * jc = new joystick_code (path != 0 ? path -> getText () : 0, root, atom -> getAtom (), callback != 0 ? callback -> getAtom () : 0, freq);
+		char * joystick_location;
+		if (path != 0) joystick_location = path -> getText ();
+		else joystick_location = "/dev/input/js0";
+		joystick_code * jc = new joystick_code (joystick_location, root, atom -> getAtom (), callback != 0 ? callback -> getAtom () : 0, freq);
 		if (atom -> getAtom () -> setMachine (jc)) return true;
 		delete jc;
 		return false;

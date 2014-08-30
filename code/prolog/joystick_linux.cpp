@@ -21,33 +21,50 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "joystick_linux.h"
+#include <unistd.h>
+#include <fcntl.h>
+#include <linux/joystick.h>
+#include <stdio.h>
 
-void joystick :: move (double delay) {}
+void joystick :: move (double delay) {
+	struct js_event e;
+	while (read (fd, & e, sizeof (e)) > 0) {
+		if ((e . type & 0x3) == 1) button (e . number, e . value != 0);
+		else {
+			if (e . value == 32767) axis (e . number, 1.0);
+			else if (e . value == -32767) axis (e . number, -1.0);
+			else axis (e . number, (double) e . value / 32768.0);
+		}
+	}
+	if (delay < 0.0) return;
+	if (delay == 0.0) usleep (10000);
+	else usleep ((int) delay * 1000);
+}
 
 void joystick :: button (int ind, bool value) {
 	switch (ind) {
-	case 0: fire_callback (value); break;
-	case 1: autofire_callback (value); break;
-	case 2: h1_callback (value); break;
-	case 3: h2_callback (value); break;
-	case 4: h3_callback (value); break;
-	case 5: h4_callback (value); break;
-	case 6: e1_callback (value); break;
-	case 7: e2_callback (value); break;
-	case 8: e3_callback (value); break;
-	case 9: e4_callback (value); break;
-	case 10: e5_callback (value); break;
-	case 11: e6_callback (value); break;
+	case 0: fire_callback (fire = value); break;
+	case 1: autofire_callback (autofire = value); break;
+	case 2: h1_callback (h1 = value); break;
+	case 3: h2_callback (h2 = value); break;
+	case 4: h3_callback (h3 = value); break;
+	case 5: h4_callback (h4 = value); break;
+	case 6: e1_callback (e1 = value); break;
+	case 7: e2_callback (e2 = value); break;
+	case 8: e3_callback (e3 = value); break;
+	case 9: e4_callback (e4 = value); break;
+	case 10: e5_callback (e5 = value); break;
+	case 11: e6_callback (e6 = value); break;
 	}
 }
 void joystick :: axis (int ind, double value) {
 	switch (ind) {
-	case 0: x_callback (value); break;
-	case 1: y_callback (value); break;
-	case 2: z_callback (value); break;
-	case 3: throttle_callback (value); break;
-	case 4: hx_callback (value); break;
-	case 5: hy_callback (value); break;
+	case 0: x_callback (x = value); break;
+	case 1: y_callback (y = value); break;
+	case 2: z_callback (z = value); break;
+	case 3: throttle_callback (throttle = value); break;
+	case 4: hx_callback (hx = value); break;
+	case 5: hy_callback (hy = value); break;
 	default: break;
 	}
 }
@@ -70,52 +87,10 @@ void joystick :: e4_callback (bool value) {}
 void joystick :: e5_callback (bool value) {}
 void joystick :: e6_callback (bool value) {}
 
-joystick :: joystick (char * path) {}
+joystick :: joystick (char * path) {
+	x = y = z = throttle = hx = hy = 0.0;
+	fire = autofire = h1 = h2 = h3 = h4 = e1 = e2 = e3 = e4 = e5 = e6 = false;
+	fd = open (path, O_RDONLY | O_NONBLOCK);
+}
 joystick :: ~ joystick (void) {}
 
-/*
-#include <stdio.h>
-#include "joystick_linux.h"
-
-#include <unistd.h>
-#include <fcntl.h>
-#include <linux/joystick.h>
-
-void joystick :: move (void) {
-	struct js_event e;
-	while (read (fd, & e, sizeof (e)) > 0) {
-		printf ("%4x %2x %2x %2x\n", e . time, e . type, e . number, e . value);
-	}
-}
-*/
-/*
-void joystick :: move (void) {
-	struct js_event e;
-	while (read (fd, & e, sizeof (e)) > 0) {
-		if (e . type & JS_EVENT_INIT != 0) {
-			if (e . type & JS_EVENT_BUTTON != 0) init_button (e . number, e . value != 0);
-			if (e . type & JS_EVENT_AXIS != 0) init_axis (e . number, e . value);
-		} else {
-			if (e . type & JS_EVENT_BUTTON != 0) button (e . number, e . value != 0);
-			if (e . type & JS_EVENT_AXIS != 0) axis (e . number, e . value);
-		}
-	}
-}
-*/
-/*
-		if (e . type & JS_EVENT_BUTTON != 0) button (e . number, e . value != 0);
-		if (e . type & JS_EVENT_AXIS != 0) axis (e . number, e . value);
-	}
-}
-
-void joystick :: button (int ind, bool value) {}
-void joystick :: axis (int ind, double value) {}
-
-joystick :: joystick (char * file_name) {
-	printf ("fd = %i\n", fd);
-	fd = open (file_name, O_RDONLY | O_NONBLOCK);
-	printf ("open = %i\n", fd);
-}
-
-joystick :: ~ joystick (void) {}
-*/
