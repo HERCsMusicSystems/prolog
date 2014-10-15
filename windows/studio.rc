@@ -65,7 +65,6 @@ TEST_PRC                RCDATA                  "../code/prolog/test.prc"
 XML_PRC                 RCDATA                  "../code/prolog/xml.prc"
 DISTRIBUTION_PRC        RCDATA                  "../code/prolog/distribution.prc"
 CONTROL_PRC             RCDATA                  "../code/prolog/control.prc"
-IRRKLANG_PRC            RCDATA                  "../code/prolog/irrklang.prc"
 #endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////
 
