@@ -27,6 +27,13 @@
 #include <stdio.h>
 
 void joystick :: move (double delay) {
+	fd_set readset;
+	FD_ZERO (& readset);
+	FD_SET (fd, & readset);
+	timeval timeout;
+	timeout . tv_sec = 1;
+	timeout . tv_usec = 0;
+	if (select (fd + 1, & readset, 0, 0, & timeout) <= 0) return;
 	struct js_event e;
 	while (read (fd, & e, sizeof (e)) > 0) {
 		if ((e . type & 0x3) == 1) button (e . number, e . value != 0);
@@ -36,9 +43,6 @@ void joystick :: move (double delay) {
 			else axis (e . number, (double) e . value / 32768.0);
 		}
 	}
-	if (delay < 0.0) return;
-	if (delay == 0.0) usleep (10000);
-	else usleep ((int) delay * 1000);
 }
 
 void joystick :: button (int ind, bool value) {
@@ -92,5 +96,5 @@ joystick :: joystick (char * path) {
 	fire = autofire = h1 = h2 = h3 = h4 = e1 = e2 = e3 = e4 = e5 = e6 = false;
 	fd = open (path, O_RDONLY | O_NONBLOCK);
 }
-joystick :: ~ joystick (void) {}
+joystick :: ~ joystick (void) {if (fd >= 0) close (fd);}
 
