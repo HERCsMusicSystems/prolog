@@ -145,7 +145,7 @@ public:
 
 int main (int args, char * argv []) {
 	PrologRoot * root = new PrologRoot ();
-	root -> get_search_directories_from_environment ("PRC_MODULE_SEARCH_PATHS");
+	root -> get_search_directories_from_environment ("STUDIO_HOME");
 	#ifdef INTERNAL_RESOURCES
 	root -> setResourceLoader (& resource_loader);
 	root -> setServiceClassLoader (& service_class_loader);
