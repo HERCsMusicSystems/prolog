@@ -24,7 +24,7 @@
 #define _LINUX_JOYSTICK_
 
 class joystick {
-private:
+protected:
 	int fd;
 public:
 	double x, y, z, throttle, hx, hy;
