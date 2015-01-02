@@ -1805,6 +1805,36 @@ public:
 	FILE * fw;
 	PrologRoot * root;
 	PrologAtom * atom;
+	void sub_right_store (PrologElement * el, char * area) {
+		if (el -> isEarth ()) return;
+		if (el -> isPair ()) {
+			PrologElement * left = el -> getLeft (); if (left == 0) return;
+			PrologElement * right = el -> getRight (); if (right == 0) return;
+			fprintf (fw, "%s", root -> separator_caption);
+			fprintf (fw, " ");
+			sub_store (left, area);
+			sub_right_store (right, area);
+			return;
+		}
+		fprintf (fw, " ");
+		fprintf (fw, "%s", root -> mid_caption);
+		fprintf (fw, " ");
+		root -> getValue (el, area, 0);
+		fprintf (fw, "%s", area);
+	}
+	void sub_store (PrologElement * el, char * area) {
+		if (el -> isPair ()) {
+			PrologElement * left = el -> getLeft (); if (left == 0) return;
+			PrologElement * right = el -> getRight (); if (right == 0) return;
+			fprintf (fw, "%s", root -> left_caption);
+			sub_store (el -> getLeft (), area);
+			sub_right_store (el -> getRight (), area);
+			fprintf (fw, "%s", root -> right_caption);
+			return;
+		}
+		root -> getValue (el, area, 0);
+		fprintf (fw, "%s", area);
+	}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		AREA area;
 		if (fw == NULL) return false;
@@ -1821,8 +1851,7 @@ public:
 			if (el -> isText ()) fprintf (fw, "%s", el -> getText ());
 			if (el -> isInteger ()) fputc (el -> getInteger (), fw);
 			while (el -> isPair ()) {
-				root -> getValue (el -> getLeft (), area, 0);
-				fprintf (fw, "%s", area);
+				sub_store (el -> getLeft (), area);
 				el = el -> getRight ();
 			}
 			parameters = parameters -> getRight ();
