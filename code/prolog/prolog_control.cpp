@@ -98,11 +98,11 @@ prolog_joystick :: prolog_joystick (char * path, PrologRoot * root, PrologAtom *
 	if (callback == 0) return;
 	#ifdef LINUX_OPERATING_SYSTEM
 	delay = freq > 0.0 ? 1000000.0 / freq : 0.0;
+	if (fd < 0) return;
 	#endif
 	#ifdef WINDOWS_OPERATING_SYSTEM
 	delay = freq > 0.0 ? 1000.0 / freq : 0.0;
 	#endif
-	if (fd < 0) return;
 	pthread_create (& thread, 0, joystick_runner, this);
 	pthread_detach (thread);
 }
