@@ -479,17 +479,29 @@ public:
 		if (left -> isVar ()) {left -> setAtom (new PrologAtom ()); return true;}
 		if (! left -> isText ()) return false;
 		parameters = parameters -> getRight ();
-		PrologAtom * atom;
-		if (parameters -> isPair ()) {
-			atom = new PrologAtom (left -> getText ());
-			if (atom == NULL) return false;
-			parameters -> getLeft () -> setAtom (atom);
-			return true;
-		}
+		if (parameters -> isPair ()) {parameters -> getLeft () -> setAtom (new PrologAtom (left -> getText ())); return true;}
+		if (parameters -> isVar ()) {parameters -> setAtom (new PrologAtom (left -> getText ())); return true;}
 		root -> createAtom (left -> getText ());
 		return true;
 	}
 	create_atom (PrologRoot * root) {this -> root = root;}
+};
+
+class create_atoms : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		PrologElement * name = 0;
+		int created_atoms = 0;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isVar ()) el -> setAtom (new PrologAtom ());
+			else if (! el -> isAtom ()) return false;
+			parameters = parameters -> getRight ();
+		}
+		return true;
+	}
+	create_atoms (PrologRoot * root) {this -> root = root;}
 };
 
 class search_atom : public PrologNativeCode {
@@ -3365,6 +3377,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "delcl") == 0) return new delcl (root);
 	if (strcmp (name, "overwrite") == 0) return new overwrite (root);
 	if (strcmp (name, "create_atom") == 0) return new create_atom (root);
+	if (strcmp (name, "create_atoms") == 0) return new create_atoms (root);
 	if (strcmp (name, "search_atom") == 0) return new search_atom (root);
 	if (strcmp (name, "preprocessor") == 0) return new preprocessor (root);
 	if (strcmp (name, "prompt") == 0) return new prompt (root);

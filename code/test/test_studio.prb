@@ -55,7 +55,12 @@
 [TestEq "create_atom *var (anonymous)" [sonda] *x [create_atom *atom] [list "user!" : *x] [is_atom *atom]]
 [TestEq "create_atom name" "mariner sonda" *x [create_atom "mariner"] [list "user!" *x]]
 [TestEq "create_atom name *var" ["mariner sonda" "voyager"] [*x *y] [create_atom "voyager" *atom] [add "" *atom *y] [list "user!" *x]]
-[TestEq "create_atom name:*var" ["mariner sonda" "voyager"] [*x *y] [create_atom "voyager" *atom] [add "" *atom : *y] [list "user!" *x]]
+[TestEq "create_atom name:*var" ["mariner sonda" "voyager"] [*x *y] [create_atom "voyager" : *atom] [add "" *atom *y] [list "user!" *x]]
+
+[TestWorks "create_atoms []" [create_atoms]]
+[TestWorks "create_atoms 1 2 command 3" [create_atoms *1 *2 command *3] [is_atom *1] [is_atom *2] [is_atom *3]]
+[TestFails "create_atoms \"sonda\"" [create_atoms "sonda"]]
+[TestFails "create_atoms 127" [create_atoms 127]]
 
 [TestFails "search_atom directory/atom 1" [search_atom "stdio" "command" *x]]
 [TestFails "search_atom directory/atom 2" [search_atom "studio" "cmmnd" *x]]

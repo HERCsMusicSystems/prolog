@@ -182,6 +182,7 @@
             <a href="#predicate_cl">cl</a>
             <a href="#predicate_CL">CL</a>
             <a href="#predicate_create_atom">create_atom</a>
+            <a href="#predicate_create_atoms">create_atoms</a>
             <a href="#predicate_delallcl">delallcl</a>
             <a href="#predicate_delcl">delcl</a>
             <a href="#predicate_DELCL">DELCL</a>
@@ -1724,6 +1725,19 @@
             <li><b>with var</b> creates an anonymous symbol in a form of <b>&lt;Atom:=004D9C98&gt;</b></li>
             <li><b>with text</b> creates a new symbol and places it into the root directory</li>
             <li><b>with text and var</b> creates an anonymous symbol with specified name</li>
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_create_atoms">
+        <div class="doc_predicate_header">
+            [create_atoms a1 a2 .... an]<br />
+            [create_atoms *a1 *a2 .... *an]
+        </div>
+        <div class="doc_predicate_body">
+            Creates anonymous atoms or check if supplied arguments are existing symbols.
+            Fails in all other cases.
         </div>
     </a>
 </div>
