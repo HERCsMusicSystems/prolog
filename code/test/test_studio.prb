@@ -712,6 +712,10 @@
 [TestFails "LENGTH [1 2 3] 4" [LENGTH [1 2 3] 4]]
 [TestFails "LENGTH 127" [LENGTH 127 *x]]
 
+[TestEq "AT 3 *x [1 2 3 4 5 6]" 4 *x [AT 3 *x [1 2 3 4 5 6]]]
+[TestEq "AT 0 *x [1 2 3 4 5 6]" 1 *x [AT 0 *x [1 2 3 4 5 6]]]
+[TestFails "AT AT *x [1 2 3 4 5 6]" [AT AT *x [1 2 3 4 5 6]]]
+
 [TestWorks "ONLIST 2 [1 2 3]" [ONLIST 2 [1 2 3]]]
 [TestFails "ONLIST 127 [1 2 3]" [ONLIST 127 [1 2 3]]]
 [TestEq "ONLIST 127 [1 * 3]" 127 *x [ONLIST 127 [1 *x 3]]]
