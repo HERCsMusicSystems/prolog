@@ -73,6 +73,7 @@ public:
 public:
 	void axis (int ind, double value) {if (callback != 0) call_axis (ind, value);}
 	void button (int ind, bool value) {if (callback != 0) call_button (ind, value);}
+	bool joystick_not_found (void) {return fd < 0;}
 	prolog_joystick (char * path, PrologRoot * root, PrologAtom * callback, double freq);
 	~ prolog_joystick (void);
 };
@@ -186,6 +187,7 @@ public:
 		if (path != 0) joystick_location = path -> getText ();
 		else joystick_location = "/dev/input/js0";
 		joystick_code * jc = new joystick_code (joystick_location, root, atom -> getAtom (), callback != 0 ? callback -> getAtom () : 0, freq);
+		if (jc -> js . joystick_not_found ()) {delete jc; return false;}
 		if (atom -> getAtom () -> setMachine (jc)) return true;
 		delete jc;
 		return false;
