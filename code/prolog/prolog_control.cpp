@@ -73,7 +73,6 @@ public:
 public:
 	void axis (int ind, double value) {if (callback != 0) call_axis (ind, value);}
 	void button (int ind, bool value) {if (callback != 0) call_button (ind, value);}
-	bool joystick_not_found (void) {return fd < 0;}
 	prolog_joystick (char * path, PrologRoot * root, PrologAtom * callback, double freq);
 	~ prolog_joystick (void);
 };

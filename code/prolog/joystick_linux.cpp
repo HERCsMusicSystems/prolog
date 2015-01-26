@@ -91,6 +91,8 @@ void joystick :: e4_callback (bool value) {}
 void joystick :: e5_callback (bool value) {}
 void joystick :: e6_callback (bool value) {}
 
+bool joystick :: joystick_not_found (void) {return fd < 0;}
+
 joystick :: joystick (char * path) {
 	x = y = z = throttle = hx = hy = 0.0;
 	fire = autofire = h1 = h2 = h3 = h4 = e1 = e2 = e3 = e4 = e5 = e6 = false;

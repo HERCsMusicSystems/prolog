@@ -51,6 +51,8 @@ public:
 	virtual void e4_callback (bool value);
 	virtual void e5_callback (bool value);
 	virtual void e6_callback (bool value);
+	// diagnostics
+	virtual bool joystick_not_found (void);
 	// move
 	void move (double delay = -1.0);
 	// constructor / destructor
