@@ -20,7 +20,7 @@ program studio #machine := "prolog.studio"
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
 		create_atom create_atoms search_atom preprocessor prompt
 		+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^
-		add add1 sub sub1 mult div mod and or xor sum times less less_eq greater greater_eq max min
+		add add1 sub sub1 mult div mod and or xor sum times mac less less_eq greater greater_eq max min
 		abs cos degrad e exp log2 log10 ln log pi pow sin tan trunc
 		timestamp
 		is_atom is_integer is_double is_number is_var is_head is_text has_machine
@@ -48,6 +48,7 @@ program studio #machine := "prolog.studio"
 #machine - := "sub"
 #machine sub := "sub"
 #machine times := "times"
+#machine mac := "mac"
 #machine ~ := "mult"
 #machine mult := "mult"
 #machine div := "div"

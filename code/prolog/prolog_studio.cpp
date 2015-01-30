@@ -992,6 +992,57 @@ public:
 	}
 };
 
+class mac : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		bool is_double = false;
+		PrologElement * e1 = parameters -> getLeft (); if (e1 -> isDouble ()) is_double = true; parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		PrologElement * e2 = parameters -> getLeft (); if (e2 -> isDouble ()) is_double = true; parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		PrologElement * e3 = parameters -> getLeft (); if (e3 -> isDouble ()) is_double = true; parameters = parameters -> getRight ();
+		PrologElement * e4 = parameters -> isPair () ? parameters -> getLeft () : parameters; if (e4 -> isDouble ()) is_double = true;
+		if (e1 -> isNumber ()) {
+			if (e2 -> isNumber ()) {
+				if (e3 -> isNumber ()) {
+					double ind = e1 -> getNumber () * e2 -> getNumber () + e3 -> getNumber ();
+					if (e4 -> isNumber ()) return e4 -> getNumber () == ind;
+					if (is_double) e4 -> setDouble (ind);
+					else e4 -> setInteger ((int) ind);
+					return true;
+				}
+				if (e4 -> isNumber ()) {
+					double ind = e4 -> getNumber () - e1 -> getNumber () * e2 -> getNumber ();
+					if (is_double) e3 -> setDouble (ind);
+					else e3 -> setInteger ((int) ind);
+					return true;
+				}
+			}
+			double ind = e1 -> getNumber ();
+			if (ind == 0.0) return false;
+			if (e3 -> isNumber () && e4 -> isNumber ()) {
+				ind = (e4 -> getNumber () - e3 -> getNumber ()) / ind;
+				if (is_double) e2 -> setDouble (ind);
+				else e2 -> setInteger ((int) ind);
+				return true;
+			}
+			return false;
+		}
+		if (e2 -> isNumber ()) {
+			double ind = e2 -> getNumber ();
+			if (ind == 0.0) return false;
+			if (e3 -> isNumber () && e4 -> isNumber ()) {
+				ind = (e4 -> getNumber () - e3 -> getNumber ()) / ind;
+				if (is_double) e1 -> setDouble (ind);
+				else e1 -> setInteger ((int) ind);
+				return true;
+			}
+		}
+		return false;
+	}
+};
+
 class add : public PrologNativeCode {
 public:
 	char * add_strings (char * area, char * text) {
@@ -1049,6 +1100,32 @@ public:
 					result_type = 2;
 					break;
 				case 2: area = add_strings (area, e1 -> isText () ? e1 -> getText () : e1 -> getAtom () -> name ()); break;
+				}
+			}
+			if (e1 -> isPair ()) {
+				PrologElement * sub = e1;
+				bool is_double = false;
+				double accu = 1.0;
+				while (sub -> isPair ()) {
+					PrologElement * subel = sub -> getLeft ();
+					if (subel -> isNumber ()) {
+						accu *= subel -> getNumber ();
+						if (subel -> isDouble ()) is_double = true;
+					}
+					sub = sub -> getRight ();
+				}
+				if (is_double) {
+					switch (result_type) {
+					case 0: double_result += accu; result_type = 1; break;
+					case 1: double_result += accu; break;
+					case 2: area = add_strings (area, accu); break;
+					}
+				} else {
+					switch (result_type) {
+					case 0: int_result += (int) accu; break;
+					case 1: double_result += accu; break;
+					case 2: area = add_strings (area, (int) accu); break;
+					}
 				}
 			}
 			if (e1 -> isVar ()) {
@@ -3315,6 +3392,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "add") == 0) return new add ();
 	if (strcmp (name, "sub") == 0) return new sub ();
 	if (strcmp (name, "times") == 0) return new times ();
+	if (strcmp (name, "mac") == 0) return new mac ();
 	if (strcmp (name, "mult") == 0) return new mult ();
 	if (strcmp (name, "div") == 0) return new division ();
 	if (strcmp (name, "mod") == 0) return new mod ();
