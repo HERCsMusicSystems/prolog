@@ -102,6 +102,7 @@
             <a href="#predicate_log2">log2</a>
             <a href="#predicate_log10">log10</a>
             <a href="#predicate_ln">ln</a>
+            <a href="#predicate_mac">mac</a>
             <a href="#predicate_max">max</a>
             <a href="#predicate_min">min</a>
             <a href="#predicate_mod">mod</a>
@@ -362,10 +363,11 @@
         <div class="doc_predicate_body">
             Adds all arguments: *x = arg-1 + arg-2 + .... + arg-n.<br />
             Without arguments: *x = 0.<br />
-            Arguments can be integers, doubles, texts or symbols.
+            Arguments can be integers, doubles, lists of numbers, texts or symbols.
             If all arguments are integers then the result is integer.
             If one of the arguments is double and all others are numbers then the result is double as well.
             If one of the arguments is text or symbol then the result is text.
+            If an argument is a list of numbers then all elements of this list will be multiplied.
             Can NOT be used for tests.
         </div>
     </a>
@@ -602,6 +604,20 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_mac">
+        <div class="doc_predicate_header">
+            [mac a b c d]<br/>
+            [mac a b c : d]
+        </div>
+        <div class="doc_predicate_body">
+            Establishes the following relation: a * b + c = d.
+            Only one o the arguments can be a variable.
+            If three arguments are integers then the result will be integer.
+            If any of the arguments is double then the result will be double as well.
+            If used for tests with all four arguments being numbers, then they be either integer or double.
+            The test will check mathematical correctness disregarding data types.
+        </div>
+    </a>
     <a id="predicate_max">
         <div class="doc_predicate_header">
             [max *max arg-1 arg-2 .... arg-n]
@@ -3765,3 +3781,4 @@
 
 </div></div>
 </body>
+
