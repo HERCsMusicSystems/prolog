@@ -4,7 +4,7 @@
         .doc_library {font-family:Arial; font-size:1.5em;}
         .doc_library_section {font-family:Arial; font-size:1.5em; margin-top:1em;}
         .doc_predicate{font-family:Arial; padding:1em; width:70em;}
-        .doc_predicate_header {background-color:#eeeeee; font-family:monospace;}
+        .doc_predicate_header {background-color:#eeeeee; font-family:monospace; background-color:gold;}
         .doc_predicate_body {font-family:Arial;}
         .doc_predicate_code {font-family:monospace; background-color:#eeeeee;}
     </style>
@@ -250,11 +250,13 @@
             <a href="#predicate_ONE">ONE</a>
             <a href="#predicate_ONLIST">ONLIST</a>
             <a href="#predicate_PROBE">PROBE</a>
+            <a href="#predicate_QUEUE">QUEUE</a>
             <a href="#predicate_res">res</a>
             <a href="#predicate_REVERSE">REVERSE</a>
             <a href="#predicate_rres">rres</a>
             <a href="#predicate_SELECT">SELECT</a>
             <a href="#predicate_sort">sort</a>
+            <a href="#predicate_STACK">STACK</a>
             <a href="#predicate_TRY">TRY</a>
             <a href="#predicate_ures">ures</a>
             <a href="#predicate_var">var</a>
@@ -2273,7 +2275,9 @@
             If accu is a variable then an anonymous atom is created.<br />
             The accumulator is initially an empty list.
             Every time a value is passed to the accumulator,
-            it is added as the head of the list.
+            it is added as the head of the list.<br />
+            <b>Note:</b> ACCUMULATOR takes special care with numbering variables, which takes extra processing time.
+            If variables are not going to be accumulated then <a href="#predicate_STACK">STACK</a> can be used instead.
         </div>
     </a>
 </div>
@@ -2784,6 +2788,27 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_QUEUE">
+        <div class="doc_predicate_header">
+            [QUEUE queue]<br />
+            ==================<br />
+            [queue term term .... term] => push terms into the queue / pops terms from the queue if variable<br />
+            [queue : *term] => retrieves the entire queue<br />
+            [queue] => destroys the queue
+        </div>
+        <div class="doc_predicate_body">
+            Constructs a queue.
+            If queue is a variable then an anonymous atom is created.<br />
+            The queue is initially empty.
+            Every time a value is passed to the queue,
+            it is placed at the end of the queue.
+            Every time a variable is passed, a value is popped from the beginning of the queue.<br />
+            <b>Note:</b> QUEUE is not designed to correctly index variables. Avoid pushing terms containing variables.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_res">
         <div class="doc_predicate_header">
             [res : *commands]
@@ -2882,6 +2907,26 @@
             &emsp;&emsp;&emsp;[sort *less *gt *gs *gtsa]/<br />
             ]<br />
             [[sort *in *out] / [sort less *in *out []]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_STACK">
+        <div class="doc_predicate_header">
+            [STACK stack]<br />
+            ==================<br />
+            [stack term term .... term] => push terms onto the stack / pops terms from the stack if variable<br />
+            [stack : *term] => retrieves the entire stack<br />
+            [stack] => destroys the stack
+        </div>
+        <div class="doc_predicate_body">
+            Constructs a stack.
+            If stack is a variable then an anonymous atom is created.<br />
+            The stack is initially empty.
+            Every time a value is passed to the stack,
+            it is pushed to the top. Every time a variable is passed, a value is popped from the stack.<br />
+            <b>Note:</b> STACK is not designed to correctly index variables. Avoid pushing terms containing variables.
         </div>
     </a>
 </div>

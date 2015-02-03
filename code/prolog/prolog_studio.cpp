@@ -2665,6 +2665,97 @@ public:
 	}
 };
 
+class stack_element {
+public:
+	PrologElement * el;
+	stack_element * next;
+	stack_element * drop (void) {stack_element * sub = next; next = 0; delete this; return sub;}
+	stack_element (PrologElement * el, stack_element * next = 0) {this -> el = el -> duplicate (); this -> next = next;}
+	~ stack_element (void) {delete el; if (next != 0) delete next;}
+};
+
+class stack : public PrologNativeCode {
+private:
+	PrologAtom * atom;
+	stack_element * sp;
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isVar ()) {
+			parameters -> setEarth ();
+			stack_element * p = sp;
+			while (p != 0) {parameters -> setPair (); parameters -> getLeft () -> duplicate (p -> el); parameters = parameters -> getRight (); p = p -> next;}
+			return true;
+		}
+		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isVar ()) {if (sp == 0) return false; el -> duplicate (sp -> el); sp = sp -> drop ();}
+			else sp = new stack_element (el, sp);
+			parameters = parameters -> getRight ();
+		}
+		return true;
+	}
+	stack (PrologAtom * atom) {this -> atom = atom; sp = 0;}
+	~ stack (void) {if (sp != 0) delete sp;}
+};
+
+class STACK : public PrologNativeCode {
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (parameters -> isVar ()) parameters -> setAtom (new PrologAtom ());
+		if (! parameters -> isAtom ()) return false;
+		PrologAtom * atom = parameters -> getAtom ();
+		if (atom -> getMachine () != 0) return false;
+		stack * st = new stack (atom);
+		if (atom -> setMachine (st)) return true;
+		delete st; return false;
+	}
+};
+
+class queue : public PrologNativeCode {
+private:
+	PrologAtom * atom;
+	stack_element * sp;
+	stack_element * ip;
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isVar ()) {
+			parameters -> setEarth ();
+			stack_element * p = sp;
+			while (p != 0) {parameters -> setPair (); parameters -> getLeft () -> duplicate (p -> el); parameters = parameters -> getRight (); p = p -> next;}
+			return true;
+		}
+		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isVar ()) {if (sp == 0) return false; el -> duplicate (sp -> el); sp = sp -> drop (); if (sp == 0) ip = 0;}
+			else {
+				if (sp == 0) sp = ip = new stack_element (el);
+				else ip = (ip -> next = new stack_element (el));
+			}
+			parameters = parameters -> getRight ();
+		}
+		return true;
+	}
+	queue (PrologAtom * atom) {this -> atom = atom; sp = ip = 0;}
+	~ queue (void) {if (sp != 0) delete sp;}
+};
+
+class QUEUE : public PrologNativeCode {
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (parameters -> isVar ()) parameters -> setAtom (new PrologAtom ());
+		if (! parameters -> isAtom ()) return false;
+		PrologAtom * atom = parameters -> getAtom ();
+		if (atom -> getMachine () != 0) return false;
+		queue * qt = new queue (atom);
+		if (atom -> setMachine (qt)) return true;
+		delete qt; return false;
+	}
+};
+
 typedef void * void_pointer;
 class array_dimension {
 public:
@@ -3500,6 +3591,8 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "CONSTANT") == 0) return new CONSTANT ();
 	if (strcmp (name, "VARIABLE") == 0) return new VARIABLE ();
 	if (strcmp (name, "ACCUMULATOR") == 0) return new ACCUMULATOR ();
+	if (strcmp (name, "STACK") == 0) return new STACK ();
+	if (strcmp (name, "QUEUE") == 0) return new QUEUE ();
 	if (strcmp (name, "ARRAY") == 0) return new ARRAY ();
 
 	if (strcmp (name, "background") == 0) return new bgcolour (root);
