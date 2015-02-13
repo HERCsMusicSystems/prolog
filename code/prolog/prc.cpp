@@ -31,6 +31,7 @@
 #include "prolog_xml.h"
 #include "prolog_distribution.h"
 #include "prolog_control.h"
+#include "prolog_http.h"
 
 #ifdef WINDOWS_OPERATING_SYSTEM
 #include "resource.h"
@@ -77,7 +78,6 @@ public:
 #endif
 
 #ifdef LINUX_OPERATING_SYSTEM
-#include "prolog_http.h"
 extern char resource_studio;
 extern char resource_conductor;
 extern char resource_midi;
@@ -122,9 +122,7 @@ public:
 	PrologServiceClass * load (char * name) {
 		if (strcmp (name, "prolog.conductor") == 0) return new PrologConductorServiceClass ();
 		if (strcmp (name, "prolog.midi") == 0) return new PrologMidiServiceClass ();
-#ifdef LINUX_OPERATING_SYSTEM
 		if (strcmp (name, "prolog.http") == 0) return new PrologHttpServiceClass ();
-#endif
 		if (strcmp (name, "prolog.neural") == 0) return new PrologNeuralServiceClass ();
 		if (strcmp (name, "prolog.xml") == 0) return new PrologXMLServiceClass ();
 		if (strcmp (name, "prolog.distribution") == 0) return new PrologDistributionServiceClass ();

@@ -4,10 +4,18 @@
 
 #include <string.h>
 
+#ifdef WIN32
+#include <Winsock2.h>
+#include <WS2tcpip.h>
+#define close closesocket
+#endif
+
+#ifdef LINUX_OPERATING_SYSTEM
 #include <unistd.h>
 #include <stdlib.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#endif
 
 #include "prolog_http.h"
 
@@ -22,7 +30,6 @@ public:
 	PrologRoot * root;
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
 		AREA area;
-		PrologElement * el;
 		while (parameters -> isPair ()) {
 			PrologElement * el = parameters -> getLeft ();
 			if (el -> isText ()) {char * cp = el -> getText (); send (fd, cp, strlen (cp), 0);}
@@ -183,14 +190,19 @@ public:
 			printf ("	HOST %s [%s]\n", v, ipstr);
 		}*/
 		int sockfd;
+#ifdef WINDOWS_OPERATING_SYSTEM
+		char yes = '1';
+#endif
+#ifdef LINUX_OPERATING_SYSTEM
 		int yes = 1;
+#endif
 		addrinfo * ip;
 		for (ip = info; ip != 0; ip = ip -> ai_next) {
 			if ((sockfd = socket (ip -> ai_family, ip -> ai_socktype, ip -> ai_protocol)) == -1) {
 				perror ("server: socket\n");
 				continue;
 			}
-			if (setsockopt (sockfd, SOL_SOCKET, SO_REUSEADDR, & yes, sizeof (int)) == -1) {
+			if (setsockopt (sockfd, SOL_SOCKET, SO_REUSEADDR, & yes, sizeof (yes)) == -1) {
 				perror ("setsockopt\n");
 				return false;
 			}
@@ -217,9 +229,12 @@ public:
 			inet_ntop (their_addr . ss_family, get_in_addr ((struct sockaddr *) & their_addr), s, sizeof (s));
 //			if (! fork ()) {
 				int read = recv (new_fd, command, 65536, 0);
-				if (read < 0) printf ("ERROR [%s]\n", strerror (read));
-				//else printf ("RECEIVED [%s]\n", command);
-//				close (sockfd);
+				if (read < 0) {
+					printf ("ERROR [%s]\n", strerror (read));
+					close (new_fd);
+					continue;
+				}
+				command [read] = '\0';
 
 				PrologRoot * root = service -> root;
 				PrologAtom * request = new PrologAtom ("HTTP-Request");
@@ -261,8 +276,8 @@ while (analyser . get_param ()) {
 				clausa = root -> pair (root -> head (0), clausa);
 				root -> resolution (clausa);
 				delete clausa;
-				request -> removeAtom ();
-				response -> removeAtom ();
+				//request -> removeAtom ();
+				//response -> removeAtom ();
 //				service -> full_text_atom -> removeAtom ();
 //				close (new_fd);
 //				exit (0);
@@ -276,6 +291,11 @@ while (analyser . get_param ()) {
 };
 
 void PrologHttpServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {
+#ifdef WINDOWS_OPERATING_SYSTEM
+	WORD version = MAKEWORD (2, 2);
+	WSADATA wsadata;
+	WSAStartup (version, & wsadata);
+#endif
 	this -> root = root;
 	http_directory = directory;
 	full_text_atom = route_atom = protocol_atom = header_atom = param_atom = 0;

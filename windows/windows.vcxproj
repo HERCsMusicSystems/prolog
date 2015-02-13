@@ -64,7 +64,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>pthread.lib;winmm.lib;dinput8.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>pthread.lib;winmm.lib;dinput8.lib;dxguid.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -106,6 +106,7 @@
     <ClCompile Include="..\code\prolog\prolog_distribution.cpp" />
     <ClCompile Include="..\code\prolog\prolog_dll_loader.cpp" />
     <ClCompile Include="..\code\prolog\prolog_element.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_http.cpp" />
     <ClCompile Include="..\code\prolog\prolog_loader.cpp" />
     <ClCompile Include="..\code\prolog\prolog_match.cpp" />
     <ClCompile Include="..\code\prolog\prolog_midi.cpp" />
