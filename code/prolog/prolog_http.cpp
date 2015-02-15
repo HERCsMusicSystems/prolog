@@ -10,14 +10,14 @@
 #define close closesocket
 #endif
 
+#include "prolog_http.h"
+
 #ifdef LINUX_OPERATING_SYSTEM
 #include <unistd.h>
 #include <stdlib.h>
 #include <netdb.h>
 #include <arpa/inet.h>
 #endif
-
-#include "prolog_http.h"
 
 static void * get_in_addr (struct sockaddr * sa) {
 	if (sa -> sa_family == AF_INET) return & (((struct sockaddr_in *) sa) -> sin_addr);
