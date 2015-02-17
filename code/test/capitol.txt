@@ -1,0 +1,17 @@
+[[capitol "Australia" "Canberra"]]
+[[capitol "New Zealand" "Wellington"]]
+[[capitol "France" "Paris"]]
+[[capitol "Poland" "Warsaw"]]
+[[capitol "USA" "Cupertino"]]
+[[capitol "England" "London"]]
+[[capitol "South Africa" "Pretoria"]]
+[[capitol "Denmark" "Copenhagen"]]
+[[capitol "Germany" "Berlin"]]
+[[capitol "Deutschland" "Munich"]]
+[[capitol "Hungary" "Buda-Pest"]]
+[[capitol "Japan" "Tokyo"]]
+[[capitol "Italy" "Rome"]]
+[[capitol "Spain" "Barcelona"]]
+
+
+[exit]
