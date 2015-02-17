@@ -61,7 +61,7 @@
 
 [show "ready"]
 
-[webserver 3008 router]
+[webserver service 3008 router]
 [show "Done...."]
 
 [exit]

@@ -8,6 +8,7 @@
 #include <Winsock2.h>
 #include <WS2tcpip.h>
 #define close closesocket
+#define usleep Sleep
 #endif
 
 #include "prolog_http.h"
@@ -148,85 +149,38 @@ public:
 	RequestAnalyser (PrologHttpServiceClass * service, char * command) {this -> service = service; this -> command = command;}
 };
 
-class webserver : public PrologNativeCode {
+void * webserver_runner (void * parameters);
+class webserver_code : public PrologNativeCode {
 public:
+	pthread_t thread;
+	bool should_continue;
+	int sockfd;
+	PrologAtom * atom;
 	PrologHttpServiceClass * service;
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * port = parameters -> getLeft ();
-		if (! port -> isInteger ()) return false;
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * router = parameters -> getLeft ();
-		if (! router -> isAtom ()) return false;
-		char command [65536];
-		sprintf (command, "%i", port -> getInteger ());
-		struct addrinfo hints;
-			memset (& hints, 0, sizeof (hints));
-			hints . ai_family = AF_UNSPEC;
-			hints . ai_socktype = SOCK_STREAM;
-			hints . ai_flags = AI_PASSIVE;
-		struct addrinfo * info;
-		int status = getaddrinfo (0, command, & hints, & info);
-		if (status != 0) {printf ("NETWORK ERROR [%s]\n", gai_strerror (status)); return false;}
-		/*
-		char ipstr [INET6_ADDRSTRLEN];
-		printf ("RESULT:\n");
-		printf ("	STATUS [%i]\n", status);
-		printf ("	ERROR  [%s]\n", gai_strerror (status));
-		for (addrinfo * ip = info; ip != 0; ip = ip -> ai_next) {
-			void * address;
-			char * v;
-			if (ip -> ai_family == AF_INET) {
-				struct sockaddr_in * ipv4 = (struct sockaddr_in *) ip -> ai_addr;
-				address = & (ipv4 -> sin_addr);
-				v = "IP:4";
-			} else {
-				struct sockaddr_in6 * ipv6 = (struct sockaddr_in6 *) ip -> ai_addr;
-				address = & (ipv6 -> sin6_addr);
-				v = "IP:6";
-			}
-			inet_ntop (ip -> ai_family, address, ipstr, sizeof (ipstr));
-			printf ("	HOST %s [%s]\n", v, ipstr);
-		}*/
-		int sockfd;
-#ifdef WINDOWS_OPERATING_SYSTEM
-		char yes = '1';
-#endif
-#ifdef LINUX_OPERATING_SYSTEM
-		int yes = 1;
-#endif
-		addrinfo * ip;
-		for (ip = info; ip != 0; ip = ip -> ai_next) {
-			if ((sockfd = socket (ip -> ai_family, ip -> ai_socktype, ip -> ai_protocol)) == -1) {
-				perror ("server: socket\n");
-				continue;
-			}
-			if (setsockopt (sockfd, SOL_SOCKET, SO_REUSEADDR, & yes, sizeof (yes)) == -1) {
-				perror ("setsockopt\n");
-				return false;
-			}
-			if (bind (sockfd, ip -> ai_addr, ip -> ai_addrlen) == -1) {
-				close (sockfd);
-				perror ("server: bind\n");
-				continue;
-			}
-			break;
-		}
-		if (ip == 0) {printf ("crap\n"); return false;}
-		freeaddrinfo (info);
-		// listening
-		if (listen (sockfd, 10) == -1) {perror ("failed to listen\n"); return false;}
+	PrologAtom * router;
+	void run (void) {
+		should_continue = true;
 		socklen_t sin_size;
 		struct sockaddr_storage their_addr;
 		int new_fd;
 		char s [INET6_ADDRSTRLEN];
-		for (int sub = 0; sub < 12; sub++) {
-//		while (1) {
+		char command [65536];
+		while (should_continue) {
+			//=========== SELECT ============//
+			fd_set area;
+			timeval timeout;
+			timeout . tv_usec = 0;
+			timeout . tv_sec = 1;
+			FD_ZERO (& area);
+			FD_SET (sockfd, & area);
+			int result = select (sockfd + 1, & area, 0, 0, & timeout);
+			if (result < 0 || ! FD_ISSET (sockfd, & area)) continue;
+			//=========== ACCEPT ============//
 			sin_size = sizeof (their_addr);
 			new_fd = accept (sockfd, (struct sockaddr *) & their_addr, & sin_size);
-			if (new_fd == -1) {printf ("accept crap\n"); return false;}
+			if (new_fd == -1) {printf ("accept crap\n"); return;}
 			inet_ntop (their_addr . ss_family, get_in_addr ((struct sockaddr *) & their_addr), s, sizeof (s));
+			//===============================//
 //			if (! fork ()) {
 				int read = recv (new_fd, command, 65536, 0);
 				if (read < 0) {
@@ -235,7 +189,6 @@ public:
 					continue;
 				}
 				command [read] = '\0';
-
 				PrologRoot * root = service -> root;
 				PrologAtom * request = new PrologAtom ("HTTP-Request");
 				PrologAtom * response = new PrologAtom ("HTTP-Response");
@@ -271,13 +224,11 @@ while (analyser . get_param ()) {
 }
 				request -> firstClause = clausa;
 
-				clausa = root -> pair (root -> atom (router -> getAtom ()), root -> pair (root -> atom (request), root -> pair (root -> atom (response), root -> earth ())));
+				clausa = root -> pair (root -> atom (router), root -> pair (root -> atom (request), root -> pair (root -> atom (response), root -> earth ())));
 				clausa = root -> pair (clausa, root -> earth ());
 				clausa = root -> pair (root -> head (0), clausa);
 				root -> resolution (clausa);
 				delete clausa;
-				//request -> removeAtom ();
-				//response -> removeAtom ();
 //				service -> full_text_atom -> removeAtom ();
 //				close (new_fd);
 //				exit (0);
@@ -285,7 +236,92 @@ while (analyser . get_param ()) {
 			close (new_fd);
 		}
 		close (sockfd);
+		should_continue = true;
+	}
+	bool prestart (int port) {
+		char command [16];
+		sprintf (command, "%i", port);
+		struct addrinfo hints;
+			memset (& hints, 0, sizeof (hints));
+			hints . ai_family = AF_UNSPEC;
+			hints . ai_socktype = SOCK_STREAM;
+			hints . ai_flags = AI_PASSIVE;
+		struct addrinfo * info;
+		int status = getaddrinfo (0, command, & hints, & info);
+		if (status != 0) {printf ("NETWORK ERROR [%s]\n", gai_strerror (status)); return false;}
+#ifdef WINDOWS_OPERATING_SYSTEM
+		char yes = '1';
+#endif
+#ifdef LINUX_OPERATING_SYSTEM
+		int yes = 1;
+#endif
+		addrinfo * ip;
+		for (ip = info; ip != 0; ip = ip -> ai_next) {
+			if ((sockfd = socket (ip -> ai_family, ip -> ai_socktype, ip -> ai_protocol)) == -1) {
+				perror ("server: socket\n");
+				continue;
+			}
+			if (setsockopt (sockfd, SOL_SOCKET, SO_REUSEADDR, & yes, sizeof (yes)) == -1) {
+				perror ("setsockopt\n");
+				freeaddrinfo (info);
+				return false;
+			}
+			if (bind (sockfd, ip -> ai_addr, ip -> ai_addrlen) == -1) {
+				close (sockfd);
+				perror ("server: bind\n");
+				continue;
+			}
+			break;
+		}
+		if (ip == 0) {printf ("crap\n"); return false;}
+		freeaddrinfo (info);
+		// listening
+		if (listen (sockfd, 10) == -1) {perror ("failed to listen\n"); return false;}
+		pthread_create (& thread, 0, webserver_runner, this);
+		pthread_detach (thread);
 		return true;
+	}
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
+		return false;
+	}
+	webserver_code (PrologAtom * atom, PrologHttpServiceClass * service, PrologAtom * router) {
+		this -> atom = atom;
+		this -> service = service;
+		this -> router = router;
+		if (router != 0) {COLLECTOR_REFERENCE_INC (router);}
+	}
+	~ webserver_code (void) {
+		should_continue = false;
+		while (! should_continue) usleep (100);
+		should_continue = false;
+		if (router != 0) router -> removeAtom (); router = 0;
+	}
+};
+void * webserver_runner (void * parameters) {((webserver_code *) parameters) -> run (); return 0;}
+
+class webserver : public PrologNativeCode {
+public:
+	PrologHttpServiceClass * service;
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		PrologElement * atom = 0;
+		PrologElement * router = 0;
+		PrologElement * port = 0;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isInteger ()) port = el;
+			if (el -> isVar () || el -> isAtom ()) if (atom == 0) atom = el; else router = el;
+			parameters = parameters -> getRight ();
+		}
+		if (port == 0 || router == 0 || atom == 0) return false;
+		if (router -> isVar ()) {PrologElement * sub = router; router = atom; atom = sub;}
+		if (! router -> isAtom ()) return false;
+		if (atom -> isVar ()) atom -> setAtom (new PrologAtom ());
+		if (atom -> getAtom () -> getMachine () != 0) return false;
+		webserver_code * wsc = new webserver_code (atom -> getAtom (), service, router -> getAtom ());
+		if (! wsc -> prestart (port -> getInteger ())) {delete wsc; return false;}
+		if (atom -> getAtom () -> setMachine (wsc)) return true;
+		delete wsc; return false;
 	}
 	webserver (PrologHttpServiceClass * service) {this -> service = service;}
 };
