@@ -1,7 +1,7 @@
 import studio
 
 program store
-	[store store_import store_header store_atoms store_relations store_clauses store_end]
+	[store store_import store_header store_atoms store_relations store_clauses store_end store_database]
 
 [[store *module_name *file_name]
 	[is_text *module_name] [is_text *file_name] /
@@ -57,5 +57,6 @@ program store
 	[*atom [*clause] "\n"] / [store_clauses *atom *clauses]]
 [[store_end *atom] [*atom "end .\n"]]
 
+[[store_database *file_name : *relations] [file_writer *fw *file_name] [store_relations *fw *relations] [*fw "[exit]\n"] [*fw]]
 
 end .
