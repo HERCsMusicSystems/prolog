@@ -42,7 +42,7 @@ void joystick :: move (double delay) {
 	v = process0 (st . lX); if (x != v) axis (0, x = v);
 	v = process0 (st . lY); if (y != v) axis (1, y = v);
 	v = process0 (st . lRz); if (z != v) axis (2, z = v);
-	v = process1 (st . rglSlider [0]); if (throttle != v) axis (3, throttle = v);
+	v = 2.0 * process1 (st . rglSlider [0]) - 1.0; if (throttle != v) axis (3, throttle = v);
 	double hhx = 0.0, hhy = 0.0;
 	switch (st . rgdwPOV [0]) {
 	case 0: hhy = -1.0; break;
