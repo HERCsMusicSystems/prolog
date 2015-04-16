@@ -535,6 +535,73 @@ public:
 	search_atom (PrologRoot * root) {this -> root = root;}
 };
 
+class unique_atoms : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	bool duplicate_found (PrologAtom * atom, PrologElement * * var) {
+		int duplicates = 0;
+		PrologDirectory * dir = root -> root;
+		while (dir != 0) {
+			PrologAtom * at = dir -> firstAtom;
+			while (at != 0) {
+				if (at != atom) {
+					if (strcmp (at -> name (), atom -> name ()) == 0) {
+						if (* var == 0) printf ("@ %s . %s\n", dir -> name (), atom -> name ());
+						else {
+							PrologElement * el = * var;
+							el -> setPair (); el = el -> getLeft ();
+							el -> setPair (); el -> getLeft () -> setAtom (at); el = el -> getRight ();
+							el -> setPair (); el -> getLeft () -> setText (dir -> name ());
+							* var = (* var) -> getRight ();
+						}
+						duplicates++;
+					}
+				}
+				at = at -> next;
+			}
+			dir = dir -> next;
+		}
+		return duplicates > 0;
+	}
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		bool no_duplicates_found = true;
+		bool need_processing = true;
+		PrologElement * var = 0;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isVar ()) {var = el; var -> setEarth ();}
+			if (el -> isAtom ()) {
+				need_processing = false;
+				if (duplicate_found (el -> getAtom (), & var)) no_duplicates_found = false;
+			}
+			if (el -> isText ()) {
+				need_processing = false;
+				PrologDirectory * dir = root -> searchDirectory (el -> getText ());
+				if (dir == 0) {printf ("Directory %s not found!\n", el -> getText ()); return false;}
+				PrologAtom * atom = dir -> firstAtom;
+				while (atom != 0) {
+					if (duplicate_found (atom, & var)) no_duplicates_found = false;
+					atom = atom -> next;
+				}
+			}
+			parameters = parameters -> getRight ();
+		}
+		if (need_processing) {
+			PrologDirectory * dir = root -> root;
+			while (dir != 0) {
+				PrologAtom * atom = dir -> firstAtom;
+				while (atom != 0) {
+					if (duplicate_found (atom, & var)) no_duplicates_found = false;
+					atom = atom -> next;
+				}
+				dir = dir -> next;
+			}
+		}
+		return var != 0 || no_duplicates_found;
+	}
+	unique_atoms (PrologRoot * root) {this -> root = root;}
+};
+
 class preprocessor : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -3548,6 +3615,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "create_atom") == 0) return new create_atom (root);
 	if (strcmp (name, "create_atoms") == 0) return new create_atoms (root);
 	if (strcmp (name, "search_atom") == 0) return new search_atom (root);
+	if (strcmp (name, "unique_atoms") == 0) return new unique_atoms (root);
 	if (strcmp (name, "preprocessor") == 0) return new preprocessor (root);
 	if (strcmp (name, "prompt") == 0) return new prompt (root);
 	if (strcmp (name, "query_stack") == 0) return new query_stack (root);
