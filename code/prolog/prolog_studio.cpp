@@ -539,13 +539,14 @@ class unique_atoms : public PrologNativeCode {
 public:
 	PrologRoot * root;
 	bool duplicate_found (PrologAtom * atom, PrologElement * * var) {
+		if (atom -> Privated) return false;
 		int duplicates = 0;
 		PrologDirectory * dir = root -> root;
 		while (dir != 0) {
 			PrologAtom * at = dir -> firstAtom;
 			while (at != 0) {
 				if (at != atom) {
-					if (strcmp (at -> name (), atom -> name ()) == 0) {
+					if (! at -> Privated && strcmp (at -> name (), atom -> name ()) == 0) {
 						if (* var == 0) printf ("@ %s . %s\n", dir -> name (), atom -> name ());
 						else {
 							PrologElement * el = * var;

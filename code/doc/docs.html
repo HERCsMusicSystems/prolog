@@ -192,6 +192,7 @@
             <a href="#predicate_OVERWRITE">OVERWRITE</a>
             <a href="#predicate_search_atom">search_atom</a>
             <a href="#predicate_scripted_atoms">scripted_atoms</a>
+            <a href="#predicate_unique_atoms">unique_atoms</a>
         </li>
         <li><a href="#term">Term manipulation</a>
             <br />
@@ -1879,6 +1880,24 @@
             All symbols must be explicitly created (by <a href="predicate_create_atom">create_atom</a>) or declared in a separate module.
             If the reader encounters an unknown symbol (atom) then it fails.
             See also: <a href="#predicate_auto_atoms">auto_atoms</a>.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="unique_atoms">
+        <div class="doc_predicate_header">
+            [unique_atoms]<br />
+            [unique_atoms *list]<br />
+            [unique_atoms *list atom]<br />
+            [unique_atoms *list "directory"]<br />
+        </div>
+        <div class="doc_predicate_body">
+            Searches for symbols with duplicated names.<br />
+            Parameters can be either variable, symbol or text:<br />
+            If there is a variable then unique_atoms never fails, but returns the list of duplicates ([] if none found).<br />
+            If there is a symbol, then unique_atoms searches all directories for duplicates.<br />
+            If there is a text, then unique_atoms checks if any symbol from the specified directory has a duplicate elsewhere.
         </div>
     </a>
 </div>
