@@ -799,11 +799,54 @@ void PrologRoot :: print (char * text) {
 }
 
 void PrologRoot :: print_character (int i) {
-	if (command == NULL) {putchar (i); return;}
-	char c [2];
-	c [0] = (char) i;
-	c [1] = '\0';
-	command -> print (c);
+	if (i >= 0) {if (command == 0) putchar (i); else command -> print (i); return;}
+	i = -i;
+	if (i <= 0x7f) {if (command == 0) putchar (i); else command -> print (i); return;}
+	if (i <= 0x7ff) {
+		int msb = 0xc0 | (i >> 6);
+		int lsb = 0x80 | (i & 0x3f);
+		if (command == 0) {putchar (msb); putchar (lsb);}
+		else {command -> print (msb); command -> print (lsb);}
+		return;
+	}
+	if (i <= 0xffff) {
+		int hsb = 0xe0 | (i >> 12);
+		int msb = 0x80 | ((i >> 6) & 0x3f);
+		int lsb = 0x80 | (i & 0x3f);
+		if (command == 0) {putchar (hsb); putchar (msb); putchar (lsb);}
+		else {command -> print (hsb); command -> print (msb); command -> print (lsb);}
+		return;
+	}
+	if (i <= 0x1fffff) {
+		int xlsb = 0xf0 | (i >> 18);
+		int hsb = 0x80 | ((i >> 12) & 0x3f);
+		int msb = 0x80 | ((i >> 6) & 0x3f);
+		int lsb = 0x80 | (i & 0x3f);
+		if (command == 0) {putchar (xlsb); putchar (hsb); putchar (msb); putchar (lsb);}
+		else {command -> print (xlsb); command -> print (hsb); command -> print (msb); command -> print (lsb);}
+		return;
+	}
+	if (i <= 0x3ffffff) {
+		int xmsb = 0xf8 | (i >> 26);
+		int xlsb = 0x80 | ((i >> 18) & 0x3f);
+		int hsb = 0x80 | ((i >> 12) & 0x3f);
+		int msb = 0x80 | ((i >> 6) & 0x3f);
+		int lsb = 0x80 | (i & 0x3f);
+		if (command == 0) {putchar (xmsb); putchar (xlsb); putchar (hsb); putchar (msb); putchar (lsb);}
+		else {command -> print (xmsb); command -> print (xlsb); command -> print (hsb); command -> print (msb); command -> print (lsb);}
+		return;
+	}
+	if (i <= 0x7fffffff) {
+		int xhsb = 0xfc | (i >> 31);
+		int xmsb = 0x80 | ((i >> 24) & 0x3f);
+		int xlsb = 0x80 | ((i >> 18) & 0x3f);
+		int hsb = 0x80 | ((i >> 12) & 0x3f);
+		int msb = 0x80 | ((i >> 6) & 0x3f);
+		int lsb = 0x80 | (i & 0x3f);
+		if (command == 0) {putchar (xhsb); putchar (xmsb); putchar (xlsb); putchar (hsb); putchar (msb); putchar (lsb);}
+		else {command -> print (xhsb); command -> print (xmsb); command -> print (xlsb); command -> print (hsb); command -> print (msb); command -> print (lsb);}
+		return;
+	}
 }
 
 int PrologRoot :: get_character (void) {

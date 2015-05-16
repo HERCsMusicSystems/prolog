@@ -2006,7 +2006,45 @@ public:
 		while (parameters -> isPair ()) {
 			el = parameters -> getLeft ();
 			if (el -> isText ()) fprintf (fw, "%s", el -> getText ());
-			if (el -> isInteger ()) fputc (el -> getInteger (), fw);
+			if (el -> isInteger ()) {
+				int i = el -> getInteger ();
+				if (i >= 0) fputc (i, fw);
+				else {
+					i = -i;
+					if (i <= 0x7f) fputc (i, fw);
+					else if (i <= 0x7ff) {
+						int msb = 0xc0 | (i >> 6);
+						int lsb = 0x80 | (i & 0x3f);
+						fputc (msb, fw); fputc (lsb, fw);
+					} else if (i <= 0xffff) {
+						int hsb = 0xe0 | (i >> 12);
+						int msb = 0x80 | ((i >> 6) & 0x3f);
+						int lsb = 0x80 | (i & 0x3f);
+						fputc (hsb, fw); fputc (msb, fw); fputc (lsb, fw);
+					} else if (i <= 0x1fffff) {
+						int xlsb = 0xf0 | (i >> 18);
+						int hsb = 0x80 | ((i >> 12) & 0x3f);
+						int msb = 0x80 | ((i >> 6) & 0x3f);
+						int lsb = 0x80 | (i & 0x3f);
+						fputc (xlsb, fw); fputc (hsb, fw); fputc (msb, fw); fputc (lsb, fw);
+					} else if (i <= 0x3ffffff) {
+						int xmsb = 0xf8 | (i >> 26);
+						int xlsb = 0x80 | ((i >> 18) & 0x3f);
+						int hsb = 0x80 | ((i >> 12) & 0x3f);
+						int msb = 0x80 | ((i >> 6) & 0x3f);
+						int lsb = 0x80 | (i & 0x3f);
+						fputc (xmsb, fw); fputc (xlsb, fw); fputc (hsb, fw); fputc (msb, fw); fputc (lsb, fw);
+					} else if (i <= 0x7fffffff) {
+						int xhsb = 0xfc | (i >> 31);
+						int xmsb = 0x80 | ((i >> 24) & 0x3f);
+						int xlsb = 0x80 | ((i >> 18) & 0x3f);
+						int hsb = 0x80 | ((i >> 12) & 0x3f);
+						int msb = 0x80 | ((i >> 6) & 0x3f);
+						int lsb = 0x80 | (i & 0x3f);
+						fputc (xhsb, fw); fputc (xmsb, fw); fputc (xlsb, fw); fputc (hsb, fw); fputc (msb, fw); fputc (lsb, fw);
+					}
+				}
+			}
 			while (el -> isPair ()) {
 				sub_store (el -> getLeft (), area);
 				el = el -> getRight ();
