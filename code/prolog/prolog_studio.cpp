@@ -2008,8 +2008,12 @@ public:
 			if (el -> isText ()) fprintf (fw, "%s", el -> getText ());
 			if (el -> isInteger ()) {
 				int i = el -> getInteger ();
-				if (i >= 0) fputc (i, fw);
-				else {
+				if (i >= 0) {
+					if (i <= 0xff) fputc (i, fw);
+					else if (i <= 0xffff) {fputc (i >> 8, fw); fputc (i & 0xff, fw);}
+					else if (i <= 0xffffff) {fputc (i >> 16, fw); fputc ((i >> 8) & 0xff, fw); fputc (i & 0xff, fw);}
+					else if (i <= 0xffffffff) {fputc (i >> 24, fw); fputc ((i >> 16) & 0xff, fw); fputc ((i >> 8) & 0xff, fw); fputc (i & 0xff, fw);}
+				} else {
 					i = -i;
 					if (i <= 0x7f) fputc (i, fw);
 					else if (i <= 0x7ff) {

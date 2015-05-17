@@ -799,7 +799,20 @@ void PrologRoot :: print (char * text) {
 }
 
 void PrologRoot :: print_character (int i) {
-	if (i >= 0) {if (command == 0) putchar (i); else command -> print (i); return;}
+	if (i >= 0) {
+		if (command == 0) {
+			if (i <= 0xff) putchar (i);
+			else if (i <= 0xffff) {putchar (i >> 8); putchar (i & 0xff);}
+			else if (i <= 0xffffff) {putchar (i >> 16); putchar ((i >> 8) & 0xff); putchar (i & 0xff);}
+			else {putchar (i >> 24); putchar ((i >> 16) & 0xff); putchar ((i >> 8) & 0xff); putchar (i & 0xff);}
+		} else {
+			if (i <= 0xff) command -> print (i);
+			else if (i <= 0xffff) {command -> print (i >> 8); command -> print (i & 0xff);}
+			else if (i <= 0xffffff) {command -> print (i >> 16); command -> print ((i >> 8) & 0xff); command -> print (i & 0xff);}
+			else {command -> print (i >> 24); command -> print ((i >> 16) & 0xff); command -> print ((i >> 8) & 0xff); command -> print (i & 0xff);}
+		}
+		return;
+	}
 	i = -i;
 	if (i <= 0x7f) {if (command == 0) putchar (i); else command -> print (i); return;}
 	if (i <= 0x7ff) {

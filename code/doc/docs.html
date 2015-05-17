@@ -1248,7 +1248,9 @@
             The writer outputs its parameters into the file in textual form.
             The textualising depend on the parameters:
             <li>A text is written without quotation marsk.</li>
-            <li>Numbers are written as ASCII characters.</li>
+            <li>Numbers are written as ASCII characters.
+                Numbers greater than 255 are written as a sequence of 8-bit ASCII characters.
+                Numbers lower than 0 are written as positive UTF-8 characters.</li>
             <li>Content of a list is written as separate Prolog terms.</li><br />
             Without any parameters the writer closes the file and releases the machine clause binding.
             If anonymous symbol is garbage collected then the file is also closed (and machine binding released as well).
@@ -1614,11 +1616,13 @@
         <div class="doc_predicate_body">
             Displays all its parameters.
             The exact display format depends on the type of the parameter:
-            <li>texts are displayed without quotation marks</li>
-            <li>atoms are displayed exactly as they are</li>
-            <li>integers are displayed as ASCII characters</li>
-            <li>content of lists are displayed using <b>pp</b></li>
-            <li>parameters of other types are ignored</li>
+            <li>Texts are displayed without quotation marks.</li>
+            <li>Atoms are displayed exactly as they are.</li>
+            <li>Integers are displayed as ASCII characters.
+                Numbers greater than 255 are displayed as a sequence of ASCII characters.
+                Numbers lower than 0 are displayed as positive UTF-8 characters.</li>
+            <li>Content of lists are displayed using <b>pp</b>.</li>
+            <li>Parameters of other types are ignored.</li>
         </div>
     </a>
 </div>
