@@ -140,13 +140,13 @@
             <a href="#predicate_erase_directory">erase_directory</a>
             <a href="#predicate_execute">execute</a>
             <a href="#predicate_exit">exit</a>
+            <a href="#predicate_file_reader">file_reader</a>
+            <a href="#predicate_file_writer">file_writer</a>
             <a href="#predicate_foreground">foreground</a>
             <a href="#predicate_get_volume_serial_number">get_volume_serial_number</a>
             <a href="#predicate_import">import</a>
             <a href="#predicate_list">list</a>
             <a href="#predicate_load">load</a>
-            <a href="#predicate_file_reader">file_reader</a>
-            <a href="#predicate_file_writer">file_writer</a>
             <a href="#predicate_machine_type">machine_type</a>
             <a href="#predicate_make_directory">make_directory</a>
             <a href="#predicate_move">move</a>
@@ -170,10 +170,10 @@
             <a href="#predicate_screen_coordinates">screen_coordinates</a>
             <a href="#predicate_search_directories">search_directories</a>
             <a href="#predicate_security_check">security_check</a>
+            <a href="#predicate_set_captions">set_...._captions</a>
             <a href="#predicate_set_machine">set_machine</a>
             <a href="#predicate_show">show</a>
             <a href="#predicate_write">write</a>
-            <a href="#predicate_set_captions">set_...._captions</a>
         </li>
         <li><a href="#clause_atome">Clause and Atome manipulation</a>
             <br />
@@ -1132,6 +1132,58 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_file_reader">
+        <div class="doc_predicate_header">
+            [file_reader *reader "file_name.extension"]<br />
+            ===========================================<br />
+            [*reader *term] => reads a prolog term<br />
+            [*reader "word" *text] => reads word<br />
+            [*reader "line" *text] => reads entire line<br />
+            [*reader "string" *text] => reads text consisting of specified characters<br />
+            [*reader] => closes the file
+        </div>
+        <div class="doc_predicate_body">
+            Creates a file reader by attaching a machine clause to a symbol.
+            If variable is passed instead of a symbol, then anonymous symbol is created.<br />
+            The reader can read from the file the following objects:
+            <li>Prolog terms.</li>
+            <li>Single words and/or separators.</li>
+            <li>Lines of text.</li>
+            <li>Texts consisting of specified characters.</li><br />
+            Without any parameters the reader closes the file and releases the machine clause binding.
+            If anonymous symbol is garbage collected then the file is also closed (and machine binding released as well).
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_file_writer">
+        <div class="doc_predicate_header">
+            [file_writer *writer "file_name.extension"]<br />
+            ===========================================<br />
+            [*writer a b c d e f] => writers parameters to the file<br />
+            [*writer "text" ....] => writers text to the file<br />
+            [*writer 100 101 102 ....] => writes ASCII characters to the file<br />
+            [*writer [a b c ....] ....] => writes Prolog terms (a b c ....) to the file<br />
+            [*writer] => closes the file.
+        </div>
+        <div class="doc_predicate_body">
+            Creates a file writer by attaching a machine clause to a symbol.
+            if variable is passed instead of a symbol, then anonymous symbol is created.<br />
+            The writer outputs its parameters into the file in textual form.
+            The textualising depend on the parameters:
+            <li>A text is written without quotation marsk.</li>
+            <li>Numbers are written as ASCII characters.
+                Numbers greater than 255 are written as a sequence of 8-bit ASCII characters.
+                Numbers lower than 0 are written as positive UTF-8 characters.</li>
+            <li>Content of a list is written as separate Prolog terms.</li><br />
+            Without any parameters the writer closes the file and releases the machine clause binding.
+            If anonymous symbol is garbage collected then the file is also closed (and machine binding released as well).
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_foreground">
         <div class="doc_predicate_header">
             [foreground fgcolour]<br />
@@ -1202,58 +1254,6 @@
             It will appear as the second module after the root "user!".
             If the module name has no extension, the default ".prc" extension will be used.
             Fails if the module can not be found anywhere.
-        </div>
-    </a>
-</div>
-
-<div class="doc_predicate">
-    <a id="predicate_file_reader">
-        <div class="doc_predicate_header">
-            [file_reader *reader "file_name.extension"]<br />
-            ===========================================<br />
-            [*reader *term] => reads a prolog term<br />
-            [*reader "word" *text] => reads word<br />
-            [*reader "line" *text] => reads entire line<br />
-            [*reader "string" *text] => reads text consisting of specified characters<br />
-            [*reader] => closes the file
-        </div>
-        <div class="doc_predicate_body">
-            Creates a file reader by attaching a machine clause to a symbol.
-            If variable is passed instead of a symbol, then anonymous symbol is created.<br />
-            The reader can read from the file the following objects:
-            <li>Prolog terms.</li>
-            <li>Single words and/or separators.</li>
-            <li>Lines of text.</li>
-            <li>Texts consisting of specified characters.</li><br />
-            Without any parameters the reader closes the file and releases the machine clause binding.
-            If anonymous symbol is garbage collected then the file is also closed (and machine binding released as well).
-        </div>
-    </a>
-</div>
-
-<div class="doc_predicate">
-    <a id="predicate_file_writer">
-        <div class="doc_predicate_header">
-            [file_writer *writer "file_name.extension"]<br />
-            ===========================================<br />
-            [*writer a b c d e f] => writers parameters to the file<br />
-            [*writer "text" ....] => writers text to the file<br />
-            [*writer 100 101 102 ....] => writes ASCII characters to the file<br />
-            [*writer [a b c ....] ....] => writes Prolog terms (a b c ....) to the file<br />
-            [*writer] => closes the file.
-        </div>
-        <div class="doc_predicate_body">
-            Creates a file writer by attaching a machine clause to a symbol.
-            if variable is passed instead of a symbol, then anonymous symbol is created.<br />
-            The writer outputs its parameters into the file in textual form.
-            The textualising depend on the parameters:
-            <li>A text is written without quotation marsk.</li>
-            <li>Numbers are written as ASCII characters.
-                Numbers greater than 255 are written as a sequence of 8-bit ASCII characters.
-                Numbers lower than 0 are written as positive UTF-8 characters.</li>
-            <li>Content of a list is written as separate Prolog terms.</li><br />
-            Without any parameters the writer closes the file and releases the machine clause binding.
-            If anonymous symbol is garbage collected then the file is also closed (and machine binding released as well).
         </div>
     </a>
 </div>
@@ -1572,6 +1572,20 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_set_captions">
+        <div class="doc_predicate_header">
+            [set_uap32_captions] [set_standard_captions]<br />
+            [set_edinburgh_captions] [set_marseille_captions]<br />
+            [set_functional_captions]
+        </div>
+        <div class="doc_predicate_body">
+            Controls the behaviour of lexical and syntax analyser.
+            This feature is experimental. It is recommended to use uap32 captions at all times (default option).
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_set_machine">
         <div class="doc_predicate_header">
             [set_machine atom "machine"]<br />
@@ -1623,20 +1637,6 @@
                 Numbers lower than 0 are displayed as positive UTF-8 characters.</li>
             <li>Content of lists are displayed using <b>pp</b>.</li>
             <li>Parameters of other types are ignored.</li>
-        </div>
-    </a>
-</div>
-
-<div class="doc_predicate">
-    <a id="predicate_set_captions">
-        <div class="doc_predicate_header">
-            [set_uap32_captions] [set_standard_captions]<br />
-            [set_edinburgh_captions] [set_marseille_captions]<br />
-            [set_functional_captions]
-        </div>
-        <div class="doc_predicate_body">
-            Controls the behaviour of lexical and syntax analyser.
-            This feature is experimental. It is recommended to use uap32 captions at all times (default option).
         </div>
     </a>
 </div>
