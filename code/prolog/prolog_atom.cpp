@@ -59,10 +59,12 @@ PrologAtom :: PrologAtom (char * name, PrologAtom * root) TRACKING (14) {
 //	reference_counter = 1;
 }
 
-void delete_clause (PrologElement * clause) {
-	PrologElement * head = (PrologElement *) clause -> getLeft () -> getLeft () -> getHead ();
-	if (head != NULL) delete_clause (head);
-	delete clause;
+static void delete_clause (PrologElement * clause) {
+	while (clause != 0) {
+		PrologElement * head = (PrologElement *) clause -> getLeft () -> getLeft () -> getHead ();
+		delete clause;
+		clause = head;
+	}
 }
 
 bool PrologAtom :: removeAtom (void) {
