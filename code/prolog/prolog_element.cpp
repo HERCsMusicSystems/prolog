@@ -34,7 +34,12 @@ PrologElement :: PrologElement (void) TRACKING (12) {
 	type = 0;
 }
 
-#define DESTROYER if (text) {delete_text (text); text = NULL;} if (right) {delete right; right = NULL;} if (left) {delete left; left = NULL;} if (atom) {atom -> removeAtom (); atom = NULL;}
+#define DESTROYER\
+	if (text) {delete_text (text); text = 0;}\
+	while (right) {PrologElement * el = right -> right; right -> right = 0; delete right; right = el;}\
+	if (left) {delete left; left = 0;}\
+	if (atom) {atom -> removeAtom ();\
+	atom = 0;}
 #define LEFT_DESTROYER if (left) {delete left; left = NULL;}
 #define RIGHT_DESTROYER if (right) {delete right; right = NULL;}
 
