@@ -25,6 +25,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+typedef PrologElement * PrologElementPointer;
+
 class pp : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -3012,6 +3014,127 @@ public:
 	}
 };
 
+//////////////////////////
+// MULTICORE RESOLUTION //
+//////////////////////////
+
+class index_resser {
+public:
+	PrologElement * res;
+	pthread_mutex_t critical;
+	void accumulate (PrologElement * el) {
+		pthread_mutex_lock (& critical);
+		res -> setPair (); res -> setLeft (el -> duplicate ());
+		res = res -> getRight ();
+		pthread_mutex_unlock (& critical);
+	}
+	index_resser (PrologElement * res) {this -> res = res; critical = PTHREAD_MUTEX_INITIALIZER;}
+	~ index_resser (void) {pthread_mutex_destroy (& critical);}
+};
+
+class index_substack : public PrologNativeCode {
+public:
+	index_resser * res;
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		while (parameters -> isPair ()) {
+			res -> accumulate (parameters -> getLeft ());
+			parameters = parameters -> getRight ();
+		}
+		return true;
+	}
+	index_substack (index_resser * res) {this -> res = res;}
+};
+
+class multicore_index : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	PrologAtom * atom;
+	PrologAtom * processor;
+	int clause_pointer;
+	PrologElement * * clauses;
+	void process_clause (index_resser * resser, PrologElement * pattern, PrologElement * parameters, int index) {
+		PrologResolution reso (root);
+		if (! reso . match (parameters, true, clauses [index] -> getLeft () -> getRight (), false)) {reso . reset (); return;}
+		PrologAtom * accu = new PrologAtom ();
+		index_substack * stacker = new index_substack (resser);
+		accu -> setMachine (stacker);
+		PrologElement * query = root -> pair (root -> fail (), root -> earth ());
+		query = root -> pair (root -> pair (root -> atom (accu),
+							root -> pair (reso . match_product (pattern, true),
+							root -> earth ())), query);
+		query = root -> pair (root -> pair (root -> atom (processor),
+							reso . match_product (clauses [index] -> getRight (), false)), query);
+		query = root -> pair (root -> atom (accu), query);
+		reso . reset ();
+		root -> resolution (query);
+		delete query;
+	}
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
+		if (processor == 0) return false;
+		if (! parameters -> isPair ()) return false;
+		PrologElement * res = parameters -> getLeft (); parameters = parameters -> getRight ();
+		if (! parameters -> isPair ()) return false;
+		PrologElement * pattern = parameters -> getLeft (); parameters = parameters -> getRight ();
+		index_resser resser (res);
+		for (int ind = 0; ind < clause_pointer; ind++) {
+			process_clause (& resser, pattern, parameters, ind);
+		}
+		return true;
+	}
+	multicore_index (PrologRoot * root, PrologDirectory * studio, PrologAtom * atom, PrologAtom * clause) {
+		this -> root = root;
+		this -> atom = atom;
+		processor = studio -> searchPrivateAtom ("res");
+		if (processor != 0) {COLLECTOR_REFERENCE_INC (processor);}
+		clause_pointer = 0;
+		PrologElement * clp = clause -> firstClause;
+		while (clp != 0) {
+			clause_pointer++;
+			clp = (PrologElement *) clp -> getLeft () -> getLeft () -> getHead ();
+		}
+		if (clause_pointer < 1) {clauses = 0; return;}
+		clauses = new PrologElementPointer [clause_pointer];
+		clp = clause -> firstClause;
+		int counter = 0;
+		while (clp != 0) {
+			clauses [counter++] = clp -> duplicate ();
+			clp = (PrologElement *) clp -> getLeft () -> getLeft () -> getHead ();
+		}
+	}
+	~ multicore_index (void) {
+		if (processor != 0) processor -> removeAtom ();
+		if (clauses != 0) {
+			for (int ind = 0; ind < clause_pointer; ind++) delete clauses [ind];
+			delete [] clauses;
+		}
+	}
+};
+
+class INDEX : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	PrologDirectory * studio;
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		PrologElement * atom = 0;
+		PrologElement * clause = 0;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isVar ()) atom = el;
+			if (el -> isAtom ()) {if (atom == 0) atom = el; else clause = el;}
+			parameters = parameters -> getRight ();
+		}
+		if (atom == 0 || clause == 0) return false;
+		if (atom -> isVar ()) atom -> setAtom (new PrologAtom ());
+		if (atom -> getAtom () -> getMachine () != 0) return false;
+		multicore_index * i = new multicore_index (root, studio, atom -> getAtom (), clause -> getAtom ());
+		if (atom -> getAtom () -> setMachine (i)) return true;
+		delete i;
+		return false;
+	}
+	INDEX (PrologRoot * root, PrologDirectory * studio) {this -> root = root; this -> studio = studio;}
+};
+
 /////////////////////
 // NOISE GENERATOR //
 /////////////////////
@@ -3095,7 +3218,6 @@ public:
 	rnd_control (PrologNoise * n) {this -> n = n;}
 };
 
-typedef PrologElement * PrologElementPointer;
 class series : public PrologNativeCode {
 public:
 	PrologNoise * n;
@@ -3705,6 +3827,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "STACK") == 0) return new STACK ();
 	if (strcmp (name, "QUEUE") == 0) return new QUEUE ();
 	if (strcmp (name, "ARRAY") == 0) return new ARRAY ();
+	if (strcmp (name, "INDEX") == 0) return new INDEX (root, directory);
 
 	if (strcmp (name, "background") == 0) return new bgcolour (root);
 	if (strcmp (name, "foreground") == 0) return new fgcolour (root);

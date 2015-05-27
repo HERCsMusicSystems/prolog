@@ -29,7 +29,7 @@ program studio #machine := "prolog.studio"
 		res not eq rres ures lazy random_cl explode TRY ONE PROBE SELECT APPEND LENGTH REVERSE AT ONLIST INLIST NODUP MAP
 		sort divide
 		WHILE FOR FOREVER forever REPEAT IF
-		CONSTANT VARIABLE ACCUMULATOR STACK QUEUE ARRAY var inc dec ALL ISALL isall isallr
+		CONSTANT VARIABLE ACCUMULATOR STACK QUEUE ARRAY INDEX var inc dec ALL ISALL isall isallr
 		rnd rnd_control grnd series
 		crack wait timeout enter signal semaphore msemaphore mutex accept select critical_section monitor task
 		background foreground open_editor close_editor screen_coordinates
@@ -171,6 +171,7 @@ program studio #machine := "prolog.studio"
 #machine STACK := "STACK"
 #machine QUEUE := "QUEUE"
 #machine ARRAY := "ARRAY"
+#machine INDEX := "INDEX"
 
 #machine background := "background"
 #machine foreground := "foreground"
