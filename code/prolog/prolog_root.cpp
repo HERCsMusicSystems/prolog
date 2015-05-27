@@ -314,7 +314,7 @@ int PrologRoot :: getValue (PrologElement * el, char * area, int ind) {
 		ind = area_cat (area, ind, el -> getText ());
 		ind = area_cat (area, ind, quotation_caption);
 		return ind;
-	case 7: sprintf (command, "<%x>", (unsigned int) el -> head); return area_cat (area, area_cat (area, ind, head_caption), command);
+	case 7: sprintf (command, "<%p>", el -> head); return area_cat (area, area_cat (area, ind, head_caption), command);
 	case 8: sprintf (command, "%i", el -> getInteger ()); return area_cat (area, ind, command);
 	case 9: sprintf (command, PROLOG_PRINTABLE_FLOAT, el -> getDouble ()); if (strstr (command, ".") == NULL) strcat (command, ".0"); return area_cat (area, ind, command);
 	default: return area_cat (area, ind, "Unknown element type.");
