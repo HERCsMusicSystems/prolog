@@ -24,6 +24,7 @@
 #include <string.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <omp.h>
 
 typedef PrologElement * PrologElementPointer;
 
@@ -3077,7 +3078,9 @@ public:
 		if (! parameters -> isPair ()) return false;
 		PrologElement * pattern = parameters -> getLeft (); parameters = parameters -> getRight ();
 		index_resser resser (res);
+		#pragma omp parallel for
 		for (int ind = 0; ind < clause_pointer; ind++) {
+			//printf ("<%i %i %i> ", ind, omp_get_thread_num (), omp_get_num_threads ());
 			process_clause (& resser, pattern, parameters, ind);
 		}
 		return true;

@@ -236,9 +236,11 @@
             <a href="#predicate_FOREVER">FOREVER</a>
             <a href="#predicate_IF">IF</a>
             <a href="#predicate_inc">inc</a>
+            <a href="#predicate_INDEX">INDEX</a>
             <a href="#predicate_INLIST">INLIST</a>
             <a href="#predicate_isall">isall</a>
             <a href="#predicate_ISALL">ISALL</a>
+            <a href="#predicate_isallq">isallq</a>
             <a href="#predicate_isallr">isallr</a>
             <a href="#predicate_lambda">lambda</a>
             <a href="#predicate_lazy">lazy</a>
@@ -2528,6 +2530,20 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_INDEX">
+        <div class="doc_predicate_header">
+            [INDEX index relation]
+        </div>
+        <div class="doc_predicate_body">
+            Creates a duplicate of the relation, which can be processed using multi-core processing.
+            The <b>index</b> itself can be used in the same way as <a href="#predicate_isall">isall</a>,
+            but the list of results may be in random order, i.e. due to the fact that each definition
+            may be processed by a separate thread. [index] closes the index.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_INLIST">
         <div class="doc_predicate_header">
             [INLIST list-1 element list-2]
@@ -2585,6 +2601,27 @@
             &emsp;&emsp;&emsp;[*atom *template] fail<br />
             ]<br />
             [[ISALL :*]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_isallq">
+        <div class="doc_predicate_header">
+            [isallq list template : instructions]
+        </div>
+        <div class="doc_predicate_body">
+            Similar to <a href="predicate_isall">isall</a> but the resulting list is un-reversed.
+            Also, the underlying implementation uses <a href="#predicate_QUEUE">QUEUE</a>,
+            hence the variables in the resulting list will not be correctly indexed.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[isallq *list *template : *call]<br />
+	        &emsp;&emsp;&emsp;[QUEUE *atom]<br />
+	        &emsp;&emsp;&emsp;[ISALL *atom *template : *call]<br />
+	        &emsp;&emsp;&emsp;[*atom : *list]<br />
+            ]
         </div>
     </a>
 </div>
