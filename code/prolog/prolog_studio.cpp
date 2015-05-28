@@ -2784,7 +2784,7 @@ public:
 	stack_element * next;
 	stack_element * drop (void) {stack_element * sub = next; next = 0; delete this; return sub;}
 	stack_element (PrologElement * el, stack_element * next = 0) {this -> el = el -> duplicate (); this -> next = next;}
-	~ stack_element (void) {delete el; if (next != 0) delete next;}
+	~ stack_element (void) {delete el; while (next != 0) {stack_element * sub = next -> next; next -> next = 0; delete next; next = sub;}}
 };
 
 class stack : public PrologNativeCode {
