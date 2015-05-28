@@ -161,6 +161,11 @@ public:
 		// 8: integer
 		// 9: double
 	PrologElement (void);
+	PrologElement (PrologAtom * atom);
+	PrologElement (char * text);
+	PrologElement (void * head);
+	PrologElement (int integer);
+	PrologElement (double floating_point);
 	~ PrologElement (void);
 	bool isEarth (void);
 	bool isPair (void);

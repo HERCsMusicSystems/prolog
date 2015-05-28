@@ -23,15 +23,69 @@
 #include "prolog.h"
 
 PrologElement :: PrologElement (void) TRACKING (12) {
-	text = NULL;
-//	string_copy (text, "");
+	text = 0;
 	floating_point = 0.0;
 	integer = 0;
-	left = NULL;
-	right = NULL;
-	atom = NULL;
-	head = NULL;
+	left = 0;
+	right = 0;
+	atom = 0;
+	head = 0;
 	type = 0;
+}
+
+PrologElement :: PrologElement (PrologAtom * atom) TRACKING (12) {
+	text = 0;
+	floating_point = 0.0;
+	integer = 0;
+	left = 0;
+	right = 0;
+	this -> atom = atom; COLLECTOR_REFERENCE_INC (atom);
+	head = 0;
+	type = 3;
+}
+
+PrologElement :: PrologElement (char * text) TRACKING (12) {
+	this -> text = create_text (text);
+	floating_point = 0.0;
+	integer = 0;
+	left = 0;
+	right = 0;
+	atom = 0;
+	head = 0;
+	type = 6;
+}
+
+PrologElement :: PrologElement (void * head) TRACKING (12) {
+	text = 0;
+	floating_point = 0.0;
+	integer = 0;
+	left = 0;
+	right = 0;
+	atom = 0;
+	this -> head = head;
+	type = 7;
+}
+
+PrologElement :: PrologElement (int integer) TRACKING (12) {
+	text = 0;
+	floating_point = 0.0;
+	this -> integer = integer;
+	left = 0;
+	right = 0;
+	atom = 0;
+	head = 0;
+	type = 8;
+}
+
+PrologElement :: PrologElement (double floating_point) TRACKING (12) {
+	text = 0;
+	this -> floating_point = floating_point;
+	integer = 0;
+	left = 0;
+	right = 0;
+	atom = 0;
+	head = 0;
+	type = 9;
 }
 
 #define DESTROYER\
