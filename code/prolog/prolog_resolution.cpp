@@ -170,67 +170,79 @@ bool PrologResolution :: match (PrologElement * actual, bool ac, PrologElement *
 }
 
 PrologElement * PrologResolution :: match_product (PrologElement * actual, bool ac) {
-	PrologMatch * v1 = NULL;
-	PrologVariable * var = NULL;
+	PrologMatch * v1 = 0;
+	PrologVariable * var = 0;
 	int ind;
 	PrologElement * ret;
-	if (actual == NULL) return NULL;
-	int type = actual -> type;
-	if (type == 2) {
-		if (ac) {
-			if (root_actual != NULL) v1 = root_actual -> getVar (actual -> integer);
-			if (v1 == NULL) {
+	PrologElement * main_return = 0;
+	PrologElement * target = 0;
+	int type;
+	do {
+		if (actual == 0) {if (target) target -> right = 0; return main_return != 0 ? main_return : 0;}
+		type = actual -> type;
+		switch (type) {
+		case 2:
+			if (ac) {
+				if (root_actual != 0) v1 = root_actual -> getVar (actual -> integer);
+				if (v1 == 0) {
+					ret = new PrologElement ();
+					ret -> type = 2;
+					root_actual = new PrologMatch (actual -> integer, root_actual, this);
+					root_actual -> var -> variable_id = var_counter;
+					ret -> integer = var_counter;
+					var_counter++;
+					if (target) target -> right = ret;
+					return main_return != 0 ? main_return : ret;
+				}
+			} else {
+				if (root_formal != 0) v1 = root_formal -> getVar (actual -> integer);
+				if (v1 == 0) {
+					ret = new PrologElement ();
+					ret -> type = 2;
+					root_formal = new PrologMatch (actual -> integer, root_formal, this);
+					root_formal -> var -> variable_id = var_counter;
+					ret -> integer = var_counter;
+					var_counter++;
+					if (target) target -> right = ret;
+					return main_return != 0 ? main_return : ret;
+				}
+			}
+			var = v1 -> var;
+			if (var -> term == 0) {
 				ret = new PrologElement ();
 				ret -> type = 2;
-				root_actual = new PrologMatch (actual -> integer, root_actual, this);
-				root_actual -> var -> variable_id = var_counter;
-				ret -> integer = var_counter;
-				var_counter++;
-				return ret;
+				ind = var -> variable_id;
+				if (ind < 0) {
+					var -> variable_id = var_counter;
+					ind = var_counter;
+					var_counter++;
+				}
+				ret -> integer = ind;
+				if (target) target -> right = ret;
+				return main_return != 0 ? main_return : ret;
 			}
-		} else {
-			if (root_formal != NULL) v1 = root_formal -> getVar (actual -> integer);
-			if (v1 == NULL) {
-				ret = new PrologElement ();
-				ret -> type = 2;
-				root_formal = new PrologMatch (actual -> integer, root_formal, this);
-				root_formal -> var -> variable_id = var_counter;
-				ret -> integer = var_counter;
-				var_counter++;
-				return ret;
-			}
-		}
-		var = v1 -> var;
-		if (var -> term == NULL) {
+			ret = match_product (var -> term, var -> location);
+			if (target) target -> right = ret;
+			return main_return != 0 ? main_return : ret;
+			break;
+		case 1:
 			ret = new PrologElement ();
-			ret -> type = 2;
-			ind = var -> variable_id;
-			if (ind < 0) {
-				var -> variable_id = var_counter;
-				ind = var_counter;
-				var_counter++;
-			}
-			ret -> integer = ind;
-			return ret;
+			if (target) target -> right = ret;
+			ret -> type = 1;
+			ret -> left = match_product (actual -> left, ac);
+			if (main_return == 0) main_return = ret;
+			target = ret;
+			actual = actual -> right;
+			break;
+		case 8: ret = new PrologElement (actual -> integer); if (target) target -> right = ret; return main_return != 0 ? main_return : ret; break;
+		case 9: ret = new PrologElement (actual -> floating_point); if (target) target -> right = ret; return main_return != 0 ? main_return : ret; break;
+		case 6: ret = new PrologElement (actual -> text); if (target) target -> right = ret; return main_return != 0 ? main_return : ret; break;
+		case 7: ret = new PrologElement (actual -> head); if (target) target -> right = ret; return main_return != 0 ? main_return : ret; break;
+		case 3: ret = new PrologElement (actual -> atom); if (target) target -> right = ret; return main_return != 0 ? main_return : ret; break;
+		default: ret = new PrologElement (); ret -> type = type; if (target) target -> right = ret; return main_return != 0 ? main_return : ret; break;
 		}
-		return match_product (var -> term, var -> location);
-	}
-	ret = new PrologElement ();
-	ret -> type = type;
-	switch (type) {
-	case 1:
-		ret -> left = match_product (actual -> left, ac);
-		ret -> right = match_product (actual -> right, ac);
-		return ret;
-	case 8: ret -> integer = actual -> integer; return ret;
-	case 9: ret -> floating_point = actual -> floating_point; return ret;
-	case 6: ret -> text = create_text (actual -> text); return ret;
-	case 7: ret -> head = actual -> head; return ret;
-	case 3: ret -> atom = actual -> atom; COLLECTOR_REFERENCE_INC (ret -> atom) return ret;
-//	case 3: ret -> atom = actual -> atom; ret -> atom -> reference_counter++; return ret;
-	default: return ret;
-	}
-	return ret;
+	} while (type == 1);
+	return main_return;
 }
 
 int PrologResolution :: res_forward (void) {
