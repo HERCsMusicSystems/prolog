@@ -63,109 +63,112 @@ void PrologResolution :: reset (void) {
 }
 
 bool PrologResolution :: match (PrologElement * actual, bool ac, PrologElement * formal, bool fc) {
-	int typea = actual -> type;
-	int typef = formal -> type;
-	PrologMatch * v1 = NULL;
-	PrologMatch * v2 = NULL;
-	PrologVariable * var = NULL;
+	int typea, typef;
+	do {
+		typea = actual -> type;
+		typef = formal -> type;
+		PrologMatch * v1 = 0;
+		PrologMatch * v2 = 0;
+		PrologVariable * var = 0;
+		if (typea == 2) {
+			if (typef == 2) {
+				if (ac) {if (root_actual != 0) v1 = root_actual -> getVar (actual -> integer);}
+				else {if (root_formal != 0) v1 = root_formal -> getVar (actual -> integer);}
+				if (fc) {if (root_actual != 0) v2 = root_actual -> getVar (formal -> integer);}
+				else {if (root_formal != 0) v2 = root_formal -> getVar (formal -> integer);}
+				if (v1 == 0) {
+					if (v2 == 0) {
+						var = newVariable (); //new PrologVariable ();
+						if (fc) root_actual = new PrologMatch (formal -> integer, var, root_actual);
+						else root_formal = new PrologMatch (formal -> integer, var, root_formal);
+					} else var = v2 -> var;
+					if (ac) root_actual = new PrologMatch (actual -> integer, var, root_actual);
+					else root_formal = new PrologMatch (actual -> integer, var, root_formal);
+					return true;
+				}
+				if (v2 == 0) {
+					if (fc) root_actual = new PrologMatch (formal -> integer, v1 -> var, root_actual);
+					else root_formal = new PrologMatch (formal -> integer, v1 -> var, root_formal);
+					return true;
+				}
+				if (v1 -> var -> term == 0) {
+					var = v1 -> var;
+					root_actual -> connect_var (var, v2 -> var);
+					root_formal -> connect_var (var, v2 -> var);
+					return true;
+				}
+				if (v2 -> var -> term == 0) {
+					var = v2 -> var;
+					root_actual -> connect_var (var, v1 -> var);
+					root_formal -> connect_var (var, v1 -> var);
+					return true;
+				}
+				return match (v1 -> var -> term, v1 -> var -> location, v2 -> var -> term, v2 -> var -> location);
+			} else {
+				if (ac) {
+					if (root_actual != 0) v1 = root_actual -> getVar (actual -> integer);
+					if (v1 == 0) {
+						root_actual = new PrologMatch (actual -> integer, formal, fc, root_actual, this);
+						return true;
+					}
+				} else {
+					if (root_formal != 0) v1 = root_formal -> getVar (actual -> integer);
+					if (v1 == 0) {
+						root_formal = new PrologMatch (actual -> integer, formal, fc, root_formal, this);
+						return true;
+					}
+				}
+				if (v1 -> var -> term == 0) {
+					v1 -> var -> term = formal;
+					v1 -> var -> location = fc;
+					return true;
+				}
+				return match (v1 -> var -> term, v1 -> var -> location, formal, fc);
+			}
+		}
 
-	if (typea == 2) {
 		if (typef == 2) {
-			if (ac) {if (root_actual != NULL) v1 = root_actual -> getVar (actual -> integer);}
-			else {if (root_formal != NULL) v1 = root_formal -> getVar (actual -> integer);}
-			if (fc) {if (root_actual != NULL) v2 = root_actual -> getVar (formal -> integer);}
-			else {if (root_formal != NULL) v2 = root_formal -> getVar (formal -> integer);}
-			if (v1 == NULL) {
-				if (v2 == NULL) {
-					var = newVariable (); //new PrologVariable ();
-					if (fc) root_actual = new PrologMatch (formal -> integer, var, root_actual);
-					else root_formal = new PrologMatch (formal -> integer, var, root_formal);
-				} else var = v2 -> var;
-				if (ac) root_actual = new PrologMatch (actual -> integer, var, root_actual);
-				else root_formal = new PrologMatch (actual -> integer, var, root_formal);
-				return true;
-			}
-			if (v2 == NULL) {
-				if (fc) root_actual = new PrologMatch (formal -> integer, v1 -> var, root_actual);
-				else root_formal = new PrologMatch (formal -> integer, v1 -> var, root_formal);
-				return true;
-			}
-			if (v1 -> var -> term == NULL) {
-				var = v1 -> var;
-				root_actual -> connect_var (var, v2 -> var);
-				root_formal -> connect_var (var, v2 -> var);
-				return true;
-			}
-			if (v2 -> var -> term == NULL) {
-				var = v2 -> var;
-				root_actual -> connect_var (var, v1 -> var);
-				root_formal -> connect_var (var, v1 -> var);
-				return true;
-			}
-			return match (v1 -> var -> term, v1 -> var -> location, v2 -> var -> term, v2 -> var -> location);
-		} else {
-			if (ac) {
-				if (root_actual != NULL) v1 = root_actual -> getVar (actual -> integer);
-				if (v1 == NULL) {
-					root_actual = new PrologMatch (actual -> integer, formal, fc, root_actual, this);
+			if (fc) {
+				if (root_actual != 0) v1 = root_actual -> getVar (formal -> integer);
+				if (v1 == 0) {
+					root_actual = new PrologMatch (formal -> integer, actual, ac, root_actual, this);
 					return true;
 				}
 			} else {
-				if (root_formal != NULL) v1 = root_formal -> getVar (actual -> integer);
-				if (v1 == NULL) {
-					root_formal = new PrologMatch (actual -> integer, formal, fc, root_formal, this);
+				if (root_formal != 0) v1 = root_formal -> getVar (formal -> integer);
+				if (v1 == 0) {
+					root_formal = new PrologMatch (formal -> integer, actual, ac, root_formal, this);
 					return true;
 				}
 			}
-			if (v1 -> var -> term == NULL) {
-				v1 -> var -> term = formal;
-				v1 -> var -> location = fc;
+			if (v1 -> var -> term == 0) {
+				v1 -> var -> term = actual;
+				v1 -> var -> location = ac;
 				return true;
 			}
-			return match (v1 -> var -> term, v1 -> var -> location, formal, fc);
+			return match (actual, ac, v1 -> var -> term, v1 -> var -> location);
 		}
-	}
 
-	if (typef == 2) {
-		if (fc) {
-			if (root_actual != NULL) v1 = root_actual -> getVar (formal -> integer);
-			if (v1 == NULL) {
-				root_actual = new PrologMatch (formal -> integer, actual, ac, root_actual, this);
-				return true;
-			}
-		} else {
-			if (root_formal != NULL) v1 = root_formal -> getVar (formal -> integer);
-			if (v1 == NULL) {
-				root_formal = new PrologMatch (formal -> integer, actual, ac, root_formal, this);
-				return true;
-			}
+		if (typea != typef) return false;
+
+		switch (typea) {
+		case 8: return actual -> integer == formal -> integer;
+		case 9: return actual -> floating_point == formal -> floating_point;
+		case 3: return actual -> atom == formal -> atom;
+		case 0: return true;
+		case 1:
+			if (! match (actual -> left, ac, formal -> left, fc)) return false;
+			actual = actual -> right, formal = formal -> right;
+			break;
+		case 4: case 5: return true;
+		case 6:
+			if (actual -> text == 0) return false;
+			if (formal -> text == 0) return false;
+			return strcmp (actual -> text, formal -> text) == 0;
+		case 7: return actual -> head == formal -> head;
+		default: return false;
 		}
-		if (v1 -> var -> term == NULL) {
-			v1 -> var -> term = actual;
-			v1 -> var -> location = ac;
-			return true;
-		}
-		return match (actual, ac, v1 -> var -> term, v1 -> var -> location);
-	}
-
-	if (typea != typef) return false;
-
-	switch (typea) {
-	case 8: return actual -> integer == formal -> integer;
-	case 9: return actual -> floating_point == formal -> floating_point;
-	case 3: return actual -> atom == formal -> atom;
-	case 0: return true;
-	case 1:
-		if (! match (actual -> left, ac, formal -> left, fc)) return false;
-		return match (actual -> right, ac, formal -> right, fc);
-	case 4: case 5: return true;
-	case 6:
-		if (actual -> text == NULL) return false;
-		if (formal -> text == NULL) return false;
-		return strcmp (actual -> text, formal -> text) == 0;
-	case 7: return actual -> head == formal -> head;
-	default: return false;
-	}
+	} while (typea == 1);
 	return false;
 }
 
