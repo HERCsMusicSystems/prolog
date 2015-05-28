@@ -1,12 +1,13 @@
 
 import studio
 
-program test [TestWorks TestFails TestEq TestNotEq TestSummary FailedTestSummary Failures Successes ResetCounters]
+program test [TestWorks TestFails TestEq TestNotEq TestSummary FailedTestSummary Failures Successes Timing ResetCounters]
 
 [[ResetCounters]
 	[TRY [has_machine Successes] [Successes]]
 	[TRY [has_machine Failures] [Failures]]
-	[ACCUMULATOR Successes] [ACCUMULATOR Failures]
+	[TRY [has_machine Timing] [Timing]]
+	[ACCUMULATOR Successes] [ACCUMULATOR Failures] [VARIABLE Timing] [wait *time] [Timing *time]
 ]
 
 auto := [[ResetCounters]]
@@ -42,6 +43,7 @@ auto := [[ResetCounters]]
 	[foreground 0xff00] [show *length_s " passed"] [show *s]
 	[foreground 0xff0000] [show *length_f " failed"] [show *f]
 	[foreground 0xffff00]
+	[Timing : *from] [wait *to] [sum *from *time *to] [div *time 1000.0 *timed] [show "TIME = " *timed " secodns."]
 	[ResetCounters]
 ]
 
@@ -49,6 +51,7 @@ auto := [[ResetCounters]]
 	[Failures : *f] [LENGTH *f *length_f]
 	[foreground 0xff0000] [show *length_f " failed"] [show *f]
 	[foreground 0xffff00]
+	[Timing : *from] [wait *to] [sum *from *time *to] [div *time 1000.0 *timed] [show "TIME = " *timed " secodns."]
 	[ResetCounters]
 ]
 
