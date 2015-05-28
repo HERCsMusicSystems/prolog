@@ -278,8 +278,9 @@ int PrologRoot :: getRightCaption (PrologElement * el, char * area, int ind) {
 	if (el -> getType () == 1) {
 		ind = area_cat (area, ind, separator_caption);
 		ind = area_cat (area, ind, " ");
-		ind = getValue (el -> getLeft (), area, ind);
-		ind = getRightCaption (el -> getRight (), area, ind);
+		int sub = getValue (el -> getLeft (), area, ind);
+		if (sub == ind) return ind;
+		ind = getRightCaption (el -> getRight (), area, sub);
 		return ind;
 	}
 	ind = area_cat (area, ind, " ");
