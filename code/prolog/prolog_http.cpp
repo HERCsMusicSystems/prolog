@@ -52,6 +52,7 @@ class RequestAnalyser {
 public:
 	PrologHttpServiceClass * service;
 	char * command;
+	char boundary [128];
 	AREA area;
 	char key [256];
 	void get_word (void) {
@@ -117,6 +118,18 @@ public:
 		int ap = 0; area [0] = '\0';
 		while (* command >= 32) ap = area_cat (area, ap, * command++);
 		skip_line ();
+		if (strcmp (key, "Content-Type") == 0) {
+			if (strstr (area, "multipart/form-data") != 0) {
+				char * bdp = strstr (area, "boundary");
+				if (bdp != 0) {
+					bdp += 9;
+					char * bcp = boundary;
+					* bcp++ = '-'; * bcp++ = '-';
+					while (* bdp >= 32) * bcp++ = * bdp++;
+					* bcp = '\0';
+				}
+			}
+		}
 		return true;
 	}
 	bool get_param (void) {
@@ -124,6 +137,23 @@ public:
 		char * cp = key;
 		while (* command > 32 && * command != '=') copy_char (& cp, & command);
 		* cp = '\0';
+		if (strcmp (key, boundary) == 0) {
+			command = strstr (command, "name=");
+			if (command == 0) return false;
+			while (* command > 32 && * command != '"') command++; command++;
+			cp = key;
+			while (* command > 32 && * command != '"') * cp++ = * command++;
+			* cp = '\0';
+			if (strstr (command, "filename=") == command + 3) skip_line ();
+			skip_line ();
+			skip_line ();
+			cp = area;
+			char * terminator = strstr (command, boundary);
+			while (terminator != 0 && command < terminator - 2) * cp++ = * command++;
+			skip_line ();
+			* cp = '\0';
+			return true;
+		}
 		if (* command == '=') command++;
 		cp = area;
 		while (* command > 32 && * command != '&') copy_char (& cp, & command);
@@ -132,6 +162,7 @@ public:
 		return true;
 	}
 	PrologAtom * get_method (void) {
+		boundary [0] = '\0';
 		get_word ();
 		if (strcmp (area, service -> get_atom -> name ()) == 0) return service -> get_atom;
 		if (strcmp (area, service -> post_atom -> name ()) == 0) return service -> post_atom;
