@@ -466,9 +466,6 @@ PrologElement * PrologReader :: atomC (char * name) {
 	el -> setAtom (atom);
 	return el;
 }
-//	if (root -> auto_atoms) return root -> atomC (name);
-//	return root -> atom (name);
-//}
 
 PrologElement * PrologReader :: readElement (void) {
 	PROLOG_STRING dir_name;
@@ -516,6 +513,10 @@ PrologElement * PrologReader :: readElement (void) {
 		if (left == NULL) return NULL;
 		return readRightSide (left, false);
 	case 9: return NULL;
+	case 21:
+		atom = atomC (".");
+		if (atom == NULL) message ("Dot atom not found.");
+		return atom;
 	default: break;
 	}
 	message ("Syntax error (unknown syntax).");
@@ -570,10 +571,6 @@ PrologElement * PrologReader :: readRightSide (PrologElement * LEFT, bool second
 			return NULL;
 		}
 		return root -> pair (LEFT, right);
-	case 21:
-		message ("Syntax error (dot not expected).");
-		if (LEFT) delete LEFT;
-		return NULL;
 	}
 	if (strlen (root -> separator_caption) > 0) {
 		if (symbol_control == 23) get_symbol ();
@@ -613,6 +610,10 @@ PrologElement * PrologReader :: readRightSide (PrologElement * LEFT, bool second
 		if (left == NULL) {if (LEFT) delete LEFT; return NULL;}
 		left = readRightSide (left, false);
 		if (left == NULL) {if (LEFT) delete LEFT; return NULL;}
+		break;
+	case 21:
+		left = atomC (".");
+		if (left == NULL) message ("Dot atom does not exist.");
 		break;
 	default: if (LEFT) delete LEFT; return NULL;
 	}
