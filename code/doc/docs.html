@@ -121,6 +121,13 @@
             <a href="#predicate_trunc">trunc</a>
             <a href="#predicate_xor">xor</a>
         </li>
+        <li><a href="#string_manipulation">String Manipulation</a>
+            <br />
+            <a href="#predicate_StringReplaceAll">StringReplaceAll</a>
+            <a href="#predicate_StringReplaceOnce">StringReplaceOnce</a>
+            <a href="#predicate_StringToLower">StringToLower</a>
+            <a href="#predicate_StringToUpper">StringToUpper</a>
+        </li>
         <li><a href="#input_output">Input / Output</a>
             <br />
             <a href="#predicate_add_search_directory">add_search_directory</a>
@@ -902,6 +909,62 @@
             Bitwise XOR: *x = a XOR b.<br />
             Both arguments must be integers. The result is integer as well.
             It can be used as negation, i.e. XOR with -1.
+        </div>
+    </a>
+</div>
+
+<div class="doc_library_section"><a id="string_manipulation">String Manipulation Predicates</a></div>
+
+<div class="doc_predicate">
+    <a id="predicate_StringReplaceAll">
+        <div class="doc_predicate_header">
+            [StringReplaceAll string pattern replacement *x]<br />
+            [StringReplaceAll string pattern replacement : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Replaces all occurences of pattern within the string with replacement.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_StringReplaceOnce">
+        <div class="doc_predicate_header">
+            [StringReplaceOnce string pattern replacement *x]<br />
+            [StringReplaceOnce string pattern replacement : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Replaces all occurences of pattern within the string with replacement.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_StringToLower">
+        <div class="doc_predicate_header">
+            [StringToLower string *x]<br />
+            [StringToLower string : *x]<br />
+            [StringToLower *x string]<br />
+            [StringToLower *x : string]
+        </div>
+        <div class="doc_predicate_body">
+            Changes all characters within the string to lower case.
+            If the first parameter is variable, then changes all characters to upper case.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_StringToUpper">
+        <div class="doc_predicate_header">
+            [StringToUpper string *x]<br />
+            [StringToUpper string : *x]<br />
+            [StringToUpper *x string]<br />
+            [StringToUpper *x : string]
+        </div>
+        <div class="doc_predicate_body">
+            Changes all characters within the string to upper case.
+            If the first parameter is variable, then changes all characters to lower case.
         </div>
     </a>
 </div>
