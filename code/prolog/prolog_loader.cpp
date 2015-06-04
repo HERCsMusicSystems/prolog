@@ -190,13 +190,16 @@ bool PrologLoader :: LOAD (char * file_name) {
 	case 1:
 		get_symbol ();
 		while (symbol_control != 2) {
-			if (symbol_control != 11) {
+			switch (symbol_control) {
+			case 11: root -> createAtom (symbol); break;
+			case 21: root -> createAtom (symbol); break;
+			default:
 				message ("Syntax error: atom expected.");
 				root -> drop ();
 				close ();
 				return false;
+				break;
 			}
-			root -> createAtom (symbol);
 			get_symbol ();
 			if (strlen (root -> separator_caption) > 0) {
 				if (symbol_control != 23 && symbol_control != 2) {

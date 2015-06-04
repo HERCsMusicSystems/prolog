@@ -232,7 +232,7 @@ void PrologReader :: get_symbol (void) {
 		return;
 	}
 	if (indexOf (root -> dot_caption, (char) act_znak) >= 0) {
-		symbol_control = 21;
+		symbol_control = 21; strcpy (symbol, root -> dot_caption);
 		act_znak = move_z ();
 		return;
 	}
@@ -514,7 +514,7 @@ PrologElement * PrologReader :: readElement (void) {
 		return readRightSide (left, false);
 	case 9: return NULL;
 	case 21:
-		atom = atomC (".");
+		atom = atomC (symbol);
 		if (atom == NULL) message ("Dot atom not found.");
 		return atom;
 	default: break;
@@ -612,7 +612,7 @@ PrologElement * PrologReader :: readRightSide (PrologElement * LEFT, bool second
 		if (left == NULL) {if (LEFT) delete LEFT; return NULL;}
 		break;
 	case 21:
-		left = atomC (".");
+		left = atomC (symbol);
 		if (left == NULL) message ("Dot atom does not exist.");
 		break;
 	default: if (LEFT) delete LEFT; return NULL;

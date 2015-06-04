@@ -35,7 +35,7 @@ program studio #machine := "prolog.studio"
 		background foreground open_editor close_editor screen_coordinates
 		get_volume_serial_number security_check encoder
 
-		computer-do-this define-this show
+		. computer-do-this define-this show
 	]
 
 #machine ++ := "add1"
