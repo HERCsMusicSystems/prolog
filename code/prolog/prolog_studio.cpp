@@ -1664,6 +1664,115 @@ public:
 	}
 };
 
+class StringToLower : public PrologNativeCode {
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * source = parameters -> getLeft (); parameters = parameters -> getRight ();
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (source -> isText () && parameters -> isVar ()) {
+			char * command = create_text (source -> getText ());
+			char * cp = command;
+			while (* cp != '\0') {* cp = tolower (* cp); cp++;}
+			parameters -> setText (command);
+			delete_text (command);
+			return true;
+		}
+		if (parameters -> isText () && source -> isVar ()) {
+			char * command = create_text (parameters -> getText ());
+			char * cp = command;
+			while (* cp != '\0') {* cp = toupper (* cp); cp++;}
+			source -> setText (command);
+			delete_text (command);
+			return true;
+		}
+		return false;
+	}
+};
+class StringToUpper : public PrologNativeCode {
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * source = parameters -> getLeft (); parameters = parameters -> getRight ();
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (source -> isText () && parameters -> isVar ()) {
+			char * command = create_text (source -> getText ());
+			char * cp = command;
+			while (* cp != '\0') {* cp = toupper (* cp); cp++;}
+			parameters -> setText (command);
+			delete_text (command);
+			return true;
+		}
+		if (parameters -> isText () && source -> isVar ()) {
+			char * command = create_text (parameters -> getText ());
+			char * cp = command;
+			while (* cp != '\0') {* cp = tolower (* cp); cp++;}
+			source -> setText (command);
+			delete_text (command);
+			return true;
+		}
+		return false;
+	}
+};
+class StringReplaceOnce : public PrologNativeCode {
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * source = parameters -> getLeft (); if (! source -> isText ()) return false;
+		parameters = parameters -> getRight (); if (! parameters -> isPair ()) return false;
+		PrologElement * pattern = parameters -> getLeft (); if (! pattern -> isText ()) return false;
+		parameters = parameters -> getRight (); if (! parameters -> isPair ()) return false;
+		PrologElement * replacement = parameters -> getLeft (); if (! replacement -> isText ()) return false;
+		parameters = parameters -> getRight (); if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (! parameters -> isVar ()) return false;
+		char * src = source -> getText ();
+		char * pat = pattern -> getText ();
+		char * rep = replacement -> getText ();
+		char * occu = strstr (src, pat);
+		if (occu == 0) {parameters -> setText (src); return true;}
+		char * dest = new char [strlen (src) + strlen (rep) + 1];
+		char * cpf = src;
+		char * cpt = dest;
+		while (cpf < occu) * cpt++ = * cpf++; cpf = rep;
+		while (* cpf != '\0') * cpt++ = * cpf++; cpf = occu + strlen (pat);
+		while (* cpf != '\0') * cpt++ = * cpf++; * cpt = '\0';
+		parameters -> setText (dest);
+		delete [] dest;
+		return true;
+	}
+};
+class StringReplaceAll : public PrologNativeCode {
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * source = parameters -> getLeft (); if (! source -> isText ()) return false;
+		parameters = parameters -> getRight (); if (! parameters -> isPair ()) return false;
+		PrologElement * pattern = parameters -> getLeft (); if (! pattern -> isText ()) return false;
+		parameters = parameters -> getRight (); if (! parameters -> isPair ()) return false;
+		PrologElement * replacement = parameters -> getLeft (); if (! replacement -> isText ()) return false;
+		parameters = parameters -> getRight (); if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (! parameters -> isVar ()) return false;
+		int occurences = 0;
+		char * cpf = source -> getText ();
+		char * pat = pattern -> getText ();
+		int pat_length = strlen (pat);
+		while ((cpf = strstr (cpf, pat)) != 0) {occurences++; cpf += pat_length;}
+		cpf = source -> getText ();
+		if (occurences < 1) {parameters -> setText (cpf); return true;}
+		char * rep = replacement -> getText ();
+		char * dest = new char [strlen (cpf) + strlen (rep) * occurences + 1];
+		char * occu;
+		char * cpt = dest;
+		while ((occu = strstr (cpf, pat)) != 0) {
+			while (cpf < occu) * cpt++ = * cpf++; cpf = rep;
+			while (* cpf != '\0') * cpt++ = * cpf++; cpf = occu + pat_length;
+		}
+		while (* cpf != '\0') * cpt++ = * cpf++; * cpt = '\0';
+		parameters -> setText (dest);
+		delete [] dest;
+		return true;
+	}
+};
+
 class timestamp : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -3740,6 +3849,11 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "sin") == 0) return new sin_operation ();
 	if (strcmp (name, "tan") == 0) return new tan_operation ();
 	if (strcmp (name, "trunc") == 0) return new trunc_operation ();
+
+	if (strcmp (name, "StringToLower") == 0) return new StringToLower ();
+	if (strcmp (name, "StringToUpper") == 0) return new StringToUpper ();
+	if (strcmp (name, "StringReplaceOnce") == 0) return new StringReplaceOnce ();
+	if (strcmp (name, "StringReplaceAll") == 0) return new StringReplaceAll ();
 
 	if (strcmp (name, "timestamp") == 0) return new timestamp ();
 

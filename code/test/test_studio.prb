@@ -397,6 +397,13 @@
 [TestFails "trunc 3 3.5" [trunc 3 3.5]]
 [TestFails "trunc 3 3" [trunc 3 3]]
 
+[TestEq "StringToLower \"Sonda Academy\" *x" "sonda academy" *x [StringToLower "Sonda Academy" *x]]
+[TestEq "StringToLower *x \"Sonda Academy\"" "SONDA ACADEMY" *x [StringToLower *x : "Sonda Academy"]]
+[TestEq "StringToUpper \"Sonda Academy\" *x" "SONDA ACADEMY" *x [StringToUpper "Sonda Academy" *x]]
+[TestEq "StringToUpper *x \"Sonda Academy\"" "sonda academy" *x [StringToUpper *x : "Sonda Academy"]]
+[TestEq "StringReplaceOnce \"012340540\" \"0\" \"-\" *x" "-12340540" *x [StringReplaceOnce "012340540" "0" "-" *x]]
+[TestEq "StringReplaceAll \"012340540\" \"0\" \"-=\" *x" "-=1234-=54-=" *x [StringReplaceAll "012340540" "0" "-=" *x]]
+
 [TestWorks "less 1 2 3 4.5 4.7 5 6" [less 1 2 3 4.5 4.7 5.0 6]]
 [TestFails "less 1 2 3 4.5 4.5 6" [less 1 2 3 4.5 4.5 6]]
 [TestFails "less 1 2 2 3" [less 1 2 2 3]]
