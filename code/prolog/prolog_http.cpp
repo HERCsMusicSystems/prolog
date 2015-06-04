@@ -51,6 +51,8 @@ public:
 class RequestAnalyser {
 public:
 	PrologHttpServiceClass * service;
+	char key_pending [256];
+	char parameter_pending [256];
 	char * command;
 	char boundary [128];
 	AREA area;
@@ -133,6 +135,11 @@ public:
 		return true;
 	}
 	bool get_param (void) {
+		if (key_pending [0] != '\0') {
+			strcpy (key, key_pending); strcpy (area, parameter_pending);
+			key_pending [0] = parameter_pending [0] = '\0';
+			return true;
+		}
 		if (* command <= 32) {skip_line (); return false;}
 		char * cp = key;
 		while (* command > 32 && * command != '=') copy_char (& cp, & command);
@@ -144,7 +151,13 @@ public:
 			cp = key;
 			while (* command > 32 && * command != '"') * cp++ = * command++;
 			* cp = '\0';
-			if (strstr (command, "filename=") == command + 3) skip_line ();
+			if (strstr (command, "filename=") == command + 3) {
+				strcpy (key_pending, key); strcat (key_pending, "_filename");
+				char * sub1 = parameter_pending;
+				char * sub2 = command + 13;
+				while (* sub2 > 0 && * sub2 != '"') * sub1++ = * sub2++; * sub1 = '\0';
+				skip_line ();
+			}
 			skip_line ();
 			skip_line ();
 			cp = area;
@@ -154,6 +167,7 @@ public:
 			* cp = '\0';
 			return true;
 		}
+		if (strstr (key, boundary) == key) return false;
 		if (* command == '=') command++;
 		cp = area;
 		while (* command > 32 && * command != '&') copy_char (& cp, & command);
@@ -162,7 +176,7 @@ public:
 		return true;
 	}
 	PrologAtom * get_method (void) {
-		boundary [0] = '\0';
+		boundary [0] = key_pending [0] = parameter_pending [0] = '\0';
 		get_word ();
 		if (strcmp (area, service -> get_atom -> name ()) == 0) return service -> get_atom;
 		if (strcmp (area, service -> post_atom -> name ()) == 0) return service -> post_atom;
