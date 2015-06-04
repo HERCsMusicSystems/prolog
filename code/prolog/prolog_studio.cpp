@@ -22,6 +22,7 @@
 
 #include "prolog_studio.h"
 #include <string.h>
+#include <ctype.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <omp.h>
