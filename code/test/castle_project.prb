@@ -1,0 +1,125 @@
+[import "http"]
+[import "store"]
+
+;//======== LOAD DATABASE =========//
+
+;//======== NATURAL LANGUAGE PROCESSOR =========//
+
+[[processor *res *file_name *content] [loaded_files *file_name] [*res "File " *file_name " already loaded."] /]
+[[processor *res *file_name *content]
+	[addcl [[loaded_files *file_name]]]
+	[*res "Reading " *file_name "<br/>"]
+	[text_term *content : *knowledge]
+	[process_knowledge *res : *knowledge]
+]
+
+[[process_knowledge *res] [*res "No (more) knowledge.<br/>"] /]
+[[process_knowledge *res []] [*res "No (more) knowledge.<br/>"] /]
+[[process_knowledge *res *statement : *statements] [process_statement *res *statement] / [process_knowledge *res : *statements]]
+
+[[process_statement *res *statement]
+	[AddKnowledge *res : *statement]
+]
+
+[[AddKnowledge *feed *x is *y] [addcl [[*x is *y]]] [addcl [[*y can_be *x]]] [*feed "UNDERSTOOD (1) => " [[*x is *y]] "<br/>"] /]
+[[AddKnowledge *feed *x is a *y] [addcl [[*x is *y]]] [addcl [[*y can_be *x]]] [*feed "UNDERSTOOD (2) => " [[*x is a *y]] "<br/>"] /]
+[[AddKnowledge *feed *x is an *y] [addcl [[*x is *y]]] [addcl [[*y can_be *x]]] [*feed "UNDERSTOOD (3) => " [[*x is an *y]] "<br/>"] /]
+[[AddKnowledge *feed *x *does *something] [addcl [[*x *does *something]]] [*feed "UNDERSTOOD (4) => " [[*x *does *something]] "<br/>"] /]
+[[AddKnowledge *feed *x *does a *something] [addcl [[*x *does *something]]] [*feed "UNDERSTOOD (5) => " [[*x *does a *something]] "<br/>"]/]
+[[AddKnowledge *feed *x *does an *something] [addcl [[*x *does *something]]] [*feed "UNDERSTOOD (6) => " [[*x *does an *something]] "<br/>"]/]
+[[AddKnowledge *feed : *command] [*feed "TOO HARD => " [*command] "<br/>"] /]
+
+;//======== QUERY PROCESSOR =======//
+
+[[querry *res *cleared]
+	[text_term *cleared : *command]
+	[QueryKnowledge *track : *command]
+	[show *track]
+	[*res "YES<br/>"]
+	[ShowTrack *res : *track]
+	[*res "PROVED<br/>"]
+	[*res "===========================<br/>"]
+	fail
+]
+[[querry *res : *]
+	[*res "NO (more) ANSWERS<br/>"]
+]
+
+[[ShowTrack *res] /]
+[[ShowTrack *res *track : *tracks] [ShowTrack *res : *tracks] [*res [*track] "<br/>"]]
+
+[[QueryKnowledge [[*x *does *y]] *does *x *y]
+	[show "DOES RELATION " [*x *does *y]]
+	[*x *does *y]
+]
+
+[[QueryKnowledge [[*something is a *y] : *tracks] *does *x *y]
+	[show "IS RELATION " [is *y *something]]
+	[*y can_be *something]
+	[QueryKnowledge *tracks *does *x *something]
+]
+
+;//======== CONTROLLERS ===========//
+
+[[controller_command *req *res]
+	[*res "HTTP/1.1 200 OK\n\n<body style=\"background-image: ai.jpg;\"><img src=ai.jpg/>\n"]
+	[*req param "command" *human]
+	[StringToLower *human *lowered]
+	[StringReplaceAll *lowered "?" "" *cleared]
+	[*res "<table align=\"center\"><tr><td>"]
+	[querry *res *cleared]
+	[*res "</td></tr></table>"]
+	[view_page *res]
+	[*res "</body>"]
+]
+
+[[controller_upload *req *res]
+	[*res "HTTP/1.1 200 OK\n\n<body>\n"]
+	[*req param "uploader_filename" *file_name]
+	[*req param "uploader" *file_content]
+	[StringToLower *file_content *lowered]
+	[StringReplaceAll *lowered "." "][" *splitted]
+	[add "[" *splitted "]" *complete]
+	[*res "<table align=\"center\"><tr><td>"]
+	[processor *res *file_name *complete]
+	[*res "</td></tr></table>"]
+	[view_page *res]
+	[*res "</body>"]
+]
+
+;//========== VIEW(s) =========//
+
+[[view_page *res]
+	[*res "<center>"]
+	;[*res "><h1>CASTLE PROJECT</h1>"]
+	[FORM *res POST command]
+		[param *res command]
+		[param *res "submit" "enter" "Enter"]
+	[FORM *res]
+	[MULTIFORM *res POST upload]
+		[*res "<input type=\"file\" name=\"uploader\"\>"]
+		[param *res "submit" "enter" "Upload"]
+	[FORM *res]
+	[*res "</center>"]
+]
+
+;//========== ROUTER ==========//
+
+[[router *req *res] [*req HTTP_URI : *route] [show *route] [route *req *res : *route]]
+
+;//========== ROUTES ===========//
+
+[[route *req *res * command] [controller_command *req *res]]
+[[route *req *res * upload] [controller_upload *req *res]]
+[[route *req *res GET ""] [*res "HTTP/1.0 200 OK\n\n<body><h1>Prolog Webserver</h1></body>"]]
+[[route *req *res : *] [*res "HTTP/1.1 401 Not found\n\n"]]
+
+;//========== WEBSERVER ===========//
+
+[webserver service 3008 router]
+[show "ready"]
+[command]
+
+;//========== END-OF-SCRIPT ===========//
+[exit]
+
