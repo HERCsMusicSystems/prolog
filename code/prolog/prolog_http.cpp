@@ -167,7 +167,7 @@ public:
 			* cp = '\0';
 			return true;
 		}
-		if (strstr (key, boundary) == key) return false;
+		if (boundary [0] != '\0' && strstr (key, boundary) == key) return false;
 		if (* command == '=') command++;
 		cp = area;
 		while (* command > 32 && * command != '&') copy_char (& cp, & command);
