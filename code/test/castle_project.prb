@@ -62,7 +62,7 @@
 ;//======== CONTROLLERS ===========//
 
 [[controller_command *req *res]
-	[*res "HTTP/1.1 200 OK\n\n<body style=\"background-image: ai.jpg;\"><img src=ai.jpg/>\n"]
+	[*res "HTTP/1.1 200 OK\n\n<body>\n"]
 	[*req param "command" *human]
 	[StringToLower *human *lowered]
 	[StringReplaceAll *lowered "?" "" *cleared]
