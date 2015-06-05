@@ -36,6 +36,14 @@ public:
 			if (el -> isText ()) {char * cp = el -> getText (); send (fd, cp, strlen (cp), 0);}
 			if (el -> isAtom ()) {char * cp = el -> getAtom () -> name (); send (fd, cp, strlen (cp), 0);}
 			if (el -> isInteger ()) {sprintf (area, "%c", el -> getInteger ()); send (fd, area, 1, 0);}
+			if (el -> isEarth () && parameters -> getRight () -> isText ()) {
+				FILE * fr = fopen (parameters -> getRight () -> getText (), "rb");
+				if (fr != 0) {
+					int ch;
+					while ((ch = fgetc (fr)) >= 0) {area [0] = (char) ch; send (fd, area, 1, 0);}
+				}
+				fclose (fr);
+			}
 			while (el -> isPair ()) {
 				int length = root -> getValue (el -> getLeft (), area, 0);
 				send (fd, area, length, 0);
