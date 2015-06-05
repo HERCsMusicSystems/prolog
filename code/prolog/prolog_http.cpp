@@ -184,7 +184,6 @@ public:
 		return true;
 	}
 	PrologAtom * get_method (void) {
-		boundary [0] = key_pending [0] = parameter_pending [0] = '\0';
 		get_word ();
 		if (strcmp (area, service -> get_atom -> name ()) == 0) return service -> get_atom;
 		if (strcmp (area, service -> post_atom -> name ()) == 0) return service -> post_atom;
@@ -199,7 +198,10 @@ public:
 		if (strcmp (area, service -> purge_atom -> name ()) == 0) return service -> purge_atom;
 		return 0;
 	}
-	RequestAnalyser (PrologHttpServiceClass * service, char * command) {this -> service = service; this -> command = command;}
+	RequestAnalyser (PrologHttpServiceClass * service, char * command) {
+		boundary [0] = key_pending [0] = parameter_pending [0] = '\0';
+		this -> service = service; this -> command = command;
+	}
 };
 
 void * webserver_runner (void * parameters);
