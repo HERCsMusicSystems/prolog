@@ -5,4 +5,8 @@ Fiona likes everyone who roars.
 Bro sings.
 Shrek sings.
 Monster roars.
-
+Bro likes Shrek.
+Bro is black.
+Shrek is green.
+Fiona likes many colours.
+Fiona likes green the most.

@@ -23,19 +23,21 @@
 
 [[AddEntity *x] [entity *x]/]
 [[AddEntity *x] [addcl [[entity *x]]]]
+[[ToDoe *does *doe] [sum *x "s" *does] [search_atom_c *x *doe] /]
+[[ToDoe *doe *doe]]
 
 [[AddKnowledge *feed *x is *y] [addcl [[*x [[*x is *y] : *t] *t is *y]]] [AddEntity *x] [*feed "UNDERSTOOD (1) => " [[*x is *y]] "<br/>"] /]
 [[AddKnowledge *feed *x is a *y] [addcl [[*x [[*x is *y] : *t] *t is *y]]] [AddEntity *x] [*feed "UNDERSTOOD (2) => " [[*x is a *y]] "<br/>"] /]
 [[AddKnowledge *feed *x is an *y] [addcl [[*x [[*x is *y] : *t] *t is *y]]] [AddEntity *x] [*feed "UNDERSTOOD (3) => " [[*x is an *y]] "<br/>"] /]
-[[AddKnowledge *feed *x *does *something] [addcl [[*x [[*x *does *something] : *t] *t *does *something]]] [AddEntity *x]
+[[AddKnowledge *feed *x *does *something] [ToDoe *does *doe] [addcl [[*x [[*x *does *something] : *t] *t *doe *something]]] [AddEntity *x]
 	[*feed "UNDERSTOOD (4) => " [[*x *does *something]] "<br/>"] /]
-[[AddKnowledge *feed *x *does a *something] [addcl [[*x [[*x *does *someting] : *t] *t *does *something]]] [AddEntity *x]
+[[AddKnowledge *feed *x *does a *something] [ToDoe *does *doe] [addcl [[*x [[*x *does *someting] : *t] *t *doe *something]]] [AddEntity *x]
 	[*feed "UNDERSTOOD (5) => " [[*x *does a *something]] "<br/>"]/]
-[[AddKnowledge *feed *x *does an *something] [addcl [[*x [[*x *does *something] : *t] *t *does *something]]] [AddEntity *x]
+[[AddKnowledge *feed *x *does an *something] [ToDoe *does *doe] [addcl [[*x [[*x *does *something] : *t] *t *doe *something]]] [AddEntity *x]
 	[*feed "UNDERSTOOD (6) => " [[*x *does an *something]] "<br/>"]/]
-[[AddKnowledge *feed *x *does] [addcl [[*x [[*x *does] : *t] *t *does]]] [AddEntity *x] [*feed "UNDERSTAND (7) => " [[*x *does]] "<br/>"]/]
-[[AddKnowledge *feed *x *likes everyone who *does]
-	[addcl [[*x [[*x *likes *someone if *someone *does] : *next] *t *likes *someone] [entity *someone] [QueryKnowledge *next *t *does *someone]]]
+[[AddKnowledge *feed *x *does] [ToDoe *does *doe] [addcl [[*x [[*x *does] : *t] *t *doe]]] [AddEntity *x] [*feed "UNDERSTAND (7) => " [[*x *does]] "<br/>"]/]
+[[AddKnowledge *feed *x *likes everyone who *does] [ToDoe *likes *like] [ToDoe *does *doe]
+	[addcl [[*x [[*x *likes *someone if *someone *does] : *next] *t *like *someone] [entity *someone] [QueryKnowledge *next *t *doe *someone]]]
 	[AddEntity *x]
 	[*feed "THIS IS COMPLEX (1) => " [[*x *likes X if X *does]] "<br/>"]/
 ]
@@ -61,6 +63,8 @@
 
 [[ShowTrack *res] /]
 [[ShowTrack *res *track : *tracks] [*res [*track] "<br/>"] / [ShowTrack *res : *tracks]]
+
+[[QueryKnowledge *track *tracks does *someone *does : *command] / [QueryKnowledge *track *tracks *does *someone : *command]]
 
 [[QueryKnowledge *track *tracks *does *x *y]
 	[entity *x]
