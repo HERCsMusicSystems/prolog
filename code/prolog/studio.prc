@@ -18,7 +18,7 @@ program studio #machine := "prolog.studio"
 		cd relativise_path dir ls DIR ARGS args args_tail edit execute make_directory erase erase_directory move copy
 		operating_system
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
-		create_atom create_atoms search_atom unique_atoms preprocessor prompt
+		create_atom create_atoms search_atom search_atom_c unique_atoms preprocessor prompt
 		+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^
 		add add1 sub sub1 mult div mod and or xor sum times mac less less_eq greater greater_eq max min
 		abs cos degrad e exp log2 log10 ln log pi pow sin tan trunc
@@ -130,6 +130,7 @@ program studio #machine := "prolog.studio"
 #machine create_atom := "create_atom"
 #machine create_atoms := "create_atoms"
 #machine search_atom := "search_atom"
+#machine search_atom_c := "search_atom_c"
 #machine unique_atoms := "unique_atoms"
 #machine preprocessor := "preprocessor"
 #machine prompt := "prompt"

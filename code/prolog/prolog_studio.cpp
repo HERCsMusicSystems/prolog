@@ -511,8 +511,10 @@ public:
 class search_atom : public PrologNativeCode {
 public:
 	PrologRoot * root;
+	bool create;
 	bool sub_code (PrologElement * parameters, char * name) {
 		PrologAtom * atom = root -> search (name);
+		if (atom == 0 && create) atom = root -> createAtom (name);
 		if (atom == 0) return false;
 		parameters -> setAtom (atom);
 		return true;
@@ -536,7 +538,7 @@ public:
 		}
 		return false;
 	}
-	search_atom (PrologRoot * root) {this -> root = root;}
+	search_atom (PrologRoot * root, bool create) {this -> root = root; this -> create = create;}
 };
 
 class unique_atoms : public PrologNativeCode {
@@ -974,6 +976,42 @@ public:
 			}
 			if (e3 -> isDouble ()) {
 				e1 -> setDouble (e3 -> getDouble () - e2 -> getDouble ());
+				return true;
+			}
+		}
+		if (e1 -> isAtom () || e1 -> isText ()) {
+			char * e1c = e1 -> isAtom () ? e1 -> getAtom () -> name () : e1 -> getText ();
+			if (e2 -> isAtom () || e2 -> isText ()) {
+				char * e2c = e2 -> isAtom () ? e2 -> getAtom () -> name () : e2 -> getText ();
+				int e1cl = strlen (e1c);
+				char * e3c = new char [e1cl + strlen (e2c) + 4];
+				strcpy (e3c, e1c);
+				strcpy (e3c + e1cl, e2c);
+				e3 -> setText (e3c);
+				delete [] e3c;
+				return true;
+			}
+			if (e3 -> isAtom () || e3 -> isText ()) {
+				char * e3c = e3 -> isAtom () ? e3 -> getAtom () -> name () : e3 -> getText ();
+				int e1cl = strlen (e1c);
+				int e3cl = strlen (e3c);
+				if (e1cl > e3cl) return false;
+				if (strstr (e3c, e1c) == e3c) {e2 -> setText (e3c + e1cl); return true;}
+				return false;
+			}
+		}
+		if (e2 -> isAtom () || e2 -> isText ()) {
+			char * e2c = e2 -> isAtom () ? e2 -> getAtom () -> name () : e2 -> getText ();
+			if (e3 -> isAtom () || e3 -> isText ()) {
+				char * e3c = e3 -> isAtom () ? e3 -> getAtom () -> name () : e3 -> getText ();
+				int e2cl = strlen (e2c);
+				int e3cl = strlen (e3c);
+				if (e2cl > e2cl) return false;
+				char * e1c = new char [e3cl];
+				e3cl -= e2cl;
+				strncpy (e1c, e3c, e3cl); e1c [e3cl] = '\0';
+				e1 -> setText (e1c);
+				delete [] e1c;
 				return true;
 			}
 		}
@@ -3897,7 +3935,8 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "overwrite") == 0) return new overwrite (root);
 	if (strcmp (name, "create_atom") == 0) return new create_atom (root);
 	if (strcmp (name, "create_atoms") == 0) return new create_atoms (root);
-	if (strcmp (name, "search_atom") == 0) return new search_atom (root);
+	if (strcmp (name, "search_atom") == 0) return new search_atom (root, false);
+	if (strcmp (name, "search_atom_c") == 0) return new search_atom (root, true);
 	if (strcmp (name, "unique_atoms") == 0) return new unique_atoms (root);
 	if (strcmp (name, "preprocessor") == 0) return new preprocessor (root);
 	if (strcmp (name, "prompt") == 0) return new prompt (root);
