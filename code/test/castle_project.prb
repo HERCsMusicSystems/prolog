@@ -37,9 +37,21 @@
 	[*feed "UNDERSTOOD (6) => " [[*x *does an *something]] "<br/>"]/]
 [[AddKnowledge *feed *x *does] [ToDoe *does *doe] [addcl [[*x [[*x *does] : *t] *t *doe]]] [AddEntity *x] [*feed "UNDERSTAND (7) => " [[*x *does]] "<br/>"]/]
 [[AddKnowledge *feed *x *likes everyone who *does] [ToDoe *likes *like] [ToDoe *does *doe]
-	[addcl [[*x [[*x *likes *someone if *someone *does] : *next] *t *like *someone] [entity *someone] [QueryKnowledge *next *t *doe *someone]]]
+	[addcl [[*x [[*x *likes *someone if *someone *does] : *next] *t *like *someone] [entity *someone] [QueryKnowledge *next *t *someone *doe]]]
 	[AddEntity *x]
 	[*feed "THIS IS COMPLEX (1) => " [[*x *likes X if X *does]] "<br/>"]/
+]
+[[AddKnowledge *feed *x *does *money per *period] [is_number *money]
+	[ToDoe *does *doe]
+	[AddEntity *x]
+	[addcl [[*x [[*x *does *money per *period] : *t] *t *doe *money per *period]]]
+	[*feed "THIS IS NUMERIC (1) => " [[*x *does *money per *period]] "<br/>"]/
+]
+[[AddKnowledge *feed there are *number *subs in a *period]
+	[ToDoe *subs *sub]
+	[AddEntity *period]
+	[addcl [[*period [[there are *number *subs in a *period] : *t] *t consists_of *number *sub]]]
+	[*feed "THIS IS NUMERIC RULE (1) => " [[there are *number *subs in a *period]] "<br/>"]/
 ]
 [[AddKnowledge *feed : *command] [*feed "TOO HARD => " [*command] "<br/>"] /]
 
@@ -48,8 +60,7 @@
 [[querry *res *cleared]
 	[add "[" *cleared "]" *cl]
 	[text_term *cl *command]
-	[show [QueryKnowledge *track [] : *command]]
-	[QueryKnowledge *track [] : *command]
+	[PreprocessQuery *track : *command]
 	[show *track]
 	[*res "YES: " [*command] "<br/>"]
 	[ShowTrack *res : *track]
@@ -64,29 +75,44 @@
 [[ShowTrack *res] /]
 [[ShowTrack *res *track : *tracks] [*res [*track] "<br/>"] / [ShowTrack *res : *tracks]]
 
-[[QueryKnowledge *track *tracks does *someone *does : *command] / [QueryKnowledge *track *tracks *does *someone : *command]]
+[[PreprocessQuery *track does *someone *does : *command] / [QueryKnowledge *track [] *someone *does : *command]]
+[[PreprocessQuery *track how much *something *does per *period] / [ToDoe *does *doe] [QueryKnowledge *track [] *something *doe *x per *period]]
+[[PreprocessQuery *track : *command] / [QueryKnowledge *track [] : *command]]
 
-[[QueryKnowledge *track *tracks *does *x *y]
+[[QueryKnowledge *track *tracks *x *does *y]
 	[entity *x]
 	[*x *track *tracks *does *y]
 ]
 
-[[QueryKnowledge *track *tracks *does *x *y]
+[[QueryKnowledge *track *tracks *x *does *y]
 	[entity *x]
 	[*x *track *next *does *someone]
-	[QueryKnowledge *next *tracks is *someone *y]
+	[QueryKnowledge *next *tracks *someone is *y]
 ]
 
-[[QueryKnowledge *track *tracks *does *someone]
+[[QueryKnowledge *track *tracks *someone *does]
 	[entity *someone]
 	[*someone *track *tracks *does]
 ]
 
-[[QueryKnowledge *track *tracks *does *someone]
+[[QueryKnowledge *track *tracks *someone *does]
 	[entity *someone]
 	[*someone *track *next is *y]
-	[QueryKnowledge *next *tracks *does *y]
+	[QueryKnowledge *next *tracks *y *does]
 ]
+
+[[QueryKnowledge *track *tracks *something *does *money per *period]
+	[entity *something]
+	[*something *track *tracks *does *money per *period]
+]
+
+;[[QueryKnowledge *track *tracks *something *does *money per *period]
+;	[entity *something]
+;	[*something *track *trakcs *does *original_money per *sub]
+;	[entity *period] [entity *sub]
+;	[*period * * consists_of *x *sub]
+;	[mult *x *original_money *money]
+;]
 
 ;//======== CONTROLLERS ===========//
 
@@ -129,7 +155,7 @@
 	;[*res "><h1>CASTLE PROJECT</h1>"]
 	[FORM *res POST command]
 		[param *res command]
-		[param *res "submit" "enter" "Enter"]
+		[param *res "submit" "enter" "Enter" "size=400 width=400"]
 	[FORM *res]
 	[MULTIFORM *res POST upload]
 		[*res "<input type=\"file\" name=\"uploader\"\>"]
