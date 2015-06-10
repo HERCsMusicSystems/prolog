@@ -531,6 +531,7 @@ public:
 			PrologDirectory * dir = root -> searchDirectory (name -> getText ());
 			if (dir == 0) return false;
 			PrologAtom * atom = dir -> searchAtom (e -> getText ());
+			if (atom == 0 && create) atom = dir -> createAtom (e -> getText ());
 			if (atom == 0) return false;
 			if (parameters -> isPair ()) parameters = parameters -> getLeft ();
 			parameters -> setAtom (atom);

@@ -198,6 +198,7 @@
             <a href="#predicate_overwrite">overwrite</a>
             <a href="#predicate_OVERWRITE">OVERWRITE</a>
             <a href="#predicate_search_atom">search_atom</a>
+            <a href="#predicate_search_atom_c">search_atom_c</a>
             <a href="#predicate_scripted_atoms">scripted_atoms</a>
             <a href="#predicate_unique_atoms">unique_atoms</a>
         </li>
@@ -1938,7 +1939,24 @@
         <div class="doc_predicate_body">
             Finds a symbol.
             If module name is specified then it searches only this particular module.
-            Otherwise it search in all modules.
+            Otherwise it searches in all modules.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_search_atom_c">
+        <div class="doc_predicate_header">
+            [search_atom_c "name" *atom]<br />
+            [search_atom_c "name" : *atom]<br />
+            [search_atom_c "module" "name" *atom]<br />
+            [search_atom_c "module" "name" : *atom]
+        </div>
+        <div class="doc_predicate_body">
+            Works similar to <a href="#predicate_search_atom">search_atom</a>.
+            However, if symbol does not exist then it is created.
+            If the module was specified then the new symbol is created in the same module.
+            Otherwise, it creates the new symbol in the first modules (typically in the "user!").
         </div>
     </a>
 </div>

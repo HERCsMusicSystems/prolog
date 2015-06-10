@@ -70,6 +70,14 @@
 [TestEq "search_atom 3" command *x [search_atom "command" *x]]
 [TestEq "search_atom 4" command *x [search_atom "command" : *x]]
 
+[TestFails "search_atom_c directory/atom 1" [search_atom_c "stdio" "command" *x]]
+[TestEq "search_atom_c directory/atom 2" *CMMND *cmmnd [search_atom_c "studio" "cmmnd" *cmmnd] [list "studio" : *list] [eq *list [*CMMND : *]]]
+[TestEq "search_atom_c atom" *CMMNDER *x [search_atom_c "cmmnder" *x] [list "user!" : *list] [eq [*CMMNDER : *] *list]]
+[TestEq "search_atom_c 1" command *x [search_atom_c "studio" "command" *x]]
+[TestEq "search_atom_c 2" command *x [search_atom_c "studio" "command" : *x]]
+[TestEq "search_atom_c 3" command *x [search_atom_c "command" *x]]
+[TestEq "search_atom_c 4" command *x [search_atom_c "command" : *x]]
+
 [TestWorks "unique_atoms" [unique_atoms]]
 [TestWorks "unique_atoms command" [unique_atoms command]]
 [TestEq "unique_atoms *x" [] *x [unique_atoms *x]]
