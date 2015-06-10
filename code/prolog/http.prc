@@ -26,7 +26,6 @@ program http #machine := "prolog.http"
 [[param *res *name] [*res "<input type=\"text\" name=\"" *name "\" />"]]
 [[param *res *type *name] [*res "<input type=\"" *type "\" name=\"" *name "\" />"]]
 [[param *res *type *name *value] [*res "<input type=\"" *type "\" name=\"" *name "\" value=\"" *value "\" />"]]
-[[param *res *type *name *value *extra] [*res "<input type=\"" *type "\" name=\"" *name "\" value=\"" *value "\" " *extra " />"]]
 
 protect [GET GETter FORM MULTIFORM FORMatter param]
 private [GETter FORMatter]

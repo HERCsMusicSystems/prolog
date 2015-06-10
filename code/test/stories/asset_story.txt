@@ -3,5 +3,3 @@ Registration costs 256 per quarter.
 Apartment earns 400 per week.
 Mortgage costs 410 per week.
 
-There are 3 quarters in a year.
-

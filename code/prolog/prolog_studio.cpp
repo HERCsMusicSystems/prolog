@@ -1008,9 +1008,10 @@ public:
 				int e2cl = strlen (e2c);
 				int e3cl = strlen (e3c);
 				if (e2cl > e2cl) return false;
+				int difference = e3cl - e2cl;
+				if (strcmp (e2c, e3c + difference) != 0) return false;
 				char * e1c = new char [e3cl];
-				e3cl -= e2cl;
-				strncpy (e1c, e3c, e3cl); e1c [e3cl] = '\0';
+				strncpy (e1c, e3c, difference); e1c [difference] = '\0';
 				e1 -> setText (e1c);
 				delete [] e1c;
 				return true;
