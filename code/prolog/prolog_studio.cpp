@@ -1814,6 +1814,127 @@ class StringReplaceAll : public PrologNativeCode {
 	}
 };
 
+/////////////////////////////////////
+// TRIGONOMETRICAL TRANSFORMATIONS //
+/////////////////////////////////////
+
+void CalculateDFT (double * f, double * rec, double * ims, int count) {
+	double frac = count > 1 ? 2.0 / (double) count : 1.0;
+	double step = frac * M_PI;
+	double omega = 0.0;
+	int spectrum_length = count >> 1;
+	for (int ind = 0; ind < spectrum_length; ind++) {
+		double re = 0.0, im = 0.0;
+		double time = 0.0;
+		for (int sub = 0; sub < count; sub++) {
+			re += f [sub] * cos (time);
+			im += f [sub] * sin (time);
+			time += omega;
+		}
+		rec [ind] = re * frac; ims [ind] = im * frac;
+		omega += step;
+	}
+}
+
+void CalculateIDFT (double * f, double * rec, double * ims, int count) {
+	double frac = count > 1 ? 2.0 / (double) count : 1.0;
+	double step = frac * M_PI;
+	double omega = 0.0;
+	int spectrum_count = count >> 1;
+	for (int ind = 0; ind < count; ind++) {
+		double fx = 0.0;
+		double time = 0.0;
+		for (int sub = 0; sub < spectrum_count; sub++) {
+			fx += rec [sub] * cos (time);
+			fx += ims [sub] * sin (time);
+			time += omega;
+		}
+		f [ind] = fx;
+		omega += step;
+	}
+}
+
+class DFT : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		PrologElement * F = 0, * REC = 0, * IMS = 0;
+		while (parameters -> isPair ()) {
+			if (F == 0) F = parameters -> getLeft ();
+			else if (REC == 0) REC = parameters -> getLeft ();
+			else IMS = parameters -> getLeft ();
+			parameters = parameters -> getRight ();
+		}
+		if (REC == 0) return false;
+		if (REC -> isVar ()) {
+			int counter = 0;
+			PrologElement * el = F;
+			while (el -> isPair ()) {
+				if (el -> getLeft () -> isNumber ()) counter++;
+				el = el -> getRight ();
+			}
+			double * f = new double [counter], * rec = new double [counter], * ims = new double [counter];
+			el = F;
+			int index = 0;
+			while (el -> isPair ()) {
+				if (el -> getLeft () -> isNumber ()) f [index++] = el -> getLeft () -> getNumber ();
+				el = el -> getRight ();
+			}
+			CalculateDFT (f, rec, ims, counter);
+			counter >>= 1;
+			for (int ind = 0; ind < counter; ind++) {
+				REC -> setPair ();
+				if (IMS == 0) REC -> getLeft () -> setDouble (sqrt (rec [ind] * rec [ind] + ims [ind] * ims [ind]));
+				else {
+					REC -> getLeft () -> setDouble (rec [ind]);
+					IMS -> setPair (); IMS -> getLeft () -> setDouble (ims [ind]); IMS = IMS -> getRight ();
+				}
+				REC = REC -> getRight ();
+			}
+			delete [] f; delete [] rec; delete [] ims;
+			return true;
+		}
+		if (F -> isVar ()) {
+			if (IMS == 0) {
+			} else {
+				int counter = 0;
+				PrologElement * recel = REC;
+				PrologElement * imsel = IMS;
+				while (recel -> isPair ())  {
+					if (recel -> getLeft () -> isNumber ()) counter++;
+					recel = recel -> getRight ();
+				}
+				while (imsel -> isPair ()) {
+					if (imsel -> getLeft () -> isNumber ()) counter++;
+					imsel = imsel -> getRight ();
+				}
+				double * f = new double [counter], * rec = new double [counter], * ims = new double [counter];
+				int index = 0;
+				recel = REC;
+				while (recel -> isPair ()) {
+					if (recel -> getLeft () -> isNumber ()) rec [index++] = recel -> getLeft () -> getNumber ();
+					recel = recel -> getRight ();
+				}
+				index = 0;
+				imsel = IMS;
+				while (imsel -> isPair ()) {
+					if (imsel -> getLeft () -> isNumber ()) ims [index++] = imsel -> getLeft () -> getNumber ();
+					imsel = imsel -> getRight ();
+				}
+				CalculateIDFT (f, rec, ims, counter);
+				for (int ind = 0; ind < counter; ind++) {
+					F -> setPair ();
+					F -> getLeft () -> setDouble (f [ind]);
+					F = F -> getRight ();
+				}
+				delete [] f; delete [] rec; delete [] ims;
+			}
+			return true;
+		}
+		return false;
+	}
+};
+
 class timestamp : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -3895,6 +4016,8 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "StringToUpper") == 0) return new StringToUpper ();
 	if (strcmp (name, "StringReplaceOnce") == 0) return new StringReplaceOnce ();
 	if (strcmp (name, "StringReplaceAll") == 0) return new StringReplaceAll ();
+
+	if (strcmp (name, "DFT") == 0) return new DFT ();
 
 	if (strcmp (name, "timestamp") == 0) return new timestamp ();
 
