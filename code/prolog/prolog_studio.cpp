@@ -1873,7 +1873,9 @@ public:
 				if (el -> getLeft () -> isNumber ()) counter++;
 				el = el -> getRight ();
 			}
-			double * f = new double [counter], * rec = new double [counter], * ims = new double [counter];
+			double * f = new double [counter + counter + counter];
+			double * rec = f + counter;
+			double * ims = rec + counter;
 			el = F;
 			int index = 0;
 			while (el -> isPair ()) {
@@ -1891,11 +1893,35 @@ public:
 				}
 				REC = REC -> getRight ();
 			}
-			delete [] f; delete [] rec; delete [] ims;
+			delete [] f;
 			return true;
 		}
 		if (F -> isVar ()) {
 			if (IMS == 0) {
+				int counter = 0;
+				PrologElement * recel = REC;
+				while (recel -> isPair ()) {if (recel -> getLeft () -> isNumber ()) counter++; recel = recel -> getRight ();}
+				counter <<= 1;
+				double * f = new double [counter + counter + counter];
+				double * rec = f + counter;
+				double * ims = rec + counter;
+				int index = 0;
+				recel = REC;
+				while (recel -> isPair ()) {
+					if (recel -> getLeft () -> isNumber ()) {
+						rec [index] = 0.0;
+						ims [index] = recel -> getLeft () -> getNumber ();
+						index++;
+					}
+					recel = recel -> getRight ();
+				}
+				CalculateIDFT (f, rec, ims, counter);
+				for (int ind = 0; ind < counter; ind++) {
+					F -> setPair ();
+					F -> getLeft () -> setDouble (f [ind]);
+					F = F -> getRight ();
+				}
+				delete [] f;
 			} else {
 				int counter = 0;
 				PrologElement * recel = REC;
@@ -1908,7 +1934,9 @@ public:
 					if (imsel -> getLeft () -> isNumber ()) counter++;
 					imsel = imsel -> getRight ();
 				}
-				double * f = new double [counter], * rec = new double [counter], * ims = new double [counter];
+				double * f = new double [counter + counter + counter];
+				double * rec = f + counter;
+				double * ims = rec + counter;
 				int index = 0;
 				recel = REC;
 				while (recel -> isPair ()) {
@@ -1927,7 +1955,7 @@ public:
 					F -> getLeft () -> setDouble (f [ind]);
 					F = F -> getRight ();
 				}
-				delete [] f; delete [] rec; delete [] ims;
+				delete [] f;
 			}
 			return true;
 		}

@@ -91,6 +91,7 @@
             <a href="#predicate_and">and</a>
             <a href="#predicate_cos">cos</a>
             <a href="#predicate_degrad">degrad</a>
+            <a href="#predicate_DFT">DFT</a>
             <a href="#predicate_div">div</a>
             <a href="#predicate_e">e</a>
             <a href="#predicate_exp">exp</a>
@@ -445,6 +446,24 @@
             Radians have to be double.
             Calculated results (both degrees and radians) will be double.
             Can be used for tests.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_DFT">
+        <div class="doc_predicate_header">
+            [DFT [.....] *RE *IM]<br />
+            [DFT [.....] *spectrum]<br />
+            [DFT *wave [.....] [.....]]<br />
+            [DFT *wave [.....]]<br />
+        </div>
+        <div class="doc_predicate_body">
+            Discrete Fourier Transform.
+            It calculates the cosine (*RE) and sine (*IM) series, or spectrum (sqrt (RE^2 + IM^2)).
+            It can also construct a waveform from spectrum provided (either sine series or both cosine and sine series).
+            The values for either wave or spectrum can be integer or double.
+            The result will always contains doubles.
         </div>
     </a>
 </div>
