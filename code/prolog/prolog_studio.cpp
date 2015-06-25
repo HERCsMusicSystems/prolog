@@ -1883,7 +1883,7 @@ void CalculateIDFT (double * f, double * rec, double * ims, int count) {
 
 class DFT : public PrologNativeCode {
 public:
-	PrologRoot * root;
+	bool fast;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		PrologElement * F = 0, * REC = 0, * IMS = 0;
 		while (parameters -> isPair ()) {
@@ -1909,7 +1909,8 @@ public:
 				if (el -> getLeft () -> isNumber ()) f [index++] = el -> getLeft () -> getNumber ();
 				el = el -> getRight ();
 			}
-			CalculateDFT (f, rec, ims, counter);
+			if (fast) CalculateFFT (f, rec, ims, counter);
+			else CalculateDFT (f, rec, ims, counter);
 			counter >>= 1;
 			for (int ind = 0; ind < counter; ind++) {
 				REC -> setPair ();
@@ -1997,6 +1998,7 @@ public:
 		}
 		return false;
 	}
+	DFT (bool fast) {this -> fast = fast;}
 };
 
 class timestamp : public PrologNativeCode {
@@ -4081,7 +4083,8 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "StringReplaceOnce") == 0) return new StringReplaceOnce ();
 	if (strcmp (name, "StringReplaceAll") == 0) return new StringReplaceAll ();
 
-	if (strcmp (name, "DFT") == 0) return new DFT ();
+	if (strcmp (name, "DFT") == 0) return new DFT (false);
+	if (strcmp (name, "FFT") == 0) return new DFT (true);
 
 	if (strcmp (name, "timestamp") == 0) return new timestamp ();
 

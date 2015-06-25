@@ -21,7 +21,7 @@ program studio #machine := "prolog.studio"
 		create_atom create_atoms search_atom search_atom_c unique_atoms preprocessor prompt
 		+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^
 		add add1 sub sub1 mult div mod and or xor sum times mac less less_eq greater greater_eq max min
-		abs cos degrad e exp log2 log10 ln log pi pow sin tan trunc DFT
+		abs cos degrad e exp log2 log10 ln log pi pow sin tan trunc DFT FFT
 		StringToLower StringToUpper StringReplaceOnce StringReplaceAll
 		timestamp
 		is_atom is_integer is_double is_number is_var is_head is_text has_machine
@@ -83,6 +83,7 @@ program studio #machine := "prolog.studio"
 #machine StringReplaceAll := "StringReplaceAll"
 
 #machine DFT := "DFT"
+#machine FFT := "FFT"
 
 #machine timestamp := "timestamp"
 
