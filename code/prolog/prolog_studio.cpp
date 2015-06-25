@@ -1819,11 +1819,12 @@ class StringReplaceAll : public PrologNativeCode {
 /////////////////////////////////////
 
 void CalculateDFT (double * f, double * rec, double * ims, int count) {
-	double frac = count > 1 ? 2.0 / (double) count : 1.0;
-	double step = frac * M_PI;
+	// count = number of samples
+	double frac = count > 1 ? 1.0 / (double) count : 1.0;
+	double step = (frac + frac) * M_PI;
 	double omega = 0.0;
 	int spectrum_length = count >> 1;
-	for (int ind = 0; ind < spectrum_length; ind++) {
+	for (int ind = 0; ind <= spectrum_length; ind++) {
 		double re = 0.0, im = 0.0;
 		double time = 0.0;
 		for (int sub = 0; sub < count; sub++) {
@@ -1836,19 +1837,45 @@ void CalculateDFT (double * f, double * rec, double * ims, int count) {
 	}
 }
 
+void CalculateFFT (double * f, double * rec, double * ims, int count) {
+	// count = number of samples
+	if (count == 4) {
+		rec [0] = (f [0] + f [1] + f [2] + f [3]) * 0.5;
+		rec [1] = (f [0] - f [2]) * 0.5;
+		ims [0] = 0.0;
+		ims [1] = (f [1] - f [3]) * 0.5;
+		return;
+	}
+	if (count == 8) {
+		double evens [4], odds [4];
+		for (int ind = 0; ind < 4; ind++) {
+			evens [ind] = f [ind * 2];
+			odds [ind] = f [ind * 2 + 1];
+		}
+		double evensrec [4], evensims [4];
+		double oddsrec [4], oddsims [4];
+		CalculateFFT (evens, evensrec, evensims, 4);
+		CalculateFFT (odds, oddsrec, oddsims, 4);
+		return;
+	}
+	CalculateDFT (f, rec, ims, count);
+}
+
 void CalculateIDFT (double * f, double * rec, double * ims, int count) {
+	// count = number of samples
+	int spectrum_count = count >> 1;
 	double frac = count > 1 ? 2.0 / (double) count : 1.0;
 	double step = frac * M_PI;
 	double omega = 0.0;
-	int spectrum_count = count >> 1;
 	for (int ind = 0; ind < count; ind++) {
-		double fx = 0.0;
-		double time = 0.0;
-		for (int sub = 0; sub < spectrum_count; sub++) {
-			fx += rec [sub] * cos (time);
-			fx += ims [sub] * sin (time);
+		double fx = rec [0];
+		double time = omega;
+		for (int sub = 1; sub < spectrum_count; sub++) {
+			double delta = rec [sub] * cos (time) + ims [sub] * sin (time);
+			fx += delta + delta;
 			time += omega;
 		}
+		fx += rec [spectrum_count] * cos (time);
 		f [ind] = fx;
 		omega += step;
 	}
@@ -1893,6 +1920,12 @@ public:
 				}
 				REC = REC -> getRight ();
 			}
+			REC -> setPair ();
+			if (IMS == 0) REC -> getLeft () -> setDouble (rec [counter]);
+			else {
+				REC -> getLeft () -> setDouble (rec [counter]);
+				IMS -> setPair (); IMS -> getLeft () -> setDouble (0.0);
+			}
 			delete [] f;
 			return true;
 		}
@@ -1915,6 +1948,8 @@ public:
 					}
 					recel = recel -> getRight ();
 				}
+				counter -= 2;
+				* rec = * ims;
 				CalculateIDFT (f, rec, ims, counter);
 				for (int ind = 0; ind < counter; ind++) {
 					F -> setPair ();
@@ -1949,6 +1984,7 @@ public:
 					if (imsel -> getLeft () -> isNumber ()) ims [index++] = imsel -> getLeft () -> getNumber ();
 					imsel = imsel -> getRight ();
 				}
+				counter -= 2;
 				CalculateIDFT (f, rec, ims, counter);
 				for (int ind = 0; ind < counter; ind++) {
 					F -> setPair ();

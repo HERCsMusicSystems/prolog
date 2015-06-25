@@ -463,7 +463,16 @@
             It calculates the cosine (*RE) and sine (*IM) series, or spectrum (sqrt (RE^2 + IM^2)).
             It can also construct a waveform from spectrum provided (either sine series or both cosine and sine series).
             The values for either wave or spectrum can be integer or double.
-            The result will always contains doubles.
+            The result will always contains doubles.<br />
+            <b>Notes:</b><br />
+            <li>The length of the wave is expected to be even.</li>
+            <li>The lengths of spectrums is expected to be half of the wave plus one.</li>
+            <li>The cosine part is the first half of the symetrical series.</li>
+            <li>The sine part is also the first half of the symetrical series. As such, the first and last element are always ZERO.</li>
+            <li>Resynthesis with one spectrum expects DC offset (cosine at frequency ZERO)
+                and even number of sine harmonics (the total number of elements is thus odd).
+                Please, note, the last element should be ZERO.
+            </li>
         </div>
     </a>
 </div>
