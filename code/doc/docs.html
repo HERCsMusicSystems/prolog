@@ -95,6 +95,7 @@
             <a href="#predicate_div">div</a>
             <a href="#predicate_e">e</a>
             <a href="#predicate_exp">exp</a>
+            <a href="#predicate_FFT">FFT</a>
             <a href="#predicate_greater">greater</a>
             <a href="#predicate_greater_eq">greater_eq</a>
             <a href="#predicate_grnd">grnd</a>
@@ -518,6 +519,23 @@
             The result is of the same type as argument (integer result is truncated).
             Fails if x <= 0.
             Can be used for tests.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_FFT">
+        <div class="doc_predicate_header">
+            [FFT [.....] *RE *IM]<br />
+            [FFT [.....] *spectrum]<br />
+            [FFT *wave [.....] [.....]]<br />
+            [FFT *wave [.....]]<br />
+        </div>
+        <div class="doc_predicate_body">
+            Works identical to <a href="#predicate_DFT">DFT</a> but in some special cases faster.
+            The special cases include situations when the wave is a series of numbers
+            and its length equals to the power of 2 (i.e. 2, 4, 8, 16, 32, and so on).
+            It uses the algorithm invented first by Carl Friedrich Gauss and last by Cooley and Tukey.
         </div>
     </a>
 </div>

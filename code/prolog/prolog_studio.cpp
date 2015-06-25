@@ -1837,28 +1837,82 @@ void CalculateDFT (double * f, double * rec, double * ims, int count) {
 	}
 }
 
+void CalculateFFTSub (double * f, double * rec, double * ims, int count) {
+	if (count == 2) {
+		rec [0] = (f [0] + f [1]) * 0.5;
+		rec [1] = (f [0] - f [1]) * 0.5;
+		ims [0] = 0.0;
+		ims [1] = 0.0;
+		return;
+	}
+	if (count == 4) {
+		rec [0] = (f [0] + f [1] + f [2] + f [3]) * 0.25;
+		rec [1] = (f [0] - f [2]) * 0.25;
+		rec [2] = (f [0] - f [1] + f [2] - f [3]) * 0.25;
+		rec [3] = rec [1];
+		ims [0] = 0;
+		ims [1] = (f [1] - f [3]) * 0.25;
+		ims [2] = 0;
+		ims [3] = - ims [1];
+		return;
+	}
+	int spectrum_length = count >> 1;
+	double * evens = new double [count + count + count];
+	double * odds = evens + spectrum_length;
+	double * evensrec = odds + spectrum_length;
+	double * evensims = evensrec + spectrum_length;
+	double * oddsrec = evensims + spectrum_length;
+	double * oddsims = oddsrec + spectrum_length;
+	int index = 0;
+	for (int ind = 0; ind < spectrum_length; ind++) {
+		evens [ind] = f [index++];
+		odds [ind] = f [index++];
+	}
+	CalculateFFTSub (evens, evensrec, evensims, spectrum_length);
+	CalculateFFTSub (odds, oddsrec, oddsims, spectrum_length);
+	double step = M_PI / (double) spectrum_length;
+	double omega = 0.0;
+	index = 0;
+	for (int sub = 0; sub < 2; sub++) {
+		for (int ind = 0; ind < spectrum_length; ind++) {
+			double cosine = cos (omega);
+			double sine = sin (omega);
+			double re = oddsrec [ind];
+			double im = oddsims [ind];
+			rec [index] = 0.5 * (evensrec [ind] + cosine * re - sine * im);
+			ims [index] = 0.5 * (evensims [ind] + cosine * im + sine * re);
+			omega += step;
+			index++;
+		}
+	}
+	delete [] evens;
+}
+
 void CalculateFFT (double * f, double * rec, double * ims, int count) {
 	// count = number of samples
-	if (count == 4) {
-		rec [0] = (f [0] + f [1] + f [2] + f [3]) * 0.5;
-		rec [1] = (f [0] - f [2]) * 0.5;
-		ims [0] = 0.0;
-		ims [1] = (f [1] - f [3]) * 0.5;
-		return;
+	if (count == 2) {CalculateFFTSub (f, rec, ims, 2); return;}
+	if (count == 4) {CalculateFFTSub (f, rec, ims, 4); return;}
+	if (count == 8) {CalculateFFTSub (f, rec, ims, 8); return;}
+	switch (count) {
+	case 2:
+	case 4:
+	case 8:
+	case 16:
+	case 32:
+	case 64:
+	case 128:
+	case 256:
+	case 512:
+	case 1024:
+	case 2048:
+	case 4096:
+	case 8192:
+	case 16384:
+	case 65536:
+		CalculateFFTSub (f, rec, ims, count);
+		break;
+	default: CalculateDFT (f, rec, ims, count); break;
 	}
-	if (count == 8) {
-		double evens [4], odds [4];
-		for (int ind = 0; ind < 4; ind++) {
-			evens [ind] = f [ind * 2];
-			odds [ind] = f [ind * 2 + 1];
-		}
-		double evensrec [4], evensims [4];
-		double oddsrec [4], oddsims [4];
-		CalculateFFT (evens, evensrec, evensims, 4);
-		CalculateFFT (odds, oddsrec, oddsims, 4);
-		return;
-	}
-	CalculateDFT (f, rec, ims, count);
 }
 
 void CalculateIDFT (double * f, double * rec, double * ims, int count) {
