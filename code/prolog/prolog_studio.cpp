@@ -1872,18 +1872,20 @@ void CalculateFFTSub (double * f, double * rec, double * ims, int count) {
 	CalculateFFTSub (odds, oddsrec, oddsims, spectrum_length);
 	double step = M_PI / (double) spectrum_length;
 	double omega = 0.0;
-	index = 0;
-	for (int sub = 0; sub < 2; sub++) {
-		for (int ind = 0; ind < spectrum_length; ind++) {
-			double cosine = cos (omega);
-			double sine = sin (omega);
-			double re = oddsrec [ind];
-			double im = oddsims [ind];
-			rec [index] = 0.5 * (evensrec [ind] + cosine * re - sine * im);
-			ims [index] = 0.5 * (evensims [ind] + cosine * im + sine * re);
-			omega += step;
-			index++;
-		}
+	index = spectrum_length;
+	for (int ind = 0; ind < spectrum_length; ind++) {
+		double cosine = cos (omega);
+		double sine = sin (omega);
+		double re = oddsrec [ind];
+		double im = oddsims [ind];
+		double oddre = cosine * re - sine * im;
+		double oddim = cosine * im + sine * re;
+		rec [ind] = 0.5 * (evensrec [ind] + oddre);
+		ims [ind] = 0.5 * (evensims [ind] + oddim);
+		rec [index] = 0.5 * (evensrec [ind] - oddre);
+		ims [index] = 0.5 * (evensims [ind] - oddim);
+		omega += step;
+		index++;
 	}
 	delete [] evens;
 }
