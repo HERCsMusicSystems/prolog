@@ -75,6 +75,27 @@ PrologServiceClass * load_plugin_service_class (char * directory, char * name) {
 	return create_service_class ();
 }
 
+typedef char * (* module_code_finder) (void);
+char * load_plugin_module (char * name) {
+	char command [256];
+	strcpy (command, name);
+	char * prc = strstr (command, ".prc");
+#ifdef LINUX_OPERATING_SYSTEM
+	if (prc != 0) strcpy (prc, ".so");
+#endif
+#ifdef WINDOWS_OPERATING_SYSTEM
+	if (prc != 0) strcpy (prc, ".dll");
+#endif
+	THREAD dll = DLL_OPEN (command);
+	if (dll == 0) return 0;
+	module_code_finder finder = (module_code_finder) GET_SYMBOL (dll, "get_module_code");
+	if (! finder) {
+		DLL_CLOSE (dll);
+		return 0;
+	}
+	return finder ();
+}
+
 ///////////////////////////////
 // PrologRoot (file editing) //
 ///////////////////////////////

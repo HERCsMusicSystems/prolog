@@ -97,6 +97,7 @@ bool PrologLoader :: load_without_main (char * file_name) {
 	return ret;
 }
 
+extern char * load_plugin_module (char * name);
 bool PrologLoader :: LOAD (char * file_name) {
 	bool ret;
 	AREA command;
@@ -111,7 +112,10 @@ bool PrologLoader :: LOAD (char * file_name) {
 			fi = fopen (command, "rb");
 			root_directory = root_directory -> next;
 		}
-		if (fi == NULL) {message_v ("File not found: ", file_name); return false;}
+		if (fi == NULL) {
+			ri = load_plugin_module (file_name);
+			if (ri == 0) {message_v ("File not found: ", file_name); return false;}
+		}
 	}
 	get_symbol ();
 	PrologDirectory * import;
