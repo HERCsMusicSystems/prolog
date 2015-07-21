@@ -33,6 +33,7 @@
 #include "prolog_http.h"
 
 #ifdef WINDOWS_OPERATING_SYSTEM
+#include "prolog_windows_console.h"
 #include "resource.h"
 class resource_loader_class : public PrologResourceLoader {
 public:
@@ -62,6 +63,7 @@ public:
 #endif
 
 #ifdef LINUX_OPERATING_SYSTEM
+#include "prolog_linux_console.h"
 extern char resource_studio;
 extern char resource_conductor;
 extern char resource_midi;
@@ -114,14 +116,6 @@ public:
 		return NULL;
 	}
 } service_class_loader;
-
-#ifdef WINDOWS_OPERATING_SYSTEM
-#include "prolog_windows_console.h"
-#endif
-
-#ifdef LINUX_OPERATING_SYSTEM
-#include "prolog_linux_console.h"
-#endif
 
 int main (int args, char * argv []) {
 	PrologRoot * root = new PrologRoot ();
