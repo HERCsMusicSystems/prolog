@@ -33,8 +33,10 @@
 #ifdef WINDOWS_OPERATING_SYSTEM
 #ifdef SDK_IMPORT
 #define API __declspec (dllimport)
-#else
+#elif SDK_EXPORT
 #define API __declspec (dllexport)
+#else
+#define API
 #endif
 #endif
 
