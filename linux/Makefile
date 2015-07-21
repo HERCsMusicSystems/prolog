@@ -349,10 +349,20 @@ control_prc.o: $(pc)control.prc
 		--redefine-sym _binary____code_prolog_control_prc_start=resource_control\
 		$(pc)control.prc control_prc.o
 
+prcgtk_prc.o: $(pc)prcgtk.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_prcgtk_prc_start=resource_prcgtk\
+		$(pc)prcgtk.prc prcgtk_prc.o
+
 ~/bin/studio: encoder.o $(objects) prc.o prolog_neural.o prolog_conductor.o midi_command_prompt.o $(prc_resources)
 	g++ -Wl,--export-dynamic encoder.o $(objects) $(prc_resources) prc.o \
 	-o ~/bin/studio -lreadline -lpthread -ldl
 
 studio: ~/bin/studio
 	cp ~/bin/studio studio
+
+/usr/lib/prcgtk.so: $(pc)prcgtk.cpp prcgtk_prc.o
+	g++ -Wno-write-strings -fPIC -shared prcgtk_prc.o $(pc)prcgtk.cpp -o /usr/lib/prcgtk.so `pkg-config --cflags gtk+-2.0 --libs gtk+-2.0`
+
+prcgtk: /usr/lib/prcgtk.so
 

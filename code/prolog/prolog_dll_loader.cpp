@@ -23,6 +23,7 @@
 #include "prolog.h"
 
 #ifdef LINUX_OPERATING_SYSTEM
+#include <string.h>
 #include <pthread.h>
 #include <dlfcn.h>
 #include <unistd.h>
@@ -102,7 +103,6 @@ char * load_plugin_module (char * name) {
 
 #ifdef LINUX_OPERATING_SYSTEM
 
-#include <string.h>
 #include <sys/stat.h>
 #include <dirent.h>
 #include <stdlib.h>
