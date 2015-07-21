@@ -20,7 +20,21 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-#include "operating_system.h"
+#ifdef WIN32
+#define WINDOWS_OPERATING_SYSTEM
+#else
+#define LINUX_OPERATING_SYSTEM
+#endif
+//#define MAC_OPERATING_SYSTEM
+
+#define MULTICORE_MULTIPROCESSING
+
+
+#ifdef SDK_IMPORT
+#define API __declspec (dllimport)
+#else
+#define API __declspec (dllexport)
+#endif
 
 #ifdef MULTICORE_MULTIPROCESSING
 

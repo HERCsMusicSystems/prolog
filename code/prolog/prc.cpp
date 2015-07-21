@@ -24,7 +24,6 @@
 
 #include <string.h>
 
-#ifdef INTERNAL_RESOURCES
 #include "prolog_neural.h"
 #include "prolog_conductor.h"
 #include "prolog_midi.h"
@@ -39,21 +38,6 @@ class resource_loader_class : public PrologResourceLoader {
 public:
 	char * load (char * name) {
 		HRSRC resource = NULL;
-		if (strcmp (name, "studio") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (STUDIO_PRC), RT_RCDATA);
-		if (strcmp (name, "conductor") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (CONDUCTOR_PRC), RT_RCDATA);
-		if (strcmp (name, "midi") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (MIDI_PRC), RT_RCDATA);
-		if (strcmp (name, "http") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (HTTP_PRC), RT_RCDATA);
-		if (strcmp (name, "store") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (STORE_PRC), RT_RCDATA);
-		if (strcmp (name, "f1") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (F1_PRC), RT_RCDATA);
-		if (strcmp (name, "help") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (HELP_PRC), RT_RCDATA);
-		if (strcmp (name, "record") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (RECORD_PRC), RT_RCDATA);
-		if (strcmp (name, "neural") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (NEURAL_PRC), RT_RCDATA);
-		if (strcmp (name, "keyboard") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (KEYBOARD_PRC), RT_RCDATA);
-		if (strcmp (name, "sql") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (SQL_PRC), RT_RCDATA);
-		if (strcmp (name, "test") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (TEST_PRC), RT_RCDATA);
-		if (strcmp (name, "xml") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (XML_PRC), RT_RCDATA);
-		if (strcmp (name, "distribution") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (DISTRIBUTION_PRC), RT_RCDATA);
-		if (strcmp (name, "control") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (CONTROL_PRC), RT_RCDATA);
 		if (strcmp (name, "studio.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (STUDIO_PRC), RT_RCDATA);
 		if (strcmp (name, "conductor.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (CONDUCTOR_PRC), RT_RCDATA);
 		if (strcmp (name, "midi.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (MIDI_PRC), RT_RCDATA);
@@ -131,8 +115,6 @@ public:
 	}
 } service_class_loader;
 
-#endif
-
 #ifdef WINDOWS_OPERATING_SYSTEM
 #include "prolog_windows_console.h"
 #endif
@@ -144,10 +126,8 @@ public:
 int main (int args, char * argv []) {
 	PrologRoot * root = new PrologRoot ();
 	root -> get_search_directories_from_environment ("STUDIO_HOME");
-	#ifdef INTERNAL_RESOURCES
 	root -> setResourceLoader (& resource_loader);
 	root -> setServiceClassLoader (& service_class_loader);
-	#endif
 	root -> set_uap32_captions ();
 	PROLOG_STRING name;
 	strcpy (name, "");

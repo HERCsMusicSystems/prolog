@@ -25,7 +25,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#include "operating_system.h"
 #ifdef LINUX_OPERATING_SYSTEM
 #include <stdlib.h>
 #endif
