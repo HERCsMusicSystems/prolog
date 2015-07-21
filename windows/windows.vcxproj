@@ -135,14 +135,12 @@
     <ClInclude Include="..\code\prolog\prolog_conductor.h" />
     <ClInclude Include="..\code\prolog\prolog_control.h" />
     <ClInclude Include="..\code\prolog\prolog_distribution.h" />
-    <ClInclude Include="..\code\prolog\prolog_irrklang.h" />
     <ClInclude Include="..\code\prolog\prolog_midi.h" />
     <ClInclude Include="..\code\prolog\prolog_neural.h" />
     <ClInclude Include="..\code\prolog\prolog_xml.h" />
     <ClInclude Include="..\code\tinyxml2\tinyxml2.h" />
     <ClInclude Include="operating_system.h" />
     <ClInclude Include="..\code\prolog\prolog.h" />
-    <ClInclude Include="..\code\prolog\prolog_export_definitions.h" />
     <ClInclude Include="..\code\prolog\prolog_midi_command.h" />
     <ClInclude Include="..\code\prolog\prolog_studio.h" />
     <ClInclude Include="..\code\prolog\prolog_windows_console.h" />
