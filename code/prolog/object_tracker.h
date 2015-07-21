@@ -30,10 +30,16 @@
 #define MULTICORE_MULTIPROCESSING
 
 
+#ifdef WINDOWS_OPERATING_SYSTEM
 #ifdef SDK_IMPORT
 #define API __declspec (dllimport)
 #else
 #define API __declspec (dllexport)
+#endif
+#endif
+
+#ifdef LINUX_OPERATING_SYSTEM
+#define API
 #endif
 
 #ifdef MULTICORE_MULTIPROCESSING

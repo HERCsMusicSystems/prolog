@@ -26,47 +26,47 @@
 #include <stdio.h>
 #include "object_tracker.h"
 
-class PrologString;
-class PrologAtom;
-class PrologElement;
-class PrologNativeCode;
-class PrologQuery;
-class PrologVariable;
-class PrologMatch;
-class PrologServiceClass;
-class PrologDirectory;
-class PrologRoot;
-class PrologResolution;
-class PrologReader;
-class PrologLoader;
-class PrologResourceLoader;
-class PrologServiceClassLoader;
-class PrologCommand;
-class object_tracker;
+class API PrologString;
+class API PrologAtom;
+class API PrologElement;
+class API PrologNativeCode;
+class API PrologQuery;
+class API PrologVariable;
+class API PrologMatch;
+class API PrologServiceClass;
+class API PrologDirectory;
+class API PrologRoot;
+class API PrologResolution;
+class API PrologReader;
+class API PrologLoader;
+class API PrologResourceLoader;
+class API PrologServiceClassLoader;
+class API PrologCommand;
+class API object_tracker;
 
 #define PROLOG_STRING_SIZE 96
 #define PROLOG_STRING_SIZE_1 95
 #define PROLOG_PRINTABLE_FLOAT "%.80g"
 typedef char PROLOG_STRING [PROLOG_STRING_SIZE];
-extern void prolog_string_copy (char * to, char * from);
-extern void prolog_string_cat (char * to, char * from);
+extern API void prolog_string_copy (char * to, char * from);
+extern API void prolog_string_cat (char * to, char * from);
 
 #define AREA_SIZE 2048
 #define AREA_SIZE_1 2047
 typedef char AREA [AREA_SIZE];
-extern int area_cat (char * area, char * from);
-extern int area_cat (char * area, int ind, char * from);
-extern int area_cat (char * area, int ind, char c);
-extern int area_cat_number (char * area, int ind, int sub);
-extern int area_cat_number (char * area, int ind, double db);
-extern void relativise (char * path, char * pwd, char * relative);
-extern int indexOf (char * text, char c);
-extern void drop_stack (PrologQuery * from, PrologQuery * to);
+extern API int area_cat (char * area, char * from);
+extern API int area_cat (char * area, int ind, char * from);
+extern API int area_cat (char * area, int ind, char c);
+extern API int area_cat_number (char * area, int ind, int sub);
+extern API int area_cat_number (char * area, int ind, double db);
+extern API void relativise (char * path, char * pwd, char * relative);
+extern API int indexOf (char * text, char c);
+extern API void drop_stack (PrologQuery * from, PrologQuery * to);
 
 
-extern char * create_text (char * text);
-extern char * create_text (int size);
-extern void delete_text (char * text);
+extern API char * create_text (char * text);
+extern API char * create_text (int size);
+extern API void delete_text (char * text);
 
 class PrologString {
 public:
@@ -79,12 +79,12 @@ public:
 class PrologResourceLoader {public: virtual char * load (char * name);};
 class PrologServiceClassLoader {public: virtual PrologServiceClass * load (char * name);};
 
-void drop_object_counter (void);
-void drop_object_counter (char * head);
-void drop_object_counter (int selector);
-void drop_object_counters (char * area);
-bool object_left (void);
-void drop_element (PrologRoot * root, PrologElement * el);
+void API drop_object_counter (void);
+void API drop_object_counter (char * head);
+void API drop_object_counter (int selector);
+void API drop_object_counters (char * area);
+bool API object_left (void);
+void API drop_element (PrologRoot * root, PrologElement * el);
 
 class PrologAtom TRACK {
 public:
@@ -432,7 +432,7 @@ public:
 	void removeMainQuery (void);
 };
 
-class var_voc TRACK {
+class API var_voc TRACK {
 public:
 	char * name;
 	var_voc * next;
