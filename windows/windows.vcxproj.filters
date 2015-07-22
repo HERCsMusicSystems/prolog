@@ -1,0 +1,248 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\code\prolog\encoder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\joystick_windows.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\midi_stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\object_tracker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_atom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_command.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_conductor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_control.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_directory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_distribution.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_dll_loader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_element.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_http.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_loader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_match.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_midi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_native_code.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_neural.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_query.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_reader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_resolution.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_root.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_service_class.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_studio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_transport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_variable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_windows_console.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_xml.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\code\tinyxml2\tinyxml2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\code\prolog\encoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\prolog\joystick_windows.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\prolog\midi_command_prompt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\prolog\midi_stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\prolog\object_tracker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="operating_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\prolog\prolog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\prolog\prolog_conductor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\prolog\prolog_control.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\prolog\prolog_distribution.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\prolog\prolog_midi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\prolog\prolog_midi_command.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\prolog\prolog_neural.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\prolog\prolog_studio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\prolog\prolog_windows_console.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\prolog\prolog_xml.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\prolog\windows_midi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\tinyxml2\tinyxml2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\code\prolog\conductor.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\control.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\doc\docs.html">
+      <Filter>Documents</Filter>
+    </None>
+    <None Include="..\code\prolog\f1.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\help.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\http.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\irrklang.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\keyboard.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\lisp.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\main_course.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\midi.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\mysql.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\neural.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\randezvous.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\record.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\scala_reader.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\sql.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\store.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\studio.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\database.sql">
+      <Filter>Documents</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{b727adcb-de19-45b7-9675-5eefe2326398}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{53304da7-d618-4c0a-b5b4-78ab8c071a67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{ff4b0f53-d6e0-4c47-a765-ed4d47ce1016}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Prolog Files">
+      <UniqueIdentifier>{828b1753-8823-400c-bf3a-96fb300bbe4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Documents">
+      <UniqueIdentifier>{6ab84d58-6c5d-4f39-98ce-8e813fd670a3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\code\doc\hercs_prolog_syntax.txt">
+      <Filter>Documents</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Icon1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="studio.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

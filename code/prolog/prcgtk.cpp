@@ -1,16 +1,30 @@
-extern char resource_prcgtk;
 
 #include <string.h>
 #include <gtk/gtk.h>
 #include "prolog.h"
 
+#ifdef WINDOWS_OPERATING_SYSTEM
+extern "C" {
+	__declspec (dllexport) char * get_module_code (void) {
+		HMODULE hm = GetModuleHandle ("prcgtk.dll");
+		HRSRC resource = FindResource (hm, MAKEINTRESOURCE (104), RT_RCDATA);
+		if (resource == 0) return 0;
+		HGLOBAL loader = LoadResource (hm, resource);
+		if (loader == 0) return 0;
+		return (char *) LockResource (loader);
+	}
+	__declspec (dllexport) PrologServiceClass * create_service_class (void);
+}
+#endif
+
+#ifdef LINUX_OPERATING_SYSTEM
 extern "C" {
 	extern char * get_module_code (void);
 	extern PrologServiceClass * create_service_class (void);
 }
-
-
+extern char resource_prcgtk;
 char * get_module_code (void) {return & resource_prcgtk;}
+#endif
 
 class gtk_init_class : public PrologNativeCode {public: bool code (PrologElement * parameters, PrologResolution * resolution) {gtk_init (0, 0); return true;}};
 class gtk_main_class : public PrologNativeCode {public: bool code (PrologElement * parameters, PrologResolution * resolution) {gtk_main (); return true;}};
@@ -27,4 +41,3 @@ public:
 };
 
 PrologServiceClass * create_service_class (void) {return new prc_gtk_service ();}
-
