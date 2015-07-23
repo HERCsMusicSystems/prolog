@@ -112,7 +112,7 @@
 
 #ifndef NO_TRACKING
 
-class object_tracker {
+class API object_tracker {
 private:
 	int type;
 public:

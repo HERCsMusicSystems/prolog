@@ -42,7 +42,6 @@ class API PrologLoader;
 class API PrologResourceLoader;
 class API PrologServiceClassLoader;
 class API PrologCommand;
-class API object_tracker;
 
 #define PROLOG_STRING_SIZE 96
 #define PROLOG_STRING_SIZE_1 95

@@ -55,7 +55,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>.;../../pthread;../../irrKlang-1.5.0/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>PTW32_STATIC_LIB;SDK_EXPORT;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>PTW32_BUILD;SDK_EXPORT;WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -66,7 +66,7 @@
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>pthread.lib;winmm.lib;dinput8.lib;dxguid.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;dinput8.lib;dxguid.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -95,6 +95,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\pthread\pthread.c" />
     <ClCompile Include="..\code\prolog\encoder.cpp" />
     <ClCompile Include="..\code\prolog\joystick_windows.cpp" />
     <ClCompile Include="..\code\prolog\midi_stream.cpp" />

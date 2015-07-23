@@ -34,7 +34,7 @@
 
 #ifdef WINDOWS_OPERATING_SYSTEM
 #include "prolog_windows_console.h"
-#include "resource.h"
+#include "studio_resource.h"
 class resource_loader_class : public PrologResourceLoader {
 public:
 	char * load (char * name) {

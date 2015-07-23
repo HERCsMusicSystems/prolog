@@ -58,8 +58,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\gtk+-bundle_2.24.10-20120208_win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>atk-1.0.lib;cairo.lib;expat.lib;fontconfig.lib;freetype.lib;gailutil.lib;gdk_pixbuf-2.0.lib;gdk-win32-2.0.lib;gio-2.0.lib;glib-2.0.lib;gmodule-2.0.lib;gobject-2.0.lib;gtk-win32-2.0.lib;intl.lib;libpng.lib;pango-1.0.lib;pangocairo-1.0.lib;pangoft2-1.0.lib;pangowin32-1.0.lib;zdll.lib;..\..\Debug\studio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\gtk+-bundle_2.24.10-20120208_win32\lib;..\..\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>atk-1.0.lib;cairo.lib;expat.lib;fontconfig.lib;freetype.lib;gailutil.lib;gdk_pixbuf-2.0.lib;gdk-win32-2.0.lib;gio-2.0.lib;glib-2.0.lib;gmodule-2.0.lib;gobject-2.0.lib;gtk-win32-2.0.lib;intl.lib;libpng.lib;pango-1.0.lib;pangocairo-1.0.lib;pangoft2-1.0.lib;pangowin32-1.0.lib;zdll.lib;studio.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
