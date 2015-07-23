@@ -148,7 +148,6 @@ int main (int args, char * argv []) {
 	delete console;
 //	if (object_left ())
 		drop_object_counter ();
-
 	return 0;
 }
 
