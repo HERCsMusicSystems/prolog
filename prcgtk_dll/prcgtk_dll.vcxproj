@@ -52,7 +52,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;PRCGTK_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SDK_IMPORT;WIN32;_DEBUG;_WINDOWS;_USRDLL;PRCGTK_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\pthread;..\..\gtk+-bundle_2.24.10-20120208_win32\include\gtk-2.0;..\..\gtk+-bundle_2.24.10-20120208_win32\lib\gtk-2.0\include;..\..\gtk+-bundle_2.24.10-20120208_win32\include\glib-2.0;..\..\gtk+-bundle_2.24.10-20120208_win32\lib\glib-2.0\include;..\..\gtk+-bundle_2.24.10-20120208_win32\include\cairo;..\..\gtk+-bundle_2.24.10-20120208_win32\include\pango-1.0;..\..\gtk+-bundle_2.24.10-20120208_win32\include\gdk-pixbuf-2.0;..\..\gtk+-bundle_2.24.10-20120208_win32\include\atk-1.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -70,7 +70,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;PRCGTK_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SDK_IMPORT;WIN32;NDEBUG;_WINDOWS;_USRDLL;PRCGTK_DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\pthread;..\..\gtk+-bundle_2.24.10-20120208_win32\include\gtk-2.0;..\..\gtk+-bundle_2.24.10-20120208_win32\lib\gtk-2.0\include;..\..\gtk+-bundle_2.24.10-20120208_win32\include\glib-2.0;..\..\gtk+-bundle_2.24.10-20120208_win32\lib\glib-2.0\include;..\..\gtk+-bundle_2.24.10-20120208_win32\include\cairo;..\..\gtk+-bundle_2.24.10-20120208_win32\include\pango-1.0;..\..\gtk+-bundle_2.24.10-20120208_win32\include\gdk-pixbuf-2.0;..\..\gtk+-bundle_2.24.10-20120208_win32\include\atk-1.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
