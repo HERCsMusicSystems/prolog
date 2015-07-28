@@ -67,9 +67,15 @@ PrologServiceClass * load_plugin_service_class (char * directory, char * name) {
 	sprintf (command, "%s%s.dll", directory, name);
 #endif
 	THREAD dll = DLL_OPEN (command);
-	if (dll == NULL) return NULL;
+	if (dll == 0) {
+		#ifdef LINUX_OPERATING_SYSTEM
+		printf ("Failed to open [%s] service library {%s}\n", command, dlerror ());
+		#endif
+		return 0;
+	}
 	service_class_creator create_service_class = (service_class_creator) GET_SYMBOL (dll, "create_service_class");
 	if (! create_service_class) {
+		printf ("create_service_class not found in [%s].\n", command);
 		DLL_CLOSE (dll);
 		return NULL;
 	}
@@ -88,9 +94,15 @@ char * load_plugin_module (char * name) {
 	if (prc != 0) strcpy (prc, ".dll");
 #endif
 	THREAD dll = DLL_OPEN (command);
-	if (dll == 0) return 0;
+	if (dll == 0) {
+		#ifdef LINUX_OPERATING_SYSTEM
+		printf ("Failed to open [%s] code library {%s}\n", command, dlerror ());
+		#endif
+		return 0;
+	}
 	module_code_finder finder = (module_code_finder) GET_SYMBOL (dll, "get_module_code");
 	if (! finder) {
+		printf ("get_module_code not found in [%s].\n", command);
 		DLL_CLOSE (dll);
 		return 0;
 	}
