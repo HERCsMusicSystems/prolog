@@ -107,8 +107,7 @@ public:
 		command++;
 		int ap = 0; area [0] = '\0';
 		char * cp = area;
-		//while (* command != '/' && * command > 32) ap = area_cat (area, ap, * command++);
-		while (* command != '/' && * command > 32) copy_char (& cp, & command);
+		while (* command != '/' && * command != '?' && * command > 32) copy_char (& cp, & command);
 		* cp = '\0';
 		return interpret ();
 	}
@@ -181,6 +180,16 @@ public:
 		while (* command > 32 && * command != '&') copy_char (& cp, & command);
 		* cp = '\0';
 		if (* command == '&') command++;
+		return true;
+	}
+	bool get_get_param (void) {
+		if (* command != '?' && * command != '&') return false;
+		command++;
+		char * cp = key;
+		while (* command > 32 && * command != '=') copy_char (& cp, & command); * cp = '\0';
+		if (* command == '=') command++;
+		cp = area;
+		while (* command > 32 && * command != '&') copy_char (& cp, & command); * cp = '\0';
 		return true;
 	}
 	PrologAtom * get_method (void) {
@@ -264,6 +273,11 @@ while ((partial = analyser . get_partial_request ()) != 0) {
 	cp = cp -> getRight ();
 }
 clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> route_atom), content)), root -> earth ());
+// GET PARAMS
+while (analyser . get_get_param ()) {
+	content = root -> pair (root -> text (analyser . key), root -> pair (root -> text (analyser . area), root -> earth ()));
+	clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> param_atom), content)), root -> earth ());
+}
 // PROTOCOL
 analyser . get_protocol ();
 clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> protocol_atom), root -> pair (root -> text (analyser . area), root -> earth ()))), root -> earth ());
