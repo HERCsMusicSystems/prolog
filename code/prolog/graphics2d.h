@@ -87,6 +87,7 @@ public:
 	bool operator == (const colour & c) const;
 	bool operator != (const colour & c) const;
 	colour (int red, int green, int blue, int alpha = 255);
+	colour (double red, double green, double blue, double alpha = 1.0);
 	colour (void);
 };
 

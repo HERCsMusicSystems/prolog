@@ -70,6 +70,7 @@ void rect :: maximise (void) {size . maximise ();}
 double int_to_colour (int c) {return c >= 255 ? 1.0 : (double) c / 256.0;}
 int colour_to_int (double c) {return c >= 1.0 ? 255 : (int) (256.0 * c);}
 colour :: colour (int red, int green, int blue, int alpha) {this -> red = int_to_colour (red); this -> green = int_to_colour (green); this -> blue = int_to_colour (blue); this -> alpha = int_to_colour (alpha);}
+colour :: colour (double red, double green, double blue, double alpha) {this -> red = red; this -> green = green; this -> blue = blue; this -> alpha = alpha;}
 colour :: colour (void) {red = green = blue = 0.0; alpha = 1.0;}
 
 bool colour :: operator == (const colour & c) const {return red == c . red && green == c . green && blue == c . blue && alpha == c . alpha;}
