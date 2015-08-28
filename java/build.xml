@@ -1,0 +1,31 @@
+<project default="run">
+
+	<target name="clean">
+		<delete file="studio.class"/>
+		<delete file="studio.jar"/>
+	</target>
+
+	<target name="compile">
+		<javac srcdir="../code/prolog" destdir="." includeantruntime="false"/>
+	</target>
+
+	<target name="jar" depends="compile">
+		<jar destfile="studio.jar">
+			<fileset dir="." excludes="studio.jar build.xml"/>
+			<fileset dir="../code/prolog" includes="studio.prc"/>
+			<manifest><attribute name="Main-Class" value="studio"/></manifest>
+		</jar>
+	</target>
+
+	<target name="run" depends="jar">
+		<java jar="studio.jar" fork="true">
+			<arg value="studio"/>
+			<arg value="a"/>
+			<arg value="b"/>
+			<arg value="c"/>
+		</java>
+		<java classname="studio" classpath="studio.jar"/>
+	</target>
+
+</project>
+
