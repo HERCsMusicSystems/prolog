@@ -23,7 +23,7 @@
 package Prolog;
 
 public class PrologAtom {
-	public String atomName;
+	public String atomName = null;
 	public PrologAtom next = null;
 	public boolean Privated = false;
 	public boolean Protected = false;
