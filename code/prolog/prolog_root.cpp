@@ -841,7 +841,7 @@ void PrologRoot :: print_character (int i) {
 		return;
 	}
 	if (i <= 0x3ffffff) {
-		int xmsb = 0xf8 | (i >> 26);
+		int xmsb = 0xf8 | (i >> 24);
 		int xlsb = 0x80 | ((i >> 18) & 0x3f);
 		int hsb = 0x80 | ((i >> 12) & 0x3f);
 		int msb = 0x80 | ((i >> 6) & 0x3f);
@@ -851,7 +851,7 @@ void PrologRoot :: print_character (int i) {
 		return;
 	}
 	if (i <= 0x7fffffff) {
-		int xhsb = 0xfc | (i >> 31);
+		int xhsb = 0xfc | (i >> 30);
 		int xmsb = 0x80 | ((i >> 24) & 0x3f);
 		int xlsb = 0x80 | ((i >> 18) & 0x3f);
 		int hsb = 0x80 | ((i >> 12) & 0x3f);
