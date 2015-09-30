@@ -1,8 +1,10 @@
 <project default="run">
 
 	<target name="clean">
-		<delete file="studio.class"/>
-		<delete file="studio.jar"/>
+		<delete>
+			<fileset dir="." includes="studio*"/>
+		</delete>
+		<delete dir="Prolog"/>
 	</target>
 
 	<target name="compile">

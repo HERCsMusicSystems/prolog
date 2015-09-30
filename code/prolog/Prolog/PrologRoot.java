@@ -419,8 +419,130 @@ public class PrologRoot {
 	public PrologElement fail () {PrologElement ret = new PrologElement (); ret . setFail (); return ret;}
 	public PrologElement text (String text) {PrologElement ret = new PrologElement (); ret . setText (text); return ret;}
 	public PrologElement head (Object obj) {PrologElement ret = new PrologElement (); ret . setHead (obj); return ret;}
-///
+	public PrologElement integer (int i) {PrologElement ret = new PrologElement (); ret . setInteger (i); return ret;}
+	public PrologElement Double (double d) {PrologElement ret = new PrologElement (); ret . setDouble (d); return ret;}
+	public boolean Private (String name) {
+		if (root == null) return false;
+		PrologAtom atom = root . searchPrivateAtom (name);
+		if (atom == null) return false;
+		atom . Private ();
+		return true;
+	}
+	public boolean Protect (String name) {
+		if (root == null) return false;
+		PrologAtom atom = root . searchPrivateAtom (name);
+		if (atom == null) return false;
+		atom . Protect ();
+		return true;
+	}
+	public PrologElement getNextClausePointer (PrologElement clause) {
+		PrologElement ret = clause . getLeft (); if (ret == null) return null;
+		ret = ret . getLeft (); if (ret == null) return null;
+		ret = (PrologElement) ret . getHead ();
+		return ret;
+	}
+	public String listAtom (String name) {
+		PrologAtom atom = search (name);
+		if (atom == null) return name + " not found." + new_line_caption;
+		PrologElement el = atom . firstClause;
+		String ret = "";
+		while (el != null) {
+			ret += left_caption + left_caption + name + getRightCaption (el . getLeft () . getRight ()) + right_caption + getRightCaption (el . getRight ()) + right_caption + new_line_caption;
+			el = getNextClausePointer (el);
+		}
+		return ret;
+	}
+	public int attachClause (PrologElement clause) {
+		if (! clause . isPair ()) return 1;
+		PrologElement head = clause . getLeft (); if (! head . isPair ()) return 2;
+		head = head . getLeft (); if (! head . isAtom ()) return 3;
+		PrologAtom atom = head . getAtom ();
+		if (atom . Protected) return 4;
+		head . setHead (null);
+		if (atom . firstClause == null) {atom . firstClause = clause; return 0;}
+		head = atom . firstClause; if (! head . isPair ()) return 5;
+		head = head . getLeft (); if (! head . isPair ()) return 6;
+		head = head . getLeft (); if (! head . isHead ()) return 7;
+		while (head . getHead () != null) {
+			head = (PrologElement) head . getHead (); if (! head . isPair ()) return 8;
+			head = head . getLeft (); if (! head . isPair ()) return 9;
+			head = head . getLeft (); if (! head . isHead ()) return 10;
+		}
+		head . setHead (clause);
+		return 0;
+	}
+	public int attachClause (PrologElement clause, int position) {
+		if (! clause . isPair ()) return 1;
+		PrologElement sub = clause . getLeft (); if (! sub . isPair ()) return 2;
+		sub = sub . getLeft (); if (! sub . isAtom ()) return 3;
+		PrologAtom atom = sub . getAtom (); if (atom . Protected) return 4;
+		if (atom . firstClause == null || position <= 0) {sub . setHead (atom . firstClause); atom . firstClause = clause; return 0;}
+		position--;
+		PrologElement head = atom . firstClause; if (! head . isPair ()) return 5;
+		head = head . getLeft (); if (! head . isPair ()) return 6;
+		head = head . getLeft (); if (! head . isHead ()) return 7;
+		while (head . getHead () != null && position > 0) {
+			position--;
+			head = (PrologElement) head . getHead (); if (! head . isPair ()) return 8;
+			head = head . getLeft (); if (! head . isPair ()) return 9;
+			head = head . getLeft (); if (! head . isHead ()) return 10;
+		}
+		sub . setHead (head . getHead ());
+		head . setHead (clause);
+		return 0;
+	}
+	public PrologServiceClass loadServiceClass (String name) {
+		try {
+			Class <?> c = Class . forName (name);
+			return (PrologServiceClass) c . newInstance ();
+		} catch (Exception ex) {return null;}
+	}
 	public void message (String text) {if (command != null) command . println (text);}
+	public void print (String text) {if (command != null) command . print (text);}
+	public void print_character (int i) {
+		if (command == null) return;
+		if (i >= 0) {
+			if (i <= 0xff) command . print ((char) i);
+			else if (i <= 0xffff) {command . print ((char) (i >> 8)); command . print ((char) (i & 0xff));}
+			else if (i <= 0xffffff) {command . print ((char) (i >> 16)); command . print ((char) (i >> 8)); command . print ((char) (i & 0xff));}
+			else {command . print ((char) (i >> 24)); command . print ((char) (i >> 16)); command . print ((char) (i >> 8)); command . print ((char) (i & 0xff));}
+			return;
+		}
+		i = -1;
+		if (i <= 0x7f) command . print ((char) i);
+		else if (i <= 0x7ff) {
+			int msb = 0xc0 | (i >> 6);
+			int lsb = 0x80 | (i & 0x3f);
+			command . print ((char) msb); command . print ((char) lsb);
+		} else if (i <= 0xffff) {
+			int hsb = 0xe0 | (i >> 12);
+			int msb = 0x80 | ((i >> 6) & 0x3f);
+			int lsb = 0x80 | (i & 0x3f);
+			command . print ((char) hsb); command . print ((char) msb); command . print ((char) lsb);
+		} else if (i <= 0x1fffff) {
+			int xlsb = 0xf0 | (i >> 18);
+			int hsb = 0x80 | ((i >> 12) & 0x3f);
+			int msb = 0x80 | ((i >> 6) & 0x3f);
+			int lsb = 0x80 | (i & 0x3f);
+			command . print ((char) xlsb); command . print ((char) hsb); command . print ((char) msb); command . print ((char) lsb);
+		} else if (i <= 0x3ffffff) {
+			int xmsb = 0xf8 | (i >> 24);
+			int xlsb = 0x80 | ((i >> 18) & 0x3f);
+			int hsb = 0x80 | ((i >> 12) & 0x3f);
+			int msb = 0x80 | ((i >> 6) & 0x3f);
+			int lsb = 0x80 | (i & 0x3f);
+			command . print ((char) xmsb); command . print ((char) xlsb); command . print ((char) hsb); command . print ((char) msb); command . print ((char) lsb);
+		} else if (i <= 0x7fffffff) {
+			int xhsb = 0xfc | (i >> 30);
+			int xmsb = 0xf8 | ((i >> 24) & 0x3f);
+			int xlsb = 0x80 | ((i >> 18) & 0x3f);
+			int hsb = 0x80 | ((i >> 12) & 0x3f);
+			int msb = 0x80 | ((i >> 6) & 0x3f);
+			int lsb = 0x80 | (i & 0x3f);
+			command . print ((char) xhsb); command . print ((char) xmsb); command . print ((char) xlsb); command . print ((char) hsb); command . print ((char) msb); command . print ((char) lsb);
+		}
+	}
+///
 	public void resolution () {System . out . println ("Default resolution: studio");}
 	public void resolution (String name) {System . out . println ("Named resolution: " + name);}
 }
