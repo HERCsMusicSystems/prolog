@@ -24,11 +24,13 @@
 package Prolog;
 
 import java . io . PrintStream;
+import java . io . InputStream;
 import java . util . ArrayList;
 
 public class PrologRoot {
 	public PrologServiceClassLoader service_loader = null;
 	public PrintStream command = System . out;
+	public InputStream reader = System . in;
 	public ArrayList <String> search_directories = new ArrayList <String> ();
 	public ArrayList <String> args = new ArrayList <String> ();
 	public boolean auto_atoms = false;
@@ -73,6 +75,7 @@ public class PrologRoot {
 	public PrologAtom preprocessor = null;
 	public int current_foreground = 0xffff00;
 	public int current_background = 0;
+	public PrologElement main_query;
 	public PrologDirectory root = new PrologDirectory ("user!", null);
 	public void set_uap32_captions () {
 		caption_id = 0;
@@ -342,7 +345,9 @@ public class PrologRoot {
 
 	public void setServiceClassLoader (PrologServiceClassLoader loader) {service_loader = loader;}
 	public void insertCommander (PrintStream command) {this . command = command;}
+	public void insertReader (InputStream reader) {this . reader = reader;}
 	public PrintStream getCommander () {return command;}
+	public InputStream getReader () {return reader;}
 	public void setBackground (int background) {current_background = background;}
 	public void setForeground (int foreground) {current_foreground = foreground;}
 	public PrologServiceClass getServiceClass () {if (root == null) return null; return root . getServiceClass ();}
@@ -542,8 +547,45 @@ public class PrologRoot {
 			command . print ((char) xhsb); command . print ((char) xmsb); command . print ((char) xlsb); command . print ((char) hsb); command . print ((char) msb); command . print ((char) lsb);
 		}
 	}
-///
-	public void resolution () {System . out . println ("Default resolution: studio");}
-	public void resolution (String name) {System . out . println ("Named resolution: " + name);}
+	public int get_character () {try {if (reader != null) return reader . read (); return System . in . read ();} catch (Exception ex) {return 0;}}
+	public boolean resolutionHead (String directory) {
+		PrologLoader loader = new PrologLoader (this);
+		if (directory . contains (".prb")) {
+			if (! loader . load ("studio.prc")) return false;
+			auto_atoms = true;
+			main_query = pair (head (null), pair (pair (atom ("batch"), pair (text (directory), earth ())), earth ()));
+			return true;
+		}
+		return loader . load (directory);
+	}
+	public boolean resolutionHead () {
+		PrologLoader loader = new PrologLoader (this);
+		if (! loader . load ("studio.prc")) return false;
+		main_query = pair (head (null), pair (pair (atom ("command"), earth ()), earth ()));
+		return true;
+	}
+	public int resolution (PrologElement query) {
+		// returns: 0 = fail, 1 = success, 2 = no space left, 3 = wrong query
+		// query is a clause, which is a list anyway
+		// the head of the query is a return interface and can be any term
+		// the rest of the query are calls
+		// after successfull processing only the interface
+		// is left from the original query matched with the result
+		// after failure the query remains unchanged
+		// query egzample: [[*x *y *z] [c1 *x] [c2 *y] [c3 *z]]
+		PrologResolution resolution = new PrologResolution (this);
+		return resolution . resolution (query);
+	}
+	public int resolution (String directory) {
+		if (! resolutionHead (directory)) return 4;
+		int ctrl = resolution (main_query);
+		main_query = null;
+		return ctrl;
+	}
+	public int resolution () {
+		if (! resolutionHead ()) return 4;
+		int ctrl = resolution (main_query);
+		main_query = null;
+		return ctrl;
+	}
 }
-

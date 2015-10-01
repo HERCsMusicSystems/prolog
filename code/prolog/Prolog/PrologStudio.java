@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////
-//                       Copyright (C) 2004 Robert P. Wolf                       //
+//                       Copyright (C) 2015 Robert P. Wolf                       //
 //                                                                               //
 // Permission is hereby granted, free of charge, to any person obtaining a copy  //
 // of this software and associated documentation files (the "Software"), to deal //
@@ -20,23 +20,10 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-#include "prolog_studio.h"
-#include <string.h>
+package Prolog;
 
-PrologRoot :: PrologRoot (void) TRACKING (5) {
-	resource_loader = NULL;
-	service_loader = NULL;
-	main_query = NULL;
-	set_standard_captions ();
-	auto_atoms = false;
-	preprocessor = NULL;
-	command = NULL;
-	search_directories = NULL;
-	args = NULL;
+class PrologStudio extends PrologServiceClass {
+	public PrologStudio () {
+		System . out . println ("Studio created.");
+	}
 }
-
-void PrologRoot :: removeMainQuery (void) {
-	if (main_query != NULL) delete main_query;
-	main_query = NULL;
-}
-
