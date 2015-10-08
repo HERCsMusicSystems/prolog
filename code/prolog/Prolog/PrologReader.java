@@ -378,7 +378,7 @@ public class PrologReader {
 		case 11: left = atomC (symbol); if (left == null) {root . message ("Unknown atom: " + symbol); break;}
 		case 22:
 			get_symbol ();
-			if (symbol_control != 11) {root . message ("Syntax error (directory_expected)."); return null;}
+			if (symbol_control != 11) {root . message ("Syntax error (directory expected)."); return null;}
 			String dir_name = "" + symbol;
 			get_symbol ();
 			if (symbol_control != 21) {root . message ("Syntax error (atom after dot expected)."); return null;}

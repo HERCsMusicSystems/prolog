@@ -41,7 +41,7 @@ public class PrologAtom {
 	}
 	public PrologAtom search (String name) {
 		PrologAtom ret = this;
-		while (ret . Privated || ! ret . equals (name)) {
+		while (ret . Privated || ! ret . atomName . equals (name)) {
 			ret = ret . next;
 			if (ret == null) return null;
 		}

@@ -497,6 +497,7 @@ public class PrologRoot {
 		return 0;
 	}
 	public PrologServiceClass loadServiceClass (String name) {
+		if (name . equals ("prolog.studio")) return new PrologStudio ();
 		try {
 			Class <?> c = Class . forName (name);
 			return (PrologServiceClass) c . newInstance ();

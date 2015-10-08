@@ -26,4 +26,7 @@ class PrologStudio extends PrologServiceClass {
 	public PrologStudio () {
 		System . out . println ("Studio created.");
 	}
+	public PrologNativeCode getNativeCode (String name) {
+		return new PrologNativeCode ();
+	}
 }
