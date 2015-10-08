@@ -274,9 +274,7 @@ public class PrologLoader extends PrologReader {
 					new PrologResolution (root) . resolution (clause);
 					break;
 				}
-				System . out . println ("I AM HERE!");
 				clause = readClause ();
-				if (clause != null) root . message (root . getValue (clause));
 				get_symbol (); if (clause == null) return rdc ("Suspicious drop 3.");
 				if (root . attachClause (clause) == 0) break;
 				return rdc ("Suspicious drop 4.");

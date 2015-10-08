@@ -42,7 +42,7 @@ public class PrologReader {
 		if (ind >= 0) return ind;
 		ind = var_root . size ();
 		var_root . add (name . length () < 1 ? root . new_line_caption : name);
-		return 0;
+		return ind;
 	}
 	public void reset_var_number () {var_root = null;}
 	public int lastRead () {return act_znak;}
@@ -375,7 +375,7 @@ public class PrologReader {
 		}
 		if (root . separator_caption . length () > 0) {if (symbol_control == 23) get_symbol (); else {root . message ("Syntax error (separator expected)."); return null;}}
 		switch (symbol_control) {
-		case 11: left = atomC (symbol); if (left == null) {root . message ("Unknown atom: " + symbol); break;}
+		case 11: left = atomC (symbol); if (left == null) root . message ("Unknown atom: " + symbol); break;
 		case 22:
 			get_symbol ();
 			if (symbol_control != 11) {root . message ("Syntax error (directory expected)."); return null;}
