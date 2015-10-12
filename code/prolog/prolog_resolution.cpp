@@ -158,7 +158,7 @@ bool PrologResolution :: match (PrologElement * actual, bool ac, PrologElement *
 		case 0: return true;
 		case 1:
 			if (! match (actual -> left, ac, formal -> left, fc)) return false;
-			actual = actual -> right, formal = formal -> right;
+			actual = actual -> right; formal = formal -> right;
 			break;
 		case 4: case 5: return true;
 		case 6:
