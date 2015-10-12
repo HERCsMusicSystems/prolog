@@ -23,4 +23,35 @@
 package Prolog;
 
 public class PrologQuery {
+	PrologQuery stack;
+	PrologQuery context;
+	PrologQuery fail_target;
+	boolean original;
+	PrologElement query;
+	public PrologQuery (PrologQuery stack, PrologQuery context, PrologElement query) {
+		this . stack = stack;
+		this . context = context;
+		this . fail_target = null;
+		this . original = true;
+		this . query = query;
+	}
+	public PrologQuery (PrologQuery stack, PrologQuery context, PrologQuery fail_target, boolean original, PrologElement query) {
+		this . stack = stack;
+		this . context = context;
+		this . fail_target = fail_target;
+		this . original = original;
+		this . query = query;
+	}
+	public PrologQuery (PrologElement query) {
+		this . stack = null;
+		this . context = null;
+		this . fail_target = null;
+		this . original = true;
+		this . query = query;
+	}
+	public void drop_stack_to_fail_target () {
+		PrologQuery q1 = stack;
+		while (q1 != null && q1 != fail_target) q1 = q1 . stack;
+		stack = fail_target;
+	}
 };
