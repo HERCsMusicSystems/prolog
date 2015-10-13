@@ -548,6 +548,7 @@ public class PrologRoot {
 			command . print ((char) xhsb); command . print ((char) xmsb); command . print ((char) xlsb); command . print ((char) hsb); command . print ((char) msb); command . print ((char) lsb);
 		}
 	}
+	public long get_system_time () {return System . currentTimeMillis ();}
 	public int get_character () {try {if (reader != null) return reader . read (); return System . in . read ();} catch (Exception ex) {return 0;}}
 	public boolean resolutionHead (String directory) {
 		PrologLoader loader = new PrologLoader (this);

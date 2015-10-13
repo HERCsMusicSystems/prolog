@@ -102,6 +102,6 @@ public class PrologElement {
 		default: break;
 		}
 	}
-	//public void drop_one_right () {right = right . right;}
+	public void drop_one_right () {right = right . right;}
 }
 

@@ -23,10 +23,18 @@
 package Prolog;
 
 class PrologStudio extends PrologServiceClass {
+	private class studio_code extends PrologNativeCode {
+		public String name;
+		public boolean code (PrologElement parameters, PrologResolution resolution) {
+			System . out . println ("CALLED [" + name + "]");
+			return true;
+		}
+		public studio_code (String name) {this . name = name;}
+	}
 	public PrologStudio () {
 		System . out . println ("Studio created.");
 	}
 	public PrologNativeCode getNativeCode (String name) {
-		return new PrologNativeCode ();
+		return new studio_code (name);
 	}
 }
