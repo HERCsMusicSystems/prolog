@@ -181,7 +181,7 @@ PrologElement * PrologResolution :: match_product (PrologElement * actual, bool 
 	PrologElement * target = 0;
 	int type;
 	do {
-		if (actual == 0) {if (target) target -> right = 0; return main_return != 0 ? main_return : 0;}
+		if (actual == 0) {if (target) target -> right = 0; return main_return;}
 		type = actual -> type;
 		switch (type) {
 		case 2:
