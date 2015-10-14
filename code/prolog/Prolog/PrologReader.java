@@ -34,7 +34,7 @@ public class PrologReader {
 	public int int_symbol;
 	public double double_symbol;
 	public void clear_context () {search_context = null;}
-	public int move_z () {return 0;}
+	public int move_z () {return root . get_character ();}
 	public void setRoot (PrologRoot root) {this . root = root;}
 	public int get_var_number (String name) {
 		if (var_root == null) {var_root = new ArrayList <String> (); var_root . add (name . length () < 1 ? root . new_line_caption : name); return 0;}
