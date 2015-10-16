@@ -549,6 +549,7 @@ public class PrologRoot {
 		}
 	}
 	public long get_system_time () {return System . currentTimeMillis ();}
+	public void wait_time (long milliseconds) {try {Thread . sleep (milliseconds);} catch (Exception ex) {}}
 	public int get_character () {try {if (reader != null) return reader . read (); return System . in . read ();} catch (Exception ex) {return 0;}}
 	public boolean resolutionHead (String directory) {
 		PrologLoader loader = new PrologLoader (this);

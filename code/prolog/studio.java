@@ -3,17 +3,16 @@ import java . io . InputStream;
 
 import Prolog . *;
 
-
 public class studio {
-	private static class service_class_loader_class extends PrologServiceClassLoader {
-		public PrologServiceClass load (String name) {
-			return null;
-		}
-	}
+//	private static class service_class_loader_class extends PrologServiceClassLoader {
+//		public PrologServiceClass load (String name) {
+//			return null;
+//		}
+//	}
 	public static void main (String [] args) {
 		PrologRoot root = new PrologRoot ();
 		root . get_search_directories_from_environment ("STUDIO_HOME");
-		root . setServiceClassLoader (new service_class_loader_class ());
+//		root . setServiceClassLoader (new service_class_loader_class ());
 		root . set_uap32_captions ();
 		String name = null;
 		for (int ind = 0; ind < args . length; ind++) {
@@ -28,16 +27,3 @@ public class studio {
 		}
 	}
 }
-/*	public studio () {
-		InputStream prcgtk = this . getClass () . getResourceAsStream ("studio.prc");
-		int ch;
-		try {
-			while ((ch = prcgtk . read ()) >= 0) {
-				System . out . print ((char) ch);
-			}
-			prcgtk . close ();
-			System . out . println ("CLOSED");
-		} catch (Exception ex) {}
-	}
-}*/
-

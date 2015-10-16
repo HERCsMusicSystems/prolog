@@ -40,36 +40,14 @@ class pp extends PrologNativeCode {
 	public pp (PrologRoot root) {this . root = root;}
 }
 
-/*
-class pp : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		AREA area;
-		while (parameters -> isPair ()) {
-			root -> getValue (parameters -> getLeft (), area, 0);
-			root -> print (area);
-			parameters = parameters -> getRight ();
-		}
+class pt extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		while (parameters . isPair ()) {root . print (root . getTrueValue (parameters . getLeft ())); parameters = parameters . getRight ();}
 		return true;
 	}
-	pp (PrologRoot * root) {this -> root = root;}
-};
-
-class pt : public PrologNativeCode {
-public :
-	PrologRoot * root;
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		AREA area;
-		while (parameters -> isPair ()) {
-			root -> getTrueValue (parameters -> getLeft (), area, 0);
-			root -> print (area);
-			parameters = parameters -> getRight ();
-		}
-		return true;
-	}
-	pt (PrologRoot * root) {this -> root = root;}
-};*/
+	public pt (PrologRoot root) {this . root = root;}
+}
 
 class write extends PrologNativeCode {
 	public PrologRoot root;
@@ -95,37 +73,25 @@ class nl extends PrologNativeCode {
 	public nl (PrologRoot root) {this . root = root;}
 }
 
-/*
-
-void standard_in_reader :: message (char * text) {root -> print (text); root -> print (root -> new_line_caption);}
-void standard_in_reader :: message_v (char * text, char * variable) {root -> message (text, variable);}
-int standard_in_reader :: move_z (void) {return root -> get_character ();}
-
-class read : public PrologNativeCode {
-public:
-	standard_in_reader * stdr;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		AREA area;
-		stdr -> getString (area, 0);
-		parameters -> setText (area);
+class read extends PrologNativeCode {
+	public PrologReader stdr;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		parameters . setText (stdr . getString ());
 		return true;
 	}
-	read (standard_in_reader * stdr) {this -> stdr = stdr;}
-};
+	public read (PrologReader stdr) {this . stdr = stdr;}
+}
 
-class readln : public PrologNativeCode {
-public:
-	standard_in_reader * stdr;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		AREA area;
-		stdr -> readln (area, 0);
-		parameters -> setText (area);
+class readln extends PrologNativeCode {
+	public PrologReader stdr;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		parameters . setText (stdr . readln ());
 		return true;
 	}
-	readln (standard_in_reader * stdr) {this -> stdr = stdr;}
-};*/
+	public readln (PrologReader stdr) {this . stdr = stdr;}
+}
 
 class pr extends PrologNativeCode {
 	public PrologReader stdr;
@@ -138,177 +104,103 @@ class pr extends PrologNativeCode {
 	public pr (PrologReader stdr) {this . stdr = stdr;}
 }
 
+class list extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isEarth ()) {root . print (root . list () + root . new_line_caption); return true;}
+		if (parameters . isVar ()) {
+			PrologDirectory dr = root . root;
+			while (dr != null) {parameters . setPair (root . text (dr . directoryName), root . earth ()); parameters = parameters . getRight (); dr = dr . next;}
+			return true;
+		}
+		if (! parameters . isPair ()) return false;
+		PrologElement ret = parameters . getRight ();
+		parameters = parameters . getLeft ();
+		if (parameters . isVar ()) {parameters . setText (root . list ()); return true;}
+		if (parameters . isAtom ()) {
+			PrologAtom atom = parameters . getAtom ();
+			if (atom . getMachine () != null) {
+				String area = atom . name () + " " + root . if_atom_caption + " " + root . machine_caption;
+				if (ret . isVar ()) {ret . setPair (root . text (area), root . earth ()); return true;}
+				area += root . new_line_caption;
+				if (ret . isPair ()) ret . getLeft () . setText (area); else root . print (area);
+				return true;
+			}
+			PrologElement clausa = atom . firstClause;
+			if (ret . isVar ()) {
+				if (clausa == null) {ret . setEarth (); return true;}
+				while (clausa != null) {
+					PrologElement dup = clausa . duplicate ();
+					dup . getLeft () . getLeft () . setAtom (atom);
+					ret . setPair (dup, root . earth ());
+					ret = ret . getRight ();
+					clausa = (PrologElement) clausa . getLeft () . getLeft () . getHead ();
+				}
+				return true;
+			}
+			String area = "";
+			while (clausa != null) {
+				PrologElement dup = clausa . duplicate ();
+				dup . getLeft () . getLeft () . setAtom (atom);
+				area += root . getValue (dup) + root . new_line_caption;
+				clausa = (PrologElement) clausa . getLeft () . getLeft () . getHead ();
+			}
+			if (ret . isPair ()) ret . getLeft () . setText (area); else root . print (area);
+			return true;
+		}
+		if (parameters . isText ()) {
+			if (ret . isVar ()) {
+				PrologDirectory dr = root . searchDirectory (parameters . getText ());
+				if (dr == null) return false;
+				PrologAtom atom = dr . firstAtom;
+				ret . setEarth ();
+				while (atom != null) {ret . setPair (root . atom (atom), root . earth ()); ret = ret . getRight (); atom = atom . next;}
+				return true;
+			}
+			String area = root . list (parameters . getText ());
+			if (ret . isPair ()) ret . getLeft () . setText (area); else root . print (area + root . new_line_caption);
+		}
+		return true;
+	}
+	public list (PrologRoot root) {this . root = root;}
+}
+
+class set_uap32_captions extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {root . set_uap32_captions (); return true;}
+	public set_uap32_captions (PrologRoot root) {this . root = root;}
+}
+class set_standard_captions extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {root . set_standard_captions (); return true;}
+	public set_standard_captions (PrologRoot root) {this . root = root;}
+}
+class set_edinburg_captions extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {root . set_edinburg_captions (); return true;}
+	public set_edinburg_captions (PrologRoot root) {this . root = root;}
+}
+class set_marseille_captions extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {root . set_marseille_captions (); return true;}
+	public set_marseille_captions (PrologRoot root) {this . root = root;}
+}
+class set_functional_captions extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {root . set_functional_captions (); return true;}
+	public set_functional_captions (PrologRoot root) {this . root = root;}
+}
+class auto_atoms extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {root . set_auto_atoms (); return true;}
+	public auto_atoms (PrologRoot root) {this . root = root;}
+}
+class scripted_atoms extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {root . set_scripted_atoms (); return true;}
+	public scripted_atoms (PrologRoot root) {this . root = root;}
+}
 /*
-class list : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		AREA area;
-		area [0] = '\0';
-		int area_ind;
-		if (parameters -> isEarth ()) {
-			// directory list
-			root -> list (area, 0);
-			root -> print (area); root -> print (root -> new_line_caption);
-			return true;
-		}
-		if (parameters -> isVar ()) {
-			// directory drop
-			PrologDirectory * dr = root -> root;
-			while (dr != NULL) {
-				parameters -> setPair (root -> text (dr -> directoryName), root -> earth ());
-				parameters = parameters -> getRight ();
-				dr = dr -> next;
-			}
-			return true;
-		}
-		if (! parameters -> isPair ()) return false;
-		PrologElement * ret = parameters -> getRight ();
-		parameters = parameters -> getLeft ();
-		if (parameters -> isVar ()) {
-			// directory drop list
-			root -> list (area, 0);
-			parameters -> setText (area);
-			return true;
-		}
-		if (parameters -> isAtom ()) {
-			PrologAtom * atom = parameters -> getAtom ();
-			if (atom -> getMachine () != NULL) {
-				area_ind = area_cat (area, 0, atom -> name ());
-				area_ind = area_cat (area, area_ind, " ");
-				area_ind = area_cat (area, area_ind, root -> if_atom_caption);
-				area_ind = area_cat (area, area_ind, " ");
-				area_ind = area_cat (area, area_ind, root -> machine_caption);
-				if (ret -> isVar ()) {
-					// machine clause drop
-					ret -> setPair (root -> text (area), root -> earth ());
-					return true;
-				}
-				// machine clause drop list / machine clause list
-				area_ind = area_cat (area, area_ind, root -> new_line_caption);
-				if (ret -> isPair ()) ret -> getLeft () -> setText (area); else root -> print (area);
-				return true;
-			}
-			PrologElement * clausa = atom -> firstClause;
-			PrologElement * dup = NULL;
-			if (ret -> isVar ()) {
-				// clause drop
-				if (clausa == NULL) {ret -> setEarth (); return true;}
-				while (clausa != NULL) {
-					dup = clausa -> duplicate ();
-					dup -> getLeft () -> getLeft () -> setAtom (atom);
-					ret -> setPair (dup, root -> earth ());
-					ret = ret -> getRight ();
-					clausa = (PrologElement *) clausa -> getLeft () -> getLeft () -> getHead ();
-				}
-				return true;
-			}
-			area_ind = area_cat (area, 0, "");
-			while (clausa != NULL) {
-				dup = clausa -> duplicate ();
-				dup -> getLeft () -> getLeft () -> setAtom (atom);
-				area_ind = root -> getValue (dup, area, area_ind);
-				delete dup;
-				area_ind = area_cat (area, area_ind, root -> new_line_caption);
-				clausa = (PrologElement *) clausa -> getLeft () -> getLeft () -> getHead ();
-			}
-			// clause drop list / clause list
-			if (ret -> isPair ()) ret -> getLeft () -> setText (area); else root -> print (area);
-			return true;
-		}
-		if (parameters -> isText ()) {
-			if (ret -> isVar ()) {
-				// atom drop
-				PrologDirectory * dr = root -> searchDirectory (parameters -> getText ());
-				if (dr == NULL) return false;
-				PrologAtom * atom = dr -> firstAtom;
-				ret -> setEarth ();
-				while (atom != NULL) {
-					ret -> setPair (root -> atom (atom), root -> earth ());
-					ret = ret -> getRight ();
-					atom = atom -> next;
-				}
-				return true;
-			}
-			area_ind = root -> list (parameters -> getText (), area, 0);
-			// atom drop list / atom list
-			if (ret -> isPair ()) ret -> getLeft () -> setText (area); else root -> print (area);
-		}
-		return true;
-	}
-	list (PrologRoot * root) {this -> root = root;}
-};
-
-class set_uap32_captions : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		root -> set_uap32_captions ();
-		return true;
-	}
-	set_uap32_captions (PrologRoot * root) {this -> root = root;}
-};
-
-class set_standard_captions : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		root -> set_standard_captions ();
-		return true;
-	}
-	set_standard_captions (PrologRoot * root) {this -> root = root;}
-};
-
-class set_edinburg_captions : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		root -> set_edinburg_captions ();
-		return true;
-	}
-	set_edinburg_captions (PrologRoot * root) {this -> root = root;}
-};
-
-class set_marseille_captions : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		root -> set_marseille_captions ();
-		return true;
-	}
-	set_marseille_captions (PrologRoot * root) {this -> root = root;}
-};
-
-class set_functional_captions : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		root -> set_functional_captions ();
-		return true;
-	}
-	set_functional_captions (PrologRoot * root) {this -> root = root;}
-};
-
-class auto_atoms : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		root -> set_auto_atoms ();
-		return true;
-	}
-	auto_atoms (PrologRoot * root) {this -> root = root;}
-};
-
-class scripted_atoms : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		root -> set_scripted_atoms ();
-		return true;
-	}
-	scripted_atoms (PrologRoot * root) {this -> root = root;}
-};
-
 class CL : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -2526,58 +2418,31 @@ public:
 	}
 	file_reader (PrologRoot * root) {this -> root = root;}
 };
+*/
 
-class module_loader : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool echo;
-	bool reload;
-	bool code (PrologElement * parameters, PrologResolution * resulotion) {
-		while (parameters -> isPair ()) {
-			PrologElement * module_name = parameters -> getLeft ();
-			if (! module_name -> isText ()) return false;
-			PrologLoader loader (root);
+class module_loader extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean echo;
+	public boolean reload;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		while (parameters . isPair ()) {
+			PrologElement module_name = parameters . getLeft ();
+			if (! module_name . isText ()) return false;
+			PrologLoader loader = new PrologLoader (root);
 			loader . echo = echo;
 			loader . reload = reload;
-			if (strstr (module_name -> getText (), ".prc") == NULL) {
-				PROLOG_STRING command;
-				prolog_string_copy (command, module_name -> getText ());
-				prolog_string_cat (command, ".prc");
-				if (! loader . load_without_main (command)) return false;
-			} else {if (! loader . load_without_main (module_name -> getText ())) return false;}
-			parameters = parameters -> getRight ();
+			if (module_name . getText () . contains (".prc")) {if (! loader . load_without_main (module_name . getText ())) return false;}
+			else {if (! loader . load_without_main (module_name . getText () + ".prc")) return false;}
+			parameters = parameters . getRight ();
 		}
 		return true;
 	}
-};
+}
+class import_loader extends module_loader {public import_loader (PrologRoot root) {this . root = root; this . echo = false; this . reload = false;}}
+class load_loader extends module_loader {public load_loader (PrologRoot root) {this . root = root; this .echo = false; this . reload = true;}}
+class consult_loader extends module_loader {public consult_loader (PrologRoot root) {this . root = root; this . echo = true; this . reload = true;}}
 
-class import_loader : public module_loader {
-public:
-	import_loader (PrologRoot * root) {
-		this -> root = root;
-		this -> echo = false;
-		this -> reload = false;
-	}
-};
-
-class load_loader : public module_loader {
-public:
-	load_loader (PrologRoot * root) {
-		this -> root = root;
-		this -> echo = false;
-		this -> reload = true;
-	}
-};
-
-class consult_loader : public module_loader {
-public:
-	consult_loader (PrologRoot * root) {
-		this -> root = root;
-		this -> echo = true;
-		this -> reload = true;
-	}
-};
-
+/*
 class remove_module : public PrologNativeCode {
 private:
 	PrologRoot * root;
@@ -3012,117 +2877,68 @@ public:
 		return false;
 	}
 };
+*/
 
-class variable : public PrologNativeCode {
-private:
-	PrologAtom * atom;
-	PrologElement * container;
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isPair ()) {
-			delete container;
-			container = parameters -> getLeft () -> duplicate ();
-			return true;
-		}
-		if (parameters -> isVar ()) {
-			parameters -> duplicate (container);
-			return true;
-		}
-		if (parameters -> isEarth ()) {
-			atom -> setMachine (0);
-			delete this;
-			return true;
-		}
+class variable extends PrologNativeCode {
+	public PrologAtom atom;
+	public PrologElement container;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isPair ()) {container = parameters . getLeft () . duplicate (); return true;}
+		if (parameters . isVar ()) {parameters . duplicate (container); return true;}
+		if (parameters . isEarth ()) {atom . setMachine (null); return true;}
 		return false;
 	}
-	variable (PrologAtom * atom) {
-		this -> atom = atom;
-		container = new PrologElement ();
-	}
-	variable (PrologAtom * atom, PrologElement * element) {
-		this -> atom = atom;
-		container = element -> duplicate ();
-	}
-	~ variable (void) {delete container;}
-};
-
-class VARIABLE : public PrologNativeCode {
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * initial_value = parameters -> getRight ();
-		parameters = parameters -> getLeft ();
-		PrologAtom * atom = NULL;
-		if (parameters -> isVar ()) {
-			atom = new PrologAtom ();
-			parameters -> setAtom (atom);
-		} else {
-			if (! parameters -> isAtom ()) return false;
-			atom = parameters -> getAtom ();
-		}
-		if (atom -> getMachine () != 0) return false;
-		variable * v;
-		if (initial_value -> isPair ()) v = new variable (atom, initial_value -> getLeft ());
+	public variable (PrologAtom atom) {this . atom = atom; container = new PrologElement ();}
+	public variable (PrologAtom atom, PrologElement element) {this . atom = atom; container = element . duplicate ();}
+}
+class variable_code extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement initial_value = parameters . getRight ();
+		parameters = parameters . getLeft ();
+		PrologAtom atom = null;
+		if (parameters . isVar ()) {atom = new PrologAtom (); parameters . setAtom (atom);}
+		else {if (! parameters . isAtom ()) return false; atom = parameters . getAtom ();}
+		if (atom . getMachine () != null) return false;
+		variable v;
+		if (initial_value . isPair ()) v = new variable (atom, initial_value . getLeft ());
 		else v = new variable (atom);
-		if (atom -> setMachine (v)) return true;
-		delete v;
-		return false;
+		return atom . setMachine (v);
 	}
-};
+}
 
-class accumulator : public PrologNativeCode {
-private:
-	PrologAtom * atom;
-	PrologElement * container;
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isPair ()) {
-			resolution -> reset ();
-			PrologElement * e = new PrologElement ();
-			e -> setPair (resolution -> match_product (parameters -> getLeft (), true), resolution -> match_product (container, false));
-			delete container;
+class accumulator extends PrologNativeCode {
+	public PrologAtom atom;
+	public PrologElement container;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isPair ()) {
+			resolution . reset ();
+			PrologElement e = new PrologElement ();
+			e . setPair (resolution . match_product (parameters . getLeft (), true), resolution . match_product (container, false));
 			container = e;
 			return true;
 		}
-		if (parameters -> isVar ()) {
-			parameters -> duplicate (container);
-			return true;
-		}
-		if (parameters -> isEarth ()) {
-			atom -> setMachine (0);
-			delete this;
-			return true;
-		}
+		if (parameters . isVar ()) {parameters . duplicate (container); return true;}
+		if (parameters . isEarth ()) {atom . setMachine (null); return true;}
 		return false;
 	}
-	accumulator (PrologAtom * atom) {
-		this -> atom = atom;
-		container = new PrologElement ();
-	}
-	~ accumulator (void) {delete container;}
-};
+	public accumulator (PrologAtom atom) {this . atom = atom; container = new PrologElement ();}
+}
 
-class ACCUMULATOR : public PrologNativeCode {
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		PrologAtom * atom = NULL;
-		if (parameters -> isVar ()) {
-			atom = new PrologAtom ();
-			parameters -> setAtom (atom);
-		} else {
-			if (! parameters -> isAtom ()) return false;
-			atom = parameters -> getAtom ();
-		}
-		if (atom -> getMachine () != 0) return false;
-		accumulator * accu = new accumulator (atom);
-		if (atom -> setMachine (accu)) return true;
-		delete accu;
-		return false;
+class accumulator_code extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		parameters = parameters . getLeft ();
+		PrologAtom atom = null;
+		if (parameters . isVar ()) {atom = new PrologAtom (); parameters . setAtom (atom);}
+		else {if (! parameters . isAtom ()) return false; atom = parameters . getAtom ();}
+		if (atom . getMachine () != null) return false;
+		accumulator accu = new accumulator (atom);
+		return atom . setMachine (accu);
 	}
-};
+}
 
+/*
 class stack_element {
 public:
 	PrologElement * el;
@@ -3631,27 +3447,27 @@ public:
 		return true;
 	}
 	series (PrologNoise * n) {this -> n = n;}
-};
+};*/
 
 /////////////
 // CRACKER //
 /////////////
 
-class wait : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isVar ()) {parameters -> setInteger (root -> get_system_time ()); return true;}
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (parameters -> isVar ()) {parameters -> setInteger (root -> get_system_time ()); return true;}
-		if (! parameters -> isInteger ()) return false;
-		root -> wait (parameters -> getInteger ());
+class wait extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isVar ()) {parameters . setInteger ((int) root . get_system_time ()); return true;}
+		if (! parameters . isPair ()) return false;
+		parameters = parameters . getLeft ();
+		if (parameters . isVar ()) {parameters . setInteger ((int) root . get_system_time ()); return true;}
+		if (! parameters . isInteger ()) return false;
+		root . wait_time (parameters . getInteger ());
 		return true;
 	}
-	wait (PrologRoot * root) {this -> root = root;}
-};
+	public wait (PrologRoot root) {this . root = root;}
+}
 
+/*
 class timeout_class : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -4064,9 +3880,6 @@ class PrologStudio extends PrologServiceClass {
 	public PrologRoot root;
 	public PrologDirectory directory;
 	public PrologReader stdr = new PrologReader ();
-	public PrologStudio () {
-		System . out . println ("Studio created.");
-	}
 	public void init (PrologRoot root, PrologDirectory directory) {this . root = root; this . directory = directory; stdr . setRoot (root);}
 	public PrologNativeCode getNativeCode (String name) {
 		if (name . equals ("add1")) return new add1 ();
@@ -4129,21 +3942,23 @@ class PrologStudio extends PrologServiceClass {
 	if (strcmp (name, "greater_eq") == 0) return new greater_eq ();
 	if (strcmp (name, "max") == 0) return new max_class ();
 	if (strcmp (name, "min") == 0) return new min_class ();
-	if (strcmp (name, "set_uap32_captions") == 0) return new set_uap32_captions (root);
-	if (strcmp (name, "set_standard_captions") == 0) return new set_standard_captions (root);
-	if (strcmp (name, "set_edinburg_captions") == 0) return new set_edinburg_captions (root);
-	if (strcmp (name, "set_marseille_captions") == 0) return new set_marseille_captions (root);
-	if (strcmp (name, "set_functional_captions") == 0) return new set_functional_captions (root);
-	if (strcmp (name, "auto_atoms") == 0) return new auto_atoms (root);
-	if (strcmp (name, "scripted_atoms") == 0) return new scripted_atoms (root);*/
-		if (name . equals ("pr")) return new pr (stdr);/*
-	if (strcmp (name, "read") == 0) return new read (& stdr);
-	if (strcmp (name, "readln") == 0) return new readln (& stdr);*/
+	*/
+		if (name . equals ("set_uap32_captions")) return new set_uap32_captions (root);
+		if (name . equals ("set_standard_captions")) return new set_standard_captions (root);
+		if (name . equals ("set_edinburg_captions")) return new set_edinburg_captions (root);
+		if (name . equals ("set_marseille_captions")) return new set_marseille_captions (root);
+		if (name . equals ("set_functional_captions")) return new set_functional_captions (root);
+		if (name . equals ("auto_atoms")) return new auto_atoms (root);
+		if (name . equals ("scripted_atoms")) return new scripted_atoms (root);
+		if (name . equals ("pr")) return new pr (stdr);
+		if (name . equals ("read")) return new read (stdr);
+		if (name . equals ("readln")) return new readln (stdr);
 		if (name . equals ("pp")) return new pp (root);
-	/*if (strcmp (name, "pt") == 0) return new pt (root);*/
+		if (name . equals ("pt")) return new pt (root);
 		if (name . equals ("write")) return new write (root);
-		if (name . equals ("nl")) return new nl (root);/*
-	if (strcmp (name, "list") == 0) return new list (root);
+		if (name . equals ("nl")) return new nl (root);
+		if (name . equals ("list")) return new list (root);
+	/*
 	if (strcmp (name, "CL") == 0) return new CL (root);
 	if (strcmp (name, "addcl") == 0) return new addcl (root);
 	if (strcmp (name, "addcl0") == 0) return new addcl0 (root);
@@ -4159,16 +3974,20 @@ class PrologStudio extends PrologServiceClass {
 	if (strcmp (name, "query_stack") == 0) return new query_stack (root);
 	if (strcmp (name, "object_counter") == 0) return new object_counter_class ();
 	if (strcmp (name, "crack") == 0) return new crack (root);
-	if (strcmp (name, "wait") == 0) return new wait (root);
+	*/
+		if (name . equals ("wait")) return new wait (root);
+	/*
 	if (strcmp (name, "timeout") == 0) return new timeout_class (root);
 	if (strcmp (name, "semaphore") == 0) return new semaphore_maker (directory);
 	if (strcmp (name, "msemaphore") == 0) return new semaphore_maker (directory, true);
 	if (strcmp (name, "mutex") == 0) return new MutexMaker (directory);
 	if (strcmp (name, "file_writer") == 0) return new file_writer (root);
 	if (strcmp (name, "file_reader") == 0) return new file_reader (root);
-	if (strcmp (name, "import_loader") == 0) return new import_loader (root);
-	if (strcmp (name, "load_loader") == 0) return new load_loader (root);
-	if (strcmp (name, "consult_loader") == 0) return new consult_loader (root);
+	*/
+		if (name . equals ("import_loader")) return new import_loader (root);
+		if (name . equals ("load_loader")) return new load_loader (root);
+		if (name . equals ("consult_loader")) return new consult_loader (root);
+	/*
 	if (strcmp (name, "remove_module") == 0) return new remove_module (root);
 	if (strcmp (name, "set_machine") == 0) return new set_machine (root);
 	if (strcmp (name, "machine_type") == 0) return new machine_type ();
@@ -4195,8 +4014,10 @@ class PrologStudio extends PrologServiceClass {
 	if (strcmp (name, "series") == 0) return new series (& n);
 
 	if (strcmp (name, "CONSTANT") == 0) return new CONSTANT ();
-	if (strcmp (name, "VARIABLE") == 0) return new VARIABLE ();
-	if (strcmp (name, "ACCUMULATOR") == 0) return new ACCUMULATOR ();
+	*/
+		if (name . equals ("VARIABLE")) return new variable_code ();
+		if (name . equals ("ACCUMULATOR")) return new accumulator_code ();
+	/*
 	if (strcmp (name, "STACK") == 0) return new STACK ();
 	if (strcmp (name, "QUEUE") == 0) return new QUEUE ();
 	if (strcmp (name, "ARRAY") == 0) return new ARRAY ();

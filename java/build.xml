@@ -15,18 +15,28 @@
 		<jar destfile="studio.jar">
 			<fileset dir="." excludes="studio.jar build.xml"/>
 			<fileset dir="../code/prolog" includes="studio.prc"/>
+			<fileset dir="../code/prolog" includes="test.prc"/>
 			<manifest><attribute name="Main-Class" value="studio"/></manifest>
 		</jar>
 	</target>
 
 	<target name="run" depends="jar">
-		<java jar="studio.jar" fork="true">
+		<!-- <java jar="studio.jar" fork="true">
 			<arg value="studio"/>
 			<arg value="a"/>
 			<arg value="b"/>
 			<arg value="c"/>
-		</java>
+		</java> -->
 		<java classname="studio" classpath="studio.jar"/>
+	</target>
+
+	<target name="test" depends="jar">
+		<java classname="studio" classpath="studio.jar">
+			<arg value="test.prb"/>
+			<arg value="a"/>
+			<arg value="b"/>
+			<arg value="c"/>
+		</java>
 	</target>
 
 </project>
