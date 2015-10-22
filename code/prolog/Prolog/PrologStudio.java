@@ -260,151 +260,100 @@ class CL extends PrologNativeCode {
 		return true;
 	}
 }
-/*
-class CL : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> getLeft () -> isInteger ()) return false;
-		int ind = parameters -> getLeft () -> getInteger ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		if (! parameters -> getLeft () -> isAtom ()) return false;
-		PrologAtom * atom = parameters -> getLeft () -> getAtom ();
-		PrologElement * e_clause = parameters;
-		parameters = parameters -> getRight ();
-		PrologElement * dup = atom -> firstClause;
-		if (dup == NULL) return false;
-		while (ind > 0) {
-			dup = (PrologElement *) dup -> getLeft () -> getLeft () -> getHead ();
-			if (dup == NULL) return false;
-			ind--;
-		}
-		dup = dup -> duplicate ();
-		dup -> getLeft () -> getLeft () -> setAtom (atom);
-		if (parameters -> isVar ()) {e_clause -> setRight (dup); return true;}
-		parameters -> setPair ();
-		parameters -> setLeft (dup);
-		return true;
-	}
-	CL (PrologRoot * root) {}
-};
 
-class delcl : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		PrologAtom * atom = 0;
+class delcl extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		PrologAtom atom = null;
 		int ind = -1;
-		while (parameters -> isPair ()) {
-			PrologElement * e = parameters -> getLeft ();
-			if (e -> isAtom ()) atom = e -> getAtom ();
-			else if (e -> isInteger ()) ind = e -> getInteger ();
+		while (parameters . isPair ()) {
+			PrologElement e = parameters . getLeft ();
+			if (e . isAtom ()) atom = e . getAtom ();
+			else if (e . isInteger ()) ind = e . getInteger ();
 			else return false;
-			parameters = parameters -> getRight ();
+			parameters = parameters . getRight ();
 		}
-		if (atom == 0 || ind < 0) return false;
-		if (atom -> Protected) return false;
-		PrologElement * dup = atom -> firstClause;
-		if (dup == NULL) return false;
-		if (ind == 0) {
-			atom -> firstClause = (PrologElement *) dup -> getLeft () -> getLeft () -> getHead ();
-			delete dup;
-			return true;
-		}
+		if (atom == null || ind < 0) return false;
+		if (atom . Protected) return false;
+		PrologElement dup = atom . firstClause;
+		if (dup == null) return false;
+		if (ind == 0) {atom . firstClause = (PrologElement) dup . getLeft () . getLeft () . getHead (); return true;}
 		ind--;
-		while (ind > 0) {
-			dup = (PrologElement *) dup -> getLeft () -> getLeft () -> getHead ();
-			if (dup == NULL) return false;
-			ind--;
-		}
-		dup = dup -> getLeft () -> getLeft ();
-		PrologElement * next = (PrologElement *) dup -> getHead ();
-		if (next == NULL) return false;
-		dup -> setHead ((PrologElement *) next -> getLeft () -> getLeft () -> getHead ());
-		delete next;
+		while (ind > 0) {dup = (PrologElement) dup . getLeft () . getLeft () . getHead (); if (dup == null) return false; ind--;}
+		dup = dup . getLeft () . getLeft ();
+		PrologElement next = (PrologElement) dup . getHead ();
+		if (next == null) return false;
+		dup . setHead ((PrologElement) next . getLeft () . getLeft () . getHead ());
 		return true;
 	}
-	delcl (PrologRoot * root) {}
-};
+}
 
-class overwrite : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		if (! parameters -> getLeft () -> isInteger ()) return false;
-		int ind = parameters -> getLeft () -> getInteger ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (! parameters -> isPair ()) return false;
-		if (! parameters -> getLeft () -> isPair ()) return false;
-		if (! parameters -> getLeft () -> getLeft () -> isAtom ()) return false;
-		PrologAtom * atom = parameters -> getLeft () -> getLeft () -> getAtom ();
-		if (atom -> Protected) return false;
-		PrologElement * dup = atom -> firstClause;
-		if (dup == NULL) return false;
-		while (ind > 0) {
-			dup = (PrologElement *) dup -> getLeft () -> getLeft () -> getHead ();
-			if (dup == NULL) return false;
-			ind--;
-		}
-		dup -> getLeft () -> setRight (parameters -> getLeft () -> getRight () -> duplicate ());
-		dup -> setRight (parameters -> getRight () -> duplicate ());
+class overwrite extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		if (! parameters . getLeft () . isInteger ()) return false;
+		int ind = parameters . getLeft () . getInteger ();
+		parameters = parameters . getRight ();
+		if (! parameters . isPair ()) return false;
+		parameters = parameters . getLeft ();
+		if (! parameters . isPair ()) return false;
+		if (! parameters . getLeft () . isPair ()) return false;
+		if (! parameters . getLeft () . getLeft () . isAtom ()) return false;
+		PrologAtom atom = parameters . getLeft () . getLeft () . getAtom ();
+		if (atom . Protected) return false;
+		PrologElement dup = atom . firstClause;
+		if (dup == null) return false;
+		while (ind > 0) {dup = (PrologElement) dup . getLeft () . getLeft () . getHead (); if (dup == null) return false; ind--;}
+		dup . getLeft () . setRight (parameters . getLeft () . getRight () . duplicate ());
+		dup . setRight (parameters . getRight () . duplicate ());
 		return true;
 	}
-	overwrite (PrologRoot * root) {}
-};
+}
 
-class addcl0 : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * dup = parameters -> getLeft () -> duplicate ();
-		if (root -> attachClause (dup, 0) == 0) return true;
-		delete dup;
-		return false;
+class addcl0 extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement dup = parameters . getLeft () . duplicate ();
+		return root . attachClause (parameters . getLeft () . duplicate (), 0) == 0;
 	}
-	addcl0 (PrologRoot * root) {this -> root = root;}
-};
+	public addcl0 (PrologRoot root) {this . root = root;}
+}
 
-class addcl : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * dup = parameters -> getLeft () -> duplicate ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isEarth ()) {if (root -> attachClause (dup) == 0) return true;}
-		if (parameters -> isPair ()) {
-			parameters = parameters -> getLeft ();
-			if (parameters -> isInteger ()) {
-				if (root -> attachClause (dup, parameters -> getInteger ()) == 0) return true;
+class addcl extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement dup = parameters . getLeft () . duplicate ();
+		parameters = parameters . getRight ();
+		if (parameters . isEarth ()) {if (root . attachClause (dup) == 0) return true;}
+		if (parameters . isPair ()) {
+			parameters = parameters . getLeft ();
+			if (parameters . isInteger ()) {
+				if (root . attachClause (dup, parameters . getInteger ()) == 0) return true;
 			}
 		}
-		delete dup;
 		return false;
 	}
-	addcl (PrologRoot * root) {this -> root = root;}
-};
+	public addcl (PrologRoot root) {this . root = root;}
+}
 
-class create_atom : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * left = parameters -> getLeft ();
-		if (left -> isAtom ()) return true;
-		if (left -> isVar ()) {left -> setAtom (new PrologAtom ()); return true;}
-		if (! left -> isText ()) return false;
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) {parameters -> getLeft () -> setAtom (new PrologAtom (left -> getText ())); return true;}
-		if (parameters -> isVar ()) {parameters -> setAtom (new PrologAtom (left -> getText ())); return true;}
-		root -> createAtom (left -> getText ());
+class create_atom extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement left = parameters . getLeft ();
+		if (left . isAtom ()) return true;
+		if (left . isVar ()) {left . setAtom (new PrologAtom ()); return true;}
+		if (! left . isText ()) return false;
+		parameters = parameters . getRight ();
+		if (parameters . isPair ()) {parameters . getLeft () . setAtom (new PrologAtom (left . getText ())); return true;}
+		if (parameters . isVar ()) {parameters . setAtom (new PrologAtom (left . getText ())); return true;}
+		root . createAtom (left . getText ());
 		return true;
 	}
-	create_atom (PrologRoot * root) {this -> root = root;}
-};
-
+	public create_atom (PrologRoot root) {this . root = root;}
+}
+/*
 class create_atoms : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -3948,12 +3897,12 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("nl")) return new nl (root);
 		if (name . equals ("list")) return new list (root);
 		if (name . equals ("CL")) return new CL ();
+		if (name . equals ("addcl")) return new addcl (root);
+		if (name . equals ("addcl0")) return new addcl0 (root);
+		if (name . equals ("delcl")) return new delcl ();
+		if (name . equals ("overwrite")) return new overwrite ();
+		if (name . equals ("create_atom")) return new create_atom (root);
 	/*
-	if (strcmp (name, "addcl") == 0) return new addcl (root);
-	if (strcmp (name, "addcl0") == 0) return new addcl0 (root);
-	if (strcmp (name, "delcl") == 0) return new delcl (root);
-	if (strcmp (name, "overwrite") == 0) return new overwrite (root);
-	if (strcmp (name, "create_atom") == 0) return new create_atom (root);
 	if (strcmp (name, "create_atoms") == 0) return new create_atoms (root);
 	if (strcmp (name, "search_atom") == 0) return new search_atom (root, false);
 	if (strcmp (name, "search_atom_c") == 0) return new search_atom (root, true);
