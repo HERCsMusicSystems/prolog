@@ -22,6 +22,10 @@
 
 package Prolog;
 
+import java . io . InputStream;
+import java . io . FileInputStream;
+import java . io . ByteArrayInputStream;
+
 class studio_code extends PrologNativeCode {
 	public String name;
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
@@ -639,56 +643,47 @@ public:
 	}
 };
 
-class term_reader : public PrologReader {
-public:
-	char * text;
-	virtual void message (char * text) {}
-	virtual int move_z (void) {
-		if (* text == '\0') return -1;
-		return * text++;
-	}
-	void init (PrologRoot * root, char * text) {
-		this -> text = text;
-		setRoot (root);
-	}
-};
+*/
 
-class text_term : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * el;
-		if (parameters -> getLeft () -> isText ()) {
-			term_reader * tr = new term_reader ();
-			tr -> init (root, parameters -> getLeft () -> getText ());
-			parameters = parameters -> getRight ();
-			parameters -> setEarth ();
-			el = tr -> readElement ();
-			while (el != NULL) {
-				parameters -> setPair (el, root -> earth ());
-				parameters = parameters -> getRight ();
-				tr -> reset_var_number ();
-				el = tr -> readElement ();
+class term_reader extends PrologReader {
+	public InputStream fi;
+	public int move_z () {try {return fi . read ();} catch (Exception ex) {return -1;}}
+	public term_reader (PrologRoot root, String text) {try {fi = new ByteArrayInputStream (text . getBytes ("UTF-8"));} catch (Exception ex) {fi = null;} setRoot (root);}
+}
+
+class text_term extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		if (parameters . getLeft () . isText ()) {
+			term_reader tr = new term_reader (root, parameters . getLeft () . getText ());
+			parameters = parameters . getRight ();
+			parameters . setEarth ();
+			PrologElement el = tr . readElement ();
+			while (el != null) {
+				parameters . setPair (el, root . earth ());
+				parameters = parameters . getRight ();
+				tr . reset_var_number ();
+				el = tr . readElement ();
 			}
-			delete tr;
 			return true;
 		}
-		el = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		AREA area;
-		int area_ind = area_cat (area, 0, "");
-		while (parameters -> isPair ()) {
-			if (area_ind > 0) area_ind = area_cat (area, area_ind, " ");
-			area_ind = root -> getValue (parameters -> getLeft (), area, area_ind);
-			parameters = parameters -> getRight ();
+		PrologElement el = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		String area = null;
+		while (parameters . isPair ()) {
+			if (area != null) area += " ";
+			else area = "";
+			area += root . getValue (parameters . getLeft ());
+			parameters = parameters . getRight ();
 		}
-		el -> setText (area);
+		el . setText (area);
 		return true;
 	}
-	text_term (PrologRoot * root) {this -> root = root;}
-};
+	public text_term (PrologRoot root) {this . root = root;}
+}
 
+/*
 class e32 : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -2342,83 +2337,65 @@ public:
 		setRoot (root);
 	}
 };
+*/
 
-class file_read : public PrologNativeCode {
-public:
-	FILE * fi;
-	symbol_reader sr;
-	PrologAtom * atom;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (fi == NULL) {
-			if (! parameters -> isEarth ()) return false;
-			atom -> setMachine (0);
-			delete this;
-			return true;
-		}
-		if (parameters -> isEarth ()) {
-			fclose (fi);
-			fi = NULL;
-			atom -> setMachine (0);
-			delete this;
-			return true;
-		}
-		if (! parameters -> isPair ()) return false;
-		PrologElement * el = parameters -> getLeft ();
-		if (el -> isText ()) {
-			parameters = parameters -> getRight ();
-			if (! parameters -> isPair ()) return false;
-			char * char_set = el -> getText ();
-			AREA area;
-			if (sr . getString (area, 0, char_set) < 0) return false;
-			parameters -> getLeft () -> setText (area);
+class symbol_reader extends PrologReader {
+	public FileInputStream fi;
+	public int move_z () {try {return fi . read ();} catch (Exception ex) {return -1;}}
+	public symbol_reader (PrologRoot root, FileInputStream fi) {this . fi = fi; setRoot (root);}
+}
+
+class file_read extends PrologNativeCode {
+	public FileInputStream fi;
+	public symbol_reader sr;
+	public PrologAtom atom;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (fi == null) {if (! parameters . isEarth ()) return false; atom . setMachine (null); return true;}
+		if (parameters . isEarth ()) {try {fi . close ();} catch (Exception ex) {} fi = null; atom . setMachine (null); return true;}
+		if (! parameters . isPair ()) return false;
+		PrologElement el = parameters . getLeft ();
+		if (el . isText ()) {
+			parameters = parameters . getRight ();
+			if (! parameters . isPair ()) return false;
+			String area = sr . getString (el . getText ());
+			if (area == null) return false;
+			parameters . getLeft () . setText (area);
 			return true;
 		}
 		el = sr . readElement ();
-		if (el == NULL) return false;
-		parameters -> setLeft (el);
+		if (el == null) return false;
+		parameters . setLeft (el);
 		return true;
 	}
-	file_read (PrologAtom * atom, PrologRoot * root, char * file_name) {
-		this -> atom = atom;
-		if (
-			(file_name [1] == ':' && file_name [2] == '\\')
-			|| (file_name [0] == '~' && file_name [1] == '/')
-			|| file_name [0] == '/'
-			) fi = fopen (file_name, "rb");
-		else {
-			fi = fopen (file_name, "rb");
-		}
-		sr . init (root, fi);
+	public file_read (PrologAtom atom, PrologRoot root, String file_name) {
+		this . atom = atom;
+		try {fi = new FileInputStream (file_name);} catch (Exception ex) {fi = null;}
+		sr = new symbol_reader (root, fi);
 	}
-	~ file_read (void) {if (fi != NULL) fclose (fi);}
-};
+}
 
-class file_reader : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		PrologElement * symbol = 0;
-		PrologElement * name = 0;
-		while (parameters -> isPair ()) {
-			PrologElement * el = parameters -> getLeft ();
-			if (el -> isAtom ()) symbol = el;
-			if (el -> isVar ()) symbol = el;
-			if (el -> isText ()) name = el;
-			parameters = parameters -> getRight ();
+class file_reader extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		PrologElement symbol = null;
+		PrologElement name = null;
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isAtom ()) symbol = el;
+			if (el . isVar ()) symbol = el;
+			if (el . isText ()) name = el;
+			parameters = parameters . getRight ();
 		}
-		if (symbol == 0 || name == 0) return false;
-		if (symbol -> isVar ()) symbol -> setAtom (new PrologAtom ());
-		PrologAtom * atom = symbol -> getAtom ();
-		if (atom -> getMachine () != 0) return false;
-		file_read * fr = new file_read (atom, root, name -> getText ());
-		if (fr -> fi == 0) {delete fr; return false;}
-		if (atom -> setMachine (fr)) return true;
-		delete fr;
-		return false;
+		if (symbol == null || name == null) return false;
+		if (symbol . isVar ()) symbol . setAtom (new PrologAtom ());
+		PrologAtom atom = symbol . getAtom ();
+		if (atom . getMachine () != null) return false;
+		file_read fr = new file_read (atom, root, name . getText ());
+		if (fr . fi == null) return false;
+		return atom . setMachine (fr);
 	}
-	file_reader (PrologRoot * root) {this -> root = root;}
-};
-*/
+	public file_reader (PrologRoot root) {this . root = root;}
+}
 
 class module_loader extends PrologNativeCode {
 	public PrologRoot root;
@@ -3691,35 +3668,35 @@ public:
 		enterAtom = dir -> searchAtom ("enter");
 		signalAtom = dir -> searchAtom ("signal");
 	}
-};
+};*/
 
 ////////////////////////
 // console procedures //
 ////////////////////////
 
-class bgcolour : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (parameters -> isInteger ()) {root -> setBackground (parameters -> getInteger ()); return true;}
-		if (parameters -> isVar ()) {parameters -> setInteger (root -> current_background); return true;}
+class bgcolour extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (parameters . isInteger ()) {root . setBackground (parameters . getInteger ()); return true;}
+		if (parameters . isVar ()) {parameters . setInteger (root . current_background); return true;}
 		return false;
 	}
-	bgcolour (PrologRoot * root) {this -> root = root;}
-};
+	public bgcolour (PrologRoot root) {this . root = root;}
+}
 
-class fgcolour : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (parameters -> isInteger ()) {root -> setForeground (parameters -> getInteger ()); return true;}
-		if (parameters -> isVar ()) {parameters -> setInteger (root -> current_foreground); return true;}
+class fgcolour extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (parameters . isInteger ()) {root . setForeground (parameters . getInteger ()); return true;}
+		if (parameters . isVar ()) {parameters . setInteger (root . current_foreground); return true;}
 		return false;
 	}
-	fgcolour (PrologRoot * root) {this -> root = root;}
-};
+	public fgcolour (PrologRoot root) {this . root = root;}
+}
+
+/*
 
 class open_editor : public PrologNativeCode {
 public:
@@ -3933,9 +3910,9 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("has_machine")) return new has_machine (root);
 		/*
 	if (strcmp (name, "has_machine") == 0) return new has_machine (root);
-	if (strcmp (name, "text_list") == 0) return new text_list ();
-	if (strcmp (name, "text_term") == 0) return new text_term (root);
-	if (strcmp (name, "e32") == 0) return new e32 ();
+	if (strcmp (name, "text_list") == 0) return new text_list ();*/
+		if (name . equals ("text_term")) return new text_term (root);
+	/*if (strcmp (name, "e32") == 0) return new e32 ();
 	if (strcmp (name, "less") == 0) return new less ();
 	if (strcmp (name, "less_eq") == 0) return new less_eq ();
 	if (strcmp (name, "greater") == 0) return new greater ();
@@ -3982,8 +3959,8 @@ class PrologStudio extends PrologServiceClass {
 	if (strcmp (name, "msemaphore") == 0) return new semaphore_maker (directory, true);
 	if (strcmp (name, "mutex") == 0) return new MutexMaker (directory);
 	if (strcmp (name, "file_writer") == 0) return new file_writer (root);
-	if (strcmp (name, "file_reader") == 0) return new file_reader (root);
 	*/
+		if (name . equals ("file_reader")) return new file_reader (root);
 		if (name . equals ("import_loader")) return new import_loader (root);
 		if (name . equals ("load_loader")) return new load_loader (root);
 		if (name . equals ("consult_loader")) return new consult_loader (root);
@@ -4024,8 +4001,10 @@ class PrologStudio extends PrologServiceClass {
 	if (strcmp (name, "INDEX") == 0) return new INDEX (root, directory);
 
 	if (strcmp (name, "background") == 0) return new bgcolour (root);
-	if (strcmp (name, "foreground") == 0) return new fgcolour (root);
-	if (strcmp (name, "open_editor") == 0) return new open_editor (root);
+	if (strcmp (name, "foreground") == 0) return new fgcolour (root);*/
+		if (name . equals ("background")) return new bgcolour (root);
+		if (name . equals ("foreground")) return new fgcolour (root);
+	/*if (strcmp (name, "open_editor") == 0) return new open_editor (root);
 	if (strcmp (name, "close_editor") == 0) return new close_editor (root);
 	if (strcmp (name, "screen_coordinates") == 0) return new screen_coordinates (root);
 

@@ -348,8 +348,14 @@ public class PrologRoot {
 	public void insertReader (InputStream reader) {this . reader = reader;}
 	public PrintStream getCommander () {return command;}
 	public InputStream getReader () {return reader;}
-	public void setBackground (int background) {current_background = background;}
-	public void setForeground (int foreground) {current_foreground = foreground;}
+	public void setBackground (int background) {
+		current_background = background;
+		System . out . print ("\u001B[48;2;" + ((background >> 16) & 0xff) + ";" + ((background >> 8) & 0xff) + ";" + (background & 0xff) + "m");
+	}
+	public void setForeground (int foreground) {
+		current_foreground = foreground;
+		System . out . print ("\u001B[38;2;" + ((foreground >> 16) & 0xff) + ";" + ((foreground >> 8) & 0xff) + ";" + (foreground & 0xff) + "m");
+	}
 	public PrologServiceClass getServiceClass () {if (root == null) return null; return root . getServiceClass ();}
 	public PrologServiceClass getServiceClass (String name) {if (root == null) return null; return root . getServiceClass (name);}
 	public PrologDirectory createDirectory (String name) {root = new PrologDirectory (name, root); return root;}
