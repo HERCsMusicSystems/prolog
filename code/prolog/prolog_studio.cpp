@@ -372,7 +372,6 @@ public:
 		parameters -> setLeft (dup);
 		return true;
 	}
-	CL (PrologRoot * root) {}
 };
 
 class delcl : public PrologNativeCode {
@@ -4176,7 +4175,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "write") == 0) return new write (root);
 	if (strcmp (name, "nl") == 0) return new nl (root);
 	if (strcmp (name, "list") == 0) return new list (root);
-	if (strcmp (name, "CL") == 0) return new CL (root);
+	if (strcmp (name, "CL") == 0) return new CL ();
 	if (strcmp (name, "addcl") == 0) return new addcl (root);
 	if (strcmp (name, "addcl0") == 0) return new addcl0 (root);
 	if (strcmp (name, "delcl") == 0) return new delcl (root);
