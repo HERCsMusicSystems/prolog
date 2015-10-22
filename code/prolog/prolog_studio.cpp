@@ -408,7 +408,6 @@ public:
 		delete next;
 		return true;
 	}
-	delcl (PrologRoot * root) {}
 };
 
 class overwrite : public PrologNativeCode {
@@ -436,7 +435,6 @@ public:
 		dup -> setRight (parameters -> getRight () -> duplicate ());
 		return true;
 	}
-	overwrite (PrologRoot * root) {}
 };
 
 class addcl0 : public PrologNativeCode {
@@ -4178,8 +4176,8 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "CL") == 0) return new CL ();
 	if (strcmp (name, "addcl") == 0) return new addcl (root);
 	if (strcmp (name, "addcl0") == 0) return new addcl0 (root);
-	if (strcmp (name, "delcl") == 0) return new delcl (root);
-	if (strcmp (name, "overwrite") == 0) return new overwrite (root);
+	if (strcmp (name, "delcl") == 0) return new delcl ();
+	if (strcmp (name, "overwrite") == 0) return new overwrite ();
 	if (strcmp (name, "create_atom") == 0) return new create_atom (root);
 	if (strcmp (name, "create_atoms") == 0) return new create_atoms (root);
 	if (strcmp (name, "search_atom") == 0) return new search_atom (root, false);
