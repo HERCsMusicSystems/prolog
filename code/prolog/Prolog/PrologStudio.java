@@ -204,54 +204,66 @@ class scripted_atoms extends PrologNativeCode {
 	public boolean code (PrologElement parameters, PrologResolution resolution) {root . set_scripted_atoms (); return true;}
 	public scripted_atoms (PrologRoot root) {this . root = root;}
 }
+
+class CL extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		if (parameters . getLeft () . isAtom ()) {
+			PrologAtom atom = parameters . getLeft () . getAtom ();
+			parameters = parameters . getRight ();
+			PrologElement e_counter = parameters;
+			if (parameters . isPair ()) e_counter = parameters . getLeft ();
+			if (e_counter . isVar () || ! parameters . isPair ()) {
+				PrologElement clause = atom . firstClause;
+				int counter = 0;
+				while (clause != null) {counter++; clause = (PrologElement) clause . getLeft () . getLeft () . getHead ();}
+				e_counter . setInteger (counter);
+				return true;
+			}
+			if (! e_counter . isInteger ()) return false;
+			if (! parameters . isPair ()) return false;
+			PrologElement e_clause = parameters;
+			parameters = parameters . getRight ();
+			if (parameters . isEarth ()) {
+				PrologElement clause = atom . firstClause;
+				int counter = 0;
+				while (clause != null) {counter++; clause = (PrologElement) clause . getLeft () . getLeft () . getHead ();}
+				return e_counter . getInteger () == counter;
+			}
+			PrologElement dup = atom . firstClause;
+			if (dup == null) return false;
+			int ind = e_counter . getInteger ();
+			while (ind > 0) {dup = (PrologElement) dup . getLeft () . getLeft () . getHead (); if (dup == null) return false; ind--;}
+			dup = dup . duplicate ();
+			dup . getLeft () . getLeft () . setAtom (atom);
+			if (parameters . isVar ()) {e_clause . setRight (dup); return true;}
+			parameters . setPair ();
+			parameters . setLeft (dup);
+			return true;
+		}
+		if (! parameters . getLeft () . isInteger ()) return false;
+		int ind = parameters . getLeft () . getInteger ();
+		parameters = parameters . getRight ();
+		if (! parameters . isPair ()) return false;
+		if (! parameters . getLeft () . isAtom ()) return false;
+		PrologAtom atom = parameters . getLeft () . getAtom ();
+		PrologElement e_clause = parameters;
+		parameters = parameters . getRight ();
+		PrologElement dup = atom . firstClause;
+		if (dup == null) return false;
+		while (ind > 0) {dup = (PrologElement) dup . getLeft () . getLeft () . getHead (); if (dup == null) return false; ind--;}
+		dup = dup . duplicate ();
+		dup . getLeft () . getLeft () . setAtom (atom);
+		if (parameters . isVar ()) {e_clause . setRight (dup); return true;}
+		parameters . setPair ();
+		parameters . setLeft (dup);
+		return true;
+	}
+}
 /*
 class CL : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		if (parameters -> getLeft () -> isAtom ()) {
-			PrologAtom * atom = parameters -> getLeft () -> getAtom ();
-			parameters = parameters -> getRight ();
-			PrologElement * e_counter = parameters;
-			if (parameters -> isPair ()) e_counter = parameters -> getLeft ();
-			if (e_counter -> isVar () || ! parameters -> isPair ()) {
-				PrologElement * clause = atom -> firstClause;
-				int counter = 0;
-				while (clause != NULL) {
-					counter++;
-					clause = (PrologElement *) clause -> getLeft () -> getLeft () -> getHead ();
-				}
-				e_counter -> setInteger (counter);
-				return true;
-			}
-			if (! e_counter -> isInteger ()) return false;
-			if (! parameters -> isPair ()) return false;
-			PrologElement * e_clause = parameters;
-			parameters = parameters -> getRight ();
-			if (parameters -> isEarth ()) {
-				PrologElement * clause = atom -> firstClause;
-				int counter = 0;
-				while (clause != NULL) {
-					counter++;
-					clause = (PrologElement *) clause -> getLeft () -> getLeft () -> getHead ();
-				}
-				return e_counter -> getInteger () == counter;
-			}
-			PrologElement * dup = atom -> firstClause;
-			if (dup == NULL) return false;
-			int ind = e_counter -> getInteger ();
-			while (ind > 0) {
-				dup = (PrologElement *) dup -> getLeft () -> getLeft () -> getHead ();
-				if (dup == NULL) return false;
-				ind--;
-			}
-			dup = dup -> duplicate ();
-			dup -> getLeft () -> getLeft () -> setAtom (atom);
-			if (parameters -> isVar ()) {e_clause -> setRight (dup); return true;}
-			parameters -> setPair ();
-			parameters -> setLeft (dup);
-			return true;
-		}
 		if (! parameters -> getLeft () -> isInteger ()) return false;
 		int ind = parameters -> getLeft () -> getInteger ();
 		parameters = parameters -> getRight ();
@@ -3935,8 +3947,8 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("write")) return new write (root);
 		if (name . equals ("nl")) return new nl (root);
 		if (name . equals ("list")) return new list (root);
+		if (name . equals ("CL")) return new CL ();
 	/*
-	if (strcmp (name, "CL") == 0) return new CL (root);
 	if (strcmp (name, "addcl") == 0) return new addcl (root);
 	if (strcmp (name, "addcl0") == 0) return new addcl0 (root);
 	if (strcmp (name, "delcl") == 0) return new delcl (root);
