@@ -710,97 +710,62 @@ public:
 		return false;
 	}
 };
+*/
 
-class sum : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e1 = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e2 = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		PrologElement * e3 = parameters -> isPair () ? parameters -> getLeft () : parameters;
-		if (e1 -> isInteger ()) {
-			if (e2 -> isInteger ()) {
-				e3 -> setInteger (e1 -> getInteger () + e2 -> getInteger ());
-				return true;
-			}
-			if (e2 -> isDouble ()) {
-				e3 -> setDouble (e1 -> getInteger () + e2 -> getDouble ());
-				return true;
-			}
-			if (e3 -> isInteger ()) {
-				e2 -> setInteger (e3 -> getInteger () - e1 -> getInteger ());
-				return true;
-			}
-			if (e3 -> isDouble ()) {
-				e2 -> setDouble (e3 -> getDouble () - e1 -> getInteger ());
-				return true;
-			}
+class sum extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement e1 = parameters . getLeft (); parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement e2 = parameters . getLeft (); parameters = parameters . getRight ();
+		PrologElement e3 = parameters . isPair () ? parameters . getLeft () : parameters;
+		if (e1 . isInteger ()) {
+			if (e2 . isInteger ()) {e3 . setInteger (e1 . getInteger () + e2 . getInteger ()); return true;}
+			if (e2 . isDouble ()) {e3 . setDouble (e1 . getInteger () + e2 . getDouble ()); return true;}
+			if (e3 . isInteger ()) {e2 . setInteger (e3 . getInteger () - e1 . getInteger ()); return true;}
+			if (e3 . isDouble ()) {e2 . setDouble (e3 . getDouble () - e1 . getInteger ()); return true;}
 			return false;
 		}
-		if (e1 -> isDouble ()) {
-			if (e2 -> isInteger ()) {
-				e3 -> setDouble (e1 -> getDouble () + e2 -> getInteger ());
-				return true;
-			}
-			if (e2 -> isDouble ()) {
-				e3 -> setDouble (e1 -> getDouble () + e2 -> getDouble ());
-				return true;
-			}
-			if (e3 -> isInteger ()) {
-				e2 -> setDouble (e3 -> getInteger () - e1 -> getDouble ());
-				return true;
-			}
-			if (e3 -> isDouble ()) {
-				e2 -> setDouble (e3 -> getDouble () - e1 -> getDouble ());
-				return true;
-			}
+		if (e1 . isDouble ()) {
+			if (e2 . isInteger ()) {e3 . setDouble (e1 . getDouble () + e2 . getInteger ()); return true;}
+			if (e2 . isDouble ()) {e3 . setDouble (e1 . getDouble () + e2 . getDouble ()); return true;}
+			if (e3 . isInteger ()) {e2 . setDouble (e3 . getInteger () - e1 . getDouble ()); return true;}
+			if (e3 . isDouble ()) {e2 . setDouble (e3 . getDouble () - e1 . getDouble ()); return true;}
 			return false;
 		}
-		if (e2 -> isInteger ()) {
-			if (e3 -> isInteger ()) {
-				e1 -> setInteger (e3 -> getInteger () - e2 -> getInteger ());
-				return true;
-			}
-			if (e3 -> isDouble ()) {
-				e1 -> setDouble (e3 -> getDouble () - e2 -> getInteger ());
-				return true;
-			}
+		if (e2 . isInteger ()) {
+			if (e3 . isInteger ()) {e1 . setInteger (e3 . getInteger () - e2 . getInteger ()); return true;}
+			if (e3 . isDouble ()) {e1 . setDouble (e3 . getDouble () - e2 . getInteger ()); return true;}
 			return false;
 		}
-		if (e2 -> isDouble ()) {
-			if (e3 -> isInteger ()) {
-				e1 -> setDouble (e3 -> getInteger () - e2 -> getDouble ());
-				return true;
-			}
-			if (e3 -> isDouble ()) {
-				e1 -> setDouble (e3 -> getDouble () - e2 -> getDouble ());
-				return true;
-			}
+		if (e2 . isDouble ()) {
+			if (e3 . isInteger ()) {e1 . setDouble (e3 . getInteger () - e2 . getDouble ()); return true;}
+			if (e3 . isDouble ()) {e1 . setDouble (e3 . getDouble () - e2 . getDouble ()); return true;}
+			return false;
 		}
-		if (e1 -> isAtom () || e1 -> isText ()) {
-			char * e1c = e1 -> isAtom () ? e1 -> getAtom () -> name () : e1 -> getText ();
-			if (e2 -> isAtom () || e2 -> isText ()) {
-				char * e2c = e2 -> isAtom () ? e2 -> getAtom () -> name () : e2 -> getText ();
-				int e1cl = strlen (e1c);
-				char * e3c = new char [e1cl + strlen (e2c) + 4];
-				strcpy (e3c, e1c);
-				strcpy (e3c + e1cl, e2c);
-				e3 -> setText (e3c);
-				delete [] e3c;
-				return true;
-			}
-			if (e3 -> isAtom () || e3 -> isText ()) {
-				char * e3c = e3 -> isAtom () ? e3 -> getAtom () -> name () : e3 -> getText ();
-				int e1cl = strlen (e1c);
-				int e3cl = strlen (e3c);
-				if (e1cl > e3cl) return false;
-				if (strstr (e3c, e1c) == e3c) {e2 -> setText (e3c + e1cl); return true;}
+		if (e1 . isAtom  () || e1 . isText ()) {
+			String e1c = e1 . isAtom () ? e1 . getAtom () . name () : e1 . getText ();
+			if (e2 . isAtom () || e2 . isText ()) {e3 . setText (e1c + (e2 . isAtom () ? e2 . getAtom () . name () : e2 . getText ())); return true;}
+			if (e3 . isAtom () || e3 . isText ()) {
+				String e3c = e3 . isAtom () ? e3 . getAtom () . name () : e3 . getText ();
+				if (e3c . startsWith (e1c)) {e2 . setText (e3c . substring (e1c . length ())); return true;}
 				return false;
 			}
 		}
+		if (e2 . isAtom () || e2 . isText ()) {
+			String e2c = e2 . isAtom () ? e2 . getAtom () . name () : e2 . getText ();
+			if (e3 . isAtom () || e3 . isText ()) {
+				String e3c = e3 . isAtom () ? e3 . getAtom () . name () : e3 . getText ();
+				if (e3c . endsWith (e2c)) {e1 . setText (e3c . substring (0, e3c . length () - e2c . length ())); return true;}
+				return false;
+			}
+		}
+		return false;
+	}
+}
+
+/*class sum : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (e2 -> isAtom () || e2 -> isText ()) {
 			char * e2c = e2 -> isAtom () ? e2 -> getAtom () -> name () : e2 -> getText ();
 			if (e3 -> isAtom () || e3 -> isText ()) {
@@ -954,9 +919,6 @@ public:
 		return false;
 	}
 };
-
-class add : public PrologNativeCode {
-public:
 	char * add_strings (char * area, char * text) {
 		if (area == 0) return create_text (text);
 		char * ret = create_text (strlen (area) + strlen (text) + 8);
@@ -974,93 +936,91 @@ public:
 		sprintf (command, "%f", ind);
 		return add_strings (area, command);
 	}
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * result = parameters -> getLeft ();
-		if (result -> isVar ()) parameters = parameters -> getRight ();
+*/
+
+class add extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement result = parameters . getLeft ();
+		if (result . isVar ()) parameters = parameters . getRight ();
 		int result_type = 0;
 		int int_result = 0;
 		double double_result = 0.0;
-		char * area = 0;
-		bool added = false;
-		while (parameters -> isPair ()) {
-			PrologElement * e1 = parameters -> getLeft ();
-			if (e1 -> isInteger ()) {
+		String area = null;
+		boolean added = false;
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isInteger ()) {
 				switch (result_type) {
-				case 0: int_result += e1 -> getInteger (); break;
-				case 1: double_result += (double) e1 -> getInteger (); break;
-				case 2: area = add_strings (area, e1 -> getInteger ()); break;
+				case 0: int_result += el . getInteger (); break;
+				case 1: double_result += (double) el . getInteger (); break;
+				case 2: area += el . getInteger (); break;
 				}
 			}
-			if (e1 -> isDouble ()) {
+			if (el . isDouble ()) {
 				switch (result_type) {
-				case 0: double_result += e1 -> getDouble () + (double) int_result; result_type = 1; break;
-				case 1: double_result += e1 -> getDouble (); break;
-				case 2: area = add_strings (area, e1 -> getDouble ()); break;
+				case 0: double_result += el . getDouble () + (double) int_result; result_type = 1; break;
+				case 1: double_result += el . getDouble (); break;
+				case 2: area += el . getDouble (); break;
 				}
 			}
-			if (e1 -> isText () || e1 -> isAtom ()) {
+			if (el . isText () || el . isAtom ()) {
+				if (area == null) area = "";
 				switch (result_type) {
 				case 0:
-					if (added) area = add_strings (area, int_result);
-					area = add_strings (area, e1 -> isText () ? e1 -> getText () : e1 -> getAtom () -> name ());
+					if (added) area += int_result;
+					area += el . isText () ? el . getText () : el . getAtom () . name ();
 					result_type = 2;
 					break;
-				case 1:
-					area = add_strings (area, double_result);
-					area = add_strings (area, e1 -> isText () ? e1 -> getText () : e1 -> getAtom () -> name ());
-					result_type = 2;
-					break;
-				case 2: area = add_strings (area, e1 -> isText () ? e1 -> getText () : e1 -> getAtom () -> name ()); break;
+				case 1: area += double_result; area += el . isText () ? el . getText () : el . getAtom () . name (); result_type = 2; break;
+				case 2: area += el . isText () ? el . getText () : el . getAtom () . name (); break;
 				}
 			}
-			if (e1 -> isPair ()) {
-				PrologElement * sub = e1;
-				bool is_double = false;
+			if (el . isPair ()) {
+				PrologElement sub = el;
+				boolean is_double = false;
 				double accu = 1.0;
-				while (sub -> isPair ()) {
-					PrologElement * subel = sub -> getLeft ();
-					if (subel -> isNumber ()) {
-						accu *= subel -> getNumber ();
-						if (subel -> isDouble ()) is_double = true;
-					}
-					sub = sub -> getRight ();
+				while (sub . isPair ()) {
+					PrologElement subel = sub . getLeft ();
+					if (subel . isNumber ()) {accu *= subel . getNumber (); if (subel . isDouble ()) is_double = true;}
+					sub = sub . getRight ();
 				}
 				if (is_double) {
 					switch (result_type) {
 					case 0: double_result += accu; result_type = 1; break;
 					case 1: double_result += accu; break;
-					case 2: area = add_strings (area, accu); break;
+					case 2: area += accu; break;
 					}
 				} else {
 					switch (result_type) {
 					case 0: int_result += (int) accu; break;
 					case 1: double_result += accu; break;
-					case 2: area = add_strings (area, (int) accu); break;
+					case 2: area += (int) accu; break;
 					}
 				}
 			}
-			if (e1 -> isVar ()) {
+			if (el . isVar ()) {
 				switch (result_type) {
-				case 0: e1 -> setInteger (int_result); break;
-				case 1: e1 -> setDouble (double_result); break;
-				case 2: e1 -> setText (area); if (area != 0) delete_text (area); break;
+				case 0: el . setInteger (int_result); break;
+				case 1: el . setDouble (double_result); break;
+				case 2: el . setText (area); break;
 				}
 				return true;
 			}
-			parameters = parameters -> getRight ();
+			parameters = parameters . getRight ();
 			added = true;
 		}
-		if (parameters -> isVar ()) result = parameters;
+		if (parameters . isVar ()) result = parameters;
 		switch (result_type) {
-		case 0: result -> setInteger (int_result); break;
-		case 1: result -> setDouble (double_result); break;
-		case 2: result -> setText (area); if (area != 0) delete_text (area); break;
+		case 0: result . setInteger (int_result); break;
+		case 1: result . setDouble (double_result); break;
+		case 2: result . setText (area); break;
 		}
 		return true;
 	}
-};
+}
 
+/*
 class division : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -1929,80 +1889,102 @@ public:
 	}
 };
 
-class less : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * a = parameters -> getLeft ();
-		PrologElement * b;
-		parameters = parameters -> getRight ();
-		while (parameters -> isPair ()) {
-			b = parameters -> getLeft ();
-			if (a -> isInteger ()) {
-				if (b -> isInteger ()) {if (a -> getInteger () >= b -> getInteger ()) return false;}
-				else if (b -> isDouble ()) {if ((double) a -> getInteger () >= b -> getDouble ()) return false;}
+*/
+
+class less extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement a = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		while (parameters . isPair ()) {
+			PrologElement b = parameters . getLeft ();
+			if (a . isInteger ()) {
+				if (b . isInteger ()) {if (a . getInteger () >= b . getInteger ()) return false;}
+				else if (b . isDouble ()) {if ((double) a . getInteger () >= b . getDouble ()) return false;}
 				else return false;
-			}
-			else if (a -> isDouble ()) {
-				if (b -> isInteger ()) {if (a -> getDouble () >= (double) b -> getInteger ()) return false;}
-				else if (b -> isDouble ()) {if (a -> getDouble () >= b -> getDouble ()) return false;}
+			} else if (a . isDouble ()) {
+				if (b . isInteger ()) {if (a . getDouble () >= (double) b . getInteger ()) return false;}
+				else if (b . isDouble ()) {if (a . getDouble () >= b . getDouble ()) return false;}
 				else return false;
-			}
-			else if (a -> isText ()) {
-				if (b -> isText ()) {if (strcmp (a -> getText (), b -> getText ()) >= 0) return false;}
-				else if (b -> isAtom ()) {if (strcmp (a -> getText (), b -> getAtom () -> name ()) >= 0) return false;}
+			} else if (a . isText ()) {
+				if (b . isText ()) {if (a . getText () . compareTo (b . getText ()) >= 0) return false;}
+				else if (b . isAtom ()) {if (a . getText () . compareTo (b . getAtom () . name ()) >= 0) return false;}
 				else return false;
-			}
-			else if (a -> isAtom ()) {
-				if (b -> isAtom ()) {if (strcmp (a -> getAtom () -> name (), b -> getAtom () -> name ()) >= 0) return false;}
-				else if (b -> isText ()) {if (strcmp (a -> getAtom () -> name (), b -> getText ()) >= 0) return false;}
+			} else if (a . isAtom ()) {
+				if (b . isAtom ()) {if (a . getAtom () . name () . compareTo (b . getAtom () . name ()) >= 0) return false;}
+				else if (b . isText ()) {if (a . getAtom () . name () . compareTo (b . getText ()) >= 0) return false;}
 				else return false;
-			}
-			else return false;
+			} else return false;
 			a = b;
-			parameters = parameters -> getRight ();
+			parameters = parameters . getRight ();
 		}
 		return true;
 	}
-};
+}
 
-class less_eq : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * a = parameters -> getLeft ();
-		PrologElement * b;
-		parameters = parameters -> getRight ();
-		while (parameters -> isPair ()) {
-			b = parameters -> getLeft ();
-			if (a -> isInteger ()) {
-				if (b -> isInteger ()) {if (a -> getInteger () > b -> getInteger ()) return false;}
-				else if (b -> isDouble ()) {if ((double) a -> getInteger () > b -> getDouble ()) return false;}
+class less_eq extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement a = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		while (parameters . isPair ()) {
+			PrologElement b = parameters . getLeft ();
+			if (a . isInteger ()) {
+				if (b . isInteger ()) {if (a . getInteger () > b . getInteger ()) return false;}
+				else if (b . isDouble ()) {if ((double) a . getInteger () > b . getDouble ()) return false;}
 				else return false;
-			}
-			else if (a -> isDouble ()) {
-				if (b -> isInteger ()) {if (a -> getDouble () > (double) b -> getInteger ()) return false;}
-				else if (b -> isDouble ()) {if (a -> getDouble () > b -> getDouble ()) return false;}
+			} else if (a . isDouble ()) {
+				if (b . isInteger ()) {if (a . getDouble () > (double) b . getInteger ()) return false;}
+				else if (b . isDouble ()) {if (a . getDouble () > b . getDouble ()) return false;}
 				else return false;
-			}
-			else if (a -> isText ()) {
-				if (b -> isText ()) {if (strcmp (a -> getText (), b -> getText ()) > 0) return false;}
-				else if (b -> isAtom ()) {if (strcmp (a -> getText (), b -> getAtom () -> name ()) > 0) return false;}
+			} else if (a . isText ()) {
+				if (b . isText ()) {if (a . getText () . compareTo (b . getText ()) > 0) return false;}
+				else if (b . isAtom ()) {if (a . getText () . compareTo (b . getAtom () . name ()) > 0) return false;}
 				else return false;
-			}
-			else if (a -> isAtom ()) {
-				if (b -> isAtom ()) {if (strcmp (a -> getAtom () -> name (), b -> getAtom () -> name ()) > 0) return false;}
-				else if (b -> isText ()) {if (strcmp (a -> getAtom () -> name (), b -> getText ()) > 0) return false;}
+			} else if (a . isAtom ()) {
+				if (b . isAtom ()) {if (a . getAtom () . name () . compareTo (b . getAtom () . name ()) > 0) return false;}
+				else if (b . isText ()) {if (a . getAtom () . name () . compareTo (b . getText ()) > 0) return false;}
 				else return false;
-			}
-			else return false;
+			} else return false;
 			a = b;
-			parameters = parameters -> getRight ();
+			parameters = parameters . getRight ();
 		}
 		return true;
 	}
-};
+}
 
+class greater extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement a = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		while (parameters . isPair ()) {
+			PrologElement b = parameters . getLeft ();
+			if (a . isInteger ()) {
+				if (b . isInteger ()) {if (a . getInteger () <= b . getInteger ()) return false;}
+				else if (b . isDouble ()) {if ((double) a . getInteger () <= b . getDouble ()) return false;}
+				else return false;
+			} else if (a . isDouble ()) {
+				if (b . isInteger ()) {if (a . getDouble () <= (double) b . getInteger ()) return false;}
+				else if (b . isDouble ()) {if (a . getDouble () <= b . getDouble ()) return false;}
+				else return false;
+			} else if (a . isText ()) {
+				if (b . isText ()) {if (a . getText () . compareTo (b . getText ()) <= 0) return false;}
+				else if (b . isAtom ()) {if (a . getText () . compareTo (b . getAtom () . name ()) <= 0) return false;}
+				else return false;
+			} else if (a . isAtom ()) {
+				if (b . isAtom ()) {if (a . getAtom () . name () . compareTo (b . getAtom () . name ()) <= 0) return false;}
+				else if (b . isText ()) {if (a . getAtom () . name () . compareTo (b . getText ()) <= 0) return false;}
+				else return false;
+			} else return false;
+			a = b;
+			parameters = parameters . getRight ();
+		}
+		return true;
+	}
+}
+
+/*
 class greater : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -3824,8 +3806,10 @@ class PrologStudio extends PrologServiceClass {
 	/*
 	if (strcmp (name, "add1") == 0) return new add1 ();
 	if (strcmp (name, "sub1") == 0) return new sub1 ();
-	if (strcmp (name, "sum") == 0) return new sum ();
-	if (strcmp (name, "add") == 0) return new add ();
+	*/
+		if (name . equals ("sum")) return new sum ();
+		if (name . equals ("add")) return new add ();
+	/*
 	if (strcmp (name, "sub") == 0) return new sub ();
 	if (strcmp (name, "times") == 0) return new times ();
 	if (strcmp (name, "mac") == 0) return new mac ();
@@ -3874,8 +3858,11 @@ class PrologStudio extends PrologServiceClass {
 	if (strcmp (name, "text_list") == 0) return new text_list ();*/
 		if (name . equals ("text_term")) return new text_term (root);
 	/*if (strcmp (name, "e32") == 0) return new e32 ();
-	if (strcmp (name, "less") == 0) return new less ();
-	if (strcmp (name, "less_eq") == 0) return new less_eq ();
+	*/
+		if (name . equals ("less")) return new less ();
+		if (name . equals ("less_eq")) return new less_eq ();
+		if (name . equals ("greater")) return new greater ();
+		/*
 	if (strcmp (name, "greater") == 0) return new greater ();
 	if (strcmp (name, "greater_eq") == 0) return new greater_eq ();
 	if (strcmp (name, "max") == 0) return new max_class ();
