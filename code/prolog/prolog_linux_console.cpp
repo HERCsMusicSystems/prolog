@@ -82,6 +82,22 @@ int PrologLinuxConsole :: get (void) {
 char * PrologLinuxConsole :: getPrompt (void) {return prompt;}
 void PrologLinuxConsole :: setPrompt (char * prompt) {prolog_string_copy (this -> prompt, prompt);}
 
+void PrologLinuxConsole :: setForeground (int foreground) {
+	int foreground_red = (foreground >> 16) & 0xff;
+	int foreground_green = (foreground >> 8) & 0xff;
+	int foreground_blue = foreground & 0xff;
+	int fg = 16 + foreground_blue / 43 + 6 * (foreground_green / 43) + 36 * (foreground_red / 43);
+	printf ("%c[38;5;%dm", 27, fg);
+}
+
+void PrologLinuxConsole :: setBackground (int background) {
+	int background_red = (background >> 16) & 0xff;
+	int background_green = (background >> 8) & 0xff;
+	int background_blue = background & 0xff;
+	int bg = 16 + background_blue / 43 + 6 * (background_green / 43) + 36 * (background_red / 43);
+	printf ("%c[48;5;%dm", 27, bg);
+}
+
 void PrologLinuxConsole :: setColours (int foreground, int background) {
 	int foreground_red = (foreground >> 16) & 0xff;
 	int foreground_green = (foreground >> 8) & 0xff;

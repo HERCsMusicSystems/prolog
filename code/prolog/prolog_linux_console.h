@@ -32,6 +32,8 @@ private:
 public:
 	virtual void print (char * text);
 	virtual int get (void);
+	virtual void setForeground (int foreground);
+	virtual void setBackground (int background);
 	virtual void setColours (int foreground, int background);
 	virtual char * getPrompt (void);
 	virtual void setPrompt (char * prompt);

@@ -47,6 +47,8 @@ int PrologCommand :: get (void) {
 
 void PrologCommand :: print (int ch) {putchar (ch);}
 void PrologCommand :: print (char * text) {printf ("%s", text);}
+void PrologCommand :: setForeground (int foreground) {}
+void PrologCommand :: setBackground (int background) {}
 void PrologCommand :: setColours (int foreground, int background) {}
 void PrologCommand :: openEditor1 (void) {}
 void PrologCommand :: openEditor2 (int selector) {}

@@ -538,6 +538,8 @@ public:
 	virtual int get (void);
 	virtual void print (int ch);
 	virtual void print (char * text);
+	virtual void setForeground (int foreground);
+	virtual void setBackground (int background);
 	virtual void setColours (int foreground, int background);
 	virtual void openEditor1 (void);
 	virtual void openEditor2 (int selector);

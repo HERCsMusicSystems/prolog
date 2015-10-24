@@ -396,12 +396,12 @@ void PrologRoot :: insertCommand (char * text) {
 
 void PrologRoot :: setBackground (int background) {
 	current_background = background;
-	if (command != 0) command -> setColours (current_foreground, current_background);
+	if (command != 0) command -> setBackground (background);
 }
 
 void PrologRoot :: setForeground (int foreground) {
 	current_foreground = foreground;
-	if (command != 0) command -> setColours (current_foreground, current_background);
+	if (command != 0) command -> setForeground (foreground);
 }
 
 void PrologRoot :: openEditor (void) {
