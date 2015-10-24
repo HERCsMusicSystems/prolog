@@ -350,11 +350,21 @@ public class PrologRoot {
 	public InputStream getReader () {return reader;}
 	public void setBackground (int background) {
 		current_background = background;
-		System . out . print ("\u001B[48;2;" + ((background >> 16) & 0xff) + ";" + ((background >> 8) & 0xff) + ";" + (background & 0xff) + "m");
+		int background_red = (background >> 16) & 0xff;
+		int background_green = (background >> 8) & 0xff;
+		int background_blue = background & 0xff;
+		int bg = 16 + background_blue / 43 + 6 * (background_green / 43) + 36 * (background_red / 43);
+		print ("\u001B[48;5;" + bg + "m");
+		//System . out . print ("\u001B[48;2;" + ((background >> 16) & 0xff) + ";" + ((background >> 8) & 0xff) + ";" + (background & 0xff) + "m");
 	}
 	public void setForeground (int foreground) {
 		current_foreground = foreground;
-		System . out . print ("\u001B[38;2;" + ((foreground >> 16) & 0xff) + ";" + ((foreground >> 8) & 0xff) + ";" + (foreground & 0xff) + "m");
+		int foreground_red = (foreground >> 16) & 0xff;
+		int foreground_green = (foreground >> 8) & 0xff;
+		int foreground_blue = foreground & 0xff;
+		int fg = 16 + foreground_blue / 43 + 6 * (foreground_green / 43) + 36 * (foreground_red / 43);
+		print ("\u001B[38;5;" + fg + "m");
+		//System . out . print ("\u001B[38;2;" + ((foreground >> 16) & 0xff) + ";" + ((foreground >> 8) & 0xff) + ";" + (foreground & 0xff) + "m");
 	}
 	public PrologServiceClass getServiceClass () {if (root == null) return null; return root . getServiceClass ();}
 	public PrologServiceClass getServiceClass (String name) {if (root == null) return null; return root . getServiceClass (name);}
