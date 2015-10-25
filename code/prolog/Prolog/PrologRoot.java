@@ -27,6 +27,13 @@ import java . io . PrintStream;
 import java . io . InputStream;
 import java . util . ArrayList;
 
+class CrackStarter implements Runnable {
+	public PrologRoot root;
+	public PrologElement query;
+	public void run () {root . resolution (query);}
+	public CrackStarter (PrologRoot root, PrologElement parameters) {this . root = root; query = root . pair (root . head (null), parameters . duplicate ());}
+}
+
 public class PrologRoot {
 	public PrologServiceClassLoader service_loader = null;
 	public PrintStream command = System . out;
@@ -565,6 +572,7 @@ public class PrologRoot {
 		}
 	}
 	public long get_system_time () {return System . currentTimeMillis ();}
+	public void start (PrologElement parameters) {new Thread (new CrackStarter (this, parameters)) . start ();}
 	public void wait_time (long milliseconds) {try {Thread . sleep (milliseconds);} catch (Exception ex) {}}
 	public int get_character () {try {if (reader != null) return reader . read (); return System . in . read ();} catch (Exception ex) {return 0;}}
 	public boolean resolutionHead (String directory) {
@@ -608,3 +616,4 @@ public class PrologRoot {
 		return ctrl;
 	}
 }
+

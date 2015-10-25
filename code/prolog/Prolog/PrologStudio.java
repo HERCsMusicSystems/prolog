@@ -3408,18 +3408,15 @@ public:
 	}
 	timeout_class (PrologRoot * root) {this -> root = root;}
 };
+*/
 
-class crack : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) return true;
-		root -> start (parameters);
-		return true;
-	}
-	crack (PrologRoot * root) {this -> root = root;}
-};
+class crack extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {if (parameters . isEarth ()) return true; root . start (parameters); return true;}
+	public crack (PrologRoot root) {this . root = root;}
+}
 
+/*
 #include <semaphore.h>
 
 class semaphore_posix : public PrologNativeCode {
@@ -3876,8 +3873,8 @@ class PrologStudio extends PrologServiceClass {
 	if (strcmp (name, "prompt") == 0) return new prompt (root);
 	if (strcmp (name, "query_stack") == 0) return new query_stack (root);
 	if (strcmp (name, "object_counter") == 0) return new object_counter_class ();
-	if (strcmp (name, "crack") == 0) return new crack (root);
 	*/
+		if (name . equals ("crack")) return new crack (root);
 		if (name . equals ("wait")) return new wait (root);
 	/*
 	if (strcmp (name, "timeout") == 0) return new timeout_class (root);
