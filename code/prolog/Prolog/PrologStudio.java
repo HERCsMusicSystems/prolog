@@ -696,20 +696,17 @@ class add1 extends PrologNativeCode {
 	}
 }
 
-/*
-class sub1 : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (e -> isInteger ()) {parameters -> setInteger (e -> getInteger () - 1); return true;}
-		if (e -> isDouble ()) {parameters -> setDouble (e -> getDouble () - 1.0); return true;}
+class sub1 extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement e = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (e . isInteger ()) {parameters . setInteger (e . getInteger () - 1); return true;}
+		if (e . isDouble ()) {parameters . setDouble (e . getDouble () - 1.0); return true;}
 		return false;
 	}
-};
-*/
+}
 
 class sum extends PrologNativeCode {
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
@@ -3352,50 +3349,25 @@ class wait extends PrologNativeCode {
 	public wait (PrologRoot root) {this . root = root;}
 }
 
-/*
-class timeout_class : public PrologNativeCode {
-public:
-	PrologRoot * root;
+class timeout_code extends PrologNativeCode {
+	public PrologRoot root;
 	// [timeout]               immediate (clears previous commands)
 	// [timeout []]            clears everything
 	// [timeout 127]           obvious (clears previous commands)
 	// [timeout [sonda]]       immediate (clears previous commands)
 	// [timeout 127 [sonda]]   obvious (clears previous commands)
-	void change_query (PrologResolution * resolution, PrologElement * query) {
-		PrologElement * original_query = resolution -> timeout_query;
-		resolution -> timeout_query = query;
-		if (original_query != NULL) delete original_query;
-	}
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {
-			// [timeout]               immediate (clears previous commands)
-			change_query (resolution, NULL);
-			resolution -> timeout = root -> get_system_time ();
-			return true;
-		}
-		PrologElement * timeout = parameters -> getLeft ();
-		if (timeout -> isEarth ()) {
-			// [timeout []]            clears everything
-			change_query (resolution, NULL);
-			resolution -> timeout = 0;
-			return true;
-		}
-		if (! timeout -> isInteger ()) {
-			// [timeout [sonda]]       immediate (clears previous commands)
-			change_query (resolution, parameters -> duplicate ());
-			resolution -> timeout = root -> get_system_time ();
-			return true;
-		}
-		parameters = parameters -> getRight ();
-		// [timeout 127 [sonda]]   obvious (clears previous commands)
-		change_query (resolution, parameters -> isEarth () ? NULL : parameters -> duplicate ());
-		// [timeout 127]           obvious (clears previous commands)
-		resolution -> timeout = root -> get_system_time () + timeout -> getInteger ();
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isEarth ()) {resolution . timeout_query = null; resolution . timeout = root . get_system_time (); return true;}
+		PrologElement timeout = parameters . getLeft ();
+		if (timeout . isEarth ()) {resolution . timeout_query = null; resolution . timeout = 0; return true;}
+		if (! timeout . isInteger ()) {resolution . timeout_query = parameters . duplicate (); resolution . timeout = root . get_system_time (); return true;}
+		parameters = parameters . getRight ();
+		resolution . timeout_query = parameters . isEarth () ? null : parameters . duplicate ();
+		resolution . timeout = root . get_system_time () + timeout . getInteger ();
 		return true;
 	}
-	timeout_class (PrologRoot * root) {this -> root = root;}
-};
-*/
+	public timeout_code (PrologRoot root) {this . root = root;}
+}
 
 class crack extends PrologNativeCode {
 	public PrologRoot root;
@@ -3725,10 +3697,7 @@ class PrologStudio extends PrologServiceClass {
 	public void init (PrologRoot root, PrologDirectory directory) {this . root = root; this . directory = directory; stdr . setRoot (root);}
 	public PrologNativeCode getNativeCode (String name) {
 		if (name . equals ("add1")) return new add1 ();
-	/*
-	if (strcmp (name, "add1") == 0) return new add1 ();
-	if (strcmp (name, "sub1") == 0) return new sub1 ();
-	*/
+		if (name . equals ("sub1")) return new sub1 ();
 		if (name . equals ("sum")) return new sum ();
 		if (name . equals ("add")) return new add ();
 		if (name . equals ("sub")) return new sub ();
@@ -3824,9 +3793,7 @@ class PrologStudio extends PrologServiceClass {
 	*/
 		if (name . equals ("crack")) return new crack (root);
 		if (name . equals ("wait")) return new wait (root);
-	/*
-	if (strcmp (name, "timeout") == 0) return new timeout_class (root);
-	*/
+		if (name . equals ("timeout")) return new timeout_code (root);
 		if (name . equals ("semaphore")) return new semaphore_maker (directory);
 		if (name . equals ("msemaphore")) return new semaphore_maker (directory);
 		if (name . equals ("mutex")) return new mutex_maker (directory);
