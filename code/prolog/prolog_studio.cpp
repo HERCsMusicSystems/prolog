@@ -492,8 +492,6 @@ class create_atoms : public PrologNativeCode {
 public:
 	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		PrologElement * name = 0;
-		int created_atoms = 0;
 		while (parameters -> isPair ()) {
 			PrologElement * el = parameters -> getLeft ();
 			if (el -> isVar ()) el -> setAtom (new PrologAtom ());
@@ -3850,8 +3848,12 @@ public:
 		}
 		if (atom -> getMachine () != 0) return false;
 		PrologNativeCode * s;
+#ifdef WIN32
+		s = new semaphore_posix (atom, waitAtom, enterAtom, signalAtom, ind);
+#else
 		if (mutexed) s = new semaphore_mutex (atom, waitAtom, enterAtom, signalAtom, ind);
 		else s = new semaphore_posix (atom, waitAtom, enterAtom, signalAtom, ind);
+#endif
 		if (atom -> setMachine (s)) return true;
 		delete s;
 		return false;
