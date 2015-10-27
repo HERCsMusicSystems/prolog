@@ -16,7 +16,7 @@ program studio #machine := "prolog.studio"
 		remove_module create_module set_machine machine_type
 		add_search_directory search_directories
 		cd relativise_path dir ls DIR ARGS args args_tail edit execute make_directory erase erase_directory move copy
-		operating_system
+		operating_system implementation
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
 		create_atom create_atoms search_atom search_atom_c unique_atoms preprocessor prompt
 		+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^
@@ -172,6 +172,7 @@ program studio #machine := "prolog.studio"
 #machine copy := "copy"
 #machine execute := "execute"
 #machine operating_system := "operating_system"
+#machine implementation := "implementation"
 #machine save_history := "save_history"
 #machine load_history := "load_history"
 

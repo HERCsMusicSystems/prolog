@@ -3017,6 +3017,16 @@ public:
 	}
 };
 
+class implementation_code : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (parameters -> isText ()) {if (strcasecmp (parameters -> getText (), "c++") == 0) return true; return false;}
+		parameters -> setText ("c++");
+		return true;
+	}
+};
+
 //////////
 // META //
 //////////
@@ -4220,6 +4230,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "save_history") == 0) return new history (root, true);
 	if (strcmp (name, "load_history") == 0) return new history (root, false);
 	if (strcmp (name, "operating_system") == 0) return new operating_system ();
+	if (strcmp (name, "implementation") == 0) return new implementation_code ();
 
 	if (strcmp (name, "rnd") == 0) return new rnd (& n);
 	if (strcmp (name, "rnd_control") == 0) return new rnd_control (& n);
