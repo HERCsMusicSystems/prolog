@@ -3017,6 +3017,10 @@ public:
 	}
 };
 
+#ifdef WIN32
+#define strcasecmp _strcmpi
+#endif
+
 class implementation_code : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
