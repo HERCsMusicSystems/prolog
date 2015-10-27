@@ -25,6 +25,7 @@ package Prolog;
 import java . io . InputStream;
 import java . io . FileInputStream;
 import java . io . ByteArrayInputStream;
+import java . util . concurrent . Semaphore;
 
 class studio_code extends PrologNativeCode {
 	public String name;
@@ -353,24 +354,22 @@ class create_atom extends PrologNativeCode {
 	}
 	public create_atom (PrologRoot root) {this . root = root;}
 }
-/*
-class create_atoms : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		PrologElement * name = 0;
-		int created_atoms = 0;
-		while (parameters -> isPair ()) {
-			PrologElement * el = parameters -> getLeft ();
-			if (el -> isVar ()) el -> setAtom (new PrologAtom ());
-			else if (! el -> isAtom ()) return false;
-			parameters = parameters -> getRight ();
+
+class create_atoms extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isVar ()) el . setAtom (new PrologAtom ());
+			else if (! el . isAtom ()) return false;
+			parameters = parameters . getRight ();
 		}
 		return true;
 	}
-	create_atoms (PrologRoot * root) {this -> root = root;}
-};
+	public create_atoms (PrologRoot root) {this . root = root;}
+}
 
+/*
 class search_atom : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -1084,52 +1083,40 @@ public:
 		}
 		return false;
 	}
-};
+};*/
 
-class sub : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e1 = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) {
-			if (e1 -> isInteger ()) {parameters -> setInteger (- e1 -> getInteger ()); return true;}
-			if (e1 -> isDouble ()) {parameters -> setDouble (- e1 -> getDouble ()); return true;}
+class sub extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement e1 = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (! parameters . isPair ()) {
+			if (e1 . isInteger ()) {parameters . setInteger (- e1 . getInteger ()); return true;}
+			if (e1 . isDouble ()) {parameters . setDouble (- e1 . getDouble ()); return true;}
 			return false;
 		}
-		PrologElement * e2 = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isEarth ()) {
-			if (e1 -> isInteger ()) {e2 -> setInteger (- e1 -> getInteger ()); return true;}
-			if (e1 -> isDouble ()) {e2 -> setDouble (- e1 -> getDouble ()); return true;}
+		PrologElement e2 = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (parameters . isEarth ()) {
+			if (e1 . isInteger ()) {e2 . setInteger (- e1 . getInteger ()); return true;}
+			if (e1 . isDouble ()) {e2 . setDouble (- e1 . getDouble ()); return true;}
 			return false;
 		}
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (e1 -> isInteger ()) {
-			if (e2 -> isInteger ()) {
-				parameters -> setInteger (e1 -> getInteger () - e2 -> getInteger ());
-				return true;
-			}
-			if (e2 -> isDouble ()) {
-				parameters -> setDouble (e1 -> getInteger () - e2 -> getDouble ());
-				return true;
-			}
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (e1 . isInteger ()) {
+			if (e2 . isInteger ()) {parameters . setInteger (e1 . getInteger () - e2 . getInteger ()); return true;}
+			if (e2 . isDouble ()) {parameters . setDouble (e1 . getInteger () - e2 . getDouble ()); return true;}
 			return false;
 		}
-		if (e1 -> isDouble ()) {
-			if (e2 -> isInteger ()) {
-				parameters -> setDouble (e1 -> getDouble () - e2 -> getInteger ());
-				return true;
-			}
-			if (e2 -> isDouble ()) {
-				parameters -> setDouble (e1 -> getDouble () - e2 -> getDouble ());
-				return true;
-			}
+		if (e1 . isDouble ()) {
+			if (e2 . isInteger ()) {parameters . setDouble (e1 . getDouble () - e2 . getInteger ()); return true;}
+			if (e2 . isDouble ()) {parameters . setDouble (e1 . getDouble () - e2 . getDouble ()); return true;}
 		}
 		return false;
 	}
-};
+}
 
+/*
 class mult : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -3416,126 +3403,86 @@ class crack extends PrologNativeCode {
 	public crack (PrologRoot root) {this . root = root;}
 }
 
-/*
-#include <semaphore.h>
-
-class semaphore_posix : public PrologNativeCode {
-public:
-	PrologAtom * atom;
-	PrologAtom * waitAtom, * enterAtom, * signalAtom;
-	sem_t semaphore;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (! parameters -> isAtom ()) return false;
-		PrologAtom * ctrl = parameters -> getAtom ();
-		if (ctrl == signalAtom) {sem_post (& semaphore); return true;}
-		if (ctrl == waitAtom) {sem_wait (& semaphore); return true;}
-		if (ctrl == enterAtom) {return sem_trywait (& semaphore) == 0;}
+class semaphore_code extends PrologNativeCode {
+	public PrologAtom atom;
+	public PrologAtom waitAtom;
+	public PrologAtom enterAtom;
+	public PrologAtom signalAtom;
+	public Semaphore semaphore;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isEarth ()) {atom . setMachine (null); return true;}
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (! parameters . isAtom ()) return false;
+		PrologAtom ctrl = parameters . getAtom ();
+		if (ctrl == signalAtom) {semaphore . release (); return true;}
+		if (ctrl == waitAtom) {try {semaphore . acquire ();} catch (Exception ex) {} return true;}
+		if (ctrl == enterAtom) {return semaphore . tryAcquire ();}
 		return false;
 	}
-	semaphore_posix (PrologAtom * atom, PrologAtom * waitAtom, PrologAtom * enterAtom, PrologAtom * signalAtom, int ind) {
-		this -> atom = atom;
-		this -> waitAtom = waitAtom;
-		this -> enterAtom = enterAtom;
-		this -> signalAtom = signalAtom;
-		sem_init (& semaphore, 0, ind);
+	public semaphore_code (PrologAtom atom, PrologAtom waitAtom, PrologAtom enterAtom, PrologAtom signalAtom, int ind) {
+		this . atom = atom;
+		this . waitAtom = waitAtom;
+		this . enterAtom = enterAtom;
+		this . signalAtom = signalAtom;
+		semaphore = new Semaphore (ind);
 	}
-	~ semaphore_posix (void) {sem_destroy (& semaphore);}
-};
+}
 
-class semaphore_mutex : public PrologNativeCode {
-public:
-	PrologAtom * atom;
-	PrologAtom * waitAtom, * enterAtom, * signalAtom;
-	pthread_mutex_t mutex;
-	pthread_cond_t conditional;
-	int state;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (! parameters -> isAtom ()) return false;
-		PrologAtom * ctrl = parameters -> getAtom ();
-		if (ctrl == signalAtom) {
-			pthread_mutex_lock (& mutex);
-			if (++state > 0) pthread_cond_broadcast (& conditional);
-			pthread_mutex_unlock (& mutex);
-			return true;
-		}
-		if (ctrl == waitAtom) {
-			pthread_mutex_lock (& mutex);
-			while (state <= 0) pthread_cond_wait (& conditional, & mutex);
-			state--;
-			pthread_mutex_unlock (& mutex);
-			return true;
-		}
-		if (ctrl == enterAtom) {
-			pthread_mutex_lock (& mutex);
-			if (state <= 0) {pthread_mutex_unlock (& mutex); return false;}
-			state--;
-			pthread_mutex_unlock (& mutex);
-			return true;
-		}
-		return false;
-	}
-	semaphore_mutex (PrologAtom * atom, PrologAtom * waitAtom, PrologAtom * enterAtom, PrologAtom * signalAtom, int ind) {
-		this -> atom = atom;
-		this -> waitAtom = waitAtom;
-		this -> enterAtom = enterAtom;
-		this -> signalAtom = signalAtom;
-		state = ind;
-		mutex = PTHREAD_MUTEX_INITIALIZER;
-		conditional = PTHREAD_COND_INITIALIZER;
-	}
-	~ semaphore_mutex (void) {pthread_mutex_destroy (& mutex); pthread_cond_destroy (& conditional);}
-};
-
-class semaphore_maker : public PrologNativeCode {
-public:
-	PrologAtom * waitAtom, * enterAtom, * signalAtom;
-	bool mutexed;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (waitAtom == NULL || enterAtom == NULL || signalAtom == NULL) return false;
-		if (! parameters -> isPair ()) return false;
-		PrologElement * ea = parameters -> getLeft ();
-		PrologAtom * atom = NULL;
-		if (ea -> isVar ()) {
-			atom = new PrologAtom ();
-			ea -> setAtom (atom);
-		} else {
-			if (! ea -> isAtom ()) return false;
-			atom = ea -> getAtom ();
-		}
+class semaphore_maker extends PrologNativeCode {
+	public PrologAtom waitAtom;
+	public PrologAtom enterAtom;
+	public PrologAtom signalAtom;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (waitAtom == null || enterAtom == null || signalAtom == null) return false;
+		if (! parameters . isPair ()) return false;
+		PrologElement ea = parameters . getLeft ();
+		PrologAtom atom = null;
+		if (ea . isVar ()) {ea . setAtom (atom = new PrologAtom ());}
+		else {if (! ea . isAtom ()) return false; atom = ea . getAtom ();}
 		int ind = 1;
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) {
-			parameters = parameters -> getLeft ();
-			if (! parameters -> isInteger ()) return false;
-			ind = parameters -> getInteger ();
-			if (ind < 0) return false;
-		}
-		if (atom -> getMachine () != 0) return false;
-		PrologNativeCode * s;
-		if (mutexed) s = new semaphore_mutex (atom, waitAtom, enterAtom, signalAtom, ind);
-		else s = new semaphore_posix (atom, waitAtom, enterAtom, signalAtom, ind);
-		if (atom -> setMachine (s)) return true;
-		delete s;
-		return false;
+		parameters = parameters . getRight ();
+		if (parameters . isPair ()) {parameters = parameters . getLeft (); if (! parameters . isInteger ()) return false; ind = parameters . getInteger (); if (ind < 0) return false;}
+		if (atom . getMachine () != null) return false;
+		// if (mutexed)....
+		return atom . setMachine (new semaphore_code (atom, waitAtom, enterAtom, signalAtom, ind));
 	}
-	semaphore_maker (PrologDirectory * dir, bool mutexed = false) {
-		this -> mutexed = mutexed;
-		waitAtom = enterAtom = signalAtom = 0;
-		if (dir == 0) return;
-		waitAtom = dir -> searchAtom ("wait");
-		enterAtom = dir -> searchAtom ("enter");
-		signalAtom = dir -> searchAtom ("signal");
+	public semaphore_maker (PrologDirectory dir) {
+		waitAtom = enterAtom = signalAtom = null;
+		if (dir == null) return;
+		waitAtom = dir . searchAtom ("wait");
+		enterAtom = dir . searchAtom ("enter");
+		signalAtom = dir . searchAtom ("signal");
 	}
-};
+}
 
 ///////////
 // MUTEX //
 ///////////
 
+class mutex_maker extends PrologNativeCode {
+	public PrologAtom waitAtom;
+	public PrologAtom enterAtom;
+	public PrologAtom signalAtom;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (waitAtom == null || enterAtom == null || signalAtom == null) return false;
+		if (! parameters . isPair ()) return false;
+		PrologElement ea = parameters . getLeft ();
+		PrologAtom atom = null;
+		if (ea . isVar ()) {ea . setAtom (atom = new PrologAtom ());}
+		else {if (! ea . isAtom ()) return false; atom = ea . getAtom ();}
+		if (atom . getMachine () != null) return false;
+		return atom . setMachine (new semaphore_code (atom, waitAtom, enterAtom, signalAtom, 1));
+	}
+	public mutex_maker (PrologDirectory dir) {
+		waitAtom = enterAtom = signalAtom = null;
+		if (dir == null) return;
+		waitAtom = dir . searchAtom ("wait");
+		enterAtom = dir . searchAtom ("enter");
+		signalAtom = dir . searchAtom ("signal");
+	}
+}
+
+/*
 class PrologMutex : public PrologNativeCode {
 public:
 	PrologAtom * atom;
@@ -3784,8 +3731,8 @@ class PrologStudio extends PrologServiceClass {
 	*/
 		if (name . equals ("sum")) return new sum ();
 		if (name . equals ("add")) return new add ();
+		if (name . equals ("sub")) return new sub ();
 	/*
-	if (strcmp (name, "sub") == 0) return new sub ();
 	if (strcmp (name, "times") == 0) return new times ();
 	if (strcmp (name, "mac") == 0) return new mac ();
 	if (strcmp (name, "mult") == 0) return new mult ();
@@ -3864,6 +3811,7 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("delcl")) return new delcl ();
 		if (name . equals ("overwrite")) return new overwrite ();
 		if (name . equals ("create_atom")) return new create_atom (root);
+		if (name . equals ("create_atoms")) return new create_atoms (root);
 	/*
 	if (strcmp (name, "create_atoms") == 0) return new create_atoms (root);
 	if (strcmp (name, "search_atom") == 0) return new search_atom (root, false);
@@ -3878,9 +3826,11 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("wait")) return new wait (root);
 	/*
 	if (strcmp (name, "timeout") == 0) return new timeout_class (root);
-	if (strcmp (name, "semaphore") == 0) return new semaphore_maker (directory);
-	if (strcmp (name, "msemaphore") == 0) return new semaphore_maker (directory, true);
-	if (strcmp (name, "mutex") == 0) return new MutexMaker (directory);
+	*/
+		if (name . equals ("semaphore")) return new semaphore_maker (directory);
+		if (name . equals ("msemaphore")) return new semaphore_maker (directory);
+		if (name . equals ("mutex")) return new mutex_maker (directory);
+	/*
 	if (strcmp (name, "file_writer") == 0) return new file_writer (root);
 	*/
 		if (name . equals ("file_reader")) return new file_reader (root);
