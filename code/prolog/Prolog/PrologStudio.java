@@ -26,6 +26,7 @@ import java . io . InputStream;
 import java . io . FileInputStream;
 import java . io . ByteArrayInputStream;
 import java . util . concurrent . Semaphore;
+import java . util . ArrayList;
 
 class studio_code extends PrologNativeCode {
 	public String name;
@@ -3162,94 +3163,78 @@ public:
 		return false;
 	}
 	INDEX (PrologRoot * root, PrologDirectory * studio) {this -> root = root; this -> studio = studio;}
-};
+};*/
 
 /////////////////////
 // NOISE GENERATOR //
 /////////////////////
 
-int PrologNoise :: get (void) {v = (v * a + c) & m; return v;}
-int PrologNoise :: get (int min, int max) {
-	float out = (float) get () * (float) (max - min);
-	out /= (float) range;
-	return min + (int) out;
+class PrologNoise {
+	public int a, c, v, range, m;
+	public int get () {return v = (v * a + c) & m;}
+	public int get (int min, int max) {
+		double out = (double) get () * (double) (max - min);
+		out /= (double) range;
+		return min + (int) out;
+	}
+	public void resolution (int bits) {range = 1 << bits; m = range - 1;}
+	public void control (int v) {this . v = v;}
+	public void control (int a, int c) {this . a = a; this . c = c;}
+	public PrologNoise () {resolution (24); control (0); control (0x5599d1, 1);}
 }
-void PrologNoise :: resolution (int bits) {range = 1 << bits; m = range - 1;}
-void PrologNoise :: control (int v) {this -> v = v;}
-void PrologNoise :: control (int a, int c) {this -> a = a; this -> c = c;}
-PrologNoise :: PrologNoise (void) TRACKING (4) {resolution (24); control (0); control (0x5599d1, 1);}
 
-class rnd : public PrologNativeCode {
-public:
-	PrologNoise * n;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isVar ()) {parameters -> setInteger (n -> get ()); return true;}
-		if (! parameters -> isPair ()) return false;
-		PrologElement * a = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isEarth ()) {a -> setInteger (n -> get ()); return true;}
-		if (! parameters -> isPair ()) return false;
-		PrologElement * b = parameters -> getLeft ();
-		PrologElement * c = parameters -> getRight ();
-		if (c -> isPair ()) c = c -> getLeft ();
-		if (a -> isInteger ()) {
-			if (b -> isInteger ()) {
-				c -> setInteger (n -> get (a -> getInteger (), b -> getInteger ()));
-				return true;
-			} else if (c -> isInteger ()) {
-				b -> setInteger (n -> get (a -> getInteger (), c -> getInteger ()));
-				return true;
-			} else return false;
+class rnd extends PrologNativeCode {
+	public PrologNoise n;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isVar ()) {parameters . setInteger (n . get ()); return true;}
+		if (! parameters . isPair ()) return false;
+		PrologElement a = parameters . getLeft (); parameters = parameters . getRight ();
+		if (parameters . isEarth ()) {a . setInteger (n . get ()); return true;}
+		if (! parameters . isPair ()) return false;
+		PrologElement b = parameters . getLeft ();
+		PrologElement c = parameters . getRight ();
+		if (c . isPair ()) c = c . getLeft ();
+		if (a . isInteger ()) {
+			if (b . isInteger ()) {c . setInteger (n . get (a . getInteger (), b . getInteger ())); return true;}
+			else if (c . isInteger ()) {b . setInteger (n . get (a . getInteger (), c . getInteger ())); return true;}
+			else return false;
 		}
-		if (b -> isInteger ()) {
-			if (c -> isInteger ()) {
-				a -> setInteger (n -> get (b -> getInteger (), c -> getInteger ()));
-				return true;
-			}
-		}
+		if (b . isInteger ()) {if (c . isInteger ()) {a . setInteger (n . get (b . getInteger (), c . getInteger ())); return true;}}
 		return false;
 	}
-	rnd (PrologNoise * n) {this -> n = n;}
-};
+	public rnd (PrologNoise n) {this . n = n;}
+}
 
-class rnd_control : public PrologNativeCode {
-public:
-	PrologNoise * n;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
+class rnd_control extends PrologNativeCode {
+	public PrologNoise n;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
 		// rnd_control [out]
 		// rnd_control [a c]
 		// rnd_control [out a c]
 		// rnd_control [out bits a c]
-		int vector [4];
+		int [] vector = new int [4];
 		int vector_counter = 0;
-		while (parameters -> isPair ()) {
+		while (parameters . isPair ()) {
 			if (vector_counter > 3) return false;
-			PrologElement * el = parameters -> getLeft ();
-			if (el -> isInteger ()) vector [vector_counter++] = el -> getInteger ();
-			else if (el -> isDouble ()) vector [vector_counter++] = (int) el -> getDouble ();
+			PrologElement el = parameters . getLeft ();
+			if (el . isInteger ()) vector [vector_counter++] = el . getInteger ();
+			else if (el . isDouble ()) vector [vector_counter++] = (int) el . getDouble ();
 			else return false;
-			parameters = parameters -> getRight ();
+			parameters = parameters . getRight ();
 		}
 		switch (vector_counter) {
-		case 1: n -> control (vector [0]); return true; break;
-		case 2: n -> control (vector [0], vector [1]); return true; break;
-		case 3: n -> control (vector [0]); n -> control (vector [1], vector [2]); return true; break;
-		case 4:
-			n -> resolution (vector [1]);
-			n -> control (vector [0]);
-			n -> control (vector [2], vector [3]);
-			return true;
-			break;
-		default: return false; break;
+		case 1: n . control (vector [0]); return true;
+		case 2: n . control (vector [0], vector [1]); return true;
+		case 3: n . control (vector [0]); n . control (vector [1], vector [2]); return true;
+		case 4: n . resolution (vector [1]); n . control (vector [0]); n . control (vector [2], vector [3]); return true;
+		default: break;
 		}
 		return false;
 	}
-	rnd_control (PrologNoise * n) {this -> n = n;}
-};
+	public rnd_control (PrologNoise n) {this . n = n;}
+}
 
-class series : public PrologNativeCode {
-public:
-	PrologNoise * n;
+/*
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
 		PrologElement * e_root = parameters -> getLeft ();
@@ -3278,24 +3263,7 @@ public:
 			}
 			delete [] table;
 			return true;
-		}
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e_length = parameters -> getLeft ();
-		if (! e_length -> isInteger ()) return false;
-		int length = e_length -> getInteger ();
-		if (length < 1) return false;
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e_step = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		double root;
-		if (e_root -> isInteger ()) root = (double) e_root -> getInteger ();
-		else {if (! e_root -> isDouble ()) return false; root = e_root -> getDouble ();}
-		double step;
-		if (e_step -> isInteger ()) step = (double) e_step -> getInteger ();
-		else {if (! e_step -> isDouble ()) return false; step = e_step -> getDouble ();}
+
 		double * table = new double [length + 32];
 		for (int ind = 0; ind < length; ind++) {table [ind] = root; root += step;}
 		int select;
@@ -3308,11 +3276,50 @@ public:
 			parameters = parameters -> getRight ();
 			table [select] = table [length];
 		}
-		delete [] table;
+		}
+*/
+
+class series extends PrologNativeCode {
+	public PrologNoise n;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement e_root = parameters . getLeft ();
+		if (e_root . isPair () || e_root . isEarth ()) {
+			PrologElement ret = parameters . getRight ();
+			if (ret . isPair ()) ret = ret . getLeft ();
+			parameters = parameters . getLeft ();
+			if (! parameters . isPair ()) {ret . setEarth (); return true;}
+			ArrayList <PrologElement> table = new ArrayList <PrologElement> ();
+			while (parameters . isPair ()) {table . add (parameters . getLeft ()); parameters = parameters . getRight ();}
+			while (table . size () > 0) {ret . setPair (); ret . setLeft (table . remove (n . get (0, table . size ())) . duplicate ()); ret = ret . getRight ();}
+			return true;
+		}
+		parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement e_length = parameters . getLeft (); if (! e_length . isInteger ()) return false;
+		int length = e_length . getInteger (); if (length < 1) return false;
+		parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement e_step = parameters . getLeft (); parameters = parameters . getRight (); if (parameters . isPair ()) parameters = parameters . getLeft ();
+		double root;
+		if (e_step . isInteger ()) root = (double) e_root . getInteger ();
+		else {if (! e_root . isDouble ()) return false; root = e_root . getDouble ();}
+		double step;
+		if (e_step . isInteger ()) step = (double) e_step . getInteger ();
+		else {if (! e_step . isDouble ()) return false; step = e_step . getDouble ();}
+		ArrayList <Double> table = new ArrayList <Double> ();
+		for (int ind = 0; ind < length; ind++) {table . add (root); root += step;}
+		boolean double_type = e_root . isDouble () || e_step . isDouble ();
+		while (table . size () > 0) {
+			int select = n . get (0, table . size ());
+			System . out . println ("MONITOR => " + table . size () + " : " + select);
+			parameters . setPair ();
+			if (double_type) parameters . getLeft () . setDouble (table . remove (select));
+			else parameters . getLeft () . setInteger (table . remove (select) . intValue ());
+			parameters = parameters . getRight ();
+		}
 		return true;
 	}
-	series (PrologNoise * n) {this -> n = n;}
-};*/
+	public series (PrologNoise n) {this . n = n;}
+}
 
 /////////////
 // CRACKER //
@@ -3677,6 +3684,7 @@ class PrologStudio extends PrologServiceClass {
 	public PrologRoot root;
 	public PrologDirectory directory;
 	public PrologReader stdr = new PrologReader ();
+	public PrologNoise n = new PrologNoise ();
 	public void init (PrologRoot root, PrologDirectory directory) {this . root = root; this . directory = directory; stdr . setRoot (root);}
 	public PrologNativeCode getNativeCode (String name) {
 		if (name . equals ("add1")) return new add1 ();
@@ -3810,11 +3818,13 @@ class PrologStudio extends PrologServiceClass {
 	if (strcmp (name, "save_history") == 0) return new history (root, true);
 	if (strcmp (name, "load_history") == 0) return new history (root, false);
 	if (strcmp (name, "operating_system") == 0) return new operating_system ();
+	*/
 
-	if (strcmp (name, "rnd") == 0) return new rnd (& n);
-	if (strcmp (name, "rnd_control") == 0) return new rnd_control (& n);
-	if (strcmp (name, "series") == 0) return new series (& n);
+		if (name . equals ("rnd")) return new rnd (n);
+		if (name . equals ("rnd_control")) return new rnd_control (n);
+		if (name . equals ("series")) return new series (n);
 
+	/*
 	if (strcmp (name, "CONSTANT") == 0) return new CONSTANT ();
 	*/
 		if (name . equals ("VARIABLE")) return new variable_code ();
@@ -3840,3 +3850,4 @@ class PrologStudio extends PrologServiceClass {
 		return new studio_code (name);
 	}
 }
+
