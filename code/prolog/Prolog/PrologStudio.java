@@ -31,7 +31,7 @@ class studio_code extends PrologNativeCode {
 	public String name;
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
 		System . out . println ("CALLED [" + name + "]");
-		return true;
+		return false;
 	}
 	public studio_code (String name) {this . name = name;}
 }
@@ -994,46 +994,29 @@ class add extends PrologNativeCode {
 	}
 }
 
-/*
-class division : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e1 = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e2 = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (e2 -> isInteger ()) {
-			int ind = e2 -> getInteger ();
+class division extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement e1 = parameters . getLeft (); parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement e2 = parameters . getLeft (); parameters = parameters . getRight (); if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (e2 . isInteger ()) {
+			int ind = e2 . getInteger ();
 			if (ind == 0) return false;
-			if (e1 -> isInteger ()) {
-				parameters -> setInteger (e1 -> getInteger () / ind);
-				return true;
-			}
-			if (e1 -> isDouble ()) {
-				parameters -> setDouble (e1 -> getDouble () / ind);
-				return true;
-			}
+			if (e1 . isInteger ()) {parameters . setInteger (e1 . getInteger () / ind); return true;}
+			if (e1 . isDouble ()) {parameters . setDouble (e1 . getDouble () / ind); return true;}
 			return false;
 		}
-		if (e2 -> isDouble ()) {
-			double db = e2 -> getDouble ();
+		if (e2 . isDouble ()) {
+			double db = e2 . getDouble ();
 			if (db == 0.0) return false;
-			if (e1 -> isInteger ()) {
-				parameters -> setDouble (e1 -> getInteger () / db);
-				return true;
-			}
-			if (e1 -> isDouble ()) {
-				parameters -> setDouble (e1 -> getDouble () / db);
-				return true;
-			}
+			if (e1 . isInteger ()) {parameters . setDouble (e1 . getInteger () / db); return true;}
+			if (e1 . isDouble ()) {parameters . setDouble (e1 . getDouble () / db); return true;}
 		}
 		return false;
 	}
-};
+}
 
+/*
 class mod : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -3705,7 +3688,9 @@ class PrologStudio extends PrologServiceClass {
 	if (strcmp (name, "times") == 0) return new times ();
 	if (strcmp (name, "mac") == 0) return new mac ();
 	if (strcmp (name, "mult") == 0) return new mult ();
-	if (strcmp (name, "div") == 0) return new division ();
+	*/
+		if (name . equals ("div")) return new division ();
+	/*
 	if (strcmp (name, "mod") == 0) return new mod ();
 	if (strcmp (name, "and") == 0) return new logical_and ();
 	if (strcmp (name, "or") == 0) return new logical_or ();
