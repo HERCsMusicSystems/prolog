@@ -2704,12 +2704,22 @@ public:
 		return true;
 	}
 };
+*/
+
+class implementation_code extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (parameters . isText ()) return parameters . getText () . equalsIgnoreCase ("java");
+		parameters . setText ("java");
+		return true;
+	}
+}
 
 //////////
 // META //
 //////////
 
-class constant : public PrologNativeCode {
+/*class constant : public PrologNativeCode {
 private:
 	PrologElement * container;
 public:
@@ -3819,6 +3829,7 @@ class PrologStudio extends PrologServiceClass {
 	if (strcmp (name, "load_history") == 0) return new history (root, false);
 	if (strcmp (name, "operating_system") == 0) return new operating_system ();
 	*/
+		if (name . equals ("implementation")) return new implementation_code ();
 
 		if (name . equals ("rnd")) return new rnd (n);
 		if (name . equals ("rnd_control")) return new rnd_control (n);
