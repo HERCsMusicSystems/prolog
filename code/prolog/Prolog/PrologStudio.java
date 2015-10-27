@@ -3244,51 +3244,6 @@ class rnd_control extends PrologNativeCode {
 	public rnd_control (PrologNoise n) {this . n = n;}
 }
 
-/*
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e_root = parameters -> getLeft ();
-		if (e_root -> isPair () || e_root -> isEarth ()) {
-			PrologElement * ret = parameters -> getRight ();
-			if (ret -> isPair ()) ret = ret -> getLeft ();
-			int length = 0;
-			while (e_root -> isPair ()) {
-				e_root = e_root -> getRight ();
-				length++;
-			}
-			if (length < 1) {ret -> setEarth (); return true;}
-			PrologElementPointer * table = new PrologElementPointer [length + 32];
-			length = 0;
-			parameters = parameters -> getLeft ();
-			while (parameters -> isPair ()) {
-				table [length++] = parameters -> getLeft ();
-				parameters = parameters -> getRight ();
-			}
-			while (length > 0) {
-				int select = n -> get (0, length--);
-				ret -> setPair ();
-				ret -> setLeft (table [select] -> duplicate ());
-				ret = ret -> getRight ();
-				table [select] = table [length];
-			}
-			delete [] table;
-			return true;
-
-		double * table = new double [length + 32];
-		for (int ind = 0; ind < length; ind++) {table [ind] = root; root += step;}
-		int select;
-		bool double_type = e_root -> isDouble () || e_step -> isDouble ();
-		while (length > 0) {
-			select = n -> get (0, length--);
-			parameters -> setPair ();
-			if (double_type) parameters -> getLeft () -> setDouble (table [select]);
-			else parameters -> getLeft () -> setInteger ((int) table [select]);
-			parameters = parameters -> getRight ();
-			table [select] = table [length];
-		}
-		}
-*/
-
 class series extends PrologNativeCode {
 	public PrologNoise n;
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
@@ -3297,11 +3252,19 @@ class series extends PrologNativeCode {
 		if (e_root . isPair () || e_root . isEarth ()) {
 			PrologElement ret = parameters . getRight ();
 			if (ret . isPair ()) ret = ret . getLeft ();
+			int length = 0; while (e_root . isPair ()) {e_root = e_root . getRight (); length++;}
+			if (length < 1) {ret . setEarth (); return true;}
+			PrologElement [] table = new PrologElement [length];
+			length = 0;
 			parameters = parameters . getLeft ();
-			if (! parameters . isPair ()) {ret . setEarth (); return true;}
-			ArrayList <PrologElement> table = new ArrayList <PrologElement> ();
-			while (parameters . isPair ()) {table . add (parameters . getLeft ()); parameters = parameters . getRight ();}
-			while (table . size () > 0) {ret . setPair (); ret . setLeft (table . remove (n . get (0, table . size ())) . duplicate ()); ret = ret . getRight ();}
+			while (parameters . isPair ()) {table [length++] = parameters . getLeft (); parameters = parameters . getRight ();}
+			while (length > 0) {
+				int select = n . get (0, length--);
+				ret . setPair ();
+				ret . setLeft (table [select] . duplicate ());
+				ret = ret . getRight ();
+				table [select] = table [length];
+			}
 			return true;
 		}
 		parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
@@ -3310,21 +3273,21 @@ class series extends PrologNativeCode {
 		parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
 		PrologElement e_step = parameters . getLeft (); parameters = parameters . getRight (); if (parameters . isPair ()) parameters = parameters . getLeft ();
 		double root;
-		if (e_step . isInteger ()) root = (double) e_root . getInteger ();
+		if (e_root . isInteger ()) root = (double) e_root . getInteger ();
 		else {if (! e_root . isDouble ()) return false; root = e_root . getDouble ();}
 		double step;
 		if (e_step . isInteger ()) step = (double) e_step . getInteger ();
 		else {if (! e_step . isDouble ()) return false; step = e_step . getDouble ();}
-		ArrayList <Double> table = new ArrayList <Double> ();
-		for (int ind = 0; ind < length; ind++) {table . add (root); root += step;}
+		double [] table = new double [length];
+		for (int ind = 0; ind < length; ind++) {table [ind] = root; root += step;}
 		boolean double_type = e_root . isDouble () || e_step . isDouble ();
-		while (table . size () > 0) {
-			int select = n . get (0, table . size ());
-			System . out . println ("MONITOR => " + table . size () + " : " + select);
+		while (length > 0) {
+			int select = n . get (0, length--);
 			parameters . setPair ();
-			if (double_type) parameters . getLeft () . setDouble (table . remove (select));
-			else parameters . getLeft () . setInteger (table . remove (select) . intValue ());
+			if (double_type) parameters . getLeft () . setDouble (table [select]);
+			else parameters . getLeft () . setInteger ((int) table [select]);
 			parameters = parameters . getRight ();
+			table [select] = table [length];
 		}
 		return true;
 	}
