@@ -52,6 +52,8 @@ PrologWindowsConsole :: PrologWindowsConsole (void) {
 	SetConsoleTitle ("HERCs PROLOG CONSOLE");
 	output = GetStdHandle (STD_OUTPUT_HANDLE);
 	input = GetStdHandle (STD_INPUT_HANDLE);
+	current_foreground = 0xffff00;
+	current_background = 0;
 	SetConsoleTextAttribute (output, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 }
 
@@ -63,6 +65,9 @@ PrologWindowsConsole :: ~ PrologWindowsConsole (void) {
 
 char * PrologWindowsConsole :: getPrompt (void) {return prompt;}
 void PrologWindowsConsole :: setPrompt (char * prompt) {prolog_string_copy (this -> prompt, prompt);}
+
+void PrologWindowsConsole :: setForeground (int foreground) {setColours (current_foreground = foreground, current_background);}
+void PrologWindowsConsole :: setBackground (int background) {setColours (current_foreground, current_background = background);}
 
 void PrologWindowsConsole :: setColours (int foreground, int background) {
 	if (output == NULL) return;

@@ -32,6 +32,7 @@ private:
 	HANDLE input;
 	AREA area;
 	PROLOG_STRING prompt;
+	int current_foreground, current_background;
 public:
 	virtual void print (char * text);
 	virtual int get (void);
