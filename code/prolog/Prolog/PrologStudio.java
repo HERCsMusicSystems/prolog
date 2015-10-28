@@ -27,6 +27,8 @@ import java . io . FileInputStream;
 import java . io . ByteArrayInputStream;
 import java . util . concurrent . Semaphore;
 import java . util . ArrayList;
+import java . util . LinkedList;
+import java . util . ListIterator;
 
 class studio_code extends PrologNativeCode {
 	public String name;
@@ -2673,38 +2675,16 @@ public:
 	}
 	history (PrologRoot * root, bool save) {this -> root = root; this -> save = save;}
 };
+*/
 
-class operating_system : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-#ifdef WINDOWS_OPERATING_SYSTEM
-		if (parameters -> isText ()) {
-			if (_stricmp (parameters -> getText (), "windows") == 0) return true;
-			return false;
-		}
-		parameters -> setText ("windows");
-#endif
-#ifdef LINUX_OPERATING_SYSTEM
-		if (parameters -> isText ()) {
-			if (strcasecmp (parameters -> getText (), "linux") == 0) return true;
-			return false;
-		}
-		parameters -> setText ("linux");
-#endif
-#ifdef OSX_OPERATING_SYSTEM
-		if (parameters -> isText ()) {
-			if (strcasecmp (parameters -> getText (), "osx") == 0) return true;
-			if (strcasecmp (parameters -> getText (), "apple") == 0) return true;
-			if (strcasecmp (parameters -> getText (), "mac") == 0) return true;
-			return false;
-		}
-		parameters -> setText ("osx");
-#endif
+class operating_system extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (parameters . isText ()) return parameters . getText () . equals (System . getProperty ("os.name"));
+		parameters . setText (System . getProperty ("os.name"));
 		return true;
 	}
-};
-*/
+}
 
 class implementation_code extends PrologNativeCode {
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
@@ -2719,18 +2699,28 @@ class implementation_code extends PrologNativeCode {
 // META //
 //////////
 
-/*class constant : public PrologNativeCode {
-private:
-	PrologElement * container;
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		parameters -> duplicate (container);
+class constant extends PrologNativeCode {
+	public PrologElement container;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		parameters . duplicate (container);
 		return true;
 	}
-	constant (PrologElement * term) {container = term -> duplicate ();}
-	~ constant (void) {delete container;}
-};
+	public constant (PrologElement term) {container = term . duplicate ();}
+}
 
+class CONSTANT_CODE extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement e = parameters . getLeft ();
+		PrologAtom atom = null;
+		if (e . isVar ()) e . setAtom (atom = new PrologAtom ());
+		else {if (! e . isAtom ()) return false; atom = e . getAtom ();}
+		parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		if (atom . getMachine () != null) return false;
+		return atom . setMachine (new constant (parameters . getLeft ()));
+	}
+}
+/*
 class CONSTANT : public PrologNativeCode {
 public:
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -2814,98 +2804,71 @@ class accumulator_code extends PrologNativeCode {
 	}
 }
 
-/*
-class stack_element {
-public:
-	PrologElement * el;
-	stack_element * next;
-	stack_element * drop (void) {stack_element * sub = next; next = 0; delete this; return sub;}
-	stack_element (PrologElement * el, stack_element * next = 0) {this -> el = el -> duplicate (); this -> next = next;}
-	~ stack_element (void) {delete el; while (next != 0) {stack_element * sub = next -> next; next -> next = 0; delete next; next = sub;}}
-};
-
-class stack : public PrologNativeCode {
-private:
-	PrologAtom * atom;
-	stack_element * sp;
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isVar ()) {
-			parameters -> setEarth ();
-			stack_element * p = sp;
-			while (p != 0) {parameters -> setPair (); parameters -> getLeft () -> duplicate (p -> el); parameters = parameters -> getRight (); p = p -> next;}
+class stack extends PrologNativeCode {
+	public PrologAtom atom;
+	public LinkedList <PrologElement> q = new LinkedList <PrologElement> ();
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isVar ()) {
+			parameters . setEarth ();
+			ListIterator <PrologElement> it = q . listIterator ();
+			while (it . hasNext ()) {parameters . setPair (); parameters . getLeft () . duplicate (it . next ()); parameters = parameters . getRight ();}
 			return true;
 		}
-		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
-		while (parameters -> isPair ()) {
-			PrologElement * el = parameters -> getLeft ();
-			if (el -> isVar ()) {if (sp == 0) return false; el -> duplicate (sp -> el); sp = sp -> drop ();}
-			else sp = new stack_element (el, sp);
-			parameters = parameters -> getRight ();
+		if (parameters . isEarth ()) {atom . setMachine (null); return true;}
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isVar ()) {if (q . size () < 1) return false; PrologElement ell = q . removeFirst (); el . duplicate (ell);}
+			else q . addFirst (el);
+			parameters = parameters . getRight ();
 		}
 		return true;
 	}
-	stack (PrologAtom * atom) {this -> atom = atom; sp = 0;}
-	~ stack (void) {if (sp != 0) delete sp;}
-};
+	public stack (PrologAtom atom) {this . atom = atom;}
+}
 
-class STACK : public PrologNativeCode {
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (parameters -> isVar ()) parameters -> setAtom (new PrologAtom ());
-		if (! parameters -> isAtom ()) return false;
-		PrologAtom * atom = parameters -> getAtom ();
-		if (atom -> getMachine () != 0) return false;
-		stack * st = new stack (atom);
-		if (atom -> setMachine (st)) return true;
-		delete st; return false;
+class STACK_CODE extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (parameters . isVar ()) parameters . setAtom (new PrologAtom ());
+		if (! parameters . isAtom ()) return false;
+		PrologAtom atom = parameters . getAtom ();
+		if (atom . getMachine () != null) return false;
+		return atom . setMachine (new stack (atom));
 	}
-};
+}
 
-class queue : public PrologNativeCode {
-private:
-	PrologAtom * atom;
-	stack_element * sp;
-	stack_element * ip;
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isVar ()) {
-			parameters -> setEarth ();
-			stack_element * p = sp;
-			while (p != 0) {parameters -> setPair (); parameters -> getLeft () -> duplicate (p -> el); parameters = parameters -> getRight (); p = p -> next;}
+class queue extends PrologNativeCode {
+	public PrologAtom atom;
+	public LinkedList <PrologElement> q = new LinkedList <PrologElement> ();
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isVar ()) {
+			parameters . setEarth ();
+			ListIterator <PrologElement> it = q . listIterator (q . size ());
+			while (it . hasPrevious ()) {parameters . setPair (); parameters . getLeft () . duplicate (it . previous ()); parameters = parameters . getRight ();}
 			return true;
 		}
-		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
-		while (parameters -> isPair ()) {
-			PrologElement * el = parameters -> getLeft ();
-			if (el -> isVar ()) {if (sp == 0) return false; el -> duplicate (sp -> el); sp = sp -> drop (); if (sp == 0) ip = 0;}
-			else {
-				if (sp == 0) sp = ip = new stack_element (el);
-				else ip = (ip -> next = new stack_element (el));
-			}
-			parameters = parameters -> getRight ();
+		if (parameters . isEarth ()) {atom . setMachine (null); return true;}
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isVar ()) {if (q . size () < 1) return false; PrologElement ell = q . removeLast (); el . duplicate (ell);}
+			else q . addFirst (el);
+			parameters = parameters . getRight ();
 		}
 		return true;
 	}
-	queue (PrologAtom * atom) {this -> atom = atom; sp = ip = 0;}
-	~ queue (void) {if (sp != 0) delete sp;}
-};
+	public queue (PrologAtom atom) {this . atom = atom;}
+}
 
-class QUEUE : public PrologNativeCode {
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (parameters -> isVar ()) parameters -> setAtom (new PrologAtom ());
-		if (! parameters -> isAtom ()) return false;
-		PrologAtom * atom = parameters -> getAtom ();
-		if (atom -> getMachine () != 0) return false;
-		queue * qt = new queue (atom);
-		if (atom -> setMachine (qt)) return true;
-		delete qt; return false;
+class QUEUE_CODE extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (parameters . isVar ()) parameters . setAtom (new PrologAtom ());
+		if (! parameters . isAtom ()) return false;
+		PrologAtom atom = parameters . getAtom ();
+		if (atom . getMachine () != null) return false;
+		return atom . setMachine (new queue (atom));
 	}
-};
-*/
+}
 
 class array_dimension {
 	public PrologElement [] elements;
@@ -3716,26 +3679,21 @@ class PrologStudio extends PrologServiceClass {
 	if (strcmp (name, "copy") == 0) return new copy_file (root);
 	if (strcmp (name, "save_history") == 0) return new history (root, true);
 	if (strcmp (name, "load_history") == 0) return new history (root, false);
-	if (strcmp (name, "operating_system") == 0) return new operating_system ();
 	*/
+		if (name . equals ("operating_system")) return new operating_system ();
 		if (name . equals ("implementation")) return new implementation_code ();
 
 		if (name . equals ("rnd")) return new rnd (n);
 		if (name . equals ("rnd_control")) return new rnd_control (n);
 		if (name . equals ("series")) return new series (n);
 
-	/*
-	if (strcmp (name, "CONSTANT") == 0) return new CONSTANT ();
-	*/
+		if (name . equals ("CONSTANT")) return new CONSTANT_CODE ();
 		if (name . equals ("VARIABLE")) return new variable_code ();
 		if (name . equals ("ACCUMULATOR")) return new accumulator_code ();
-	/*
-	if (strcmp (name, "STACK") == 0) return new STACK ();
-	if (strcmp (name, "QUEUE") == 0) return new QUEUE ();
-	*/
+		if (name . equals ("STACK")) return new STACK_CODE ();
+		if (name . equals ("QUEUE")) return new QUEUE_CODE ();
 		if (name . equals ("ARRAY")) return new ARRAY ();
 	/*
-	if (strcmp (name, "ARRAY") == 0) return new ARRAY ();
 	if (strcmp (name, "INDEX") == 0) return new INDEX (root, directory);
 
 	if (strcmp (name, "background") == 0) return new bgcolour (root);
