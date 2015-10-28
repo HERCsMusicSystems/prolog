@@ -31,7 +31,7 @@ import java . util . ArrayList;
 class studio_code extends PrologNativeCode {
 	public String name;
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
-		System . out . println ("CALLED [" + name + "]");
+		System . out . println ("==============================> CALLED [" + name + "]");
 		return false;
 	}
 	public studio_code (String name) {this . name = name;}
@@ -2905,157 +2905,83 @@ public:
 		delete qt; return false;
 	}
 };
+*/
 
-typedef void * void_pointer;
 class array_dimension {
-public:
-	void_pointer * content;
-	int size;
-	bool locked;
-	bool elements;
-	void insert_dimension (int size) {
-		int ind;
-		if (locked)
-			for (ind = 0; ind < this -> size; ind++)
-				((array_dimension *) (content [ind])) -> insert_dimension (size);
-		else
-			for (ind = 0; ind < this -> size; ind++)
-				content [ind] = (void *) new array_dimension (size);
-		locked = true;
+	public PrologElement [] elements;
+	public array_dimension [] dimensions;
+	public int size;
+	public void insert_dimension (int size) {
+		if (dimensions != null) {for (int ind = 0; ind < this . size; ind++) dimensions [ind] . insert_dimension (size);}
+		else {dimensions = new array_dimension [this . size]; for (int ind = 0; ind < this . size; ind++) dimensions [ind] = new array_dimension (size);}
 	}
-	void insert_elements (void) {
-		int ind;
-		if (elements) return;
-		if (locked)
-			for (ind = 0; ind < size; ind++)
-				((array_dimension *) (content [ind])) -> insert_elements ();
-		else {
-			for (ind = 0; ind < size; ind++)
-				content [ind] = (void *) new PrologElement ();
-			elements = true;
-		}
-		locked = true;
+	public void insert_elements () {
+		if (dimensions != null) {for (int ind = 0; ind < size; ind++) dimensions [ind] . insert_elements ();}
+		else {elements = new PrologElement [size]; for (int ind = 0; ind < size; ind++) elements [ind] = new PrologElement ();}
 	}
-	array_dimension * get_dimension (int location) {
-		if (location < 0 || location >= size || elements) return NULL;
-		return (array_dimension *) (content [location]);
-	}
-	PrologElement * * get_element (int location) {
-		if (location < 0 || location >= size || ! elements) return NULL;
-		return (PrologElement * *) (& content [location]);
-	}
-	array_dimension (int size) {
-		content = new void_pointer [size];
-		this -> size = size;
-		locked = false;
-		elements = false;
-	}
-	~ array_dimension (void) {
-		int ind;
-		if (elements)
-			for (ind = 0; ind < size; ind++)
-				delete (PrologElement *) (content [ind]);
-		else
-			for (ind = 0; ind < size; ind++)
-				delete (array_dimension *) (content [ind]);
-		delete [] content;
-	}
-};
+	public array_dimension get_dimension (int location) {if (location < 0 || location >= size || dimensions == null) return null; return dimensions [location];}
+	public PrologElement get_element (int location) {if (location < 0 || location >= size || elements == null) return null; return elements [location];}
+	public boolean set_element (int location, PrologElement el) {if (location < 0 || location >= size || elements == null) return false; elements [location] = el; return true;}
+	public array_dimension (int size) {this . size = size;}
+}
 
-class array : public PrologNativeCode {
-private:
-	PrologAtom * atom;
-	array_dimension * dimension;
-	int dimensions;
-public:
-	void insert_dimension (int size) {
-		if (dimension == NULL) dimension = new array_dimension (size);
-		else dimension -> insert_dimension (size);
-		dimensions++;
-	}
-	void insert_elements (void) {
-		if (dimension == NULL) return;
-		dimension -> insert_elements ();
-	}
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {
-			atom -> setMachine (0);
-			delete this;
-			return true;
-		}
+class array_code extends PrologNativeCode {
+	public PrologAtom atom;
+	public array_dimension dimension;
+	public int dimensions;
+	public void insert_dimension (int size) {if (dimension == null) dimension = new array_dimension (size); else dimension . insert_dimension (size); dimensions++;}
+	public void insert_elements () {if (dimension == null) return; dimension . insert_elements ();}
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isEarth ()) {atom . setMachine (null); return true;}
 		int ind = dimensions;
-		array_dimension * current_dimension = dimension;
-		PrologElement * left;
+		array_dimension current_dimension = dimension;
+		PrologElement left;
 		while (ind > 1) {
-			if (! parameters -> isPair ()) return false;
-			left = parameters -> getLeft ();
-			if (! left -> isInteger ()) return false;
-			parameters = parameters -> getRight ();
-			current_dimension = current_dimension -> get_dimension (left -> getInteger ());
-			if (current_dimension == NULL) return false;
+			if (! parameters . isPair ()) return false;
+			left = parameters . getLeft ();
+			if (! left . isInteger ()) return false;
+			parameters = parameters . getRight ();
+			current_dimension = current_dimension . get_dimension (left . getInteger ());
+			if (current_dimension == null) return false;
 			ind--;
 		}
-		if (! parameters -> isPair ()) return false;
-		left = parameters -> getLeft ();
-		if (! left -> isInteger ()) return false;
-		parameters = parameters -> getRight ();
-		PrologElement * * container = current_dimension -> get_element (left -> getInteger ());
-		if (container == NULL) return false;
-		if (parameters -> isPair ()) {
-			delete * container;
-			* container = parameters -> getLeft () -> duplicate ();
-			return true;
-		}
-		if (parameters -> isVar ()) {
-			parameters -> duplicate (* container);
-			return true;
-		}
+		if (! parameters . isPair ()) return false;
+		left = parameters . getLeft ();
+		if (! left . isInteger ()) return false;
+		parameters = parameters . getRight ();
+		int location = left . getInteger ();
+		if (parameters . isPair ()) return current_dimension . set_element (location, parameters . getLeft () . duplicate ());
+		if (parameters . isVar ()) {parameters . duplicate (current_dimension . get_element (location)); return true;}
 		return false;
 	}
-	array (PrologAtom * atom) {
-		this -> atom = atom;
-		dimension = NULL;
-		dimensions = 0;
-	}
-	~ array (void) {if (dimension) delete dimension;}
-};
+	public array_code (PrologAtom atom) {this . atom = atom;}
+}
 
-class ARRAY : public PrologNativeCode {
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * left = parameters -> getLeft ();
-		PrologAtom * atom = NULL;
-		if (left -> isVar ()) {
-			atom = new PrologAtom ();
-			left -> setAtom (atom);
-		} else {
-			if (! left -> isAtom ()) return false;
-			atom = left -> getAtom ();
+class ARRAY extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement left = parameters . getLeft ();
+		PrologAtom atom = null;
+		if (left . isVar ()) left . setAtom (atom = new PrologAtom ());
+		else {if (! left . isAtom ()) return false; atom = left . getAtom ();}
+		if (atom . getMachine () != null) return false;
+		array_code a = new array_code (atom);
+		parameters = parameters . getRight ();
+		while (parameters . isPair ()) {
+			left = parameters . getLeft (); if (! left . isInteger ()) return false;
+			a . insert_dimension (left . getInteger ());
+			parameters = parameters . getRight ();
 		}
-		if (atom -> getMachine () != 0) return false;
-		array * a = new array (atom);
-		parameters = parameters -> getRight ();
-		while (parameters -> isPair ()) {
-			left = parameters -> getLeft ();
-			if (! left -> isInteger ()) {
-				delete a;
-				return false;
-			}
-			a -> insert_dimension (left -> getInteger ());
-			parameters = parameters -> getRight ();
-		}
-		a -> insert_elements ();
-		if (atom -> setMachine (a)) return true;
-		delete a;
-		return false;
+		a . insert_elements ();
+		return atom . setMachine (a);
 	}
-};
+}
 
 //////////////////////////
 // MULTICORE RESOLUTION //
 //////////////////////////
 
+/*
 class index_resser {
 public:
 	PrologElement * res;
@@ -3806,6 +3732,9 @@ class PrologStudio extends PrologServiceClass {
 	/*
 	if (strcmp (name, "STACK") == 0) return new STACK ();
 	if (strcmp (name, "QUEUE") == 0) return new QUEUE ();
+	*/
+		if (name . equals ("ARRAY")) return new ARRAY ();
+	/*
 	if (strcmp (name, "ARRAY") == 0) return new ARRAY ();
 	if (strcmp (name, "INDEX") == 0) return new INDEX (root, directory);
 
