@@ -762,158 +762,92 @@ class sum extends PrologNativeCode {
 	}
 }
 
-/*
-class times : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e1 = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e2 = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		PrologElement * e3 = parameters -> isPair () ? parameters -> getLeft () : parameters;
+class times extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement e1 = parameters . getLeft (); parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement e2 = parameters . getLeft (); parameters = parameters . getRight ();
+		PrologElement e3 = parameters . isPair () ? parameters . getLeft () : parameters;
 		int ind;
 		double db;
-		if (e1 -> isInteger ()) {
-			if (e2 -> isInteger ()) {
-				e3 -> setInteger (e1 -> getInteger () * e2 -> getInteger ());
-				return true;
-			}
-			if (e2 -> isDouble ()) {
-				e3 -> setDouble (e1 -> getInteger () * e2 -> getDouble ());
-				return true;
-			}
-			ind = e1 -> getInteger ();
+		if (e1 . isInteger ()) {
+			if (e2 . isInteger ()) {e3 . setInteger (e1 . getInteger () * e2 . getInteger ()); return true;}
+			if (e2 . isDouble ()) {e3 . setDouble (e1 . getInteger () * e2 . getDouble ()); return true;}
+			ind = e1 . getInteger ();
 			if (ind == 0) return false;
-			if (e3 -> isInteger ()) {
-				e2 -> setInteger (e3 -> getInteger () / ind);
-				return true;
-			}
-			if (e3 -> isDouble ()) {
-				e2 -> setDouble (e3 -> getDouble () / ind);
-				return true;
-			}
+			if (e3 . isInteger ()) {e2 . setInteger (e3 . getInteger () / ind); return true;}
+			if (e3 . isDouble ()) {e2 . setDouble (e3 . getDouble () / ind); return true;}
 			return false;
 		}
-		if (e1 -> isDouble ()) {
-			if (e2 -> isInteger ()) {
-				e3 -> setDouble (e1 -> getDouble () * e2 -> getInteger ());
-				return true;
-			}
-			if (e2 -> isDouble ()) {
-				e3 -> setDouble (e1 -> getDouble () * e2 -> getDouble ());
-				return true;
-			}
-			db = e1 -> getDouble ();
+		if (e1 . isDouble ()) {
+			if (e2 . isInteger ()) {e3 . setDouble (e1 . getDouble () * e2 . getInteger ()); return true;}
+			if (e2 . isDouble ()) {e3 . setDouble (e1 . getDouble () * e2 . getDouble ()); return true;}
+			db = e1 . getDouble ();
 			if (db == 0.0) return false;
-			if (e3 -> isInteger ()) {
-				e2 -> setDouble (e3 -> getInteger () / db);
-				return true;
-			}
-			if (e3 -> isDouble ()) {
-				e2 -> setDouble (e3 -> getDouble () / db);
-				return true;
-			}
+			if (e3 . isInteger ()) {e2 . setDouble (e3 . getInteger () / db); return true;}
+			if (e3 . isDouble ()) {e2 . setDouble (e3 . getDouble () / db); return true;}
 			return false;
 		}
-		if (e2 -> isInteger ()) {
-			ind = e2 -> getInteger ();
+		if (e2 . isInteger ()) {
+			ind = e2 . getInteger ();
 			if (ind == 0) return false;
-			if (e3 -> isInteger ()) {
-				e1 -> setInteger (e3 -> getInteger () / ind);
-				return true;
-			}
-			if (e3 -> isDouble ()) {
-				e1 -> setDouble (e3 -> getDouble () / ind);
-				return true;
-			}
+			if (e3 . isInteger ()) {e1 . setInteger (e3 . getInteger () / ind); return true;}
+			if (e3 . isDouble ()) {e1 . setDouble (e3 . getDouble () / ind); return true;}
 			return false;
 		}
-		if (e2 -> isDouble ()) {
-			db = e2 -> getDouble ();
+		if (e2 . isDouble ()) {
+			db = e2 . getDouble ();
 			if (db == 0.0) return false;
-			if (e3 -> isInteger ()) {
-				e1 -> setDouble (e3 -> getInteger () / db);
-				return true;
-			}
-			if (e3 -> isDouble ()) {
-				e1 -> setDouble (e3 -> getDouble () / db);
-				return true;
-			}
+			if (e3 . isInteger ()) {e1 . setDouble (e3 . getInteger () / db); return true;}
+			if (e3 . isDouble ()) {e1 . setDouble (e3 . getDouble () / db); return true;}
 		}
 		return false;
 	}
-};
+}
 
-class mac : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		bool is_double = false;
-		PrologElement * e1 = parameters -> getLeft (); if (e1 -> isDouble ()) is_double = true; parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e2 = parameters -> getLeft (); if (e2 -> isDouble ()) is_double = true; parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e3 = parameters -> getLeft (); if (e3 -> isDouble ()) is_double = true; parameters = parameters -> getRight ();
-		PrologElement * e4 = parameters -> isPair () ? parameters -> getLeft () : parameters; if (e4 -> isDouble ()) is_double = true;
-		if (e1 -> isNumber ()) {
-			if (e2 -> isNumber ()) {
-				if (e3 -> isNumber ()) {
-					double ind = e1 -> getNumber () * e2 -> getNumber () + e3 -> getNumber ();
-					if (e4 -> isNumber ()) return e4 -> getNumber () == ind;
-					if (is_double) e4 -> setDouble (ind);
-					else e4 -> setInteger ((int) ind);
+class mac extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		boolean is_double = false;
+		PrologElement e1 = parameters . getLeft (); if (e1 . isDouble ()) is_double = true; parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement e2 = parameters . getLeft (); if (e2 . isDouble ()) is_double = true; parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement e3 = parameters . getLeft (); if (e3 . isDouble ()) is_double = true; parameters = parameters . getRight ();
+		PrologElement e4 = parameters . isPair () ? parameters . getLeft () : parameters; if (e4 . isDouble ()) is_double = true;
+		if (e1 . isNumber ()) {
+			if (e2 . isNumber ()) {
+				if (e3 . isNumber ()) {
+					double ind = e1 . getNumber () * e2 . getNumber () + e3 . getNumber ();
+					if (e4 . isNumber ()) return e4 . getNumber () == ind;
+					if (is_double) e4 . setDouble (ind); else e4 . setInteger ((int) ind);
 					return true;
 				}
-				if (e4 -> isNumber ()) {
-					double ind = e4 -> getNumber () - e1 -> getNumber () * e2 -> getNumber ();
-					if (is_double) e3 -> setDouble (ind);
-					else e3 -> setInteger ((int) ind);
+				if (e4 . isNumber ()) {
+					double ind = e4 . getNumber () - e1 . getNumber () * e2 . getNumber ();
+					if (is_double) e3 . setDouble (ind); else e3 . setInteger ((int) ind);
 					return true;
 				}
 			}
-			double ind = e1 -> getNumber ();
+			double ind = e1 . getNumber ();
 			if (ind == 0.0) return false;
-			if (e3 -> isNumber () && e4 -> isNumber ()) {
-				ind = (e4 -> getNumber () - e3 -> getNumber ()) / ind;
-				if (is_double) e2 -> setDouble (ind);
-				else e2 -> setInteger ((int) ind);
+			if (e3 . isNumber () && e4 . isNumber ()) {
+				ind = (e4 . getNumber () - e3 . getNumber ()) / ind;
+				if (is_double) e2 . setDouble (ind); else e2 . setInteger ((int) ind);
 				return true;
 			}
 			return false;
 		}
-		if (e2 -> isNumber ()) {
-			double ind = e2 -> getNumber ();
+		if (e2 . isNumber ()) {
+			double ind = e2 . getNumber ();
 			if (ind == 0.0) return false;
-			if (e3 -> isNumber () && e4 -> isNumber ()) {
-				ind = (e4 -> getNumber () - e3 -> getNumber ()) / ind;
-				if (is_double) e1 -> setDouble (ind);
-				else e1 -> setInteger ((int) ind);
+			if (e3 . isNumber () && e4 . isNumber ()) {
+				ind = (e4 . getNumber () - e3 . getNumber ()) / ind;
+				if (is_double) e1 . setDouble (ind); else e1 . setInteger ((int) ind);
 				return true;
 			}
 		}
 		return false;
 	}
-};
-	char * add_strings (char * area, char * text) {
-		if (area == 0) return create_text (text);
-		char * ret = create_text (strlen (area) + strlen (text) + 8);
-		sprintf (ret, "%s%s", area, text);
-		delete_text (area);
-		return ret;
-	}
-	char * add_strings (char * area, int ind) {
-		char command [128];
-		sprintf (command, "%i", ind);
-		return add_strings (area, command);
-	}
-	char * add_strings (char * area, double ind) {
-		char command [256];
-		sprintf (command, "%f", ind);
-		return add_strings (area, command);
-	}
-*/
+}
 
 class add extends PrologNativeCode {
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
@@ -2310,105 +2244,83 @@ class import_loader extends module_loader {public import_loader (PrologRoot root
 class load_loader extends module_loader {public load_loader (PrologRoot root) {this . root = root; this .echo = false; this . reload = true;}}
 class consult_loader extends module_loader {public consult_loader (PrologRoot root) {this . root = root; this . echo = true; this . reload = true;}}
 
-/*
-class remove_module : public PrologNativeCode {
-private:
-	PrologRoot * root;
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		while (parameters -> isPair ()) {
-			PrologElement * drop = parameters -> getLeft ();
-			if (! drop -> isText ()) return false;
-			if (! root -> drop (drop -> getText ())) return false;
-			parameters = parameters -> getRight ();
+class remove_module extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		while (parameters . isPair ()) {
+			PrologElement drop = parameters . getLeft ();
+			if (! drop . isText ()) return false;
+			if (! root . drop (drop . getText ())) return false;
+			parameters = parameters . getRight ();
 		}
 		return true;
 	}
-	remove_module (PrologRoot * root) {this -> root = root;}
-};
+	public remove_module (PrologRoot root) {this . root = root;}
+}
 
-class create_module : public PrologNativeCode {
-private:
-	PrologRoot * root;
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {root -> close (); return true;}
-		if (! parameters -> isPair ()) return false;
-		PrologElement * em = parameters -> getLeft ();
-		if (! em -> isText ()) return false;
-		parameters = parameters -> getRight ();
-		if (parameters -> isEarth ()) {root -> createDirectory (em -> getText ()); return true;}
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (! parameters -> isText ()) return false;
-		PrologServiceClass * service = root -> loadServiceClass (parameters -> getText ());
-		if (service == NULL) return false;
-		PrologDirectory * directory = root -> createDirectory (em -> getText (), service);
-		service -> init (root, directory);
+class create_module extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isEarth ()) {root . close (); return true;}
+		if (! parameters . isPair ()) return false;
+		PrologElement em = parameters . getLeft (); if (! em . isText ()) return false; parameters = parameters . getRight ();
+		if (parameters . isEarth ()) {root . createDirectory (em . getText ()); return true;}
+		if (! parameters . isPair ()) return false;
+		parameters = parameters . getLeft (); if (! parameters . isText ()) return false;
+		PrologServiceClass service = root . loadServiceClass (parameters . getText ());
+		if (service == null) return false;
+		PrologDirectory directory = root . createDirectory (em . getText (), service);
+		service . init (root, directory);
 		return true;
 	}
-	create_module (PrologRoot * root) {this -> root = root;}
-};
+	public create_module (PrologRoot root) {this . root = root;}
+}
 
-class set_machine : public PrologNativeCode {
-private:
-	PrologRoot * root;
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * ea = parameters -> getLeft ();
-		if (! ea -> isAtom ()) return false;
-		if (ea -> getAtom () -> getMachine () != 0) return false;
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * et = parameters -> getLeft ();
-		if (! et -> isText ()) return false;
-		parameters = parameters -> getRight ();
-		PrologServiceClass * service;
-		if (parameters -> isEarth ()) {
-			service = root -> getServiceClass ();
-			if (service == NULL) return false;
-			PrologNativeCode * native = service -> getNativeCode (et -> getText ());
-			if (native == NULL) return false;
-			bool ret = ea -> getAtom () -> setMachine (native);
-			if (! ret) delete native;
-			return ret;
+class set_machine extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement ea = parameters . getLeft ();
+		if (! ea . isAtom ()) return false;
+		if (ea . getAtom () . getMachine () != null) return false;
+		parameters = parameters . getRight ();
+		if (! parameters . isPair ()) return false;
+		PrologElement et = parameters . getLeft ();
+		if (! et . isText ()) return false;
+		parameters = parameters . getRight ();
+		if (parameters . isEarth ()) {
+			PrologServiceClass service = root . getServiceClass ();
+			if (service == null) return false;
+			PrologNativeCode native_code = service . getNativeCode (et . getText ());
+			if (native_code == null) return false;
+			return ea . getAtom () . setMachine (native_code);
 		}
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (! parameters -> isText ()) return false;
-		service = root -> getServiceClass (et -> getText ());
-		if (service == NULL) return false;
-		PrologNativeCode * native = service -> getNativeCode (parameters -> getText ());
-		if (native == NULL ) return false;
-		bool ret = ea -> getAtom () -> setMachine (native);
-		if (! ret) delete native;
-		return ret;
+		if (! parameters . isPair ()) return false;
+		parameters = parameters . getLeft ();
+		if (! parameters . isText ()) return false;
+		PrologServiceClass service = root . getServiceClass (et . getText ());
+		if (service == null) return false;
+		PrologNativeCode native_code = service . getNativeCode (parameters . getText ());
+		if (native_code == null) return false;
+		return ea . getAtom () . setMachine (native_code);
 	}
-	set_machine (PrologRoot * root) {this -> root = root;}
-};
+	public set_machine (PrologRoot root) {this . root = root;}
+}
 
-class machine_type : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * argument = parameters -> getLeft ();
-		if (! argument -> isAtom ()) return false;
-		PrologAtom * atom = argument -> getAtom ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (parameters -> isVar ()) {
-			char * machine_name = atom -> machineType ();
-			if (machine_name == 0) return false;
-			parameters -> setText (machine_name);
-			return true;
-		}
-		if (parameters -> isAtom ()) return atom -> isTypeOf (parameters -> getAtom ());
-		if (parameters -> isEarth ()) return atom -> isTypeOf (this);
+class machine_type extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement argument = parameters . getLeft ();
+		if (! argument . isAtom ()) return false;
+		PrologAtom atom = argument . getAtom ();
+		parameters = parameters . getRight ();
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (parameters . isVar ()) {parameters . setText (atom . machineType ()); return true;}
+		if (parameters . isAtom ()) return atom . isTypeOf (parameters . getAtom ());
+		if (parameters . isEarth ()) return atom . isTypeOf (this);
 		return false;
 	}
-};
-*/
+}
 
 class add_search_directory extends PrologNativeCode {
 	public PrologRoot root;
@@ -3540,9 +3452,9 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("sum")) return new sum ();
 		if (name . equals ("add")) return new add ();
 		if (name . equals ("sub")) return new sub ();
+		if (name . equals ("times")) return new times ();
+		if (name . equals ("mac")) return new mac ();
 	/*
-	if (strcmp (name, "times") == 0) return new times ();
-	if (strcmp (name, "mac") == 0) return new mac ();
 	if (strcmp (name, "mult") == 0) return new mult ();
 	*/
 		if (name . equals ("div")) return new division ();
@@ -3645,12 +3557,10 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("import_loader")) return new import_loader (root);
 		if (name . equals ("load_loader")) return new load_loader (root);
 		if (name . equals ("consult_loader")) return new consult_loader (root);
-	/*
-	if (strcmp (name, "remove_module") == 0) return new remove_module (root);
-	if (strcmp (name, "set_machine") == 0) return new set_machine (root);
-	if (strcmp (name, "machine_type") == 0) return new machine_type ();
-	if (strcmp (name, "create_module") == 0) return new create_module (root);
-	*/
+		if (name . equals ("remove_module")) return new remove_module (root);
+		if (name . equals ("set_machine")) return new set_machine (root);
+		if (name . equals ("machine_type")) return new machine_type ();
+		if (name . equals ("create_module")) return new create_module (root);
 		if (name . equals ("add_search_directory")) return new add_search_directory (root);
 		if (name . equals ("search_directories")) return new search_directories (root);
 	/*

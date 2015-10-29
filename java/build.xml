@@ -15,6 +15,7 @@
 		<jar destfile="studio.jar">
 			<fileset dir="." excludes="studio.jar build.xml"/>
 			<fileset dir="../code/prolog" includes="studio.prc"/>
+			<fileset dir="../code/prolog" includes="keyboard.prc"/>
 			<fileset dir="../code/prolog" includes="test.prc"/>
 			<manifest><attribute name="Main-Class" value="studio"/></manifest>
 		</jar>
