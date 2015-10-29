@@ -2408,66 +2408,53 @@ public:
 		return false;
 	}
 };
+*/
 
-class add_search_directory : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		while (parameters -> isPair ()) {
-			PrologElement * dir = parameters -> getLeft ();
-			if (! dir -> isText ()) return false;
-			root -> addSearchDirectory (dir -> getText ());
-			parameters = parameters -> getRight ();
+class add_search_directory extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		while (parameters . isPair ()) {
+			PrologElement dir = parameters . getLeft ();
+			if (! dir . isText ()) return false;
+			root . addSearchDirectory (dir . getText ());
+			parameters = parameters . getRight ();
 		}
 		return true;
 	}
-	add_search_directory (PrologRoot * root) {this -> root = root;}
-};
+	public add_search_directory (PrologRoot root) {this . root = root;}
+}
 
-class search_directories : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {
-			printf ("SEARCH DIRECTORIES:\n");
-			PrologString * search_directory = root -> search_directories;
-			while (search_directory != NULL) {
-				printf ("	[%s]\n", search_directory -> text);
-				search_directory = search_directory -> next;
-			}
+class search_directories extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isEarth ()) {
+			root . message ("SEARCH DIRECTORIES:");
+			ListIterator <String> it = root . search_directories . listIterator ();
+			while (it . hasNext ()) root . message ("	[" + it . next () + "]");
 			return true;
 		}
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (parameters -> isEarth ()) {root -> deleteSearchDirectories (); return true;}
-		if (parameters -> isVar ()) {
-			PrologString * search_directory = root -> search_directories;
-			if (search_directory == NULL) {parameters -> setEarth (); return true;}
-			while (search_directory != NULL) {
-				parameters -> setPair ();
-				parameters -> getLeft () -> setText (search_directory -> text);
-				parameters = parameters -> getRight ();
-				search_directory = search_directory -> next;
-			}
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (parameters . isEarth ()) {root . deleteSearchDirectories (); return true;}
+		if (parameters . isVar ()) {
+			if (root . search_directories . size () < 1) {parameters . setEarth (); return true;}
+			ListIterator <String> it = root . search_directories . listIterator ();
+			while (it . hasNext ()) {parameters . setPair (); parameters . getLeft () . setText (it . next ()); parameters = parameters . getRight ();}
 			return true;
 		}
-		if (parameters -> isPair ()) {
-			PrologString * search_directory = NULL;
-			root -> deleteSearchDirectories ();
-			while (parameters -> isPair ()) {
-				if (parameters -> getLeft () -> isText ()) {
-					PrologString * dir = new PrologString (parameters -> getLeft () -> getText (), NULL);
-					if (root -> search_directories == NULL) root -> search_directories = search_directory = dir;
-					else {search_directory -> next = dir; search_directory = search_directory -> next;}
-				}
-				parameters = parameters -> getRight ();
+		if (parameters . isPair ()) {
+			root . deleteSearchDirectories ();
+			while (parameters . isPair ()) {
+				if (parameters . getLeft () . isText ()) root . search_directories . add (parameters . getLeft () . getText ());
+				parameters = parameters . getRight ();
 			}
 			return true;
 		}
 		return false;
 	}
-	search_directories (PrologRoot * root) {this -> root = root;}
-};
+	public search_directories (PrologRoot root) {this . root = root;}
+}
 
+/*
 class cd : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -2529,20 +2516,19 @@ public:
 	}
 	DIR (PrologRoot * root) {this -> root = root;}
 };
+*/
 
-class ARGS : public PrologNativeCode {
-private:
-	PrologRoot * root;
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (root -> args == NULL) {parameters -> setEarth (); return true;}
-		PrologString * sp = root -> args;
-		while (sp != NULL) {parameters -> setPair (); parameters -> getLeft () -> setText (sp -> text); parameters = parameters -> getRight (); sp = sp -> next;}
+class ARGS extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (root . args . size () < 1) {parameters . setEarth (); return true;}
+		ListIterator <String> it = root . args . listIterator ();
+		while (it . hasNext ()) {parameters . setPair (); parameters . getLeft () . setText (it . next ()); parameters = parameters . getRight ();}
 		return true;
 	}
-	ARGS (PrologRoot * root) {this -> root = root;}
-};
-
+	public ARGS (PrologRoot root) {this . root = root;}
+}
+/*
 class edit : public PrologNativeCode {
 private:
 	PrologRoot * root;
@@ -3664,12 +3650,16 @@ class PrologStudio extends PrologServiceClass {
 	if (strcmp (name, "set_machine") == 0) return new set_machine (root);
 	if (strcmp (name, "machine_type") == 0) return new machine_type ();
 	if (strcmp (name, "create_module") == 0) return new create_module (root);
-	if (strcmp (name, "add_search_directory") == 0) return new add_search_directory (root);
-	if (strcmp (name, "search_directories") == 0) return new search_directories (root);
+	*/
+		if (name . equals ("add_search_directory")) return new add_search_directory (root);
+		if (name . equals ("search_directories")) return new search_directories (root);
+	/*
 	if (strcmp (name, "cd") == 0) return new cd (root);
 	if (strcmp (name, "relativise_path") == 0) return new relativise_path (root);
 	if (strcmp (name, "DIR") == 0) return new DIR (root);
-	if (strcmp (name, "ARGS") == 0) return new ARGS (root);
+	*/
+		if (name . equals ("ARGS")) return new ARGS (root);
+	/*
 	if (strcmp (name, "edit") == 0) return new edit (root);
 	if (strcmp (name, "execute") == 0) return new execute (root);
 	if (strcmp (name, "make_directory") == 0) return new make_directory (root);

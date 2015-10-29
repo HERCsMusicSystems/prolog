@@ -267,7 +267,7 @@ public class PrologRoot {
 	public void deleteSearchDirectories () {search_directories = new ArrayList <String> ();}
 	public void addSearchDirectory (String directory) {
 		if (search_directories == null) search_directories = new ArrayList <String> ();
-		search_directories . add (directory);
+		search_directories . add (0, directory);
 	}
 	public boolean searchDirectoryNotFound (String directory) {
 		if (search_directories == null) return true;
