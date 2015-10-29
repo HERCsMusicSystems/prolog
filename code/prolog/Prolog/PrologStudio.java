@@ -372,41 +372,40 @@ class create_atoms extends PrologNativeCode {
 	public create_atoms (PrologRoot root) {this . root = root;}
 }
 
-/*
-class search_atom : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool create;
-	bool sub_code (PrologElement * parameters, char * name) {
-		PrologAtom * atom = root -> search (name);
-		if (atom == 0 && create) atom = root -> createAtom (name);
-		if (atom == 0) return false;
-		parameters -> setAtom (atom);
+class search_atom extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean create;
+	public boolean sub_code (PrologElement parameters, String name) {
+		PrologAtom atom = root . search (name);
+		if (atom == null && create) atom = root . createAtom (name);
+		if (atom == null) return false;
+		parameters . setAtom (atom);
 		return true;
 	}
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * name = parameters -> getLeft (); if (! name -> isText ()) return false; parameters = parameters -> getRight ();
-		if (parameters -> isVar ()) return sub_code (parameters, name -> getText ());
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (e -> isVar ()) return sub_code (e, name -> getText ());
-		if (e -> isText ()) {
-			PrologDirectory * dir = root -> searchDirectory (name -> getText ());
-			if (dir == 0) return false;
-			PrologAtom * atom = dir -> searchAtom (e -> getText ());
-			if (atom == 0 && create) atom = dir -> createAtom (e -> getText ());
-			if (atom == 0) return false;
-			if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-			parameters -> setAtom (atom);
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement name = parameters . getLeft (); if (! name . isText ()) return false; parameters = parameters . getRight ();
+		if (parameters . isVar ()) return sub_code (parameters, name . getText ());
+		if (! parameters . isPair ()) return false;
+		PrologElement e = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (e . isVar ()) return sub_code (e, name . getText ());
+		if (e . isText ()) {
+			PrologDirectory dir = root . searchDirectory (name . getText ());
+			if (dir == null) return false;
+			PrologAtom atom = dir . searchAtom (e . getText ());
+			if (atom == null & create) atom = dir . createAtom (e . getText ());
+			if (atom == null) return false;
+			if (parameters . isPair ()) parameters = parameters . getLeft ();
+			parameters . setAtom (atom);
 			return true;
 		}
 		return false;
 	}
-	search_atom (PrologRoot * root, bool create) {this -> root = root; this -> create = create;}
-};
+	public search_atom (PrologRoot root, boolean create) {this . root = root; this . create = create;}
+}
 
+/*
 class unique_atoms : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -883,7 +882,7 @@ class add extends PrologNativeCode {
 					area += el . isText () ? el . getText () : el . getAtom () . name ();
 					result_type = 2;
 					break;
-				case 1: area += double_result; area += el . isText () ? el . getText () : el . getAtom () . name (); result_type = 2; break;
+				case 1: area += String . format ("%.6f", double_result); area += el . isText () ? el . getText () : el . getAtom () . name (); result_type = 2; break;
 				case 2: area += el . isText () ? el . getText () : el . getAtom () . name (); break;
 				}
 			}
@@ -3534,10 +3533,9 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("overwrite")) return new overwrite ();
 		if (name . equals ("create_atom")) return new create_atom (root);
 		if (name . equals ("create_atoms")) return new create_atoms (root);
+		if (name . equals ("search_atom")) return new search_atom (root, false);
+		if (name . equals ("search_atom_c")) return new search_atom (root, true);
 	/*
-	if (strcmp (name, "create_atoms") == 0) return new create_atoms (root);
-	if (strcmp (name, "search_atom") == 0) return new search_atom (root, false);
-	if (strcmp (name, "search_atom_c") == 0) return new search_atom (root, true);
 	if (strcmp (name, "unique_atoms") == 0) return new unique_atoms (root);*/
 		if (name . equals ("preprocessor")) return new preprocessor (root);/*
 	if (strcmp (name, "prompt") == 0) return new prompt (root);
