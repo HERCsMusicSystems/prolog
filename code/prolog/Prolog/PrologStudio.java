@@ -552,40 +552,36 @@ class has_machine extends PrologNativeCode {
 	}
 	public has_machine (PrologRoot root) {this . root = root;}
 }
-	/*
-class text_list : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		if (parameters -> getLeft () -> isText ()) {
-			char * text = parameters -> getLeft () -> getText ();
-			parameters = parameters -> getRight ();
-			if (! parameters -> isPair ()) return false;
-			parameters = parameters -> getLeft ();
-			while (* text != '\0') {
-				parameters -> setPair ();
-				parameters -> getLeft () -> setInteger (* text++);
-				parameters = parameters -> getRight ();
+
+class text_list extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		if (parameters . getLeft () . isText ()) {
+			String text = parameters . getLeft () . getText ();
+			parameters = parameters . getRight ();
+			if (! parameters . isPair ()) return false;
+			parameters = parameters . getLeft ();
+			for (int ind = 0; ind < text . length (); ind++) {
+				parameters . setPair ();
+				parameters . getLeft () . setInteger ((int) text . charAt (ind));
+				parameters = parameters . getRight ();
 			}
 			return true;
 		}
-		PrologElement * text_ptr = parameters -> getLeft ();
-		AREA area;
-		int area_ind = 0;
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		while (parameters -> isPair ()) {
-			if (! parameters -> getLeft () -> isInteger ()) return false;
-			area_ind = area_cat (area, area_ind, (char) parameters -> getLeft () -> getInteger ());
-			parameters = parameters -> getRight ();
+		PrologElement text_ptr = parameters . getLeft ();
+		String area = "";
+		parameters = parameters . getRight ();
+		if (! parameters . isPair ()) return false;
+		parameters = parameters . getLeft ();
+		while (parameters . isPair ()) {
+			if (! parameters . getLeft () . isInteger ()) return false;
+			area += (char) parameters . getLeft () . getInteger ();
+			parameters = parameters . getRight ();
 		}
-		text_ptr -> setText (area);
-		return parameters -> isEarth ();
+		text_ptr . setText (area);
+		return parameters . isEarth ();
 	}
-};
-
-*/
+}
 
 class term_reader extends PrologReader {
 	public InputStream fi;
@@ -625,46 +621,31 @@ class text_term extends PrologNativeCode {
 	public text_term (PrologRoot root) {this . root = root;}
 }
 
-/*
-class e32 : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
+class e32 extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
 		int ind = 0;
-		PrologElement * el = parameters -> getLeft ();
-		if (el -> isInteger ()) {
-			ind = el -> getInteger ();
-			parameters = parameters -> getRight (); parameters -> setPair (); parameters -> getLeft () -> setInteger (ind & 0xff);
-			parameters = parameters -> getRight (); parameters -> setPair (); parameters -> getLeft () -> setInteger ((ind >> 8) & 0xff);
-			parameters = parameters -> getRight (); parameters -> setPair (); parameters -> getLeft () -> setInteger ((ind >> 16) & 0xff);
-			parameters = parameters -> getRight (); parameters -> setPair (); parameters -> getLeft () -> setInteger ((ind >> 24) & 0xff);
+		PrologElement el = parameters . getLeft ();
+		if (el . isInteger ()) {
+			ind = el . getInteger ();
+			parameters = parameters . getRight (); parameters . setPair (); parameters . getLeft () . setInteger (ind & 0xff);
+			parameters = parameters . getRight (); parameters . setPair (); parameters . getLeft () . setInteger ((ind >> 8) & 0xff);
+			parameters = parameters . getRight (); parameters . setPair (); parameters . getLeft () . setInteger ((ind >> 16) & 0xff);
+			parameters = parameters . getRight (); parameters . setPair (); parameters . getLeft () . setInteger ((ind >> 24)& 0xff);
 			return true;
 		}
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) {el -> setInteger (ind); return true;}
-		PrologElement * ex = parameters -> getLeft ();
-		if (! ex -> isInteger ()) return false;
-		ind = ex -> getInteger ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) {el -> setInteger (ind); return true;}
-		ex = parameters -> getLeft ();
-		if (! ex -> isInteger ()) return false;
-		ind += ex -> getInteger () << 8;
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) {el -> setInteger (ind); return true;}
-		ex = parameters -> getLeft ();
-		if (! ex -> isInteger ()) return false;
-		ind += ex -> getInteger () << 16;
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) {el -> setInteger (ind); return true;}
-		ex = parameters -> getLeft ();
-		if (! ex -> isInteger ()) return false;
-		ind += ex -> getInteger () << 24;
-		el -> setInteger (ind);
+		parameters = parameters . getRight (); if (! parameters . isPair ()) {el . setInteger (ind); return true;}
+		PrologElement ex = parameters . getLeft (); if (! ex . isInteger ()) return false; ind = ex . getInteger ();
+		parameters = parameters . getRight (); if (! parameters . isPair ()) {el . setInteger (ind); return true;}
+		ex = parameters . getLeft (); if (! ex . isInteger ()) return false; ind += ex . getInteger () << 8;
+		parameters = parameters . getRight (); if (! parameters . isPair ()) {el . setInteger (ind); return true;}
+		ex = parameters . getLeft (); if (! ex . isInteger ()) return false; ind += ex . getInteger () << 16;
+		parameters = parameters . getRight (); if (! parameters . isPair ()) {el . setInteger (ind); return true;}
+		ex = parameters . getLeft (); if (! ex . isInteger ()) return false; ind += ex . getInteger () << 24;
+		el . setInteger (ind);
 		return true;
 	}
-};
-*/
+}
 
 class add1 extends PrologNativeCode {
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
@@ -3476,12 +3457,9 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("is_head")) return new is_head ();
 		if (name . equals ("is_text")) return new is_text ();
 		if (name . equals ("has_machine")) return new has_machine (root);
-		/*
-	if (strcmp (name, "has_machine") == 0) return new has_machine (root);
-	if (strcmp (name, "text_list") == 0) return new text_list ();*/
+		if (name . equals ("text_list")) return new text_list ();
 		if (name . equals ("text_term")) return new text_term (root);
-	/*if (strcmp (name, "e32") == 0) return new e32 ();
-	*/
+		if (name . equals ("e32")) return new e32 ();
 		if (name . equals ("less")) return new less ();
 		if (name . equals ("less_eq")) return new less_eq ();
 		if (name . equals ("greater")) return new greater ();
