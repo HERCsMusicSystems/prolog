@@ -75,6 +75,8 @@ public class PrologRoot {
 	public String protect_caption = "protect";
 	public String private_caption = "private";
 	public String end_caption = "end";
+	public String prompt = "";
+	public int prompt_character = 10;
 	public String serial_number = "";
 	public String key = "";
 	public int volume_id = 0;
@@ -574,7 +576,12 @@ public class PrologRoot {
 	public long get_system_time () {return System . currentTimeMillis ();}
 	public void start (PrologElement parameters) {new Thread (new CrackStarter (this, parameters)) . start ();}
 	public void wait_time (long milliseconds) {try {Thread . sleep (milliseconds);} catch (Exception ex) {}}
-	public int get_character () {try {if (reader != null) return reader . read (); return System . in . read ();} catch (Exception ex) {return 0;}}
+	public int get_character () {
+		try {
+			if (reader != null) {if (prompt_character == 10) print (prompt); return prompt_character = reader . read ();}
+			return System . in . read ();
+		} catch (Exception ex) {return 0;}
+	}
 	public boolean resolutionHead (String directory) {
 		PrologLoader loader = new PrologLoader (this);
 		if (directory . contains (".prb")) {

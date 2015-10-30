@@ -405,74 +405,66 @@ class search_atom extends PrologNativeCode {
 	public search_atom (PrologRoot root, boolean create) {this . root = root; this . create = create;}
 }
 
-/*
-class unique_atoms : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool duplicate_found (PrologAtom * atom, PrologElement * * var) {
-		if (atom -> Privated) return false;
-		int duplicates = 0;
-		PrologDirectory * dir = root -> root;
-		while (dir != 0) {
-			PrologAtom * at = dir -> firstAtom;
-			while (at != 0) {
-				if (at != atom) {
-					if (! at -> Privated && strcmp (at -> name (), atom -> name ()) == 0) {
-						if (* var == 0) printf ("@ %s . %s\n", dir -> name (), atom -> name ());
-						else {
-							PrologElement * el = * var;
-							el -> setPair (); el = el -> getLeft ();
-							el -> setPair (); el -> getLeft () -> setAtom (at); el = el -> getRight ();
-							el -> setPair (); el -> getLeft () -> setText (dir -> name ());
-							* var = (* var) -> getRight ();
+class unique_atoms extends PrologNativeCode {
+	public PrologRoot root;
+	class unique_atoms_var {
+		public PrologElement var;
+		public boolean duplicate_found (PrologAtom atom) {
+			if (atom . Privated) return false;
+			int duplicates = 0;
+			PrologDirectory dir = root . root;
+			while (dir != null) {
+				PrologAtom at = dir . firstAtom;
+				while (at != null) {
+					if (at != atom) {
+						if (! at . Privated && at . name () . equals (atom . name ())) {
+							if (var == null) root . message ("@ " + dir . name () + " . " + atom . name ());
+							else {
+								PrologElement el = var;
+								el . setPair (); el = el . getLeft ();
+								el . setPair (); el . getLeft () . setAtom (at); el = el . getRight ();
+								el . setPair (); el . getLeft () . setText (dir . name ());
+								var = var . getRight ();
+							}
+							duplicates++;
 						}
-						duplicates++;
 					}
+					at = at . next;
 				}
-				at = at -> next;
+				dir = dir . next;
 			}
-			dir = dir -> next;
+			return duplicates > 0;
 		}
-		return duplicates > 0;
 	}
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		bool no_duplicates_found = true;
-		bool need_processing = true;
-		PrologElement * var = 0;
-		while (parameters -> isPair ()) {
-			PrologElement * el = parameters -> getLeft ();
-			if (el -> isVar ()) {var = el; var -> setEarth ();}
-			if (el -> isAtom ()) {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		boolean no_duplicates_found = true;
+		boolean need_processing = true;
+		unique_atoms_var var = new unique_atoms_var ();
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isVar ()) {var . var = el; var . var . setEarth ();}
+			if (el . isAtom ()) {need_processing = false; if (var . duplicate_found (el . getAtom ())) no_duplicates_found = false;}
+			if (el . isText ()) {
 				need_processing = false;
-				if (duplicate_found (el -> getAtom (), & var)) no_duplicates_found = false;
+				PrologDirectory dir = root . searchDirectory (el . getText ());
+				if (dir == null) {root . message ("Directory " + el . getText () + " not found!"); return false;}
+				PrologAtom atom = dir . firstAtom;
+				while (atom != null) {if (var . duplicate_found (atom)) no_duplicates_found = false; atom = atom . next;}
 			}
-			if (el -> isText ()) {
-				need_processing = false;
-				PrologDirectory * dir = root -> searchDirectory (el -> getText ());
-				if (dir == 0) {printf ("Directory %s not found!\n", el -> getText ()); return false;}
-				PrologAtom * atom = dir -> firstAtom;
-				while (atom != 0) {
-					if (duplicate_found (atom, & var)) no_duplicates_found = false;
-					atom = atom -> next;
-				}
-			}
-			parameters = parameters -> getRight ();
+			parameters = parameters . getRight ();
 		}
 		if (need_processing) {
-			PrologDirectory * dir = root -> root;
-			while (dir != 0) {
-				PrologAtom * atom = dir -> firstAtom;
-				while (atom != 0) {
-					if (duplicate_found (atom, & var)) no_duplicates_found = false;
-					atom = atom -> next;
-				}
-				dir = dir -> next;
+			PrologDirectory dir = root . root;
+			while (dir != null) {
+				PrologAtom atom = dir . firstAtom;
+				while (atom != null) {if (var . duplicate_found (atom)) no_duplicates_found = false; atom = atom . next;}
+				dir = dir . next;
 			}
 		}
-		return var != 0 || no_duplicates_found;
+		return var . var != null || no_duplicates_found;
 	}
-	unique_atoms (PrologRoot * root) {this -> root = root;}
-};*/
+	public unique_atoms (PrologRoot root) {this . root = root;}
+}
 
 class preprocessor extends PrologNativeCode {
 	public PrologRoot root;
@@ -489,31 +481,19 @@ class preprocessor extends PrologNativeCode {
 	public preprocessor (PrologRoot root) {this . root = root;}
 }
 
-/*
-class prompt : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (root -> getCommander () == NULL) return false;
-		if (! parameters -> isPair ()) {
-			char * current_prompt = root -> getCommander () -> getPrompt ();
-			if (current_prompt == NULL) return false;
-			parameters -> setText (current_prompt);
-			return true;
-		}
-		parameters = parameters -> getLeft ();
-		if (parameters -> isText ()) {root -> getCommander () -> setPrompt (parameters -> getText ()); return true;}
-		if (parameters -> isVar ()) {
-			char * current_prompt = root -> getCommander () -> getPrompt ();
-			if (current_prompt == NULL) return false;
-			parameters -> setText (current_prompt);
-			return true;
-		}
+class prompt extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) {parameters . setText ("" + root . prompt); return true;}
+		parameters = parameters . getLeft ();
+		if (parameters . isText ()) {root . prompt = ("" + parameters . getText ()); return true;}
+		if (parameters . isVar ()) {parameters . setText ("" + root . prompt); return true;}
 		return false;
 	}
-	prompt (PrologRoot * root) {this -> root = root;}
-};
+	public prompt (PrologRoot root) {this . root = root;}
+}
 
+/*
 class query_stack : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -3535,10 +3515,10 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("create_atoms")) return new create_atoms (root);
 		if (name . equals ("search_atom")) return new search_atom (root, false);
 		if (name . equals ("search_atom_c")) return new search_atom (root, true);
+		if (name . equals ("unique_atoms")) return new unique_atoms (root);
+		if (name . equals ("preprocessor")) return new preprocessor (root);
+		if (name . equals ("prompt")) return new prompt (root);
 	/*
-	if (strcmp (name, "unique_atoms") == 0) return new unique_atoms (root);*/
-		if (name . equals ("preprocessor")) return new preprocessor (root);/*
-	if (strcmp (name, "prompt") == 0) return new prompt (root);
 	if (strcmp (name, "query_stack") == 0) return new query_stack (root);
 	if (strcmp (name, "object_counter") == 0) return new object_counter_class ();
 	*/
