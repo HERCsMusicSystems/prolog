@@ -380,6 +380,14 @@
 [TestWorks "ln 21 3" [ln 21 3]]
 [TestFails "ln 20 3" [ln 20 3]]
 
+[TestEq "log 5 125 *" 3 *x [log 5 125 *x]]
+[TestEq "log 5 125 : *" 3 *x [log 5 125 : *x]]
+[TestEq "log 5.0 25 *" 2.0 *x [log 5.0 25 *x]]
+[TestEq "log 5 25.0 : *" 2.0 *x [log 5 25.0 : *x]]
+[TestWorks "log 5 25 2" [log 5 25 2]]
+[TestFails "log 5 25.0 2" [log 5 25.0 2]]
+[TestFails "log 5 25 2.0" [log 5 25 2.0]]
+
 [TestEq "pow 2.0 3.0 *" 8.0 *x [pow 2.0 3.0 *x]]
 [TestEq "pow 2.0 3 *" 8.0 *x [pow 2.0 3 *x]]
 [TestEq "pow 2 3.0 : *" 8.0 *x [pow 2 3.0 : *x]]
