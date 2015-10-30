@@ -913,54 +913,28 @@ class division extends PrologNativeCode {
 	}
 }
 
-/*
-class mod : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e1 = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e2 = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		PrologElement * e_div = NULL;
-		if (parameters -> isPair ()) {
-			PrologElement * e = parameters -> getRight ();
-			if (e -> isPair ()) e_div = e -> getLeft ();
-			parameters = parameters -> getLeft ();
-		}
-		if (e2 -> isInteger ()) {
-			int ind = e2 -> getInteger ();
-			if (ind == 0) return false;
-			if (e1 -> isInteger ()) {
-				parameters -> setInteger (e1 -> getInteger () % ind);
-				if (e_div != NULL) e_div -> setInteger (e1 -> getInteger () / ind);
-				return true;
-			}
-			if (e1 -> isDouble ()) {
-				parameters -> setDouble ((int) e1 -> getDouble () % ind);
-				if (e_div != NULL) e_div -> setDouble ((int) e1 -> getDouble () / ind);
-				return true;
-			}
+class mod extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement e1 = parameters . getLeft (); parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement e2 = parameters . getLeft (); parameters = parameters . getRight ();
+		PrologElement e_div = null;
+		if (parameters . isPair ()) {PrologElement e = parameters . getRight (); if (e . isPair ()) e_div = e . getLeft (); parameters = parameters . getLeft ();}
+		if (e2 . isInteger ()) {
+			int ind = e2 . getInteger (); if (ind == 0) return false;
+			if (e1 . isInteger ()) {parameters . setInteger (e1 . getInteger () % ind); if (e_div != null) e_div . setInteger (e1 . getInteger () / ind); return true;}
+			if (e1 . isDouble ()) {parameters . setDouble ((int) e1 . getDouble () % ind); if (e_div != null) e_div . setDouble ((int) e1 . getDouble () / ind); return true;}
 			return false;
 		}
-		if (e2 -> isDouble ()) {
-			int db = (int) e2 -> getDouble ();
+		if (e2 . isDouble ()) {
+			int db = (int) e2 . getDouble ();
 			if (db == 0) return false;
-			if (e1 -> isInteger ()) {
-				parameters -> setDouble (e1 -> getInteger () % db);
-				if (e_div != NULL) e_div -> setDouble (e1 -> getInteger () / db);
-				return true;
-			}
-			if (e1 -> isDouble ()) {
-				parameters -> setDouble ((int) e1 -> getDouble () % db);
-				if (e_div != NULL) e_div -> setDouble ((int) e1 -> getDouble () / db);
-				return true;
-			}
+			if (e1 . isInteger ()) {parameters . setDouble (e1 . getInteger () % db); if (e_div != null) e_div . setDouble (e1 . getInteger () / db); return true;}
+			if (e1 . isDouble ()) {parameters . setDouble ((int) e1 . getDouble () % db); if (e_div != null) e_div . setDouble ((int) e1 . getDouble () / db); return true;}
 		}
 		return false;
 	}
-};*/
+}
 
 class sub extends PrologNativeCode {
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
@@ -993,320 +967,288 @@ class sub extends PrologNativeCode {
 	}
 }
 
-/*
-class mult : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * result = parameters -> getLeft ();
-		if (result -> isVar ()) parameters = parameters -> getRight ();
+class mult extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement result = parameters . getLeft ();
+		if (result . isVar ()) parameters = parameters . getRight ();
 		int result_type = 0;
 		int int_result = 1;
 		double double_result = 1.0;
-		while (parameters -> isPair ()) {
-			PrologElement * e1 = parameters -> getLeft ();
-			if (e1 -> isInteger ()) {
+		while (parameters . isPair ()) {
+			PrologElement e1 = parameters . getLeft ();
+			if (e1 . isInteger ()) {
 				switch (result_type) {
-				case 0: int_result *= e1 -> getInteger (); break;
-				case 1: double_result *= (double) e1 -> getInteger (); break;
+				case 0: int_result *= e1 . getInteger (); break;
+				case 1: double_result *= (double) e1 . getInteger (); break;
 				}
 			}
-			if (e1 -> isDouble ()) {
+			if (e1 . isDouble ()) {
 				switch (result_type) {
-				case 0: double_result *= e1 -> getDouble () * (double) int_result; result_type = 1; break;
-				case 1: double_result *= e1 -> getDouble (); break;
+				case 0: double_result *= e1 . getDouble () * (double) int_result; result_type = 1; break;
+				case 1: double_result *= e1 . getDouble (); break;
 				}
 			}
-			if (e1 -> isVar ()) {
+			if (e1 . isVar ()) {
 				switch (result_type) {
-				case 0: e1 -> setInteger (int_result); break;
-				case 1: e1 -> setDouble (double_result); break;
+				case 0: e1 . setInteger (int_result); break;
+				case 1: e1 . setDouble (double_result); break;
 				}
 				return true;
 			}
-			parameters = parameters -> getRight ();
+			parameters = parameters . getRight ();
 		}
-		if (parameters -> isVar ()) result = parameters;
+		if (parameters . isVar ()) result = parameters;
 		switch (result_type) {
-		case 0: result -> setInteger (int_result); break;
-		case 1: result -> setDouble (double_result); break;
+		case 0: result . setInteger (int_result); break;
+		case 1: result . setDouble (double_result); break;
 		}
 		return true;
 	}
-};
+}
 
-class logical : public PrologNativeCode {
-public:
-	virtual int operation (int a, int b) {return 0;}
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * a = parameters -> getLeft ();
-		if (! a -> isInteger ()) return false;
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * b = parameters -> getLeft ();
-		if (! b -> isInteger ()) return false;
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		parameters -> setInteger (operation (a -> getInteger (), b -> getInteger ()));
+class logical extends PrologNativeCode {
+	public int operation (int a, int b) {return 0;}
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement a = parameters . getLeft (); if (! a . isInteger ()) return false; parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement b = parameters . getLeft (); if (! b . isInteger ()) return false; parameters = parameters . getRight ();
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		parameters . setInteger (operation (a . getInteger (), b . getInteger ()));
 		return true;
 	}
-};
+}
 
-class logical_and : public logical {
-public:
-	int operation (int a, int b) {return a & b;}
-};
+class logical_and extends logical {public int operation (int a, int b) {return a & b;}}
+class logical_or extends logical {public int operation (int a, int b) {return a | b;}}
+class logical_xor extends logical {public int operation (int a, int b) {return a ^ b;}}
 
-class logical_or : public logical {
-public:
-	int operation (int a, int b) {return a | b;}
-};
-
-class logical_xor : public logical {
-public:
-	int operation (int a, int b) {return a ^ b;}
-};
-
-class abs_operation : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * el = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+class abs_operation extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement e1 = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
 		double a;
 		int ind;
-		if (el -> isDouble ()) {a = el -> getDouble (); parameters -> setDouble (a >= 0.0 ? a : - a); return true;}
-		if (el -> isInteger ()) {ind = el -> getInteger (); parameters -> setInteger (ind >= 0 ? ind : - ind); return true;}
+		if (e1 . isDouble ()) {a = e1 . getDouble (); parameters . setDouble (a >= 0.0 ? a : - a); return true;}
+		if (e1 . isInteger ()) {ind = e1 . getInteger (); parameters . setInteger (ind >= 0 ? ind : - ind); return true;}
 		return false;
 	}
-};
-class cos_operation : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * el = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (el -> isDouble ()) {parameters -> setDouble (cos (el -> getDouble ())); return true;}
-		if (el -> isInteger ()) {parameters -> setDouble (cos ((double) el -> getInteger () * M_PI / 180.0)); return true;}
-		if (el -> isVar ()) {
-			double sub = 2.0;
-			if (parameters -> isDouble ()) sub = parameters -> getDouble ();
-			if (parameters -> isInteger ()) sub = (double) parameters -> getInteger ();
-			if (sub > 1.0 || sub < -1.0) return false;
-			el -> setDouble (acos (sub));
-			return true;
-		}
-		return false;
-	}
-};
-class degrad_operation : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * el = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (el -> isInteger ()) {parameters -> setDouble ((double) el -> getInteger () * M_PI / 180.0); return true;}
-		if (el -> isDouble ()) {parameters -> setDouble (el -> getDouble () * M_PI / 180.0); return true;}
-		if (parameters -> isDouble ()) {el -> setDouble (parameters -> getDouble () * 180.0 / M_PI); return true;}
-		return false;
-	}
-};
-class e_operation : public PrologNativeCode {
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		parameters -> setDouble (M_E);
-		return true;
-	}
-};
-class exp_operation : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * el = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (el -> isDouble ()) {parameters -> setDouble (exp (el -> getDouble ())); return true;}
-		if (el -> isInteger ()) {parameters -> setInteger ((int) (exp ((double) el -> getInteger ()))); return true;}
-		if (parameters -> isDouble ()) {double d = parameters -> getDouble (); if (d <= 0.0) return false; el -> setDouble (log (d)); return true;}
-		if (parameters -> isInteger ()) {int d = parameters -> getInteger (); if (d <= 0) return false; el -> setInteger ((int) log ((double) d)); return true;}
-		return false;
-	}
-};
-class log2_operation : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * ex = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (ex -> isDouble ()) {double x = ex -> getDouble (); if (x <= 0.0) return false; parameters -> setDouble (log (x) / 0.69314718055994530941723212145818); return true;}
-		if (ex -> isInteger ()) {int x = ex -> getInteger (); if (x <= 0) return false; parameters -> setInteger ((int) (log ((double) x) / 0.69314718055994530941723212145818)); return true;}
-		if (parameters -> isDouble ()) {ex -> setDouble (pow (2.0, parameters -> getDouble ())); return true;}
-		if (parameters -> isInteger ()) {ex -> setInteger ((int) pow (2.0, (double) parameters -> getInteger ())); return true;}
-		return false;
-	}
-};
-class log10_operation : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * ex = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (ex -> isDouble ()) {double x = ex -> getDouble (); if (x <= 0.0) return false; parameters -> setDouble (log10 (x)); return true;}
-		if (ex -> isInteger ()) {int x = ex -> getInteger (); if (x <= 0) return false; parameters -> setInteger ((int) log10 ((double) x)); return true;}
-		if (parameters -> isDouble ()) {ex -> setDouble (pow (10.0, parameters -> getDouble ())); return true;}
-		if (parameters -> isInteger ()) {ex -> setInteger ((int) pow (10.0, (double) parameters -> getInteger ())); return true;}
-		return false;
-	}
-};
-class ln_operation : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * ex = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (ex -> isDouble ()) {double x = ex -> getDouble (); if (x <= 0.0) return false; parameters -> setDouble (log (x)); return true;}
-		if (ex -> isInteger ()) {int x = ex -> getInteger (); if (x <= 0) return false; parameters -> setInteger ((int) log ((double) x)); return true;}
-		if (parameters -> isDouble ()) {ex -> setDouble (exp (parameters -> getDouble ())); return true;}
-		if (parameters -> isInteger ()) {ex -> setInteger ((int) exp ((double) parameters -> getInteger ())); return true;}
-		return false;
-	}
-};
-class log_operation : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * ea = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * ex = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		PrologElement * en = parameters -> isPair () ? parameters -> getLeft () : parameters;
-		bool integer = true;
-		double a, x, n;
-		if (ea -> isDouble ()) {a = ea -> getDouble (); integer = false;}
-		else {if (! ea -> isInteger ()) return false; a = (double) ea -> getInteger ();}
-		if (ex -> isDouble ()) {x = ex -> getDouble (); integer = false;}
-		else {if (! ex -> isInteger ()) return false; x = (double) ex -> getInteger ();}
-		if (a <= 0.0) return false;
-		if (a == 1.0) return false;
-		if (x <= 0.0) return false;
-		n = log (x) / log (a);
-		if (integer) en -> setInteger ((int) n);
-		else en -> setDouble (n);
-		return true;
-	}
-};
-class pi_operation : public PrologNativeCode {
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		parameters -> setDouble (M_PI);
-		return true;
-	}
-};
-class pow_operation : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * ea = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * en = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		PrologElement * ex = parameters -> isPair () ? parameters -> getLeft () : parameters;
-		if (ea -> isDouble ()) {
-			double a = ea -> getDouble ();
-			if (en -> isDouble ()) {ex -> setDouble (pow (a, en -> getDouble ())); return true;}
-			if (en -> isInteger ()) {ex -> setDouble (pow (a, (double) en -> getInteger ())); return true;}
-			if (a <= 0.0 || a == 1.0) return false;
-			if (ex -> isDouble ()) {double x = ex -> getDouble (); if (x <= 0.0) return false; en -> setDouble (log (x) / log (a)); return true;}
-			if (ex -> isInteger ()) {int x = ex -> getInteger (); if (x <= 0) return false; en -> setDouble (log ((double) x) / log (a)); return true;}
-		}
-		if (ea -> isInteger ()) {
-			int a = ea -> getInteger ();
-			if (en -> isDouble ()) {ex -> setDouble (pow ((double) a, en -> getDouble ())); return true;}
-			if (en -> isInteger ()) {ex -> setInteger ((int) pow ((double) a, (double) en -> getInteger ())); return true;}
-			if (a <= 0 || a == 1) return false;
-			if (ex -> isDouble ()) {double x = ex -> getDouble (); if (x <= 0.0) return false; en -> setDouble (log (x) / log ((double) a)); return true;}
-			if (ex -> isInteger ()) {int x = ex -> getInteger (); if (x <= 0) return false; en -> setInteger ((int) (log ((double) x) / log ((double) a))); return true;}
-		}
-		if (en -> isDouble ()) {
-			double n = en -> getDouble ();
-			if (n == 0.0) return false;
-			n = 1.0 / n;
-			if (ex -> isDouble ()) {ea -> setDouble (pow (ex -> getDouble (), n)); return true;}
-			if (ex -> isInteger ()) {ea -> setDouble (pow ((double) ex -> getInteger (), n)); return true;}
-		}
-		if (en -> isInteger ()) {
-			double n = (double) en -> getInteger ();
-			if (n == 0.0) return false;
-			n = 1.0 / n;
-			if (ex -> isDouble ()) {ea -> setDouble (pow (ex -> getDouble (), n)); return true;}
-			if (ex -> isInteger ()) {ea -> setInteger ((int) pow ((double) ex -> getInteger (), n)); return true;}
-		}
-		return false;
-	}
-};
-class sin_operation : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * el = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (el -> isDouble ()) {parameters -> setDouble (sin (el -> getDouble ())); return true;}
-		if (el -> isInteger ()) {parameters -> setDouble (sin ((double) el -> getInteger () * M_PI / 180.0)); return true;}
-		if (el -> isVar ()) {
-			double sub = 2.0;
-			if (parameters -> isDouble ()) sub = parameters -> getDouble ();
-			if (parameters -> isInteger ()) sub = (double) parameters -> getInteger ();
-			if (sub > 1.0 || sub < -1.0) return false;
-			el -> setDouble (asin (sub));
-			return true;
-		}
-		return false;
-	}
-};
-class tan_operation : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * el = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (el -> isDouble ()) {parameters -> setDouble (tan (el -> getDouble ())); return true;}
-		if (el -> isInteger ()) {parameters -> setDouble (tan ((double) el -> getInteger () * M_PI / 180.0)); return true;}
-		if (parameters -> isDouble ()) {el -> setDouble (atan (parameters -> getDouble ())); return true;}
-		if (parameters -> isInteger ()) {el -> setDouble (atan ((double) parameters -> getInteger ())); return true;}
-		return false;
-	}
-};
-class trunc_operation : public PrologNativeCode {
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * left = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (left -> isDouble ()) {parameters -> setInteger ((int) left -> getDouble ()); return true;}
-		if (left -> isInteger ()) {parameters -> setDouble ((double) left -> getInteger ()); return true;}
-		if (left -> isVar ()) {
-			if (parameters -> isInteger ()) {left -> setDouble ((double) parameters -> getInteger ()); return true;}
-			if (parameters -> isDouble ()) {left -> setDouble ((double) ((int) parameters -> getDouble ())); return true;}
-			return false;
-		}
-		return false;
-	}
-};
+}
 
+class cos_operation extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement e1 = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (e1 . isDouble ()) {parameters . setDouble (Math . cos (e1 . getDouble ())); return true;}
+		if (e1 . isInteger ()) {parameters . setDouble (Math . cos (Math . toRadians (e1 . getInteger ()))); return true;}
+		if (e1 . isVar ()) {
+			double sub = 2.0;
+			if (parameters . isDouble ()) sub = parameters . getDouble ();
+			if (parameters . isInteger ()) sub = (double) parameters . getInteger ();
+			if (sub > 1.0 || sub < -1.0) return false;
+			e1 . setDouble (Math . acos (sub));
+			return true;
+		}
+		return false;
+	}
+}
+
+class degrad_operation extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement e1 = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (e1 . isInteger ()) {parameters . setDouble (Math . toRadians (e1 . getInteger ())); return true;}
+		if (e1 . isDouble ()) {parameters . setDouble (Math . toRadians (e1 . getDouble ())); return true;}
+		if (parameters . isDouble ()) {e1 . setDouble (Math . toDegrees (parameters . getDouble ())); return true;}
+		return false;
+	}
+}
+
+class e_operation extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		parameters . setDouble (Math . E);
+		return true;
+	}
+}
+
+class exp_operation extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement e1 = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (e1 . isDouble ()) {parameters . setDouble (Math . exp (e1 . getDouble ())); return true;}
+		if (e1 . isInteger ()) {parameters . setInteger ((int) (Math . exp ((double) e1 . getInteger ()))); return true;}
+		if (parameters . isDouble ()) {double d = parameters . getDouble (); if (d <= 0.0) return false; e1 . setDouble (Math . log (d)); return true;}
+		if (parameters . isInteger ()) {int d = parameters . getInteger (); if (d <= 0) return false; e1 . setInteger ((int) Math . log ((double) d)); return true;}
+		return false;
+	}
+}
+
+class log2_operation extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement ex = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (ex . isDouble ()) {double x = ex . getDouble (); if (x <= 0.0) return false; parameters . setDouble (Math . log (x) / Math . log (2.0)); return true;}
+		if (ex . isInteger ()) {int x = ex . getInteger (); if (x <= 0.0) return false; parameters . setInteger ((int) (Math . log ((double) x) / Math . log (2.0))); return true;}
+		if (parameters . isDouble ()) {ex . setDouble (Math . pow (2.0, parameters . getDouble ())); return true;}
+		if (parameters . isInteger ()) {ex . setInteger ((int) Math . pow (2.0, (double) parameters . getInteger ())); return true;}
+		return false;
+	}
+}
+
+class log10_operation extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement ex = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (ex . isDouble ()) {double x = ex . getDouble (); if (x <= 0.0) return false; parameters . setDouble (Math . log10 (x)); return true;}
+		if (ex . isInteger ()) {int x = ex . getInteger (); if (x <= 0.0) return false; parameters . setInteger ((int) Math . log10 ((double) x)); return true;}
+		if (parameters . isDouble ()) {ex . setDouble (Math . pow (10.0, parameters . getDouble ())); return true;}
+		if (parameters . isInteger ()) {ex . setInteger ((int) Math . pow (10.0, (double) parameters . getInteger ())); return true;}
+		return false;
+	}
+}
+
+class ln_operation extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement ex = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (ex . isDouble ()) {double x = ex . getDouble (); if (x <= 0.0) return false; parameters . setDouble (Math . log (x)); return true;}
+		if (ex . isInteger ()) {int x = ex . getInteger (); if (x <= 0.0) return false; parameters . setInteger ((int) Math . log ((double) x)); return true;}
+		if (parameters . isDouble ()) {ex . setDouble (Math . exp (parameters . getDouble ())); return true;}
+		if (parameters . isInteger ()) {ex . setInteger ((int) Math . exp ((double) parameters . getInteger ())); return true;}
+		return false;
+	}
+}
+
+class log_operation extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement ea = parameters . getLeft (); parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement ex = parameters . getLeft (); parameters = parameters . getRight ();
+		PrologElement en = parameters . isPair () ? parameters . getLeft () : parameters;
+		boolean integer = true;
+		double a, x, n;
+		if (ea . isDouble ()) {a = ea . getDouble (); integer = false;} else {if (! ea . isInteger ()) return false; a = (double) ea . getInteger ();}
+		if (ex . isDouble ()) {x = ex . getDouble (); integer = false;}	else {if (! ex . isInteger ()) return false; x = (double) ex . getInteger ();}
+		if (a <= 0.0 || a == 1.0 || x <= 0.0) return false;
+		n = Math . log (x) / Math . log (a);
+		if (integer) en . setInteger ((int) n); else en . setDouble (n);
+		return true;
+	}
+}
+
+class pi_operation extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		parameters . setDouble (Math . PI);
+		return true;
+	}
+}
+
+class pow_operation extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement ea = parameters . getLeft (); parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement en = parameters . getLeft (); parameters = parameters . getRight ();
+		PrologElement ex = parameters . isPair () ? parameters . getLeft () : parameters;
+		if (ea . isDouble ()) {
+			double a = ea . getDouble ();
+			if (en . isDouble ()) {ex . setDouble (Math . pow (a, en . getDouble ())); return true;}
+			if (en . isInteger ()) {ex . setDouble (Math . pow (a, (double) en . getInteger ())); return true;}
+			if (a <= 0.0 || a== 1.0) return false;
+			if (ex . isDouble ()) {double x = ex . getDouble (); if (x <= 0.0) return false; en . setDouble (Math . log (x) / Math . log (a)); return true;}
+			if (ex . isInteger ()) {int x = ex . getInteger (); if (x <= 0) return false; en . setDouble (Math . log ((double) x) / Math . log (a)); return true;}
+		}
+		if (ea . isInteger ()) {
+			int a = ea . getInteger ();
+			if (en . isDouble ()) {ex . setDouble (Math . pow ((double) a, en . getDouble ())); return true;}
+			if (en . isInteger ()) {ex . setInteger ((int) Math . pow ((double) a, (double) en . getInteger ())); return true;}
+			if (a <= 0 || a == 1) return false;
+			if (ex . isDouble ()) {double x = ex . getDouble (); if (x <= 0.0) return false; en . setDouble (Math . log (x) / Math . log ((double) a)); return true;}
+			if (ex . isInteger ()) {int x = ex . getInteger (); if (x <= 0) return false; en . setInteger ((int) (Math . log ((double) x) / Math . log ((double) a))); return true;}
+		}
+		if (en . isDouble ()) {
+			double n = en . getDouble ();
+			if (n == 0.0) return false;
+			n = 1.0 / n;
+			if (ex . isDouble ()) {ea . setDouble (Math . pow (ex . getDouble (), n)); return true;}
+			if (ex . isInteger ()) {ea . setDouble (Math . pow ((double) ex . getInteger (), n)); return true;}
+		}
+		if (en . isInteger ()) {
+			double n = (double) en . getInteger ();
+			if (n == 0.0) return false;
+			n = 1.0 / n;
+			if (ex . isDouble ()) {ea . setDouble (Math . pow (ex . getDouble (), n)); return true;}
+			if (ex . isInteger ()) {ea . setInteger ((int) Math . pow ((double) ex . getInteger (), n)); return true;}
+		}
+		return false;
+	}
+}
+
+class sin_operation extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement e1 = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (e1 . isDouble ()) {parameters . setDouble (Math . sin (e1 . getDouble ())); return true;}
+		if (e1 . isInteger ()) {parameters . setDouble (Math . sin (Math . toRadians (e1 . getInteger ()))); return true;}
+		if (e1 . isVar ()) {
+			double sub = 2.0;
+			if (parameters . isDouble ()) sub = parameters . getDouble ();
+			if (parameters . isInteger ()) sub = (double) parameters . getInteger ();
+			if (sub > 1.0 || sub < -1.0) return false;
+			e1 . setDouble (Math . asin (sub));
+			return true;
+		}
+		return false;
+	}
+}
+
+class tan_operation extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement e1 = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (e1 . isDouble ()) {parameters . setDouble (Math . tan (e1 . getDouble ())); return true;}
+		if (e1 . isInteger ()) {parameters . setDouble (Math . tan (Math . toRadians (e1 . getInteger ()))); return true;}
+		if (parameters . isDouble ()) {e1 . setDouble (Math . atan (parameters . getDouble ())); return true;}
+		if (parameters . isInteger ()) {e1 . setDouble (Math . atan ((double) parameters . getInteger ())); return true;}
+		return false;
+	}
+}
+
+class trunc_operation extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement left = parameters . getLeft (); parameters = parameters . getRight ();
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (left . isDouble ()) {parameters . setInteger ((int) left . getDouble ()); return true;}
+		if (left . isInteger ()) {parameters . setDouble ((double) left . getInteger ()); return true;}
+		if (left . isVar ()) {
+			if (parameters . isInteger ()) {left . setDouble ((double) parameters . getInteger ()); return true;}
+			if (parameters . isDouble ()) {left . setDouble ((double) ((int) parameters . getDouble ())); return true;}
+		}
+		return false;
+	}
+}
+
+/*
 class StringToLower : public PrologNativeCode {
 public:
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -3414,31 +3356,29 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("sub")) return new sub ();
 		if (name . equals ("times")) return new times ();
 		if (name . equals ("mac")) return new mac ();
-	/*
-	if (strcmp (name, "mult") == 0) return new mult ();
-	*/
+		if (name . equals ("mult")) return new mult ();
 		if (name . equals ("div")) return new division ();
+		if (name . equals ("mod")) return new mod ();
+		if (name . equals ("and")) return new logical_and ();
+		if (name . equals ("or")) return new logical_or ();
+		if (name . equals ("xor")) return new logical_xor ();
+
+		if (name . equals ("abs")) return new abs_operation ();
+		if (name . equals ("cos")) return new cos_operation ();
+		if (name . equals ("degrad")) return new degrad_operation ();
+		if (name . equals ("e")) return new e_operation ();
+		if (name . equals ("exp")) return new exp_operation ();
+		if (name . equals ("log2")) return new log2_operation ();
+		if (name . equals ("log10")) return new log10_operation ();
+		if (name . equals ("ln")) return new ln_operation ();
+		if (name . equals ("log")) return new log_operation ();
+		if (name . equals ("pi")) return new pi_operation ();
+		if (name . equals ("pow")) return new pow_operation ();
+		if (name . equals ("sin")) return new sin_operation ();
+		if (name . equals ("tan")) return new tan_operation ();
+		if (name . equals ("trunc")) return new trunc_operation ();
+
 	/*
-	if (strcmp (name, "mod") == 0) return new mod ();
-	if (strcmp (name, "and") == 0) return new logical_and ();
-	if (strcmp (name, "or") == 0) return new logical_or ();
-	if (strcmp (name, "xor") == 0) return new logical_xor ();
-
-	if (strcmp (name, "abs") == 0) return new abs_operation ();
-	if (strcmp (name, "cos") == 0) return new cos_operation ();
-	if (strcmp (name, "degrad") == 0) return new degrad_operation ();
-	if (strcmp (name, "e") == 0) return new e_operation ();
-	if (strcmp (name, "exp") == 0) return new exp_operation ();
-	if (strcmp (name, "log2") == 0) return new log2_operation ();
-	if (strcmp (name, "log10") == 0) return new log10_operation ();
-	if (strcmp (name, "ln") == 0) return new ln_operation ();
-	if (strcmp (name, "log") == 0) return new log_operation ();
-	if (strcmp (name, "pi") == 0) return new pi_operation ();
-	if (strcmp (name, "pow") == 0) return new pow_operation ();
-	if (strcmp (name, "sin") == 0) return new sin_operation ();
-	if (strcmp (name, "tan") == 0) return new tan_operation ();
-	if (strcmp (name, "trunc") == 0) return new trunc_operation ();
-
 	if (strcmp (name, "StringToLower") == 0) return new StringToLower ();
 	if (strcmp (name, "StringToUpper") == 0) return new StringToUpper ();
 	if (strcmp (name, "StringReplaceOnce") == 0) return new StringReplaceOnce ();
