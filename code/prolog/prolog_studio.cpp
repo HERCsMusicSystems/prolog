@@ -549,8 +549,15 @@ public:
 			while (at != 0) {
 				if (at != atom) {
 					if (! at -> Privated && strcmp (at -> name (), atom -> name ()) == 0) {
-						if (* var == 0) printf ("@ %s . %s\n", dir -> name (), atom -> name ());
-						else {
+						if (* var == 0) {
+							AREA area;
+							int ind = area_cat (area, 0, "@ ");
+							ind = area_cat (area, ind, dir -> name ());
+							ind = area_cat (area, ind, " . ");
+							ind = area_cat (area, ind, atom -> name ());
+							ind = area_cat (area, ind, "\n");
+							root -> print (area);
+						} else {
 							PrologElement * el = * var;
 							el -> setPair (); el = el -> getLeft ();
 							el -> setPair (); el -> getLeft () -> setAtom (at); el = el -> getRight ();
@@ -580,7 +587,7 @@ public:
 			if (el -> isText ()) {
 				need_processing = false;
 				PrologDirectory * dir = root -> searchDirectory (el -> getText ());
-				if (dir == 0) {printf ("Directory %s not found!\n", el -> getText ()); return false;}
+				if (dir == 0) {root -> message ("Directory not found!", el -> getText ()); return false;}
 				PrologAtom * atom = dir -> firstAtom;
 				while (atom != 0) {
 					if (duplicate_found (atom, & var)) no_duplicates_found = false;
