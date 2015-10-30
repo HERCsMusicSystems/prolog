@@ -1,0 +1,101 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "studio_resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "windows.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (Australia) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RCDATA
+//
+
+STUDIO_PRC              RCDATA                  "../code/prolog/studio.prc"
+STORE_PRC               RCDATA                  "../code/prolog/store.prc"
+HELP_PRC                RCDATA                  "../code/prolog/help.prc"
+KEYBOARD_PRC            RCDATA                  "../code/prolog/keyboard.prc"
+RECORD_PRC              RCDATA                  "../code/prolog/record.prc"
+NEURAL_PRC              RCDATA                  "../code/prolog/neural.prc"
+F1_PRC                  RCDATA                  "../code/prolog/f1.prc"
+SQL_PRC                 RCDATA                  "../code/prolog/sql.prc"
+CONDUCTOR_PRC           RCDATA                  "../code/prolog/conductor.prc"
+MIDI_PRC                RCDATA                  "../code/prolog/midi.prc"
+HTTP_PRC                RCDATA                  "../code/prolog/http.prc"
+TEST_PRC                RCDATA                  "../code/prolog/test.prc"
+XML_PRC                 RCDATA                  "../code/prolog/xml.prc"
+DISTRIBUTION_PRC        RCDATA                  "../code/prolog/distribution.prc"
+CONTROL_PRC             RCDATA                  "../code/prolog/control.prc"
+#endif    // English (Australia) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (Australia) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENA)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_A                   ICON                    "IconH.ico"
+#endif    // English (Australia) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
