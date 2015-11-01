@@ -3,9 +3,10 @@
 ;;        ALL RIGHTS RESERVED        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-program control #machine := "prolog.control" [joystick]
+program control #machine := "prolog.control" [joystick serial]
 
 #machine joystick := "joystick"
+#machine serial := "serial"
 
 end.
 

@@ -33,6 +33,8 @@ static void usleep (int delay) {Sleep (delay);}
 #include <unistd.h>
 #endif
 
+#include <fcntl.h>
+
 /*********************************************************
 
 [joystick "dev/js0" js cb 0.0] => opens joystick with ultra callback
@@ -117,6 +119,28 @@ prolog_joystick :: ~ prolog_joystick (void) {
 	if (callback != 0) callback -> removeAtom (); callback = 0;
 }
 
+class serial_code : public PrologNativeCode {
+public:
+	PrologAtom * atom;
+	int fd;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (parameters -> isVar ()) {
+			int ind = 0;
+			read (fd, & ind, 1);
+			parameters -> setInteger (ind);
+			return true;
+		}
+		return false;
+	}
+	serial_code (char * location, PrologAtom * atom) {
+		this -> atom = atom;
+		fd = open (location, O_RDONLY | O_NONBLOCK);
+		printf ("LOCATION [%i]\n", fd);
+	}
+};
+
 class joystick_code : public PrologNativeCode {
 public:
 	prolog_joystick js;
@@ -195,9 +219,37 @@ public:
 	create_joystick (PrologRoot * root) {this -> root = root;}
 };
 
+class create_serial : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		PrologElement * path = 0;
+		PrologElement * atom = 0;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isText ()) path = el;
+			if (el -> isVar ()) el -> setAtom (new PrologAtom ());
+			if (el -> isAtom ()) atom = el;
+			parameters = parameters -> getRight ();
+		}
+		if (atom == 0) return false;
+		if (atom -> getAtom () -> getMachine () != 0) return false;
+		char * serial_location;
+		if (path != 0) serial_location = path -> getText ();
+		else serial_location = "/dev/ttyACM0";
+		serial_code * sc = new serial_code (serial_location, atom -> getAtom ());
+		if (atom -> getAtom () -> setMachine (sc)) return true;
+		delete sc;
+		return false;
+	}
+	create_serial (PrologRoot * root) {this -> root = root;}
+};
+
 void PrologControlServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {this -> root = root;}
 
 PrologNativeCode * PrologControlServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "joystick") == 0) return new create_joystick (root);
+	if (strcmp (name, "serial") == 0) return new create_serial (root);
 	return 0;
 }
+
