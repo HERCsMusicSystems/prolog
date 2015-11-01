@@ -29,6 +29,8 @@ import java . util . concurrent . Semaphore;
 import java . util . ArrayList;
 import java . util . LinkedList;
 import java . util . ListIterator;
+import java . util . Calendar;
+import java . util . Date;
 
 class studio_code extends PrologNativeCode {
 	public String name;
@@ -1248,120 +1250,63 @@ class trunc_operation extends PrologNativeCode {
 	}
 }
 
-/*
-class StringToLower : public PrologNativeCode {
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * source = parameters -> getLeft (); parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (source -> isText () && parameters -> isVar ()) {
-			char * command = create_text (source -> getText ());
-			char * cp = command;
-			while (* cp != '\0') {* cp = tolower (* cp); cp++;}
-			parameters -> setText (command);
-			delete_text (command);
-			return true;
-		}
-		if (parameters -> isText () && source -> isVar ()) {
-			char * command = create_text (parameters -> getText ());
-			char * cp = command;
-			while (* cp != '\0') {* cp = toupper (* cp); cp++;}
-			source -> setText (command);
-			delete_text (command);
-			return true;
-		}
+class StringToLower extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement source = parameters . getLeft (); parameters = parameters . getRight ();
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (source . isText () && parameters . isVar ()) {parameters . setText (source . getText () . toLowerCase ()); return true;}
+		if (parameters . isText () && source . isVar ()) {source . setText (parameters . getText () . toUpperCase ()); return true;}
 		return false;
 	}
-};
-class StringToUpper : public PrologNativeCode {
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * source = parameters -> getLeft (); parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (source -> isText () && parameters -> isVar ()) {
-			char * command = create_text (source -> getText ());
-			char * cp = command;
-			while (* cp != '\0') {* cp = toupper (* cp); cp++;}
-			parameters -> setText (command);
-			delete_text (command);
-			return true;
-		}
-		if (parameters -> isText () && source -> isVar ()) {
-			char * command = create_text (parameters -> getText ());
-			char * cp = command;
-			while (* cp != '\0') {* cp = tolower (* cp); cp++;}
-			source -> setText (command);
-			delete_text (command);
-			return true;
-		}
+}
+
+class StringToUpper extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement source = parameters . getLeft (); parameters = parameters . getRight ();
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (source . isText () && parameters . isVar ()) {parameters . setText (source . getText () . toUpperCase ()); return true;}
+		if (parameters . isText () && source . isVar ()) {source . setText (parameters . getText () . toLowerCase ()); return true;}
 		return false;
 	}
-};
-class StringReplaceOnce : public PrologNativeCode {
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * source = parameters -> getLeft (); if (! source -> isText ()) return false;
-		parameters = parameters -> getRight (); if (! parameters -> isPair ()) return false;
-		PrologElement * pattern = parameters -> getLeft (); if (! pattern -> isText ()) return false;
-		parameters = parameters -> getRight (); if (! parameters -> isPair ()) return false;
-		PrologElement * replacement = parameters -> getLeft (); if (! replacement -> isText ()) return false;
-		parameters = parameters -> getRight (); if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (! parameters -> isVar ()) return false;
-		char * src = source -> getText ();
-		char * pat = pattern -> getText ();
-		char * rep = replacement -> getText ();
-		char * occu = strstr (src, pat);
-		if (occu == 0) {parameters -> setText (src); return true;}
-		char * dest = new char [strlen (src) + strlen (rep) + 1];
-		char * cpf = src;
-		char * cpt = dest;
-		while (cpf < occu) * cpt++ = * cpf++; cpf = rep;
-		while (* cpf != '\0') * cpt++ = * cpf++; cpf = occu + strlen (pat);
-		while (* cpf != '\0') * cpt++ = * cpf++; * cpt = '\0';
-		parameters -> setText (dest);
-		delete [] dest;
+}
+
+class StringReplaceOnce extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement source = parameters . getLeft (); if (! source . isText ()) return false;
+		parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement pattern = parameters . getLeft (); if (! pattern . isText ()) return false;
+		parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement replacement = parameters . getLeft (); if (! replacement . isText ()) return false;
+		parameters = parameters . getRight (); if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (! parameters . isVar ()) return false;
+		parameters . setText (source . getText () . replaceFirst (pattern . getText (), replacement . getText ()));
 		return true;
 	}
-};
-class StringReplaceAll : public PrologNativeCode {
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * source = parameters -> getLeft (); if (! source -> isText ()) return false;
-		parameters = parameters -> getRight (); if (! parameters -> isPair ()) return false;
-		PrologElement * pattern = parameters -> getLeft (); if (! pattern -> isText ()) return false;
-		parameters = parameters -> getRight (); if (! parameters -> isPair ()) return false;
-		PrologElement * replacement = parameters -> getLeft (); if (! replacement -> isText ()) return false;
-		parameters = parameters -> getRight (); if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (! parameters -> isVar ()) return false;
-		int occurences = 0;
-		char * cpf = source -> getText ();
-		char * pat = pattern -> getText ();
-		int pat_length = strlen (pat);
-		while ((cpf = strstr (cpf, pat)) != 0) {occurences++; cpf += pat_length;}
-		cpf = source -> getText ();
-		if (occurences < 1) {parameters -> setText (cpf); return true;}
-		char * rep = replacement -> getText ();
-		char * dest = new char [strlen (cpf) + strlen (rep) * occurences + 1];
-		char * occu;
-		char * cpt = dest;
-		while ((occu = strstr (cpf, pat)) != 0) {
-			while (cpf < occu) * cpt++ = * cpf++; cpf = rep;
-			while (* cpf != '\0') * cpt++ = * cpf++; cpf = occu + pat_length;
-		}
-		while (* cpf != '\0') * cpt++ = * cpf++; * cpt = '\0';
-		parameters -> setText (dest);
-		delete [] dest;
+}
+
+class StringReplaceAll extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement source = parameters . getLeft (); if (! source . isText ()) return false;
+		parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement pattern = parameters . getLeft (); if (! pattern . isText ()) return false;
+		parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement replacement = parameters . getLeft (); if (! replacement . isText ()) return false;
+		parameters = parameters . getRight (); if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (! parameters . isVar ()) return false;
+		parameters . setText (source . getText () . replaceAll (pattern . getText (), replacement . getText ()));
 		return true;
 	}
-};
+}
 
 /////////////////////////////////////
 // TRIGONOMETRICAL TRANSFORMATIONS //
 /////////////////////////////////////
 
+/*
 void CalculateDFT (double * f, double * rec, double * ims, int count) {
 	// count = number of samples
 	double frac = count > 1 ? 1.0 / (double) count : 1.0;
@@ -1600,7 +1545,82 @@ public:
 	}
 	DFT (bool fast) {this -> fast = fast;}
 };
+*/
 
+class timestamp extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) parameters . setPair ();
+		PrologElement stamp = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (! parameters . isPair ()) parameters . setPair ();
+		PrologElement year = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (! parameters . isPair ()) parameters . setPair ();
+		PrologElement month = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (! parameters . isPair ()) parameters . setPair ();
+		PrologElement day = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (! parameters . isPair ()) parameters . setPair ();
+		PrologElement year_day = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (! parameters . isPair ()) parameters . setPair ();
+		PrologElement week_day = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (! parameters . isPair ()) parameters . setPair ();
+		PrologElement hour = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (! parameters . isPair ()) parameters . setPair ();
+		PrologElement minute = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (! parameters . isPair ()) parameters . setPair ();
+		PrologElement second = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (year . isVar () || year . isEarth ()) {
+			Calendar time_stamp = Calendar . getInstance ();
+			if (stamp . isInteger ()) time_stamp . setTimeInMillis (stamp . getInteger ());
+			else {time_stamp . setTime (new Date ()); stamp . setInteger ((int) time_stamp . getTimeInMillis ());}
+			year . setInteger (time_stamp . get (Calendar . YEAR));
+			month . setInteger (time_stamp . get (Calendar . MONTH));
+			day . setInteger (time_stamp . get (Calendar . DAY_OF_MONTH));
+			year_day . setInteger (time_stamp . get (Calendar . DAY_OF_YEAR));
+			week_day . setInteger (time_stamp . get (Calendar . DAY_OF_WEEK));
+			hour . setInteger (time_stamp . get (Calendar . HOUR));
+			minute . setInteger (time_stamp . get (Calendar . MINUTE));
+			second . setInteger (time_stamp . get (Calendar . SECOND));
+			return true;
+		}
+		Calendar tmp = Calendar . getInstance ();
+		if (year . isInteger ()) tmp . set (Calendar . YEAR, year . getInteger ());
+		if (month . isInteger ()) tmp . set (Calendar . MONTH, month . getInteger ());
+		if (day . isInteger ()) tmp . set (Calendar . DAY_OF_MONTH, day . getInteger ());
+		if (year_day . isInteger ()) tmp . set (Calendar . DAY_OF_YEAR, year_day . getInteger ());
+		if (week_day . isInteger ()) tmp . set (Calendar . DAY_OF_WEEK, week_day . getInteger ());
+		if (hour . isInteger ()) tmp . set (Calendar . HOUR, hour . getInteger ());
+		if (minute . isInteger ()) tmp . set (Calendar . MINUTE, minute . getInteger ());
+		if (second . isInteger ()) tmp . set (Calendar . SECOND, minute . getInteger ());
+		if (! stamp . isInteger ()) stamp . setInteger ((int) tmp . getTimeInMillis ());
+//		if (day . isInteger ()) tmp . tm_mday = day . getInteger ();
+//		if (year_day . isInteger ()) tmp . tm_yday = year_day . getInteger ();
+//		if (week_day . isInteger ()) tmp . tm_wday = week_day . getInteger ();
+//		if (hour . isInteger ()) tmp . tm_hour = hour . getInteger ();
+//		if (minute . isInteger ()) tmp . tm_min = minute . getInteger ();
+//		if (second . isInteger ()) tmp . tm_sec = second . getInteger ();
+//		time_t time_stamp = mktime (& tmp);
+//		if (! stamp . isInteger ()) stamp . setInteger ((int) time_stamp);
+//		if (! year . isInteger ()) year . setInteger (1900 + tmp . tm_year);
+//		if (! month . isInteger ()) month . setInteger (tmp . tm_mon + 1);
+//		if (! day . isInteger ()) day . setInteger (tmp . tm_mday);
+//		if (! year_day . isInteger ()) year_day . setInteger (tmp . tm_yday);
+//		if (! week_day . isInteger ()) week_day . setInteger (tmp . tm_wday);
+//		if (! hour . isInteger ()) hour . setInteger (tmp . tm_hour);
+//		if (! minute . isInteger ()) minute . setInteger (tmp . tm_min);
+//		if (! second . isInteger ()) second . setInteger (tmp . tm_sec);
+		return true;
+	}
+}
+
+/*
 class timestamp : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -1768,119 +1788,106 @@ class greater extends PrologNativeCode {
 	}
 }
 
-/*
-class greater : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * a = parameters -> getLeft ();
-		PrologElement * b;
-		parameters = parameters -> getRight ();
-		while (parameters -> isPair ()) {
-			b = parameters -> getLeft ();
-			if (a -> isInteger ()) {
-				if (b -> isInteger ()) {if (a -> getInteger () <= b -> getInteger ()) return false;}
-				else if (b -> isDouble ()) {if ((double) a -> getInteger () <= b -> getDouble ()) return false;}
+class greater_eq extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement a = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		while (parameters . isPair ()) {
+			PrologElement b = parameters . getLeft ();
+			if (a . isInteger ()) {
+				if (b . isInteger ()) {if (a . getInteger () < b . getInteger ()) return false;}
+				else if (b . isDouble ()) {if ((double) a . getInteger () < b . getDouble ()) return false;}
 				else return false;
-			}
-			else if (a -> isDouble ()) {
-				if (b -> isInteger ()) {if (a -> getDouble () <= (double) b -> getInteger ()) return false;}
-				else if (b -> isDouble ()) {if (a -> getDouble () <= b -> getDouble ()) return false;}
+			} else if (a . isDouble ()) {
+				if (b . isInteger ()) {if (a . getDouble () < (double) b . getInteger ()) return false;}
+				else if (b . isDouble ()) {if (a . getDouble () < b . getDouble ()) return false;}
 				else return false;
-			}
-			else if (a -> isText ()) {
-				if (b -> isText ()) {if (strcmp (a -> getText (), b -> getText ()) <= 0) return false;}
-				else if (b -> isAtom ()) {if (strcmp (a -> getText (), b -> getAtom () -> name ()) <= 0) return false;}
+			} else if (a . isText ()) {
+				if (b . isText ()) {if (a . getText () . compareTo (b . getText ()) < 0) return false;}
+				else if (b . isAtom ()) {if (a . getText () . compareTo (b . getAtom () . name ()) < 0) return false;}
 				else return false;
-			}
-			else if (a -> isAtom ()) {
-				if (b -> isAtom ()) {if (strcmp (a -> getAtom () -> name (), b -> getAtom () -> name ()) <= 0) return false;}
-				else if (b -> isText ()) {if (strcmp (a -> getAtom () -> name (), b -> getText ()) <= 0) return false;}
-				else return false;
-			}
-			else return false;
-			a = b;
-			parameters = parameters -> getRight ();
-		}
-		return true;
-	}
-};
-
-class greater_eq : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * a = parameters -> getLeft ();
-		PrologElement * b;
-		parameters = parameters -> getRight ();
-		while (parameters -> isPair ()) {
-			b = parameters -> getLeft ();
-			if (a -> isInteger ()) {
-				if (b -> isInteger ()) {if (a -> getInteger () < b -> getInteger ()) return false;}
-				else if (b -> isDouble ()) {if ((double) a -> getInteger () < b -> getDouble ()) return false;}
-				else return false;
-			}
-			else if (a -> isDouble ()) {
-				if (b -> isInteger ()) {if (a -> getDouble () < (double) b -> getInteger ()) return false;}
-				else if (b -> isDouble ()) {if (a -> getDouble () < b -> getDouble ()) return false;}
-				else return false;
-			}
-			else if (a -> isText ()) {
-				if (b -> isText ()) {if (strcmp (a -> getText (), b -> getText ()) < 0) return false;}
-				else if (b -> isAtom ()) {if (strcmp (a -> getText (), b -> getAtom () -> name ()) < 0) return false;}
-				else return false;
-			}
-			else if (a -> isAtom ()) {
-				if (b -> isAtom ()) {if (strcmp (a -> getAtom () -> name (), b -> getAtom () -> name ()) < 0) return false;}
-				else if (b -> isText ()) {if (strcmp (a -> getAtom () -> name (), b -> getText ()) < 0) return false;}
-				else return false;
-			}
-			else return false;
-			a = b;
-			parameters = parameters -> getRight ();
-		}
-		return true;
-	}
-};
-
-class max_class : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * res = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * maximum = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		while (parameters -> isPair ()) {
-			PrologElement * e = parameters -> getLeft ();
-			if (e -> isInteger ()) {
-				if (maximum -> isInteger ()) {if (e -> getInteger () > maximum -> getInteger ()) maximum = e;}
-				else if (maximum -> isDouble ()) {if ((double) e -> getInteger () > maximum -> getDouble ()) maximum = e;}
-				else return false;
-			} else if (e -> isDouble ()) {
-				if (maximum -> isDouble ()) {if (e -> getDouble () > maximum -> getDouble ()) maximum = e;}
-				else if (maximum -> isInteger ()) {if (e -> getDouble () > (double) maximum -> getInteger ()) maximum = e;}
-				else return false;
-			} else if (e -> isText ()) {
-				if (maximum -> isText ()) {if (strcmp (e -> getText (), maximum -> getText ()) > 0) maximum = e;}
-				else if (maximum -> isAtom ()) {if (strcmp (e -> getText (), maximum -> getAtom () -> name ()) > 0) maximum = e;}
-				else return false;
-			} else if (e -> isAtom ()) {
-				if (maximum -> isAtom ()) {if (strcmp (e -> getAtom () -> name (), maximum -> getAtom () -> name ()) > 0) maximum = e;}
-				else if (maximum -> isText ()) {if (strcmp (e -> getAtom () -> name (), maximum -> getText ()) > 0) maximum = e;}
+			} else if (a . isAtom ()) {
+				if (b . isAtom ()) {if (a . getAtom () . name () . compareTo (b . getAtom () . name ()) < 0) return false;}
+				else if (b . isText ()) {if (a . getAtom () . name () . compareTo (b . getText ()) < 0) return false;}
 				else return false;
 			} else return false;
-			parameters = parameters -> getRight ();
+			a = b;
+			parameters = parameters . getRight ();
 		}
-		if (maximum -> isInteger ()) {res -> setInteger (maximum -> getInteger ()); return true;}
-		if (maximum -> isDouble ()) {res -> setDouble (maximum -> getDouble ()); return true;}
-		if (maximum -> isText ()) {res -> setText (maximum -> getText ()); return true;}
-		if (maximum -> isAtom ()) {res -> setAtom (maximum -> getAtom ()); return true;}
+		return true;
+	}
+}
+
+class max_class extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement res = parameters . getLeft (); parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement maximum = parameters . getLeft (); parameters = parameters . getRight ();
+		while (parameters . isPair ()) {
+			PrologElement e = parameters . getLeft ();
+			if (e . isInteger ()) {
+				if (maximum . isInteger ()) {if (e . getInteger () > maximum . getInteger ()) maximum = e;}
+				else if (maximum . isDouble ()) {if ((double) e . getInteger () > maximum . getDouble ()) maximum = e;}
+				else return false;
+			} else if (e . isDouble ()) {
+				if (maximum . isDouble ()) {if (e . getDouble () > maximum . getDouble ()) maximum = e;}
+				else if (maximum . isInteger ()) {if (e . getDouble () > (double) maximum . getInteger ()) maximum = e;}
+				else return false;
+			} else if (e . isText ()) {
+				if (maximum . isText ()) {if (e . getText () . compareTo (maximum . getText ()) > 0) maximum = e;}
+				else if (maximum . isAtom ()) {if (e . getText () . compareTo (maximum . getAtom () . name ()) > 0) maximum = e;}
+				else return false;
+			} else if (e . isAtom ()) {
+				if (maximum . isAtom ()) {if (e . getAtom () . name () . compareTo (maximum . getAtom () . name ()) > 0) maximum = e;}
+				else if (maximum . isText ()) {if (e . getAtom () . name () . compareTo (maximum . getText ()) > 0) maximum = e;}
+				else return false;
+			} else return false;
+			parameters = parameters . getRight ();
+		}
+		if (maximum . isInteger ()) {res . setInteger (maximum . getInteger ()); return true;}
+		if (maximum . isDouble ()) {res . setDouble (maximum . getDouble ()); return true;}
+		if (maximum . isText ()) {res . setText (maximum . getText ()); return true;}
+		if (maximum . isAtom ()) {res . setAtom (maximum . getAtom ()); return true;}
 		return false;
 	}
-};
+}
 
+class min_class extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement res = parameters . getLeft (); parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+		PrologElement maximum = parameters . getLeft (); parameters = parameters . getRight ();
+		while (parameters . isPair ()) {
+			PrologElement e = parameters . getLeft ();
+			if (e . isInteger ()) {
+				if (maximum . isInteger ()) {if (e . getInteger () < maximum . getInteger ()) maximum = e;}
+				else if (maximum . isDouble ()) {if ((double) e . getInteger () < maximum . getDouble ()) maximum = e;}
+				else return false;
+			} else if (e . isDouble ()) {
+				if (maximum . isDouble ()) {if (e . getDouble () < maximum . getDouble ()) maximum = e;}
+				else if (maximum . isInteger ()) {if (e . getDouble () < (double) maximum . getInteger ()) maximum = e;}
+				else return false;
+			} else if (e . isText ()) {
+				if (maximum . isText ()) {if (e . getText () . compareTo (maximum . getText ()) < 0) maximum = e;}
+				else if (maximum . isAtom ()) {if (e . getText () . compareTo (maximum . getAtom () . name ()) < 0) maximum = e;}
+				else return false;
+			} else if (e . isAtom ()) {
+				if (maximum . isAtom ()) {if (e . getAtom () . name () . compareTo (maximum . getAtom () . name ()) < 0) maximum = e;}
+				else if (maximum . isText ()) {if (e . getAtom () . name () . compareTo (maximum . getText ()) < 0) maximum = e;}
+				else return false;
+			} else return false;
+			parameters = parameters . getRight ();
+		}
+		if (maximum . isInteger ()) {res . setInteger (maximum . getInteger ()); return true;}
+		if (maximum . isDouble ()) {res . setDouble (maximum . getDouble ()); return true;}
+		if (maximum . isText ()) {res . setText (maximum . getText ()); return true;}
+		if (maximum . isAtom ()) {res . setAtom (maximum . getAtom ()); return true;}
+		return false;
+	}
+}
+
+/*
 class min_class : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -3378,16 +3385,17 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("tan")) return new tan_operation ();
 		if (name . equals ("trunc")) return new trunc_operation ();
 
-	/*
-	if (strcmp (name, "StringToLower") == 0) return new StringToLower ();
-	if (strcmp (name, "StringToUpper") == 0) return new StringToUpper ();
-	if (strcmp (name, "StringReplaceOnce") == 0) return new StringReplaceOnce ();
-	if (strcmp (name, "StringReplaceAll") == 0) return new StringReplaceAll ();
+		if (name . equals ("StringToLower")) return new StringToLower ();
+		if (name . equals ("StringToUpper")) return new StringToUpper ();
+		if (name . equals ("StringReplaceOnce")) return new StringReplaceOnce ();
+		if (name . equals ("StringReplaceAll")) return new StringReplaceAll ();
 
+	/*
 	if (strcmp (name, "DFT") == 0) return new DFT (false);
 	if (strcmp (name, "FFT") == 0) return new DFT (true);
+	*/
 
-	if (strcmp (name, "timestamp") == 0) return new timestamp ();*/
+		if (name . equals ("timestamp")) return new timestamp ();
 
 		if (name . equals ("is_atom")) return new is_atom ();
 		if (name . equals ("is_integer")) return new is_integer ();
@@ -3403,12 +3411,9 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("less")) return new less ();
 		if (name . equals ("less_eq")) return new less_eq ();
 		if (name . equals ("greater")) return new greater ();
-		/*
-	if (strcmp (name, "greater") == 0) return new greater ();
-	if (strcmp (name, "greater_eq") == 0) return new greater_eq ();
-	if (strcmp (name, "max") == 0) return new max_class ();
-	if (strcmp (name, "min") == 0) return new min_class ();
-	*/
+		if (name . equals ("greater_eq")) return new greater_eq ();
+		if (name . equals ("max")) return new max_class ();
+		if (name . equals ("min")) return new min_class ();
 		if (name . equals ("set_uap32_captions")) return new set_uap32_captions (root);
 		if (name . equals ("set_standard_captions")) return new set_standard_captions (root);
 		if (name . equals ("set_edinburg_captions")) return new set_edinburg_captions (root);
@@ -3491,9 +3496,8 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("ARRAY")) return new ARRAY ();
 	/*
 	if (strcmp (name, "INDEX") == 0) return new INDEX (root, directory);
+	*/
 
-	if (strcmp (name, "background") == 0) return new bgcolour (root);
-	if (strcmp (name, "foreground") == 0) return new fgcolour (root);*/
 		if (name . equals ("background")) return new bgcolour (root);
 		if (name . equals ("foreground")) return new fgcolour (root);
 	/*if (strcmp (name, "open_editor") == 0) return new open_editor (root);
