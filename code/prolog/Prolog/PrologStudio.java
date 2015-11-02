@@ -2112,40 +2112,42 @@ public:
 	}
 	cd (PrologRoot * root) {this -> root = root;}
 };
+*/
 
-class relativise_path : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * path = parameters -> getLeft ();
-		if (! path -> isText ()) return false; parameters = parameters -> getRight ();
-		AREA area;
-		if (parameters -> isVar ()) {
-			relativise (path -> getText (), root -> getCWD (), area);
-			parameters -> setText (area);
-			return true;
+class relativise_path extends PrologNativeCode {
+	public String relativise (String path, String pwd) {
+		int ipwd = 0;
+		int ipath = 0;
+		String relative = "";
+		if (path . length () <= 0) return pwd;
+		while (pwd . length () > ipwd && (pwd . charAt (ipwd) == path . charAt (ipath) || (pwd . charAt (ipwd) == '\\' && path . charAt (ipath) == '/'))) {ipwd++; ipath++;}
+		if (path . charAt (ipath) == '/' || path . charAt (ipath) == '\\') ipath++;
+		boolean should_escape = false;
+		while (pwd . length () > ipwd) {
+			if (pwd . charAt (ipwd) == '/' || pwd . charAt (ipwd) == '\\') {should_escape = false; relative += "../";}
+			else should_escape = true;
+			ipwd++;
 		}
-		if (! parameters -> isPair ()) return false;
-		PrologElement * argument = parameters -> getLeft ();
-		if (argument -> isVar ()) {
-			relativise (path -> getText (), root -> getCWD (), area);
-			argument -> setText (area);
-			return true;
-		}
-		if (! argument -> isText ()) return false;
-		parameters = parameters -> getRight ();
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (parameters -> isVar ()) {
-			relativise (path -> getText (), argument -> getText (), area);
-			parameters -> setText (area);
-			return true;
-		}
+		if (should_escape) relative += "../";
+		return relative + path . substring (ipath);
+	}
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement path = parameters . getLeft (); if (! path . isText ()) return false; parameters = parameters . getRight ();
+		if (parameters . isVar ()) {parameters . setText (relativise (path . getText (), System . getProperty ("user.dir"))); return true;}
+		if (! parameters . isPair ()) return false;
+		PrologElement argument = parameters . getLeft ();
+		if (argument . isVar ()) {argument . setText (relativise (path . getText (), System . getProperty ("user.dir"))); return true;}
+		if (! argument . isText ()) return false;
+		parameters = parameters . getRight ();
+		if (parameters . isPair ()) parameters = parameters . getLeft ();
+		if (parameters . isVar ()) {parameters . setText (relativise (path . getText (), argument . getText ())); return true;}
 		return false;
 	}
-	relativise_path (PrologRoot * root) {this -> root = root;}
+	public relativise_path (PrologRoot root) {}
 };
 
+/*
 class DIR : public PrologNativeCode {
 private:
 	PrologRoot * root;
@@ -3288,7 +3290,9 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("search_directories")) return new search_directories (root);
 	/*
 	if (strcmp (name, "cd") == 0) return new cd (root);
-	if (strcmp (name, "relativise_path") == 0) return new relativise_path (root);
+	*/
+		if (name . equals ("relativise_path")) return new relativise_path (root);
+	/*
 	if (strcmp (name, "DIR") == 0) return new DIR (root);
 	*/
 		if (name . equals ("ARGS")) return new ARGS (root);
