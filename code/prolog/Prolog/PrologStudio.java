@@ -24,6 +24,7 @@ package Prolog;
 
 import java . io . InputStream;
 import java . io . FileInputStream;
+import java . io . FileOutputStream;
 import java . io . ByteArrayInputStream;
 import java . util . concurrent . Semaphore;
 import java . util . ArrayList;
@@ -1806,191 +1807,95 @@ class min_class extends PrologNativeCode {
 	}
 }
 
-/*
-class min_class : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * res = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		PrologElement * minimum = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		while (parameters -> isPair ()) {
-			PrologElement * e = parameters -> getLeft ();
-			if (e -> isInteger ()) {
-				if (minimum -> isInteger ()) {if (e -> getInteger () < minimum -> getInteger ()) minimum = e;}
-				else if (minimum -> isDouble ()) {if ((double) e -> getInteger () < minimum -> getDouble ()) minimum = e;}
-				else return false;
-			} else if (e -> isDouble ()) {
-				if (minimum -> isDouble ()) {if (e -> getDouble () < minimum -> getDouble ()) minimum = e;}
-				else if (minimum -> isInteger ()) {if (e -> getDouble () < (double) minimum -> getInteger ()) minimum = e;}
-				else return false;
-			} else if (e -> isText ()) {
-				if (minimum -> isText ()) {if (strcmp (e -> getText (), minimum -> getText ()) < 0) minimum = e;}
-				else if (minimum -> isAtom ()) {if (strcmp (e -> getText (), minimum -> getAtom () -> name ()) < 0) minimum = e;}
-				else return false;
-			} else if (e -> isAtom ()) {
-				if (minimum -> isAtom ()) {if (strcmp (e -> getAtom () -> name (), minimum -> getAtom () -> name ()) < 0) minimum = e;}
-				else if (minimum -> isText ()) {if (strcmp (e -> getAtom () -> name (), minimum -> getText ()) < 0) minimum = e;}
-				else return false;
-			} else return false;
-			parameters = parameters -> getRight ();
-		}
-		if (minimum -> isInteger ()) {res -> setInteger (minimum -> getInteger ()); return true;}
-		if (minimum -> isDouble ()) {res -> setDouble (minimum -> getDouble ()); return true;}
-		if (minimum -> isText ()) {res -> setText (minimum -> getText ()); return true;}
-		if (minimum -> isAtom ()) {res -> setAtom (minimum -> getAtom ()); return true;}
-		return false;
-	}
-};
-
-class file_write : public PrologNativeCode {
-public:
-	FILE * fw;
-	PrologRoot * root;
-	PrologAtom * atom;
-	void sub_right_store (PrologElement * el, char * area) {
-		if (el -> isEarth ()) return;
-		if (el -> isPair ()) {
-			PrologElement * left = el -> getLeft (); if (left == 0) return;
-			PrologElement * right = el -> getRight (); if (right == 0) return;
-			fprintf (fw, "%s", root -> separator_caption);
-			fprintf (fw, " ");
-			sub_store (left, area);
-			sub_right_store (right, area);
-			return;
-		}
-		fprintf (fw, " ");
-		fprintf (fw, "%s", root -> mid_caption);
-		fprintf (fw, " ");
-		root -> getValue (el, area, 0);
-		fprintf (fw, "%s", area);
-	}
-	void sub_store (PrologElement * el, char * area) {
-		if (el -> isPair ()) {
-			PrologElement * left = el -> getLeft (); if (left == 0) return;
-			PrologElement * right = el -> getRight (); if (right == 0) return;
-			fprintf (fw, "%s", root -> left_caption);
-			sub_store (el -> getLeft (), area);
-			sub_right_store (el -> getRight (), area);
-			fprintf (fw, "%s", root -> right_caption);
-			return;
-		}
-		root -> getValue (el, area, 0);
-		fprintf (fw, "%s", area);
-	}
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		AREA area;
-		if (fw == NULL) return false;
-		PrologElement * el;
-		if (parameters -> isEarth ()) {
-			fclose (fw);
-			fw = 0;
-			atom -> setMachine (0);
-			delete this;
-			return true;
-		}
-		while (parameters -> isPair ()) {
-			el = parameters -> getLeft ();
-			if (el -> isText ()) fprintf (fw, "%s", el -> getText ());
-			if (el -> isInteger ()) {
-				int i = el -> getInteger ();
-				if (i >= 0) {
-					if (i <= 0xff) fputc (i, fw);
-					else if (i <= 0xffff) {fputc (i >> 8, fw); fputc (i & 0xff, fw);}
-					else if (i <= 0xffffff) {fputc (i >> 16, fw); fputc ((i >> 8) & 0xff, fw); fputc (i & 0xff, fw);}
-					else if (i <= 0xffffffff) {fputc (i >> 24, fw); fputc ((i >> 16) & 0xff, fw); fputc ((i >> 8) & 0xff, fw); fputc (i & 0xff, fw);}
-				} else {
-					i = -i;
-					if (i <= 0x7f) fputc (i, fw);
-					else if (i <= 0x7ff) {
-						int msb = 0xc0 | (i >> 6);
-						int lsb = 0x80 | (i & 0x3f);
-						fputc (msb, fw); fputc (lsb, fw);
-					} else if (i <= 0xffff) {
-						int hsb = 0xe0 | (i >> 12);
-						int msb = 0x80 | ((i >> 6) & 0x3f);
-						int lsb = 0x80 | (i & 0x3f);
-						fputc (hsb, fw); fputc (msb, fw); fputc (lsb, fw);
-					} else if (i <= 0x1fffff) {
-						int xlsb = 0xf0 | (i >> 18);
-						int hsb = 0x80 | ((i >> 12) & 0x3f);
-						int msb = 0x80 | ((i >> 6) & 0x3f);
-						int lsb = 0x80 | (i & 0x3f);
-						fputc (xlsb, fw); fputc (hsb, fw); fputc (msb, fw); fputc (lsb, fw);
-					} else if (i <= 0x3ffffff) {
-						int xmsb = 0xf8 | (i >> 24);
-						int xlsb = 0x80 | ((i >> 18) & 0x3f);
-						int hsb = 0x80 | ((i >> 12) & 0x3f);
-						int msb = 0x80 | ((i >> 6) & 0x3f);
-						int lsb = 0x80 | (i & 0x3f);
-						fputc (xmsb, fw); fputc (xlsb, fw); fputc (hsb, fw); fputc (msb, fw); fputc (lsb, fw);
-					} else if (i <= 0x7fffffff) {
-						int xhsb = 0xfc | (i >> 30);
-						int xmsb = 0x80 | ((i >> 24) & 0x3f);
-						int xlsb = 0x80 | ((i >> 18) & 0x3f);
-						int hsb = 0x80 | ((i >> 12) & 0x3f);
-						int msb = 0x80 | ((i >> 6) & 0x3f);
-						int lsb = 0x80 | (i & 0x3f);
-						fputc (xhsb, fw); fputc (xmsb, fw); fputc (xlsb, fw); fputc (hsb, fw); fputc (msb, fw); fputc (lsb, fw);
+class file_write extends PrologNativeCode {
+	public FileOutputStream fw;
+	public PrologAtom atom;
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (fw == null) return false;
+		if (parameters . isEarth ()) {try {fw . close ();} catch (Exception ex) {} atom . setMachine (null); return true;}
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			try {
+				if (el . isText ()) fw . write (el . getText () . getBytes ());
+				if (el . isInteger ()) {
+					int i = el . getInteger ();
+					if (i >= 0) {
+						if (i <= 0xff) fw . write (i);
+						else if (i <= 0xffff) {fw . write (i >> 8); fw . write (i & 0xff);}
+						else if (i <= 0xffffff) {fw . write (i >> 16); fw . write ((i >> 8) & 0xff); fw . write (i & 0xff);}
+						else if (i <= 0xffffffff) {fw . write (i >> 24); fw . write ((i >> 16) & 0xff); fw . write ((i >> 8) & 0xff); fw . write (i & 0xff);}
+					} else {
+						i = -i;
+						if (i <= 0x7f) fw . write (i);
+						else if (i <= 0x7ff) {
+							int msb = 0xc0 | (i >> 6);
+							int lsb = 0x80 | (i & 0x3f);
+							fw . write (msb); fw . write (lsb);
+						} else if (i <= 0xffff) {
+							int hsb = 0xe0 | (i >> 12);
+							int msb = 0x80 | ((i >> 6) & 0x3f);
+							int lsb = 0x80 | (i & 0x3f);
+							fw . write (hsb); fw . write (msb); fw . write (lsb);
+						} else if (i <= 0x1fffff) {
+							int xlsb = 0xf0 | (i >> 18);
+							int hsb = 0x80 | ((i >> 12) & 0x3f);
+							int msb = 0x80 | ((i >> 6) & 0x3f);
+							int lsb = 0x80 | (i & 0x3f);
+							fw . write (xlsb); fw . write (hsb); fw . write (msb); fw . write (lsb);
+						} else if (i <= 0x3ffffff) {
+							int xmsb = 0xf8 | (i >> 24);
+							int xlsb = 0x80 | ((i >> 18) & 0x3f);
+							int hsb = 0x80 | ((i >> 12) & 0x3f);
+							int msb = 0x80 | ((i >> 6) & 0x3f);
+							int lsb = 0x80 | (i & 0x3f);
+							fw . write (xmsb); fw . write (xlsb); fw . write (hsb); fw . write (msb); fw . write (lsb);
+						} else if (i <= 0x7fffffff) {
+							int xhsb = 0xfc | (i >> 30);
+							int xmsb = 0x80 | ((i >> 24) & 0x3f);
+							int xlsb = 0x80 | ((i >> 18) & 0x3f);
+							int hsb = 0x80 | ((i >> 12) & 0x3f);
+							int msb = 0x80 | ((i >> 6) & 0x3f);
+							int lsb = 0x80 | (i & 0x3f);
+							fw . write (xhsb); fw . write (xmsb); fw . write (xlsb); fw . write (hsb); fw . write (msb); fw . write (lsb);
+						}
 					}
 				}
-			}
-			while (el -> isPair ()) {
-				sub_store (el -> getLeft (), area);
-				el = el -> getRight ();
-			}
-			parameters = parameters -> getRight ();
+				while (el . isPair ()) {fw . write (root . getValue (el . getLeft ()) . getBytes ()); el = el . getRight ();}
+			} catch (Exception ex) {}
+			parameters = parameters . getRight ();
 		}
 		return true;
 	}
-	file_write (PrologAtom * atom, PrologRoot * root, char * file_name) {
-		this -> atom = atom;
-		this -> root = root;
-		fw = fopen (file_name, "wb");
+	public file_write (PrologAtom atom, PrologRoot root, String name) {
+		this . atom = atom;
+		this . root = root;
+		try {this . fw = new FileOutputStream (name);} catch (Exception ex) {this . fw = null;}
 	}
-	~ file_write (void) {if (fw != NULL) fclose (fw);}
-};
+}
 
-class file_writer : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		PrologElement * symbol = 0;
-		PrologElement * name = 0;
-		while (parameters -> isPair ()) {
-			PrologElement * el = parameters -> getLeft ();
-			if (el -> isAtom ()) symbol = el;
-			if (el -> isVar ()) symbol = el;
-			if (el -> isText ()) name = el;
-			parameters = parameters -> getRight ();
+class file_writer extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		PrologElement symbol = null;
+		PrologElement name = null;
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isAtom ()) symbol = el;
+			if (el . isVar ()) symbol = el;
+			if (el . isText ()) name = el;
+			parameters = parameters . getRight ();
 		}
-		if (symbol == 0 || name == 0) return false;
-		if (symbol -> isVar ()) symbol -> setAtom (new PrologAtom ());
-		PrologAtom * atom = symbol -> getAtom ();
-		if (atom -> getMachine () != 0) return false;
-		file_write * fw = new file_write (atom, root, name -> getText ());
-		if (fw -> fw == 0) {delete fw; return false;}
-		if (atom -> setMachine (fw)) return true;
-		delete fw;
-		return false;
+		if (symbol == null || name == null) return false;
+		if (symbol . isVar ()) symbol . setAtom (new PrologAtom ());
+		PrologAtom atom = symbol . getAtom ();
+		if (atom . getMachine () != null) return false;
+		file_write fw = new file_write (atom, root, name . getText ());
+		if (fw . fw == null) return false;
+		return atom . setMachine (fw);
 	}
-	file_writer (PrologRoot * root) {this -> root = root;}
-};
-
-class symbol_reader : public PrologReader {
-public:
-	FILE * fi;
-	void message (char * text) {root -> print (text); root -> print (root -> new_line_caption);}
-	void message_v (char * text, char * variable) {root -> message (text, variable);}
-	int move_z (void) {return fgetc (fi);}
-	void init (PrologRoot * root, FILE * fi) {
-		this -> fi = fi;
-		setRoot (root);
-	}
-};
-*/
+	public file_writer (PrologRoot root) {this . root = root;}
+}
 
 class symbol_reader extends PrologReader {
 	public FileInputStream fi;
@@ -3370,9 +3275,7 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("semaphore")) return new semaphore_maker (directory);
 		if (name . equals ("msemaphore")) return new semaphore_maker (directory);
 		if (name . equals ("mutex")) return new mutex_maker (directory);
-	/*
-	if (strcmp (name, "file_writer") == 0) return new file_writer (root);
-	*/
+		if (name . equals ("file_writer")) return new file_writer (root);
 		if (name . equals ("file_reader")) return new file_reader (root);
 		if (name . equals ("import_loader")) return new import_loader (root);
 		if (name . equals ("load_loader")) return new load_loader (root);
