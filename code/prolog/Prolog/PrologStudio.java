@@ -1578,122 +1578,41 @@ class timestamp extends PrologNativeCode {
 		parameters = parameters . getRight ();
 		if (year . isVar () || year . isEarth ()) {
 			Calendar time_stamp = Calendar . getInstance ();
-			if (stamp . isInteger ()) time_stamp . setTimeInMillis (stamp . getInteger ());
-			else {time_stamp . setTime (new Date ()); stamp . setInteger ((int) time_stamp . getTimeInMillis ());}
+			if (stamp . isInteger ()) time_stamp . setTimeInMillis ((long) stamp . getInteger () * 1000L);
+			else {time_stamp . setTime (new Date ()); stamp . setInteger ((int) (time_stamp . getTimeInMillis () / 1000L));}
 			year . setInteger (time_stamp . get (Calendar . YEAR));
-			month . setInteger (time_stamp . get (Calendar . MONTH));
+			month . setInteger (time_stamp . get (Calendar . MONTH) + 1);
 			day . setInteger (time_stamp . get (Calendar . DAY_OF_MONTH));
-			year_day . setInteger (time_stamp . get (Calendar . DAY_OF_YEAR));
-			week_day . setInteger (time_stamp . get (Calendar . DAY_OF_WEEK));
-			hour . setInteger (time_stamp . get (Calendar . HOUR));
+			year_day . setInteger (time_stamp . get (Calendar . DAY_OF_YEAR) - 1);
+			week_day . setInteger (time_stamp . get (Calendar . DAY_OF_WEEK) - 1);
+			hour . setInteger (time_stamp . get (Calendar . HOUR_OF_DAY));
 			minute . setInteger (time_stamp . get (Calendar . MINUTE));
 			second . setInteger (time_stamp . get (Calendar . SECOND));
 			return true;
 		}
 		Calendar tmp = Calendar . getInstance ();
+		tmp . clear ();
 		if (year . isInteger ()) tmp . set (Calendar . YEAR, year . getInteger ());
-		if (month . isInteger ()) tmp . set (Calendar . MONTH, month . getInteger ());
+		if (month . isInteger ()) tmp . set (Calendar . MONTH, month . getInteger () - 1);
 		if (day . isInteger ()) tmp . set (Calendar . DAY_OF_MONTH, day . getInteger ());
-		if (year_day . isInteger ()) tmp . set (Calendar . DAY_OF_YEAR, year_day . getInteger ());
-		if (week_day . isInteger ()) tmp . set (Calendar . DAY_OF_WEEK, week_day . getInteger ());
-		if (hour . isInteger ()) tmp . set (Calendar . HOUR, hour . getInteger ());
+		if (year_day . isInteger ()) tmp . set (Calendar . DAY_OF_YEAR, year_day . getInteger () + 1);
+		if (week_day . isInteger ()) tmp . set (Calendar . DAY_OF_WEEK, week_day . getInteger () + 1);
+		if (hour . isInteger ()) tmp . set (Calendar . HOUR_OF_DAY, hour . getInteger ());
 		if (minute . isInteger ()) tmp . set (Calendar . MINUTE, minute . getInteger ());
-		if (second . isInteger ()) tmp . set (Calendar . SECOND, minute . getInteger ());
-		if (! stamp . isInteger ()) stamp . setInteger ((int) tmp . getTimeInMillis ());
-//		if (day . isInteger ()) tmp . tm_mday = day . getInteger ();
-//		if (year_day . isInteger ()) tmp . tm_yday = year_day . getInteger ();
-//		if (week_day . isInteger ()) tmp . tm_wday = week_day . getInteger ();
-//		if (hour . isInteger ()) tmp . tm_hour = hour . getInteger ();
-//		if (minute . isInteger ()) tmp . tm_min = minute . getInteger ();
-//		if (second . isInteger ()) tmp . tm_sec = second . getInteger ();
-//		time_t time_stamp = mktime (& tmp);
-//		if (! stamp . isInteger ()) stamp . setInteger ((int) time_stamp);
-//		if (! year . isInteger ()) year . setInteger (1900 + tmp . tm_year);
-//		if (! month . isInteger ()) month . setInteger (tmp . tm_mon + 1);
-//		if (! day . isInteger ()) day . setInteger (tmp . tm_mday);
-//		if (! year_day . isInteger ()) year_day . setInteger (tmp . tm_yday);
-//		if (! week_day . isInteger ()) week_day . setInteger (tmp . tm_wday);
-//		if (! hour . isInteger ()) hour . setInteger (tmp . tm_hour);
-//		if (! minute . isInteger ()) minute . setInteger (tmp . tm_min);
-//		if (! second . isInteger ()) second . setInteger (tmp . tm_sec);
+		if (second . isInteger ()) tmp . set (Calendar . SECOND, second . getInteger ());
+		if (! stamp . isInteger ()) stamp . setInteger ((int) (tmp . getTimeInMillis () / 1000L));
+		if (! year . isInteger ()) year . setInteger (tmp . get (Calendar . YEAR));
+		if (! month . isInteger ()) month . setInteger (tmp . get (Calendar . MONTH) + 1);
+		if (! day . isInteger ()) day . setInteger (tmp . get (Calendar . DAY_OF_MONTH));
+		if (! year_day . isInteger ()) year_day . setInteger (tmp . get (Calendar . DAY_OF_YEAR) - 1);
+		if (! week_day . isInteger ()) week_day . setInteger (tmp . get (Calendar . DAY_OF_WEEK) - 1);
+		if (! hour . isInteger ()) hour . setInteger (tmp . get (Calendar . HOUR_OF_DAY));
+		if (! minute . isInteger ()) minute . setInteger (tmp . get (Calendar . MINUTE));
+		if (! second . isInteger ()) second . setInteger (tmp . get (Calendar . SECOND));
+		System . out . println ("I am here => " + tmp . getTimeInMillis ());
 		return true;
 	}
 }
-
-/*
-class timestamp : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) parameters -> setPair ();
-		PrologElement * stamp = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) parameters -> setPair ();
-		PrologElement * year = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) parameters -> setPair ();
-		PrologElement * month = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) parameters -> setPair ();
-		PrologElement * day = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) parameters -> setPair ();
-		PrologElement * year_day = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) parameters -> setPair ();
-		PrologElement * week_day = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) parameters -> setPair ();
-		PrologElement * hour = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) parameters -> setPair ();
-		PrologElement * minute = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) parameters -> setPair ();
-		PrologElement * second = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (year -> isVar () || year -> isEarth ()) {
-			time_t time_stamp = 0;
-			if (stamp -> isInteger ()) time_stamp = (time_t) stamp -> getInteger ();
-			else {time_stamp = time (0); stamp -> setInteger ((int) time_stamp);}
-			struct tm ptm;
-			ptm = * localtime (& time_stamp);
-			year -> setInteger (1900 + ptm . tm_year);
-			month -> setInteger (ptm . tm_mon + 1);
-			day -> setInteger (ptm . tm_mday);
-			year_day -> setInteger (ptm . tm_yday);
-			week_day -> setInteger (ptm . tm_wday);
-			hour -> setInteger (ptm . tm_hour);
-			minute -> setInteger (ptm . tm_min);
-			second -> setInteger (ptm . tm_sec);
-			return true;
-		}
-		struct tm tmp;
-		tmp . tm_isdst = -1;
-		tmp . tm_yday = -1;
-		tmp . tm_wday = -1;
-		if (year -> isInteger ()) tmp . tm_year = year -> getInteger () - 1900;
-		if (month -> isInteger ()) tmp . tm_mon = month -> getInteger () - 1;
-		if (day -> isInteger ()) tmp . tm_mday = day -> getInteger ();
-		if (year_day -> isInteger ()) tmp . tm_yday = year_day -> getInteger ();
-		if (week_day -> isInteger ()) tmp . tm_wday = week_day -> getInteger ();
-		if (hour -> isInteger ()) tmp . tm_hour = hour -> getInteger ();
-		if (minute -> isInteger ()) tmp . tm_min = minute -> getInteger ();
-		if (second -> isInteger ()) tmp . tm_sec = second -> getInteger ();
-		time_t time_stamp = mktime (& tmp);
-		if (! stamp -> isInteger ()) stamp -> setInteger ((int) time_stamp);
-		if (! year -> isInteger ()) year -> setInteger (1900 + tmp . tm_year);
-		if (! month -> isInteger ()) month -> setInteger (tmp . tm_mon + 1);
-		if (! day -> isInteger ()) day -> setInteger (tmp . tm_mday);
-		if (! year_day -> isInteger ()) year_day -> setInteger (tmp . tm_yday);
-		if (! week_day -> isInteger ()) week_day -> setInteger (tmp . tm_wday);
-		if (! hour -> isInteger ()) hour -> setInteger (tmp . tm_hour);
-		if (! minute -> isInteger ()) minute -> setInteger (tmp . tm_min);
-		if (! second -> isInteger ()) second -> setInteger (tmp . tm_sec);
-		return true;
-	}
-};
-
-*/
 
 class less extends PrologNativeCode {
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
