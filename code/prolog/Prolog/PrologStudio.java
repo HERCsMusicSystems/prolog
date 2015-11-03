@@ -3139,7 +3139,7 @@ class PrologStudio extends PrologServiceClass {
 	/*
 	if (strcmp (name, "cd") == 0) return new cd (root);
 	*/
-		if (name . equals ("relativise_path")) return new relativise_path (root);
+		if (name . equals ("relativise_path")) return new relativise_path ();
 	/*
 	if (strcmp (name, "DIR") == 0) return new DIR (root);
 	*/
