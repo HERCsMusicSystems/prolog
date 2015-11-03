@@ -121,25 +121,88 @@ prolog_joystick :: ~ prolog_joystick (void) {
 
 class serial_code : public PrologNativeCode {
 public:
+	PrologRoot * root;
 	PrologAtom * atom;
+	PrologAtom * callback;
+	pthread_t thread;
+	bool should_continue;
+#ifdef WIN32
+	HANDLE fd;
+#else
 	int fd;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (parameters -> isVar ()) {
-			int ind = 0;
-			read (fd, & ind, 1);
-			parameters -> setInteger (ind);
-			return true;
-		}
-		return false;
-	}
-	serial_code (char * location, PrologAtom * atom) {
-		this -> atom = atom;
-		fd = open (location, O_RDONLY | O_NONBLOCK);
-		printf ("LOCATION [%i]\n", fd);
-	}
+#endif
+	int ind;
+	bool code (PrologElement * parameters, PrologResolution * resolution);
+	bool port_not_found (void);
+	serial_code (char * location, PrologRoot * root, PrologAtom * atom, PrologAtom * callback);
+	~ serial_code (void);
 };
+
+static void * serial_runner (void * parameters) {
+	serial_code * code = (serial_code *) parameters;
+	PrologRoot * root = code -> root;
+	code -> should_continue = true;
+	while (code -> should_continue) {
+		PrologElement * clause = root -> pair (root -> atom (code -> callback), root -> pair (root -> integer (code -> ind++), root -> earth ()));
+		clause = root -> pair (root -> head (0), root -> pair (clause, root -> earth ()));
+		root -> resolution (clause);
+		delete clause;
+		Sleep (500);
+	}
+	code -> should_continue = true;
+	return 0;
+}
+
+bool serial_code :: code (PrologElement * parameters, PrologResolution * resolution) {
+	if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
+	if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+	if (parameters -> isVar ()) {
+		int ind = 0;
+#ifdef WIN32
+		ReadFile (fd, & ind, 1, NULL, NULL);
+#else
+		read (fd, & ind, 1);
+#endif
+		parameters -> setInteger (ind);
+		return true;
+	}
+	return false;
+}
+bool serial_code :: port_not_found (void) {
+#ifdef WIN32
+	return fd == INVALID_HANDLE_VALUE;
+#else
+	return fd == 0;
+#endif
+}
+serial_code :: serial_code (char * location, PrologRoot * root, PrologAtom * atom, PrologAtom * callback) {
+	ind = 0;
+	this -> should_continue = false;
+	this -> root = root;
+	this -> atom = atom;
+	this -> callback = callback;
+	if (callback != 0) {COLLECTOR_REFERENCE_INC (callback);}
+#ifdef WIN32
+	fd = CreateFile (location, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+#else
+	fd = open (location, O_RDONLY | O_NONBLOCK);
+#endif
+	if (callback == 0) return;
+	if (port_not_found ()) return;
+	pthread_create (& thread, 0, serial_runner, this);
+	pthread_detach (thread);
+}
+serial_code :: ~ serial_code (void) {
+	if (should_continue) {should_continue = false; while (! should_continue) Sleep (100);}
+	if (callback != 0) callback -> removeAtom (); callback = 0;
+	if (! port_not_found ()) {
+#ifdef WIN32
+		CloseHandle (fd);
+#else
+		close (fd);
+#endif
+	}
+}
 
 class joystick_code : public PrologNativeCode {
 public:
@@ -225,11 +288,12 @@ public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		PrologElement * path = 0;
 		PrologElement * atom = 0;
+		PrologElement * callback = 0;
 		while (parameters -> isPair ()) {
 			PrologElement * el = parameters -> getLeft ();
 			if (el -> isText ()) path = el;
 			if (el -> isVar ()) el -> setAtom (new PrologAtom ());
-			if (el -> isAtom ()) atom = el;
+			if (el -> isAtom ()) {if (atom == 0) atom = el; else callback = el;}
 			parameters = parameters -> getRight ();
 		}
 		if (atom == 0) return false;
@@ -237,7 +301,8 @@ public:
 		char * serial_location;
 		if (path != 0) serial_location = path -> getText ();
 		else serial_location = "/dev/ttyACM0";
-		serial_code * sc = new serial_code (serial_location, atom -> getAtom ());
+		serial_code * sc = new serial_code (serial_location, root, atom -> getAtom (), callback != 0 ? callback -> getAtom () : 0);
+		if (sc -> port_not_found ()) {delete sc; return false;}
 		if (atom -> getAtom () -> setMachine (sc)) return true;
 		delete sc;
 		return false;

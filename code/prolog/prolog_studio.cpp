@@ -226,7 +226,7 @@ public:
 			}
 			area_ind = root -> list (parameters -> getText (), area, 0);
 			// atom drop list / atom list
-			if (ret -> isPair ()) ret -> getLeft () -> setText (area); else root -> print (area);
+			if (ret -> isPair ()) ret -> getLeft () -> setText (area); else {root -> print (area); root -> print (root -> new_line_caption);}
 		}
 		return true;
 	}
