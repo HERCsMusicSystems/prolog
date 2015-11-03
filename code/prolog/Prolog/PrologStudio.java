@@ -2144,7 +2144,6 @@ class relativise_path extends PrologNativeCode {
 		if (parameters . isVar ()) {parameters . setText (relativise (path . getText (), argument . getText ())); return true;}
 		return false;
 	}
-	public relativise_path (PrologRoot root) {}
 };
 
 /*
@@ -2353,30 +2352,6 @@ class CONSTANT_CODE extends PrologNativeCode {
 		return atom . setMachine (new constant (parameters . getLeft ()));
 	}
 }
-/*
-class CONSTANT : public PrologNativeCode {
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * e = parameters -> getLeft ();
-		PrologAtom * atom = NULL;
-		if (e -> isVar ()) {
-			atom = new PrologAtom ();
-			e -> setAtom (atom);
-		} else {
-			if (! e -> isAtom ()) return false;
-			atom = e -> getAtom ();
-		}
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		if (atom -> getMachine () != 0) return false;
-		constant * c = new constant (parameters -> getLeft ());
-		if (atom -> setMachine (c)) return true;
-		delete c;
-		return false;
-	}
-};
-*/
 
 class variable extends PrologNativeCode {
 	public PrologAtom atom;
@@ -2939,59 +2914,6 @@ class mutex_maker extends PrologNativeCode {
 	}
 }
 
-/*
-class PrologMutex : public PrologNativeCode {
-public:
-	PrologAtom * atom;
-	PrologAtom * waitAtom, * enterAtom, * signalAtom;
-	pthread_mutex_t mutex;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (! parameters -> isAtom ()) return false;
-		PrologAtom * ctrl = parameters -> getAtom ();
-		if (ctrl == signalAtom) {pthread_mutex_unlock (& mutex); return true;}
-		if (ctrl == waitAtom) {pthread_mutex_lock (& mutex); return true;}
-		if (ctrl == enterAtom) {return pthread_mutex_trylock (& mutex) == 0;}
-		return false;
-	}
-	PrologMutex (PrologAtom * atom, PrologAtom * waitAtom, PrologAtom * enterAtom, PrologAtom * signalAtom) {
-		this -> atom = atom;
-		this -> waitAtom = waitAtom;
-		this -> enterAtom = enterAtom;
-		this -> signalAtom = signalAtom;
-		mutex = PTHREAD_MUTEX_INITIALIZER;
-	}
-	~ PrologMutex (void) {pthread_mutex_destroy (& mutex);}
-};
-
-class MutexMaker : public PrologNativeCode {
-public:
-	PrologAtom * waitAtom;
-	PrologAtom * enterAtom;
-	PrologAtom * signalAtom;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (waitAtom == 0 || enterAtom == 0 || signalAtom == 0) return false;
-		if (! parameters -> isPair ()) return false;
-		PrologElement * ae = parameters -> getLeft ();
-		PrologAtom * atom = 0;
-		if (ae -> isVar ()) {ae -> setAtom (atom = new PrologAtom ());}
-		else {if (! ae -> isAtom ()) return false; atom = ae -> getAtom ();}
-		if (atom -> getMachine () != 0) return false;
-		PrologMutex * mutex = new PrologMutex (atom, waitAtom, enterAtom, signalAtom);
-		if (atom -> setMachine (mutex)) return true;
-		delete mutex;
-		return false;
-	}
-	MutexMaker (PrologDirectory * dir) {
-		waitAtom = enterAtom = signalAtom = 0;
-		if (dir == 0) return;
-		waitAtom = dir -> searchAtom ("wait");
-		enterAtom = dir -> searchAtom ("enter");
-		signalAtom = dir -> searchAtom ("signal");
-	}
-};*/
-
 ////////////////////////
 // console procedures //
 ////////////////////////
@@ -3018,77 +2940,11 @@ class fgcolour extends PrologNativeCode {
 	public fgcolour (PrologRoot root) {this . root = root;}
 }
 
-/*
-
-class open_editor : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {
-			root -> openEditor ();
-			return true;
-		}
-		if (! parameters -> isPair ()) return false;
-		PrologElement * selector = parameters -> getLeft ();
-		if (! selector -> isInteger ()) return false;
-		parameters = parameters -> getRight ();
-		if (parameters -> isEarth ()) {
-			root -> openEditor (selector -> getInteger ());
-			return true;
-		}
-		PrologElement * sub_selector = parameters -> getLeft ();
-		if (! sub_selector -> isInteger ()) return false;
-		root -> openEditor (selector -> getInteger (), sub_selector -> getInteger ());
-		return true;
-	}
-	open_editor (PrologRoot * root) {this -> root = root;}
-};
-
-class close_editor : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {
-			root -> closeEditor ();
-			return true;
-		}
-		if (! parameters -> isPair ()) return false;
-		PrologElement * selector = parameters -> getLeft ();
-		if (! selector -> isInteger ()) return false;
-		parameters = parameters -> getRight ();
-		if (parameters -> isEarth ()) {
-			root -> closeEditor (selector -> getInteger ());
-			return true;
-		}
-		PrologElement * sub_selector = parameters -> getLeft ();
-		if (! sub_selector -> isInteger ()) return false;
-		root -> closeEditor (selector -> getInteger (), sub_selector -> getInteger ());
-		return true;
-	}
-	close_editor (PrologRoot * root) {this -> root = root;}
-};
-
-class screen_coordinates : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * x = parameters -> getLeft ();
-		if (! x -> isInteger ()) return false;
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (! parameters -> isInteger ()) return false;
-		root -> setScreenCoordinates (x -> getInteger (), parameters -> getInteger ());
-		return true;
-	}
-	screen_coordinates (PrologRoot * root) {this -> root = root;}
-};
-
 ///////////////////////////
 // SERIAL NUMBER SERVICE //
 ///////////////////////////
 
+/*
 #include "encoder.h"
 
 class get_volume_serial_number : public PrologNativeCode {
@@ -3161,19 +3017,11 @@ public:
 	}
 };
 
+*/
+
 ///////////////////
 // SERVICE CLASS //
 ///////////////////
-
-void PrologStudio :: init (PrologRoot * root, PrologDirectory * directory) {
-	this -> root = root;
-	this -> directory = directory;
-	stdr . setRoot (root);
-}
-
-	return NULL;
-}
-*/
 
 class PrologStudio extends PrologServiceClass {
 	public PrologRoot root;
