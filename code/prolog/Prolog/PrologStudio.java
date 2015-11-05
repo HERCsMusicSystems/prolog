@@ -496,36 +496,15 @@ class prompt extends PrologNativeCode {
 	public prompt (PrologRoot root) {this . root = root;}
 }
 
-/*
-class query_stack : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		PrologQuery * query = resolution -> getQuery ();
-		while (query != NULL) {
-			drop_element (root, query -> query);
-			query = query -> stack;
-		}
+class query_stack extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		PrologQuery query = resolution . getQuery ();
+		while (query != null) {root . message (root . getValue (query . query)); query = query . stack;}
 		return true;
 	}
-	query_stack (PrologRoot * root) {this -> root = root;}
-};
-
-class object_counter_class : public PrologNativeCode {
-public:
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {
-			drop_object_counter ();
-			return true;
-		}
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		AREA area;
-		drop_object_counters (area);
-		parameters -> setText (area);
-		return true;
-	}
-};*/
+	public query_stack (PrologRoot root) {this . root = root;}
+}
 
 class is_atom extends PrologNativeCode {public boolean code (PrologElement parameters, PrologResolution resolution) {if (! parameters . isPair ()) return false; return parameters . getLeft () . isAtom ();}}
 class is_integer extends PrologNativeCode {public boolean code (PrologElement parameters, PrologResolution resolution) {if (! parameters . isPair ()) return false; return parameters . getLeft () . isInteger ();}}
@@ -3115,10 +3094,7 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("unique_atoms")) return new unique_atoms (root);
 		if (name . equals ("preprocessor")) return new preprocessor (root);
 		if (name . equals ("prompt")) return new prompt (root);
-	/*
-	if (strcmp (name, "query_stack") == 0) return new query_stack (root);
-	if (strcmp (name, "object_counter") == 0) return new object_counter_class ();
-	*/
+		if (name . equals ("query_stack")) return new query_stack (root);
 		if (name . equals ("crack")) return new crack (root);
 		if (name . equals ("wait")) return new wait (root);
 		if (name . equals ("timeout")) return new timeout_code (root);
