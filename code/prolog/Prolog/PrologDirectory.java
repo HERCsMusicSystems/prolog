@@ -22,7 +22,7 @@
 
 package Prolog;
 
-class PrologDirectory {
+public class PrologDirectory {
 	public String directoryName = null;
 	public PrologDirectory next = null;
 	public PrologAtom firstAtom = null;
