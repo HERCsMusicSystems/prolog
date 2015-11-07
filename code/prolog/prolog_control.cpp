@@ -167,18 +167,20 @@ static void * serial_runner (void * parameters) {
 
 bool serial_code :: code (PrologElement * parameters, PrologResolution * resolution) {
 	if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
-	if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-	if (parameters -> isVar ()) {
+	while (parameters -> isPair ()) {
+		PrologElement * el = parameters -> getLeft ();
+		if (el -> isVar ()) {
 #ifdef WIN32
-		int ind = 0;
-		ReadFile (fd, & ind, 1, NULL, NULL);
+			int ind = 0;
+			ReadFile (fd, & ind, 1, NULL, NULL);
 #else
-		int ind = tmread (fd);
+			int ind = tmread (fd);
 #endif
-		parameters -> setInteger (ind);
-		return true;
+			el -> setInteger (ind);
+		}
+		parameters = parameters -> getRight ();
 	}
-	return false;
+	return true;
 }
 bool serial_code :: port_not_found (void) {
 #ifdef WIN32
