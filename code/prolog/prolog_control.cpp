@@ -131,23 +131,35 @@ public:
 #else
 	int fd;
 #endif
-	int ind;
 	bool code (PrologElement * parameters, PrologResolution * resolution);
 	bool port_not_found (void);
 	serial_code (char * location, PrologRoot * root, PrologAtom * atom, PrologAtom * callback);
 	~ serial_code (void);
 };
 
+static int tmread (int fd) {
+	fd_set readset;
+	FD_ZERO (& readset);
+	FD_SET (fd, & readset);
+	timeval timeout;
+	timeout . tv_sec = 1;
+	timeout . tv_usec = 0;
+	if (select (fd + 1, & readset, 0, 0, & timeout) > 0) {int v = 0; read (fd, & v, 1); return v;}
+	return -1;
+}
+
 static void * serial_runner (void * parameters) {
 	serial_code * code = (serial_code *) parameters;
 	PrologRoot * root = code -> root;
 	code -> should_continue = true;
 	while (code -> should_continue) {
-		PrologElement * clause = root -> pair (root -> atom (code -> callback), root -> pair (root -> integer (code -> ind++), root -> earth ()));
-		clause = root -> pair (root -> head (0), root -> pair (clause, root -> earth ()));
-		root -> resolution (clause);
-		delete clause;
-		Sleep (500);
+		int ind = tmread (code -> fd);
+		if (ind >= 0) {
+			PrologElement * clause = root -> pair (root -> atom (code -> callback), root -> pair (root -> integer (ind), root -> earth ()));
+			clause = root -> pair (root -> head (0), root -> pair (clause, root -> earth ()));
+			root -> resolution (clause);
+			delete clause;
+		}
 	}
 	code -> should_continue = true;
 	return 0;
@@ -157,11 +169,11 @@ bool serial_code :: code (PrologElement * parameters, PrologResolution * resolut
 	if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
 	if (parameters -> isPair ()) parameters = parameters -> getLeft ();
 	if (parameters -> isVar ()) {
-		int ind = 0;
 #ifdef WIN32
+		int ind = 0;
 		ReadFile (fd, & ind, 1, NULL, NULL);
 #else
-		read (fd, & ind, 1);
+		int ind = tmread (fd);
 #endif
 		parameters -> setInteger (ind);
 		return true;
@@ -176,7 +188,6 @@ bool serial_code :: port_not_found (void) {
 #endif
 }
 serial_code :: serial_code (char * location, PrologRoot * root, PrologAtom * atom, PrologAtom * callback) {
-	ind = 0;
 	this -> should_continue = false;
 	this -> root = root;
 	this -> atom = atom;
@@ -193,7 +204,7 @@ serial_code :: serial_code (char * location, PrologRoot * root, PrologAtom * ato
 	pthread_detach (thread);
 }
 serial_code :: ~ serial_code (void) {
-	if (should_continue) {should_continue = false; while (! should_continue) Sleep (100);}
+	if (should_continue) {should_continue = false; while (! should_continue) usleep (100);}
 	if (callback != 0) callback -> removeAtom (); callback = 0;
 	if (! port_not_found ()) {
 #ifdef WIN32
