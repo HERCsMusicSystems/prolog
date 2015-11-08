@@ -169,6 +169,14 @@ bool serial_code :: code (PrologElement * parameters, PrologResolution * resolut
 	if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
 	while (parameters -> isPair ()) {
 		PrologElement * el = parameters -> getLeft ();
+		if (el -> isInteger ()) {
+			int ind = el -> getInteger () & 0xff;
+			write (fd, & ind, 1);
+		}
+		if (el -> isText ()) {
+			char * text = el -> getText ();
+			write (fd, text, strlen (text));
+		}
 		if (el -> isVar ()) {
 #ifdef WIN32
 			int ind = 0;
@@ -186,7 +194,7 @@ bool serial_code :: port_not_found (void) {
 #ifdef WIN32
 	return fd == INVALID_HANDLE_VALUE;
 #else
-	return fd == 0;
+	return fd < 0;
 #endif
 }
 serial_code :: serial_code (char * location, PrologRoot * root, PrologAtom * atom, PrologAtom * callback) {
@@ -198,7 +206,7 @@ serial_code :: serial_code (char * location, PrologRoot * root, PrologAtom * ato
 #ifdef WIN32
 	fd = CreateFile (location, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 #else
-	fd = open (location, O_RDONLY | O_NONBLOCK);
+	fd = open (location, O_RDWR | O_NONBLOCK);
 #endif
 	if (callback == 0) return;
 	if (port_not_found ()) return;
