@@ -137,6 +137,13 @@ public:
 	~ serial_code (void);
 };
 
+#ifdef WIN32
+static int tmread (HANDLE fd) {
+	int ind = 0;
+	ReadFile (fd, & ind, 1, NULL, NULL);
+	return ind;
+}
+#else
 static int tmread (int fd) {
 	fd_set readset;
 	FD_ZERO (& readset);
@@ -147,6 +154,7 @@ static int tmread (int fd) {
 	if (select (fd + 1, & readset, 0, 0, & timeout) > 0) {int v = 0; read (fd, & v, 1); return v;}
 	return -1;
 }
+#endif
 
 static void * serial_runner (void * parameters) {
 	serial_code * code = (serial_code *) parameters;
@@ -171,19 +179,24 @@ bool serial_code :: code (PrologElement * parameters, PrologResolution * resolut
 		PrologElement * el = parameters -> getLeft ();
 		if (el -> isInteger ()) {
 			int ind = el -> getInteger () & 0xff;
+#ifdef WIN32
+			DWORD written;
+			WriteFile (fd, & ind, 1, & written, NULL);
+#else
 			write (fd, & ind, 1);
+#endif
 		}
 		if (el -> isText ()) {
 			char * text = el -> getText ();
+#ifdef WIN32
+			DWORD written;
+			WriteFile (fd, text, strlen (text), & written, NULL);
+#else
 			write (fd, text, strlen (text));
+#endif
 		}
 		if (el -> isVar ()) {
-#ifdef WIN32
-			int ind = 0;
-			ReadFile (fd, & ind, 1, NULL, NULL);
-#else
 			int ind = tmread (fd);
-#endif
 			el -> setInteger (ind);
 		}
 		parameters = parameters -> getRight ();
