@@ -19,6 +19,7 @@
 			<fileset dir="../code/prolog" includes="studio.prc"/>
 			<fileset dir="../code/prolog" includes="keyboard.prc"/>
 			<fileset dir="../code/prolog" includes="test.prc"/>
+			<fileset dir="../code/prolog" includes="store.prc"/>
 			<manifest><attribute name="Main-Class" value="studio"/></manifest>
 		</jar>
 	</target>
