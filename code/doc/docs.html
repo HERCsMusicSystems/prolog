@@ -216,6 +216,7 @@
             <a href="#predicate_is_text">is_text</a>
             <a href="#predicate_is_var">is_var</a>
             <a href="#predicate_text_list">text_list</a>
+            <a href="#predicate_text_term">text_term</a>
         </li>
         <li><a href="#multithreading">Multi-threading</a>
             <br />
@@ -2164,7 +2165,21 @@
     </a>
 </div>
 
-<div class="doc_predicate">
+  <div class="doc_predicate">
+    <a id="predicate_text_term">
+      <div class="doc_predicate_header">
+        [text_term "1 2 3" : *list]<br />
+        [text_list *text 1 2 3]
+      </div>
+      <div class="doc_predicate_body">
+        Interprets text as a series of terms and vice versa.
+        Please note, if only the first term from the string is required,
+        then an open ended form may be used (i.e. [text_term "1 2 3" *x : *]).
+      </div>
+    </a>
+  </div>
+
+  <div class="doc_predicate">
     <a id="###">
         <div class="doc_predicate_header">
             ###
