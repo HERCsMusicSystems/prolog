@@ -308,6 +308,11 @@ void PrologReader :: get_symbol (void) {
 			while (indexOf (root -> atom_tail_captions, (char) act_znak) >= 0) {
 				if (strcmp (root -> if_atom_caption, symbol) == 0) return;
 				if (strcmp (root -> and_atom_caption, symbol) == 0) return;
+				char * opp = root -> operator_captions;
+				while (* opp != '\0') {
+					if (strcmp (opp, symbol) == 0) return;
+					while (* opp != '\0') opp++; opp++;
+				}
 				ind = area_cat (symbol, ind, (char) act_znak);
 				act_znak = move_z ();
 			}
@@ -417,13 +422,12 @@ void PrologReader :: get_symbol (void) {
 			act_znak = move_z ();
 			if (strcmp (root -> if_atom_caption, symbol) == 0) return;
 			if (strcmp (root -> and_atom_caption, symbol) == 0) return;
+			char * opp = root -> operator_captions;
+			while (* opp != '\0') {
+				if (strcmp (opp, symbol) == 0) return;
+				while (* opp != '\0') opp++; opp++;
+			}
 		} while (indexOf (root -> atom_tail_captions, (char) act_znak) >= 0);
-//		while (indexOf (root -> atom_tail_captions, (char) act_znak) >= 0) {
-//			ind = area_cat (symbol, ind, (char) act_znak);
-//			act_znak = move_z ();
-//			if (strcmp (root -> if_atom_caption, symbol) == 0) return;
-//			if (strcmp (root -> and_atom_caption, symbol) == 0) return;
-//		}
 		if (strcmp (root -> fail_caption, symbol) == 0) symbol_control = 4;
 		return;
 	}

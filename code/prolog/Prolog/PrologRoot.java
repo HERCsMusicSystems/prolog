@@ -67,6 +67,7 @@ public class PrologRoot {
 	public String dot_caption = ".";
 	public String if_atom_caption = ":-";
 	public String and_atom_caption = "+";
+	public ArrayList <String> operator_captions = null;
 	public String program_caption = "program";
 	public String import_caption = "import";
 	public String auto_atoms_caption = "#auto";
@@ -113,6 +114,7 @@ public class PrologRoot {
 		dot_caption = ".";
 		if_atom_caption = ":=";
 		and_atom_caption = "^";
+		operator_captions = null;
 		program_caption = "program";
 		import_caption = "import";
 		auto_atoms_caption = "#auto";
@@ -149,6 +151,7 @@ public class PrologRoot {
 		dot_caption = ".";
 		if_atom_caption = ":-";
 		and_atom_caption = "+";
+		operator_captions = null;
 		program_caption = "program";
 		import_caption = "import";
 		auto_atoms_caption = "#auto";
@@ -185,6 +188,7 @@ public class PrologRoot {
 		dot_caption = ".";
 		if_atom_caption = ":-";
 		and_atom_caption = "+";
+		operator_captions = null;
 		program_caption = "program";
 		import_caption = "import";
 		auto_atoms_caption = "#auto";
@@ -221,6 +225,7 @@ public class PrologRoot {
 		dot_caption = ".";
 		if_atom_caption = "+";
 		and_atom_caption = "-";
+		operator_captions = null;
 		program_caption = "program";
 		import_caption = "import";
 		auto_atoms_caption = "#auto";
@@ -257,6 +262,12 @@ public class PrologRoot {
 		dot_caption = ".";
 		if_atom_caption = ":=";
 		and_atom_caption = "'";
+		operator_captions = new ArrayList <String> ();
+		operator_captions . add ("+");
+		operator_captions . add ("-");
+		operator_captions . add ("*");
+		operator_captions . add ("^");
+		operator_captions . add ("=");
 		program_caption = "program";
 		import_caption = "import";
 		auto_atoms_caption = "#auto";

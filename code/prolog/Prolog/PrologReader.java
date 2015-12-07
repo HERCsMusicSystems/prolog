@@ -184,6 +184,7 @@ public class PrologReader {
 				while (root . atom_tail_captions . indexOf ((char) act_znak) >= 0) {
 					if (root . if_atom_caption . equals (symbol)) return;
 					if (root . and_atom_caption . equals (symbol)) return;
+					if (root . operator_captions != null && root . operator_captions . indexOf (symbol) >= 0) return;
 					symbol += ((char) act_znak);
 					act_znak = move_z ();
 				}
@@ -276,6 +277,7 @@ public class PrologReader {
 				act_znak = move_z ();
 				if (root . if_atom_caption . equals (symbol)) return;
 				if (root . and_atom_caption . equals (symbol)) return;
+				if (root . operator_captions != null && root . operator_captions . indexOf (symbol) >= 0) return;
 			} while (root . atom_tail_captions . indexOf ((char) act_znak) >= 0);
 			if (root . fail_caption . equals (symbol)) symbol_control = 4;
 			return;

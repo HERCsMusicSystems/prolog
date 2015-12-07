@@ -48,6 +48,7 @@ class API PrologCommand;
 #define PROLOG_PRINTABLE_FLOAT "%.80g"
 typedef char PROLOG_STRING [PROLOG_STRING_SIZE];
 extern API void prolog_string_copy (char * to, char * from);
+extern API void prolog_delimited_string_copy (char * to, char * from);
 extern API void prolog_string_cat (char * to, char * from);
 
 #define AREA_SIZE 2048
@@ -299,6 +300,7 @@ public:
 	PROLOG_STRING dot_caption;
 	PROLOG_STRING if_atom_caption;
 	PROLOG_STRING and_atom_caption;
+	PROLOG_STRING operator_captions;
 	PROLOG_STRING program_caption;
 	PROLOG_STRING import_caption;
 	PROLOG_STRING auto_atoms_caption;

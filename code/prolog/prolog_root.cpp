@@ -97,6 +97,7 @@ void PrologRoot :: set_uap32_captions (void) {
 	prolog_string_copy (dot_caption, ".");
 	prolog_string_copy (if_atom_caption, ":=");
 	prolog_string_copy (and_atom_caption, "^");
+	* operator_captions = '\0';
 	prolog_string_copy (program_caption, "program");
 	prolog_string_copy (import_caption, "import");
 	prolog_string_copy (auto_atoms_caption, "#auto");
@@ -136,6 +137,7 @@ void PrologRoot :: set_standard_captions (void) {
 	prolog_string_copy (dot_caption, ".");
 	prolog_string_copy (if_atom_caption, ":-");
 	prolog_string_copy (and_atom_caption, "+");
+	* operator_captions = '\0';
 	prolog_string_copy (program_caption, "program");
 	prolog_string_copy (import_caption, "import");
 	prolog_string_copy (auto_atoms_caption, "#auto");
@@ -176,6 +178,7 @@ void PrologRoot :: set_edinburg_captions (void) {
 	prolog_string_copy (dot_caption, ".");
 	prolog_string_copy (if_atom_caption, ":-");
 	prolog_string_copy (and_atom_caption, "+");
+	* operator_captions = '\0';
 	prolog_string_copy (program_caption, "program");
 	prolog_string_copy (import_caption, "import");
 	prolog_string_copy (auto_atoms_caption, "#auto");
@@ -215,6 +218,7 @@ void PrologRoot :: set_marseille_captions (void) {
 	prolog_string_copy (dot_caption, ".");
 	prolog_string_copy (if_atom_caption, "+");
 	prolog_string_copy (and_atom_caption, "-");
+	* operator_captions = '\0';
 	prolog_string_copy (program_caption, "program");
 	prolog_string_copy (import_caption, "import");
 	prolog_string_copy (auto_atoms_caption, "#auto");
@@ -254,6 +258,7 @@ void PrologRoot :: set_functional_captions (void) {
 	prolog_string_copy (dot_caption, ".");
 	prolog_string_copy (if_atom_caption, ":=");
 	prolog_string_copy (and_atom_caption, "'");
+	prolog_delimited_string_copy (operator_captions, "+\0-\0*\0^\0=\0");
 	prolog_string_copy (program_caption, "program");
 	prolog_string_copy (import_caption, "import");
 	prolog_string_copy (auto_atoms_caption, "#auto");

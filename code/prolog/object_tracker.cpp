@@ -154,6 +154,19 @@ void prolog_string_copy (char * to, char * from) {
 	* to = '\0';
 }
 
+void prolog_delimited_string_copy (char * to, char * from) {
+	int ind = PROLOG_STRING_SIZE - 2;
+	while (* from != '\0') {
+		if (ind-- == 0) {* to++ = '\0'; * to = '\0'; return;}
+		* to++ = * from++;
+		if (* from == '\0') {
+			if (ind-- == 0) {* to++ = '\0'; * to = '\0'; return;}
+			* to++ = * from++;
+		}
+	}
+	* to = '\0';
+}
+
 void prolog_string_cat (char * to, char * from) {
 	int ind = 0;
 	while (to [ind] != '\0' && ind < PROLOG_STRING_SIZE_1) ind++;
