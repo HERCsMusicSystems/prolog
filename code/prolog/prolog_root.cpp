@@ -258,6 +258,46 @@ void PrologRoot :: set_functional_captions (void) {
 	prolog_string_copy (dot_caption, ".");
 	prolog_string_copy (if_atom_caption, ":=");
 	prolog_string_copy (and_atom_caption, "'");
+	* operator_captions = '\0';
+	prolog_string_copy (program_caption, "program");
+	prolog_string_copy (import_caption, "import");
+	prolog_string_copy (auto_atoms_caption, "#auto");
+	prolog_string_copy (auto_caption, "auto");
+	prolog_string_copy (preprocessor_caption, "preprocessor");
+	prolog_string_copy (protect_caption, "protect");
+	prolog_string_copy (private_caption, "private");
+	prolog_string_copy (end_caption, "end");
+}
+
+void PrologRoot :: set_mathematical_captions (void) {
+	caption_id = 4;
+	prolog_string_copy (left_caption, "[");
+	prolog_string_copy (right_caption, "]");
+	prolog_string_copy (secondary_left_caption, "(");
+	prolog_string_copy (secondary_right_caption, ")");
+	prolog_string_copy (mid_caption, ":");
+	prolog_string_copy (comment_caption, ";");
+	prolog_string_copy (fail_caption, "fail");
+	prolog_string_copy (slash_caption, "!");
+	prolog_string_copy (quotation_caption, "\"");
+	prolog_string_copy (atom_quotation_caption, "`");
+	prolog_string_copy (escape_caption, "\\");
+	prolog_string_copy (head_caption, ":head:");
+	prolog_string_copy (separator_caption, "");
+	prolog_string_copy (directive_head_caption, "\\");
+	prolog_string_copy (machine_caption, "#machine");
+	new_line_caption [0] = 13;
+	new_line_caption [1] = 10;
+	new_line_caption [2] = '\0';
+	prolog_string_copy (var_head_captions, "~");
+	prolog_string_copy (var_tail_captions, "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM");
+	prolog_string_copy (var_caption, "~");
+	prolog_string_copy (atom_head_captions, "_qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM'?<>&|+-*=/%#$^{}");
+	prolog_string_copy (atom_tail_captions, "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM'?/<>&|=%#");
+	prolog_string_copy (at_caption, "@");
+	prolog_string_copy (dot_caption, ".");
+	prolog_string_copy (if_atom_caption, ":=");
+	prolog_string_copy (and_atom_caption, "'");
 	prolog_delimited_string_copy (operator_captions, "+\0-\0*\0^\0=\0");
 	prolog_string_copy (program_caption, "program");
 	prolog_string_copy (import_caption, "import");

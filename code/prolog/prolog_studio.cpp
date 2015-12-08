@@ -283,6 +283,16 @@ public:
 	set_functional_captions (PrologRoot * root) {this -> root = root;}
 };
 
+class set_mathematical_captions : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		root -> set_mathematical_captions ();
+		return true;
+	}
+	set_mathematical_captions (PrologRoot * root) {this -> root = root;}
+};
+
 class auto_atoms : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -4186,6 +4196,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "set_edinburg_captions") == 0) return new set_edinburg_captions (root);
 	if (strcmp (name, "set_marseille_captions") == 0) return new set_marseille_captions (root);
 	if (strcmp (name, "set_functional_captions") == 0) return new set_functional_captions (root);
+	if (strcmp (name, "set_mathematical_captions") == 0) return new set_mathematical_captions (root);
 	if (strcmp (name, "auto_atoms") == 0) return new auto_atoms (root);
 	if (strcmp (name, "scripted_atoms") == 0) return new scripted_atoms (root);
 	if (strcmp (name, "pr") == 0) return new pr (& stdr);

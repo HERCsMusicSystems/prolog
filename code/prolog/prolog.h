@@ -325,6 +325,7 @@ public:
 	void set_edinburg_captions (void);
 	void set_marseille_captions (void);
 	void set_functional_captions (void);
+	void set_mathematical_captions (void);
 	void set_auto_atoms (void);
 	void set_scripted_atoms (void);
 	void set_serial_number (char * serial_number);

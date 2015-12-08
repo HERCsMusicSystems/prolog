@@ -201,6 +201,11 @@ class set_functional_captions extends PrologNativeCode {
 	public boolean code (PrologElement parameters, PrologResolution resolution) {root . set_functional_captions (); return true;}
 	public set_functional_captions (PrologRoot root) {this . root = root;}
 }
+class set_mathematical_captions extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {root . set_mathematical_captions (); return true;}
+	public set_mathematical_captions (PrologRoot root) {this . root = root;}
+}
 class auto_atoms extends PrologNativeCode {
 	public PrologRoot root;
 	public boolean code (PrologElement parameters, PrologResolution resolution) {root . set_auto_atoms (); return true;}
@@ -3072,6 +3077,7 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("set_edinburg_captions")) return new set_edinburg_captions (root);
 		if (name . equals ("set_marseille_captions")) return new set_marseille_captions (root);
 		if (name . equals ("set_functional_captions")) return new set_functional_captions (root);
+		if (name . equals ("set_mathematical_captions")) return new set_mathematical_captions (root);
 		if (name . equals ("auto_atoms")) return new auto_atoms (root);
 		if (name . equals ("scripted_atoms")) return new scripted_atoms (root);
 		if (name . equals ("pr")) return new pr (stdr);

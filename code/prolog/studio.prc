@@ -8,7 +8,8 @@ program studio #machine := "prolog.studio"
 
 
 	[
-		set_uap32_captions set_standard_captions set_edinburg_captions set_marseille_captions set_functional_captions
+		set_uap32_captions set_standard_captions set_edinburg_captions
+		set_marseille_captions set_functional_captions set_mathematical_captions
 		auto_atoms scripted_atoms
 		pr read readln
 		write nl pp pt list
@@ -115,6 +116,7 @@ program studio #machine := "prolog.studio"
 #machine set_edinburg_captions := "set_edinburg_captions"
 #machine set_marseille_captions := "set_marseille_captions"
 #machine set_functional_captions := "set_functional_captions"
+#machine set_mathematical_captions := "set_mathematical_captions"
 #machine auto_atoms := "auto_atoms"
 #machine scripted_atoms := "scripted_atoms"
 #machine pr := "pr"
