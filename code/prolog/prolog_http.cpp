@@ -247,8 +247,12 @@ public:
 			if (new_fd == -1) {printf ("accept crap\n"); return;}
 			inet_ntop (their_addr . ss_family, get_in_addr ((struct sockaddr *) & their_addr), s, sizeof (s));
 			//===============================//
+#ifdef WIN32
+			int process_id = 0;
+#else
 			pid_t process_id = daemon ? fork () : 0;
 			if (process_id > 0) {int res; wait (& res);} else
+#endif
 			if (process_id == 0) {
 				int read = recv (new_fd, command, 65536, 0);
 				if (read < 0) {
@@ -302,11 +306,13 @@ while (analyser . get_param ()) {
 				clausa = root -> pair (root -> head (0), clausa);
 				root -> resolution (clausa);
 				delete clausa;
+#ifndef WIN32
 				if (daemon) {
 					service -> full_text_atom -> removeAtom ();
 					close (new_fd);
 					exit (0);
 				}
+#endif
 			}
 			close (new_fd);
 		}
