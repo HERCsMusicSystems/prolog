@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <sys/wait.h>
 #endif
 
 static void * get_in_addr (struct sockaddr * sa) {
@@ -222,6 +223,7 @@ public:
 	PrologAtom * atom;
 	PrologHttpServiceClass * service;
 	PrologAtom * router;
+	bool daemon;
 	void run (void) {
 		should_continue = true;
 		socklen_t sin_size;
@@ -245,7 +247,9 @@ public:
 			if (new_fd == -1) {printf ("accept crap\n"); return;}
 			inet_ntop (their_addr . ss_family, get_in_addr ((struct sockaddr *) & their_addr), s, sizeof (s));
 			//===============================//
-//			if (! fork ()) {
+			pid_t process_id = daemon ? fork () : 0;
+			if (process_id > 0) {int res; wait (& res);} else
+			if (process_id == 0) {
 				int read = recv (new_fd, command, 65536, 0);
 				if (read < 0) {
 					printf ("ERROR [%s]\n", strerror (read));
@@ -298,10 +302,12 @@ while (analyser . get_param ()) {
 				clausa = root -> pair (root -> head (0), clausa);
 				root -> resolution (clausa);
 				delete clausa;
-//				service -> full_text_atom -> removeAtom ();
-//				close (new_fd);
-//				exit (0);
-//			}
+				if (daemon) {
+					service -> full_text_atom -> removeAtom ();
+					close (new_fd);
+					exit (0);
+				}
+			}
 			close (new_fd);
 		}
 		close (sockfd);
@@ -354,10 +360,11 @@ while (analyser . get_param ()) {
 		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
 		return false;
 	}
-	webserver_code (PrologAtom * atom, PrologHttpServiceClass * service, PrologAtom * router) {
+	webserver_code (PrologAtom * atom, PrologHttpServiceClass * service, PrologAtom * router, bool daemon = false) {
 		this -> atom = atom;
 		this -> service = service;
 		this -> router = router;
+		this -> daemon = daemon;
 		if (router != 0) {COLLECTOR_REFERENCE_INC (router);}
 	}
 	~ webserver_code (void) {
@@ -371,6 +378,7 @@ void * webserver_runner (void * parameters) {((webserver_code *) parameters) -> 
 
 class webserver : public PrologNativeCode {
 public:
+	bool daemon;
 	PrologHttpServiceClass * service;
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
 		PrologElement * atom = 0;
@@ -387,12 +395,12 @@ public:
 		if (! router -> isAtom ()) return false;
 		if (atom -> isVar ()) atom -> setAtom (new PrologAtom ());
 		if (atom -> getAtom () -> getMachine () != 0) return false;
-		webserver_code * wsc = new webserver_code (atom -> getAtom (), service, router -> getAtom ());
+		webserver_code * wsc = new webserver_code (atom -> getAtom (), service, router -> getAtom (), daemon);
 		if (! wsc -> prestart (port -> getInteger ())) {delete wsc; return false;}
 		if (atom -> getAtom () -> setMachine (wsc)) return true;
 		delete wsc; return false;
 	}
-	webserver (PrologHttpServiceClass * service) {this -> service = service;}
+	webserver (PrologHttpServiceClass * service, bool daemon = false) {this -> service = service; this -> daemon = daemon;}
 };
 
 void PrologHttpServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {
@@ -431,6 +439,7 @@ void PrologHttpServiceClass :: set_atoms (void) {
 PrologNativeCode * PrologHttpServiceClass :: getNativeCode (char * name) {
 	set_atoms ();
 	if (strcmp (name, "webserver") == 0) return new webserver (this);
+	if (strcmp (name, "daemon") == 0) return new webserver (this, true);
 	return 0;
 }
 

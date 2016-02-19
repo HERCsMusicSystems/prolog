@@ -2,12 +2,13 @@
 program http #machine := "prolog.http"
 
 	[
-		webserver FULL_HEADER_TEXT param HTTP_URI HTTP_PROTOCOL HTTP_HEADER
+		webserver daemon FULL_HEADER_TEXT param HTTP_URI HTTP_PROTOCOL HTTP_HEADER
 		GET POST PUT PATCH DELETE COPY HEAD OPTIONS LINK UNLINK PURGE
 		GETter FORM MULTIFORM FORMatter
 	]
 
 #machine webserver := "webserver"
+#machine daemon := "daemon"
 
 [[GET *res *content] / [*res "<a href=\"/\" />" *content "</a>"]]
 [[GET *res : *command] / [*res "<a href=\""] / [GETter *res : *command]]
