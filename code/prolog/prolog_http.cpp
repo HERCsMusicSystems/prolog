@@ -409,6 +409,44 @@ public:
 	webserver (PrologHttpServiceClass * service, bool daemon = false) {this -> service = service; this -> daemon = daemon;}
 };
 
+class fork_code : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		#ifdef WIN32
+		return false;
+		#else
+		PrologElement * pid = 0;
+		if (parameters -> isPair ()) {PrologElement * el = parameters -> getLeft (); if (el -> isVar ()) {pid = el; parameters = parameters -> getRight ();}}
+		pid_t process_id = fork ();
+		if (process_id == 0) {root -> resolution (root -> pair (root -> head (0), parameters)); exit (0);}
+		else if (process_id > 0) {if (pid != 0) pid -> setInteger (process_id); else {int res; waitpid (process_id, & res, 0);} return true;}
+		return true;
+		#endif
+	}
+	fork_code (PrologRoot * root) {this -> root = root;}
+};
+
+class wait_for_code : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		#ifdef WIN32
+		return false;
+		#else
+		PrologElement * pid = 0;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isInteger ()) pid = el;
+			parameters = parameters -> getRight ();
+		}
+		int res;
+		if (pid == 0) wait (& res);
+		else waitpid ((pid_t) pid -> getInteger (), & res, 0);
+		return true;
+		#endif
+	}
+};
+
 void PrologHttpServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {
 #ifdef WINDOWS_OPERATING_SYSTEM
 	WORD version = MAKEWORD (2, 2);
@@ -446,6 +484,8 @@ PrologNativeCode * PrologHttpServiceClass :: getNativeCode (char * name) {
 	set_atoms ();
 	if (strcmp (name, "webserver") == 0) return new webserver (this);
 	if (strcmp (name, "daemon") == 0) return new webserver (this, true);
+	if (strcmp (name, "fork") == 0) return new fork_code (this -> root);
+	if (strcmp (name, "wait_for") == 0) return new wait_for_code ();
 	return 0;
 }
 
