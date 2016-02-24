@@ -2587,6 +2587,34 @@ public:
 	file_reader (PrologRoot * root) {this -> root = root;}
 };
 
+class shebang_reader : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		PrologElement * symbol = 0;
+		PrologElement * name = 0;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isAtom ()) symbol = el;
+			if (el -> isVar ()) symbol = el;
+			if (el -> isText ()) name = el;
+			parameters = parameters -> getRight ();
+		}
+		if (symbol == 0 || name == 0) return false;
+		if (symbol -> isVar ()) symbol -> setAtom (new PrologAtom ());
+		PrologAtom * atom = symbol -> getAtom ();
+		if (atom -> getMachine () != 0) return false;
+		file_read * fr = new file_read (atom, root, name -> getText ());
+		if (fr -> fi == 0) {delete fr; return false;}
+		fr -> sr . shebang ();
+		if (atom -> setMachine (fr)) return true;
+		delete fr;
+		return false;
+	}
+	shebang_reader (PrologRoot * root) {this -> root = root;}
+};
+
+
 class module_loader : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -4229,6 +4257,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "mutex") == 0) return new MutexMaker (directory);
 	if (strcmp (name, "file_writer") == 0) return new file_writer (root);
 	if (strcmp (name, "file_reader") == 0) return new file_reader (root);
+	if (strcmp (name, "shebang_reader") == 0) return new shebang_reader (root);
 	if (strcmp (name, "import_loader") == 0) return new import_loader (root);
 	if (strcmp (name, "load_loader") == 0) return new load_loader (root);
 	if (strcmp (name, "consult_loader") == 0) return new consult_loader (root);

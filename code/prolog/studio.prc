@@ -13,7 +13,7 @@ program studio #machine := "prolog.studio"
 		auto_atoms scripted_atoms
 		pr read readln
 		write nl pp pt list
-		file_writer import load consult batch file_reader reload
+		file_writer import load consult batch file_reader shebang_reader reload
 		remove_module create_module set_machine machine_type
 		add_search_directory search_directories
 		cd relativise_path dir ls DIR ARGS args args_tail edit execute make_directory erase erase_directory move copy
@@ -153,6 +153,7 @@ program studio #machine := "prolog.studio"
 
 #machine file_writer := "file_writer"
 #machine file_reader := "file_reader"
+#machine shebang_reader := "shebang_reader"
 #machine import := "import_loader"
 #machine load := "load_loader"
 #machine consult := "consult_loader"
@@ -463,9 +464,9 @@ program studio #machine := "prolog.studio"
 [[command *x *y] [inner_call [*x : *y]]]
 
 
-[[batch *text] [file_reader *atom *text] / [batch [batch] *atom]]
+[[batch *text] [shebang_reader *atom *text] / [batch [batch] *atom]]
 [[batch [exit] *reader][*reader]]
-[[batch *x *reader][*reader *head]/[batch *x *reader *head]] ;[*reader *tail][*head :*tail] / [batch [*head :*tail] *reader]]
+[[batch *x *reader][*reader *head]/[batch *x *reader *head]]
 [[batch *x *reader][*reader] / fail]
 [[batch *x *reader *head] [eq *head [[* : *] : *]] / [inner_addcl *head] / [batch *head *reader]]
 [[batch *x *reader *head] [is_atom *head] / [*reader *tail] [inner_call [*head : *tail]] / [batch [*head : *tail] *reader]]

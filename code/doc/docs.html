@@ -181,6 +181,7 @@
             <a href="#predicate_security_check">security_check</a>
             <a href="#predicate_set_captions">set_...._captions</a>
             <a href="#predicate_set_machine">set_machine</a>
+            <a href="#predicate_shebang_reader">shebang_reader</a>
             <a href="#predicate_show">show</a>
             <a href="#predicate_write">write</a>
         </li>
@@ -1067,7 +1068,7 @@
             [batch "file_name.prb"]
         </div>
         <div class="doc_predicate_body">
-            Run the specified file as if it was a series of interactive commands.
+            Runs the specified file as if it was a series of interactive commands.
             The file is expected to be terminated by [exit] command
             (as if in a real interactive session).
             If any of the commands fail or if the series of commands is not terminated with [exit]
@@ -1269,6 +1270,8 @@
             <li>Texts consisting of specified characters.</li><br />
             Without any parameters the reader closes the file and releases the machine clause binding.
             If anonymous symbol is garbage collected then the file is also closed (and machine binding released as well).
+            <br/>
+            <b>Note:</b> use <a href=#predicate_shebang_reader>shebang_reader</a> to filter-out the possible initial shebang sequence (#!).
         </div>
     </a>
 </div>
@@ -1714,6 +1717,20 @@
             If no module was specified then it searches machine code in the root module.
             Fails if machine code can not be found or applied (i.e. the symbol has already some definitions attached).
             Note: machine binding can only be removed if the binding itself allows for it.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_shebang_reader">
+        <div class="doc_predicate_header">
+            [shebang_reader *reader "file_name.extension"]
+        </div>
+        <div class="doc_predicate_body">
+            Works identical to <a href=#predicate_file_reader>file_reader</a>.
+            However, it skips the initial shebang line (beginning with #! character sequence) if present.
+            Very good for Unix/Linux scripting.
+            It is, in fact, used by <a href=#predicate_batch>batch</a> processor.
         </div>
     </a>
 </div>

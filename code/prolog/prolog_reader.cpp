@@ -168,6 +168,12 @@ bool PrologReader :: prefetch_whites (void) {
 	return false;
 }
 
+void PrologReader :: shebang (void) {
+	act_znak = move_z ();
+	if (act_znak != '#') return;
+	while (act_znak != 10 && act_znak != 13 && act_znak >= 0) act_znak = move_z ();
+}
+
 void PrologReader :: get_symbol (void) {
 	bool negative = false;
 	bool atom_possible = true;

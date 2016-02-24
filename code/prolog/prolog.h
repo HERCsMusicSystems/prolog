@@ -466,6 +466,7 @@ public:
 	int getString (char * area, int ind, char * char_set);
 	int readln (char * area, int ind);
 	bool prefetch_whites (void);
+	void shebang (void);
 	void get_symbol (void);
 	PrologAtom * searchAtom (char * name);
 	PrologAtom * searchAtomC (char * name);
