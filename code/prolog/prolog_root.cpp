@@ -938,7 +938,7 @@ int PrologRoot :: resolution (PrologElement * query) {
 }
 
 bool PrologRoot :: resolutionHead (char * directory) {
-	if (strstr (directory, ".prb") != 0) {
+	if (strstr (directory, ".prc") == 0) {
 		PrologLoader loader (this);
 		if (! loader . load ("studio.prc")) return false;
 		if (main_query != 0) removeMainQuery ();

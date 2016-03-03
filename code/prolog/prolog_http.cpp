@@ -382,6 +382,46 @@ while (analyser . get_param ()) {
 };
 void * webserver_runner (void * parameters) {((webserver_code *) parameters) -> run (); return 0;}
 
+static PrologElement * extract_request_clause (PrologHttpServiceClass * service, char * command, char * continuation) {
+	PrologRoot * root = service -> root;
+	RequestAnalyser analyser (service, command);
+	// FULL TEXT
+	PrologElement * clausa = root -> pair (root -> pair (root -> head (0), root -> pair (root -> atom (service -> full_text_atom), root -> pair (root -> text (command), root -> earth ()))), root -> earth ());
+	// METHOD
+	PrologAtom * method_atom = analyser . get_method ();
+	PrologElement * content = root -> pair (method_atom != 0 ? root -> atom (method_atom) : root -> text (analyser . area), root -> earth ());
+	PrologElement * cp = content -> getRight ();
+	PrologElement * partial = 0;
+	while ((partial = analyser . get_partial_request ()) != 0) {
+		cp -> setPair (partial, root -> earth ());
+		cp = cp -> getRight ();
+	}
+	clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> route_atom), content)), root -> earth ());
+	// GET PARAMS
+	while (analyser . get_get_param ()) {
+		content = root -> pair (root -> text (analyser . key), root -> pair (root -> text (analyser . area), root -> earth ()));
+		clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> param_atom), content)), root -> earth ());
+	}
+	// PROTOCOL
+	analyser . get_protocol ();
+	clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> protocol_atom), root -> pair (root -> text (analyser . area), root -> earth ()))), root -> earth ());
+	// HEADER LINES
+	while (analyser . get_header_line ()) {
+		content = root -> pair (root -> text (analyser . key), root -> pair (root -> text (analyser . area), root -> earth ()));
+		clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> header_atom), content)), root -> earth ());
+	}
+	if (strcmp (analyser . key, "Content-Length") == 0) {
+		int length = atoi (analyser . area);
+		for (int ind = 0; ind < length; ind++) * continuation++ = getchar (); * continuation = '\0';
+	}
+	// PARAMS
+	while (analyser . get_param ()) {
+		content = root -> pair (root -> text (analyser . key), root -> pair (root -> text (analyser . area), root -> earth ()));
+		clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> param_atom), content)), root -> earth ());
+	}
+	return clausa;
+}
+
 class webserver : public PrologNativeCode {
 public:
 	bool daemon;
@@ -447,6 +487,26 @@ public:
 	}
 };
 
+class http_request_code : public PrologNativeCode {
+public:
+	PrologHttpServiceClass * service;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (parameters -> isVar ()) parameters -> setAtom (new PrologAtom ("HTTP-Request"));
+		if (! parameters -> isAtom ()) return false;
+		PrologAtom * request = parameters -> getAtom ();
+		char command [65536];
+		char * cpx = command;
+		int ch = * cpx++ = getchar ();
+		int prev = 0;
+		while (ch >= 0 && (ch != 13 || prev != 10)) {prev = ch; ch = * cpx++ = getchar ();} getchar ();
+		* cpx = '\0';
+		request -> firstClause = extract_request_clause (service, command, cpx);
+		return true;
+	}
+	http_request_code (PrologHttpServiceClass * service) {this -> service = service;}
+};
+
 void PrologHttpServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {
 #ifdef WINDOWS_OPERATING_SYSTEM
 	WORD version = MAKEWORD (2, 2);
@@ -486,6 +546,7 @@ PrologNativeCode * PrologHttpServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "daemon") == 0) return new webserver (this, true);
 	if (strcmp (name, "fork") == 0) return new fork_code (this -> root);
 	if (strcmp (name, "wait_for") == 0) return new wait_for_code ();
+	if (strcmp (name, "http_request") == 0) return new http_request_code (this);
 	return 0;
 }
 

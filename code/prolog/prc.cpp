@@ -123,10 +123,9 @@ int main (int args, char * argv []) {
 	root -> setResourceLoader (& resource_loader);
 	root -> setServiceClassLoader (& service_class_loader);
 	root -> set_uap32_captions ();
-	PROLOG_STRING name;
-	strcpy (name, "");
+	char * name = 0;
 	for (int ind = 1; ind < args; ind++) {
-		if (strlen (name) < 1) strcpy (name, argv [ind]);
+		if (name == 0) name = argv [ind];
 		else root -> addArg (argv [ind]);
 	}
 
@@ -138,16 +137,13 @@ int main (int args, char * argv []) {
 	#endif
 
 	root -> insertCommander (console);
-	if (strlen (name) == 0) {root -> auto_atoms = true; root -> resolution ();}
-	else {
-		if (strstr (name, ".prc") == NULL && strstr (name, ".prb") == NULL) strcat (name, ".prc");
-		root -> resolution (name);
-	}
+	int ctrl;
+	if (name == 0) {root -> auto_atoms = true; ctrl = root -> resolution ();}
+	else ctrl = root -> resolution (name);
 
 	delete root;
 	delete console;
-//	if (object_left ())
-		drop_object_counter ();
+	if (ctrl == 1) drop_object_counter ();
 	return 0;
 }
 
