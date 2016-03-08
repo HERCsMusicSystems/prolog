@@ -143,7 +143,7 @@ int main (int args, char * argv []) {
 
 	delete root;
 	delete console;
-	if (ctrl == 1) drop_object_counter ();
+	if (object_left ()) drop_object_counter ();
 	return 0;
 }
 
