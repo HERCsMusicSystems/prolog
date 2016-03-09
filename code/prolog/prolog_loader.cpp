@@ -24,6 +24,7 @@
 #include <string.h>
 
 PrologLoader :: PrologLoader (PrologRoot * root) {
+	instructions = 0;
 	drop_main = false;
 	echo = false;
 	reload = false;
@@ -313,7 +314,8 @@ bool PrologLoader :: LOAD (char * file_name) {
 					if (echo) message ("");
 					root -> close ();
 					if (clause != NULL) {
-						if (drop_main) {
+						if (instructions != 0 && instructions -> isPair ()) instructions -> setRight (clause);
+						else if (drop_main) {
 							root -> getValue (clause, command, 0);
 							root -> message ("Illegal instructions dropped", command);
 							delete clause;

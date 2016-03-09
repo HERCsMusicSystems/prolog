@@ -480,6 +480,7 @@ class PrologLoader : public PrologReader {
 private:
 	void close (void);
 public:
+	PrologElement * instructions;
 	bool drop_main;
 	bool echo;
 	bool reload;

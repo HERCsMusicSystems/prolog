@@ -136,6 +136,7 @@
             <a href="#predicate_ARGS">ARGS</a>
             <a href="#predicate_background">background</a>
             <a href="#predicate_batch">batch</a>
+            <a href="#predicate_bootstrap">bootstrap</a>
             <a href="#predicate_cd">cd</a>
             <a href="#predicate_close_editor">close_editor</a>
             <a href="#predicate_command">command</a>
@@ -1078,6 +1079,20 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_bootstrap">
+        <div class="doc_predicate_header">
+            [bootstrap "file_name"]
+        </div>
+        <div class="doc_predicate_body">
+            Works similar to <a href="#predicate_batch">batch</a>
+            with <a href="#predicate_shebang_reader">shebang_reader</a> used instead of <a href="#predicate_file_reder">file_reader</a>.
+            However, if it can't find the file specified, then it tries to work as <a href="#predicate_import">import</a>
+            and run optional instructions, if they are present.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_cd">
         <div class="doc_predicate_header">
             [cd]<br />
@@ -1119,16 +1134,20 @@
 <div class="doc_predicate">
     <a id="predicate_consult">
         <div class="doc_predicate_header">
-            [consult "module_name"]
+            [consult "module-1" "module-2" .... "module-n" : *optional_instructions]
         </div>
         <div class="doc_predicate_body">
-            Loads specified module from a file.
-            If the module is present then it will be removed first and the loaded.
+            Loads specified module(s) from file(s).
+            If a module is present then it will be removed first and the re-loaded.
             It will appear as the second module after the root "user!".
             If the module name has no extension, the default ".prc" extension will be used.
-            Fails if the module can not be found anywhere.
+            Fails immediately if a module can not be found anywhere.
             The source code will be displayed on the console during the loading process.
-            To avoid it, load (or import) can be used instead.
+            To avoid it, <a href="#predicate_load">load</a> or <a href="#predicate_import">import</a> can be used instead.<br/>
+            The optional instructions will retrieve the list of commands
+            located between the end of the module and final dot.
+            They can be subsequently called.
+            However, this works only for the last module from the list.
         </div>
     </a>
 </div>
@@ -1271,7 +1290,7 @@
             Without any parameters the reader closes the file and releases the machine clause binding.
             If anonymous symbol is garbage collected then the file is also closed (and machine binding released as well).
             <br/>
-            <b>Note:</b> use <a href=#predicate_shebang_reader>shebang_reader</a> to filter-out the possible initial shebang sequence (#!).
+            <b>Note:</b> use <a href="#predicate_shebang_reader">shebang_reader</a> to filter-out the possible initial shebang sequence (#!).
         </div>
     </a>
 </div>
@@ -1330,14 +1349,18 @@
 <div class="doc_predicate">
     <a id="predicate_import">
         <div class="doc_predicate_header">
-            [import "module_name"]
+            [import "module-1" "module-2" .... "module-n" : *optional_instructions]
         </div>
         <div class="doc_predicate_body">
-            Loads specified module from a file.
-            If the module is present then it will not be reloaded.
+            Loads specified module(s) from file(s).
+            If a module is present then it will not be re-loaded.
             If loaded then it will appear as the second module after the root "user!".
             If the module name has no extension, the default ".prc" extension will be used.
-            Fails if the module can not be found anywhere.
+            Fails immediately if a module can not be found anywhere.<br/>
+            The optional instructions will retrieve the list of commands
+            located between the end of the module and final dot.
+            They can be subsequently called.
+            However, this works only for the last module from the list.
         </div>
     </a>
 </div>
@@ -1366,14 +1389,18 @@
 <div class="doc_predicate">
     <a id="predicate_load">
         <div class="doc_predicate_header">
-            [load "module_name"]
+            [load "module-1" "module-2" ... "module-n" : *optional_instructions]
         </div>
         <div class="doc_predicate_body">
-            Loads specified module from a file.
-            If the module is present then it will be removed first and the loaded.
+            Loads specified module(s) from file(s).
+            If a module is present then it will be removed first and then re-loaded.
             It will appear as the second module after the root "user!".
             If the module name has no extension, the default ".prc" extension will be used.
-            Fails if the module can not be found anywhere.
+            Fails if the module can not be found anywhere.<br/>>
+            The optional instructions will retrieve the list of commands
+            located between the end of the module and final dot.
+            They can be subsequently called.
+            However, this works only for the last module from the list.
         </div>
     </a>
 </div>
@@ -1727,10 +1754,10 @@
             [shebang_reader *reader "file_name.extension"]
         </div>
         <div class="doc_predicate_body">
-            Works identical to <a href=#predicate_file_reader>file_reader</a>.
+            Works identical to <a href="#predicate_file_reader">file_reader</a>.
             However, it skips the initial shebang line (beginning with #! character sequence) if present.
             Very good for Unix/Linux scripting.
-            It is, in fact, used by <a href=#predicate_batch>batch</a> processor.
+            It is, in fact, used by <a href="#predicate_bootstrap">bootstrap</a> processor.
         </div>
     </a>
 </div>

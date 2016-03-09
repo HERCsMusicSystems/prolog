@@ -2621,12 +2621,14 @@ public:
 	bool echo;
 	bool reload;
 	bool code (PrologElement * parameters, PrologResolution * resulotion) {
-		while (parameters -> isPair ()) {
+		bool looping = true;
+		while (looping && parameters -> isPair ()) {
 			PrologElement * module_name = parameters -> getLeft ();
 			if (! module_name -> isText ()) return false;
 			PrologLoader loader (root);
 			loader . echo = echo;
 			loader . reload = reload;
+			if (parameters -> getRight () -> isVar ()) {parameters -> getRight () -> setEarth (); loader . instructions = parameters; looping = false;}
 			if (strstr (module_name -> getText (), ".prc") == NULL) {
 				PROLOG_STRING command;
 				prolog_string_copy (command, module_name -> getText ());

@@ -943,7 +943,7 @@ bool PrologRoot :: resolutionHead (char * directory) {
 		if (! loader . load ("studio.prc")) return false;
 		if (main_query != 0) removeMainQuery ();
 		auto_atoms = true;
-		main_query = pair (pair (atom ("batch"), pair (text (directory), earth ())), earth ());
+		main_query = pair (pair (atom ("bootstrap"), pair (text (directory), earth ())), earth ());
 		main_query = pair (head (0), main_query);
 		return true;
 	}
