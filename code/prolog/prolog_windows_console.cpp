@@ -58,9 +58,9 @@ PrologWindowsConsole :: PrologWindowsConsole (void) {
 }
 
 PrologWindowsConsole :: ~ PrologWindowsConsole (void) {
-	if (output != 0) CloseHandle (output); output = 0;
-	if (input != 0) CloseHandle (input); input = 0;
-	FreeConsole ();
+//	if (output != 0) CloseHandle (output); output = 0;
+//	if (input != 0) CloseHandle (input); input = 0;
+//	FreeConsole ();
 }
 
 char * PrologWindowsConsole :: getPrompt (void) {return prompt;}
