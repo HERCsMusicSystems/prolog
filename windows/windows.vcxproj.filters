@@ -91,7 +91,7 @@
     <ClCompile Include="..\code\tinyxml2\tinyxml2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\pthread\pthread.c">
+    <ClCompile Include="..\code\pthread\pthread.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
