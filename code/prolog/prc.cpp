@@ -144,6 +144,9 @@ int main (int args, char * argv []) {
 	delete root;
 	delete console;
 	if (object_left ()) drop_object_counter ();
+#ifdef _DEBUG
+	getchar ();
+#endif
 	return 0;
 }
 
