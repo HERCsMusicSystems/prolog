@@ -17,7 +17,7 @@ program studio #machine := "prolog.studio"
 		remove_module create_module set_machine machine_type
 		add_search_directory search_directories
 		cd relativise_path dir ls DIR ARGS args args_tail edit execute make_directory erase erase_directory move copy
-		operating_system implementation
+		operating_system implementation version
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
 		create_atom create_atoms search_atom search_atom_c unique_atoms preprocessor prompt
 		+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^
@@ -39,6 +39,9 @@ program studio #machine := "prolog.studio"
 
 		. computer-do-this define-this show
 	]
+
+[[version 2016 4]]
+[[version] [version : *x] [show "VERSION: " *x]]
 
 #machine ++ := "add1"
 #machine add1 := "add1"
