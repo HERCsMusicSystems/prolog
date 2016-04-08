@@ -35,7 +35,6 @@ class CrackStarter implements Runnable {
 }
 
 public class PrologRoot {
-	public PrologServiceClassLoader service_loader = null;
 	public PrintStream command = System . out;
 	public InputStream reader = System . in;
 	public ArrayList <String> search_directories = new ArrayList <String> ();
@@ -400,7 +399,6 @@ public class PrologRoot {
 	public void setPreprocessor (PrologAtom atom) {preprocessor = atom;}
 	public PrologAtom getPreprocessor () {return preprocessor;}
 
-	public void setServiceClassLoader (PrologServiceClassLoader loader) {service_loader = loader;}
 	public void insertCommander (PrintStream command) {this . command = command;}
 	public void insertReader (InputStream reader) {this . reader = reader;}
 	public PrintStream getCommander () {return command;}
@@ -632,10 +630,10 @@ public class PrologRoot {
 	}
 	public boolean resolutionHead (String directory) {
 		PrologLoader loader = new PrologLoader (this);
-		if (directory . contains (".prb")) {
+		if (! directory . contains (".prc")) {
 			if (! loader . load ("studio.prc")) return false;
 			auto_atoms = true;
-			main_query = pair (head (null), pair (pair (atom ("batch"), pair (text (directory), earth ())), earth ()));
+			main_query = pair (head (null), pair (pair (atom ("bootstrap"), pair (text (directory), earth ())), earth ()));
 			return true;
 		}
 		return loader . load (directory);

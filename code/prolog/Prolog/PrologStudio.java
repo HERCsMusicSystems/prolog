@@ -1939,17 +1939,43 @@ class file_reader extends PrologNativeCode {
 	public file_reader (PrologRoot root) {this . root = root;}
 }
 
+class shebang_reader extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		PrologElement symbol = null;
+		PrologElement name = null;
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isAtom ()) symbol = el;
+			if (el . isVar ()) symbol = el;
+			if (el . isText ()) name = el;
+			parameters = parameters . getRight ();
+		}
+		if (symbol == null || name == null) return false;
+		if (symbol . isVar ()) symbol . setAtom (new PrologAtom ());
+		PrologAtom atom = symbol . getAtom ();
+		if (atom . getMachine () != null) return false;
+		file_read fr = new file_read (atom, root, name . getText ());
+		if (fr . fi == null) return false;
+		fr . sr . shebang ();
+		return atom . setMachine (fr);
+	}
+	public shebang_reader (PrologRoot root) {this . root = root;}
+}
+
 class module_loader extends PrologNativeCode {
 	public PrologRoot root;
 	public boolean echo;
 	public boolean reload;
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
-		while (parameters . isPair ()) {
+		boolean looping = true;
+		while (looping && parameters . isPair ()) {
 			PrologElement module_name = parameters . getLeft ();
 			if (! module_name . isText ()) return false;
 			PrologLoader loader = new PrologLoader (root);
 			loader . echo = echo;
 			loader . reload = reload;
+			if (parameters . getRight () . isVar ()) {parameters . getRight () . setEarth (); loader . instructions = parameters; looping = false;}
 			if (module_name . getText () . contains (".prc")) {if (! loader . load_without_main (module_name . getText ())) return false;}
 			else {if (! loader . load_without_main (module_name . getText () + ".prc")) return false;}
 			parameters = parameters . getRight ();
@@ -3109,6 +3135,7 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("mutex")) return new mutex_maker (directory);
 		if (name . equals ("file_writer")) return new file_writer (root);
 		if (name . equals ("file_reader")) return new file_reader (root);
+		if (name . equals ("shebang_reader")) return new shebang_reader (root);
 		if (name . equals ("import_loader")) return new import_loader (root);
 		if (name . equals ("load_loader")) return new load_loader (root);
 		if (name . equals ("consult_loader")) return new consult_loader (root);

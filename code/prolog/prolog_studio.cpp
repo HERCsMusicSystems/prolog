@@ -2614,7 +2614,6 @@ public:
 	shebang_reader (PrologRoot * root) {this -> root = root;}
 };
 
-
 class module_loader : public PrologNativeCode {
 public:
 	PrologRoot * root;

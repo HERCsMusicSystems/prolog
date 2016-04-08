@@ -26,6 +26,7 @@ import java . io . InputStream;
 import java . io . FileInputStream;
 
 public class PrologLoader extends PrologReader {
+	public PrologElement instructions = null;
 	public boolean drop_main = false;
 	public boolean echo = false;
 	public boolean reload = false;
@@ -191,7 +192,8 @@ public class PrologLoader extends PrologReader {
 						if (echo) root . message ("");
 						root . close ();
 						if (clause != null) {
-							if (drop_main) root . message ("Illegal instructions dropped " + root . getValue (clause));
+							if (instructions != null && instructions . isPair ()) instructions . setRight (clause);
+							else if (drop_main) root . message ("Illegal instructions dropped " + root . getValue (clause));
 							else {
 								if (root . main_query != null) {root . message ("Instructions dropped " + root . getValue (root . main_query)); root . main_query = null;}
 								clause = root . pair (root .head (null), clause);

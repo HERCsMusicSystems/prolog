@@ -93,6 +93,11 @@ public class PrologReader {
 		}
 		return false;
 	}
+	public void shebang () {
+		act_znak = move_z ();
+		if (act_znak != '#') return;
+		while (act_znak != 10 && act_znak != 13 && act_znak >= 0) act_znak = move_z ();
+	}
 	public void get_symbol () {
 		if (act_znak < 0) act_znak = move_z ();
 		while (act_znak < 33 || root . comment_caption . indexOf ((char) act_znak) >= 0) {
