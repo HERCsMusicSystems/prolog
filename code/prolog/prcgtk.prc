@@ -1,4 +1,6 @@
 
+import studio
+
 program prcgtk #machine := "prcgtk" [gtk_init gtk_main gtk_stop gtk_command]
 
 #machine gtk_init := "gtk_init"
