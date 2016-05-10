@@ -1983,21 +1983,6 @@ class module_loader extends PrologNativeCode {
 		}
 		return true;
 	}
-	public boolean codes (PrologElement parameters, PrologResolution resolution) {
-		boolean looping = true;
-		while (looping && parameters . isPair ()) {
-			PrologElement module_name = parameters . getLeft ();
-			if (! module_name . isText ()) return false;
-			PrologLoader loader = new PrologLoader (root);
-			loader . echo = echo;
-			loader . reload = reload;
-			if (parameters . getRight () . isVar ()) {parameters . getRight () . setEarth (); loader . instructions = parameters; looping = false;}
-			if (module_name . getText () . contains (".prc")) {if (! loader . load_without_main (module_name . getText ())) return false;}
-			else {if (! loader . load_without_main (module_name . getText () + ".prc")) return false;}
-			parameters = parameters . getRight ();
-		}
-		return true;
-	}
 }
 class import_loader extends module_loader {public import_loader (PrologRoot root) {this . root = root; this . echo = false; this . reload = false;}}
 class load_loader extends module_loader {public load_loader (PrologRoot root) {this . root = root; this .echo = false; this . reload = true;}}
