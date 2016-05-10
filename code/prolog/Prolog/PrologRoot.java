@@ -84,7 +84,6 @@ public class PrologRoot {
 	public PrologAtom preprocessor = null;
 	public int current_foreground = 0xffff00;
 	public int current_background = 0;
-	public PrologElement main_query;
 	public PrologDirectory root = new PrologDirectory ("user!", null);
 	public void set_uap32_captions () {
 		caption_id = 0;
@@ -628,22 +627,6 @@ public class PrologRoot {
 			return System . in . read ();
 		} catch (Exception ex) {return 0;}
 	}
-	public boolean resolutionHead (String directory) {
-		PrologLoader loader = new PrologLoader (this);
-		if (! directory . contains (".prc")) {
-			if (! loader . load ("studio.prc")) return false;
-			auto_atoms = true;
-			main_query = pair (head (null), pair (pair (atom ("bootstrap"), pair (text (directory), earth ())), earth ()));
-			return true;
-		}
-		return loader . load (directory);
-	}
-	public boolean resolutionHead () {
-		PrologLoader loader = new PrologLoader (this);
-		if (! loader . load ("studio.prc")) return false;
-		main_query = pair (head (null), pair (pair (atom ("command"), earth ()), earth ()));
-		return true;
-	}
 	public int resolution (PrologElement query) {
 		// returns: 0 = fail, 1 = success, 2 = no space left, 3 = wrong query
 		// query is a clause, which is a list anyway
@@ -657,16 +640,16 @@ public class PrologRoot {
 		return resolution . resolution (query);
 	}
 	public int resolution (String directory) {
-		if (! resolutionHead (directory)) return 4;
-		int ctrl = resolution (main_query);
-		main_query = null;
-		return ctrl;
-	}
-	public int resolution () {
-		if (! resolutionHead ()) return 4;
-		int ctrl = resolution (main_query);
-		main_query = null;
-		return ctrl;
+		if (directory == null) directory = "studio.prc";
+		PrologLoader loader = new PrologLoader (this);
+		if (! directory . contains (".prc")) {
+			if (! loader . load ("studio.prc")) return 4;
+			auto_atoms = true;
+			return resolution (pair (head (null), pair (pair (atom ("bootstrap"), pair (text (directory), earth ())), earth ())));
+		}
+		if (! loader . load (directory)) return 4;
+		if (loader . instructions != null) return resolution (pair (head (null), loader . instructions));
+		return 1;
 	}
 }
 

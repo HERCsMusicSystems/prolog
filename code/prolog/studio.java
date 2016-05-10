@@ -14,7 +14,6 @@ public class studio {
 			else root . addArg (args [ind]);
 		}
 		// root . insertCommander (System . out); default value in PrologRoot
-		if (name == null) {root . auto_atoms = true; root . resolution ();}
-		else root . resolution (name);
+		root . resolution (name);
 	}
 }

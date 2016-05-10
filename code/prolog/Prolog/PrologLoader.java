@@ -192,13 +192,8 @@ public class PrologLoader extends PrologReader {
 						if (echo) root . message ("");
 						root . close ();
 						if (clause != null) {
-							if (instructions != null && instructions . isPair ()) instructions . setRight (clause);
-							else if (drop_main) root . message ("Illegal instructions dropped " + root . getValue (clause));
-							else {
-								if (root . main_query != null) {root . message ("Instructions dropped " + root . getValue (root . main_query)); root . main_query = null;}
-								clause = root . pair (root .head (null), clause);
-								root . main_query = clause;
-							}
+							instructions = clause;
+							if (drop_main) root . message ("Illegal instructions dropped " + root . getValue (clause));
 						}
 						close ();
 						return true;
