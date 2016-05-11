@@ -25,7 +25,6 @@
 
 PrologLoader :: PrologLoader (PrologRoot * root) {
 	instructions = 0;
-	drop_main = false;
 	echo = false;
 	reload = false;
 	old_caption_id = 0;
@@ -69,7 +68,6 @@ int PrologLoader :: move_z (void) {
 }
 
 bool PrologLoader :: load (char * file_name) {
-	drop_main = false;
 	old_caption_id = root -> captionId ();
 	old_auto_atoms = root -> autoAtoms ();
 	root -> setCaptions (0, false);
@@ -80,21 +78,9 @@ bool PrologLoader :: load (char * file_name) {
 }
 
 bool PrologLoader :: load (char * file_name, int captions, bool atoms) {
-	drop_main = false;
 	old_caption_id = root -> captionId ();
 	old_auto_atoms = root -> autoAtoms ();
 	root -> setCaptions (captions, atoms);
-	bool ret = LOAD (file_name);
-	clear_context ();
-	root -> setCaptions (old_caption_id, old_auto_atoms);
-	return ret;
-}
-
-bool PrologLoader :: load_without_main (char * file_name) {
-	drop_main = true;
-	old_caption_id = root -> captionId ();
-	old_auto_atoms = root -> autoAtoms ();
-	root -> setCaptions (0, false);
 	bool ret = LOAD (file_name);
 	clear_context ();
 	root -> setCaptions (old_caption_id, old_auto_atoms);
@@ -138,8 +124,7 @@ bool PrologLoader :: LOAD (char * file_name) {
 				PrologLoader * loader = new PrologLoader (root);
 				area_cat (command, 0, symbol);
 				area_cat (command, ".prc");
-				if (drop_main) ret = loader -> load_without_main (command);
-				else ret = loader -> load (command);
+				ret = loader -> load (command);
 				delete loader;
 				if (! ret) {message_v ("Module not loaded: ", command); close (); return false;}
 				import = root -> searchDirectory (symbol);
@@ -317,13 +302,7 @@ bool PrologLoader :: LOAD (char * file_name) {
 				if (symbol_control == 21) {
 					if (echo) message ("");
 					root -> close ();
-					if (clause != 0) {
-						instructions = clause;
-						if (drop_main) {
-							root -> getValue (clause, command, 0);
-							root -> message ("Illegal instructions dropped", command);
-						}
-					}
+					if (clause != 0) instructions = clause;
 					close ();
 					return true;
 				}

@@ -2630,8 +2630,8 @@ public:
 				PROLOG_STRING command;
 				prolog_string_copy (command, el -> getText ());
 				prolog_string_cat (command, ".prc");
-				if (! loader . load_without_main (command)) return false;
-			} else {if (! loader . load_without_main (el -> getText ())) return false;}
+				if (! loader . load (command)) return false;
+			} else {if (! loader . load (el -> getText ())) return false;}
 			el = parameters -> getRight ();
 			if (el -> isVar ()) {PrologElement * i = loader . takeInstructions (); if (i != 0) parameters -> setRight (i); else el -> setEarth (); return true;}
 			parameters = el;
