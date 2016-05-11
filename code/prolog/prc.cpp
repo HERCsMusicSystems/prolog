@@ -137,10 +137,7 @@ int main (int args, char * argv []) {
 	#endif
 
 	root -> insertCommander (console);
-	int ctrl;
-	if (name == 0) {root -> auto_atoms = true; ctrl = root -> resolution ();}
-	else ctrl = root -> resolution (name);
-
+	int ctrl = root -> resolution (name);
 	delete root;
 	delete console;
 	if (object_left ()) drop_object_counter ();

@@ -640,6 +640,7 @@ public class PrologRoot {
 		return resolution . resolution (query);
 	}
 	public int resolution (String directory) {
+		// returns: 0 = fail, 1 = success, 2 = no space left, 3 = wrong query, 4 = file not found
 		if (directory == null) directory = "studio.prc";
 		PrologLoader loader = new PrologLoader (this);
 		if (! directory . contains (".prc")) {
@@ -648,8 +649,8 @@ public class PrologRoot {
 			return resolution (pair (head (null), pair (pair (atom ("bootstrap"), pair (text (directory), earth ())), earth ())));
 		}
 		if (! loader . load (directory)) return 4;
-		if (loader . instructions != null) return resolution (pair (head (null), loader . instructions));
-		return 1;
+		if (loader . instructions == null) return 1;
+		return resolution (pair (head (null), loader . instructions));
 	}
 }
 

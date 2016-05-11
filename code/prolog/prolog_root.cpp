@@ -26,7 +26,6 @@
 PrologRoot :: PrologRoot (void) TRACKING (5) {
 	resource_loader = NULL;
 	service_loader = NULL;
-	main_query = NULL;
 	root = new PrologDirectory ("user!", NULL);
 	set_standard_captions ();
 	auto_atoms = false;
@@ -925,66 +924,25 @@ int PrologRoot :: resolution (PrologElement * query) {
 	// is left from the original query matched with the result
 	// after failure the query remains unchanged
 	// query egzample: [[*x *y *z] [c1 *x] [c2 *y] [c3 *z]]
-//	if (active_main) {
-//		print ("Instructions dropped: ");
-//		AREA area;
-//		getValue (NULL, area, 0);
-//		print (area);
-//		print (new_line_caption);
-//		return 4;
-//	}
 	PrologResolution resolution (this);
 	return resolution . resolution (query);
 }
 
-bool PrologRoot :: resolutionHead (char * directory) {
-	if (strstr (directory, ".prc") == 0) {
-		PrologLoader loader (this);
-		if (! loader . load ("studio.prc")) return false;
-		if (main_query != 0) removeMainQuery ();
-		auto_atoms = true;
-		main_query = pair (pair (atom ("bootstrap"), pair (text (directory), earth ())), earth ());
-		main_query = pair (head (0), main_query);
-		return true;
-	}
-	if (strcmp (directory, "") == 0) return resolutionHead ();
-	PrologLoader * loader = new PrologLoader (this);
-	bool ret = loader -> load (directory);
-	delete loader;
-	return ret;
-}
-
-bool PrologRoot :: resolutionHead (void) {
-	PrologLoader * loader = new PrologLoader (this);
-	if (! loader -> load ("studio.prc")) {delete loader; return false;}
-	delete loader;
-	if (main_query != NULL) {
-		AREA area;
-		getValue (main_query, area, 0);
-		message ("Instructions dropped <studio.prc>", area);
-		removeMainQuery ();
-	}
-	main_query = pair (pair (atom ("command"), earth ()), earth ());
-	main_query = pair (head (NULL), main_query);
-	return true;
-}
-
 int PrologRoot :: resolution (char * directory) {
-	if (! resolutionHead (directory)) return 4;
-	int ctrl = resolution (main_query);
-	removeMainQuery ();
+	if (directory == 0) directory = "studio.prc";
+	PrologLoader loader (this);
+	PrologElement * query = 0;
+	if (strstr (directory, ".prc") == 0) {
+		if (! loader . load ("studio.prc")) return 4;
+		auto_atoms = true;
+		query = pair (pair (atom ("bootstrap"), pair (text (directory), earth ())), earth ());
+	} else {
+		if (! loader . load (directory)) return 4;
+		query = loader . takeInstructions ();
+	}
+	if (query == 0) return 1;
+	query = pair (head (0), query);
+	int ctrl = resolution (query);
+	delete query;
 	return ctrl;
 }
-
-int PrologRoot :: resolution (void) {
-	if (! resolutionHead ()) return 4;
-	int ctrl = resolution (main_query);
-	removeMainQuery ();
-	return ctrl;
-}
-
-void PrologRoot :: removeMainQuery (void) {
-	if (main_query != NULL) delete main_query;
-	main_query = NULL;
-}
-
