@@ -271,7 +271,6 @@ public:
 	PrologCommand * command;
 	PrologResourceLoader * resource_loader;
 	PrologServiceClassLoader * service_loader;
-	PrologElement * main_query;
 	PrologAtom * preprocessor;
 	bool auto_atoms;
 	int caption_id; // 0 = uap32, 1 = standard, 2 = edinburg, 3 = marseille, 4 = functional
@@ -426,12 +425,8 @@ public:
 		// is left from the original query matched with the result
 		// after failure the query remains unchanged
 		// query egzample: [[*x *y *z] [c1 *x] [c2 *y] [c3 *z]]
-	bool resolutionHead (void);
-	bool resolutionHead (char * directory);
-	int resolution (void);
 	int resolution (char * directory);
 		// returns: 0 = fail, 1 = success, 2 = no space left, 3 = wrong query, 4 = file not found
-	void removeMainQuery (void);
 };
 
 class API var_voc TRACK {
@@ -478,10 +473,10 @@ public:
 
 class PrologLoader : public PrologReader {
 private:
-	void close (void);
-public:
 	PrologElement * instructions;
-	bool drop_main;
+	void close (void);
+	void drop_instructions (void);
+public:
 	bool echo;
 	bool reload;
 	FILE * fi;
@@ -492,9 +487,8 @@ public:
 	virtual void message_v (char * text, char * variable);
 	virtual int move_z (void);
 	bool load (char * file_name);
-	bool load (char * file_name, int captions, bool atoms);
-	bool load_without_main (char * file_name);
 	bool LOAD (char * file_name);
+	PrologElement * takeInstructions (void);
 	PrologLoader (PrologRoot * root);
 	~ PrologLoader (void);
 };

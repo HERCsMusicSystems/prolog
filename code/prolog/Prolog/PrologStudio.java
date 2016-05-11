@@ -1968,17 +1968,18 @@ class module_loader extends PrologNativeCode {
 	public boolean echo;
 	public boolean reload;
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
-		boolean looping = true;
-		while (looping && parameters . isPair ()) {
-			PrologElement module_name = parameters . getLeft ();
-			if (! module_name . isText ()) return false;
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (! el . isText ()) return false;
 			PrologLoader loader = new PrologLoader (root);
 			loader . echo = echo;
 			loader . reload = reload;
-			if (parameters . getRight () . isVar ()) {parameters . getRight () . setEarth (); loader . instructions = parameters; looping = false;}
-			if (module_name . getText () . contains (".prc")) {if (! loader . load_without_main (module_name . getText ())) return false;}
-			else {if (! loader . load_without_main (module_name . getText () + ".prc")) return false;}
-			parameters = parameters . getRight ();
+			String command = el . getText () + "";
+			if (! command . contains (".prc")) command += ".prc";
+			if (! loader . load (command)) return false;
+			el = parameters . getRight ();
+			if (el . isVar ()) {if (loader . instructions != null) parameters . setRight (loader . instructions); else el . setEarth (); return true;}
+			parameters = el;
 		}
 		return true;
 	}

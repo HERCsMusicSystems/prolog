@@ -27,7 +27,6 @@ import java . io . FileInputStream;
 
 public class PrologLoader extends PrologReader {
 	public PrologElement instructions = null;
-	public boolean drop_main = false;
 	public boolean echo = false;
 	public boolean reload = false;
 	public int old_caption_id = 0;
@@ -43,17 +42,6 @@ public class PrologLoader extends PrologReader {
 		return ch;
 	}
 	public boolean load (String file_name) {
-		drop_main = false;
-		old_caption_id = root . captionId ();
-		old_auto_atoms = root . autoAtoms ();
-		root . setCaptions (0, false);
-		boolean ret = LOAD (file_name);
-		clear_context ();
-		root . setCaptions (old_caption_id, old_auto_atoms);
-		return ret;
-	}
-	public boolean load_without_main (String file_name) {
-		drop_main = true;
 		old_caption_id = root . captionId ();
 		old_auto_atoms = root . autoAtoms ();
 		root . setCaptions (0, false);
@@ -89,8 +77,7 @@ public class PrologLoader extends PrologReader {
 				import_directory = root . searchDirectory (symbol);
 				if (import_directory == null) {
 					PrologLoader loader = new PrologLoader (root);
-					if (drop_main) ret = loader . load_without_main (symbol + ".prc");
-					else ret = loader . load (symbol + ".prc");
+					ret = loader . load (symbol + ".prc");
 					if (! ret) return rc ("Module not loaded: " + symbol + ".prc");
 					import_directory = root . searchDirectory (symbol);
 				}
@@ -191,15 +178,7 @@ public class PrologLoader extends PrologReader {
 					if (symbol_control == 21) {
 						if (echo) root . message ("");
 						root . close ();
-						if (clause != null) {
-							if (instructions != null && instructions . isPair ()) instructions . setRight (clause);
-							else if (drop_main) root . message ("Illegal instructions dropped " + root . getValue (clause));
-							else {
-								if (root . main_query != null) {root . message ("Instructions dropped " + root . getValue (root . main_query)); root . main_query = null;}
-								clause = root . pair (root .head (null), clause);
-								root . main_query = clause;
-							}
-						}
+						if (clause != null) instructions = clause;
 						close ();
 						return true;
 					}

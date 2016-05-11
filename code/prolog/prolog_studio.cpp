@@ -2619,22 +2619,22 @@ public:
 	PrologRoot * root;
 	bool echo;
 	bool reload;
-	bool code (PrologElement * parameters, PrologResolution * resulotion) {
-		bool looping = true;
-		while (looping && parameters -> isPair ()) {
-			PrologElement * module_name = parameters -> getLeft ();
-			if (! module_name -> isText ()) return false;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (! el -> isText ()) return false;
 			PrologLoader loader (root);
 			loader . echo = echo;
 			loader . reload = reload;
-			if (parameters -> getRight () -> isVar ()) {parameters -> getRight () -> setEarth (); loader . instructions = parameters; looping = false;}
-			if (strstr (module_name -> getText (), ".prc") == NULL) {
+			if (strstr (el -> getText (), ".prc") == 0) {
 				PROLOG_STRING command;
-				prolog_string_copy (command, module_name -> getText ());
+				prolog_string_copy (command, el -> getText ());
 				prolog_string_cat (command, ".prc");
-				if (! loader . load_without_main (command)) return false;
-			} else {if (! loader . load_without_main (module_name -> getText ())) return false;}
-			parameters = parameters -> getRight ();
+				if (! loader . load (command)) return false;
+			} else {if (! loader . load (el -> getText ())) return false;}
+			el = parameters -> getRight ();
+			if (el -> isVar ()) {PrologElement * i = loader . takeInstructions (); if (i != 0) parameters -> setRight (i); else el -> setEarth (); return true;}
+			parameters = el;
 		}
 		return true;
 	}

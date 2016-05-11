@@ -507,4 +507,4 @@ protect [
 private [inner inner_addcl inner_call random_cl explode divide args_tail]
 
 
-end.
+end := [[auto_atoms] [command]] .

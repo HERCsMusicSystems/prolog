@@ -25,7 +25,6 @@
 
 PrologLoader :: PrologLoader (PrologRoot * root) {
 	instructions = 0;
-	drop_main = false;
 	echo = false;
 	reload = false;
 	old_caption_id = 0;
@@ -33,7 +32,10 @@ PrologLoader :: PrologLoader (PrologRoot * root) {
 	setRoot (root);
 }
 
-PrologLoader :: ~ PrologLoader (void) {}
+PrologLoader :: ~ PrologLoader (void) {drop_instructions ();}
+
+void PrologLoader :: drop_instructions (void) {if (instructions != 0) delete instructions; instructions = 0;}
+PrologElement * PrologLoader :: takeInstructions (void) {PrologElement * ret = instructions; instructions = 0; return ret;}
 
 void PrologLoader :: message (char * text) {root -> print (text); root -> print (root -> new_line_caption);}
 void PrologLoader :: message_v (char * text, char * variable) {
@@ -66,29 +68,6 @@ int PrologLoader :: move_z (void) {
 }
 
 bool PrologLoader :: load (char * file_name) {
-	drop_main = false;
-	old_caption_id = root -> captionId ();
-	old_auto_atoms = root -> autoAtoms ();
-	root -> setCaptions (0, false);
-	bool ret = LOAD (file_name);
-	clear_context ();
-	root -> setCaptions (old_caption_id, old_auto_atoms);
-	return ret;
-}
-
-bool PrologLoader :: load (char * file_name, int captions, bool atoms) {
-	drop_main = false;
-	old_caption_id = root -> captionId ();
-	old_auto_atoms = root -> autoAtoms ();
-	root -> setCaptions (captions, atoms);
-	bool ret = LOAD (file_name);
-	clear_context ();
-	root -> setCaptions (old_caption_id, old_auto_atoms);
-	return ret;
-}
-
-bool PrologLoader :: load_without_main (char * file_name) {
-	drop_main = true;
 	old_caption_id = root -> captionId ();
 	old_auto_atoms = root -> autoAtoms ();
 	root -> setCaptions (0, false);
@@ -104,6 +83,7 @@ bool PrologLoader :: LOAD (char * file_name) {
 	AREA command;
 	ri = NULL;
 	fi = NULL;
+	drop_instructions ();
 	if (root -> resource_loader != NULL) ri = root -> resource_loader -> load (file_name);
 	if (ri == NULL) {
 		fi = fopen (file_name, "rb");
@@ -134,8 +114,7 @@ bool PrologLoader :: LOAD (char * file_name) {
 				PrologLoader * loader = new PrologLoader (root);
 				area_cat (command, 0, symbol);
 				area_cat (command, ".prc");
-				if (drop_main) ret = loader -> load_without_main (command);
-				else ret = loader -> load (command);
+				ret = loader -> load (command);
 				delete loader;
 				if (! ret) {message_v ("Module not loaded: ", command); close (); return false;}
 				import = root -> searchDirectory (symbol);
@@ -313,22 +292,7 @@ bool PrologLoader :: LOAD (char * file_name) {
 				if (symbol_control == 21) {
 					if (echo) message ("");
 					root -> close ();
-					if (clause != NULL) {
-						if (instructions != 0 && instructions -> isPair ()) instructions -> setRight (clause);
-						else if (drop_main) {
-							root -> getValue (clause, command, 0);
-							root -> message ("Illegal instructions dropped", command);
-							delete clause;
-						} else {
-							if (root -> main_query != NULL) {
-								root -> getValue (root -> main_query, command, 0);
-								root -> message ("Instructions dropped", command);
-								root -> removeMainQuery ();
-							}
-							clause = root -> pair (root -> head (NULL), clause);
-							root -> main_query = clause;
-						}
-					}
+					if (clause != 0) instructions = clause;
 					close ();
 					return true;
 				}
