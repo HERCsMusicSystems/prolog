@@ -1976,7 +1976,7 @@ class module_loader extends PrologNativeCode {
 			loader . reload = reload;
 			String command = el . getText () + "";
 			if (! command . contains (".prc")) command += ".prc";
-			if (! loader . load_without_main (command)) return false;
+			if (! loader . load (command)) return false;
 			el = parameters . getRight ();
 			if (el . isVar ()) {if (loader . instructions != null) parameters . setRight (loader . instructions); else el . setEarth (); return true;}
 			parameters = el;
