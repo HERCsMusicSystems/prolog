@@ -492,7 +492,6 @@ public:
 	virtual void message_v (char * text, char * variable);
 	virtual int move_z (void);
 	bool load (char * file_name);
-	bool load (char * file_name, int captions, bool atoms);
 	bool LOAD (char * file_name);
 	PrologElement * takeInstructions (void);
 	PrologLoader (PrologRoot * root);

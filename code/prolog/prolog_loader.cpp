@@ -77,16 +77,6 @@ bool PrologLoader :: load (char * file_name) {
 	return ret;
 }
 
-bool PrologLoader :: load (char * file_name, int captions, bool atoms) {
-	old_caption_id = root -> captionId ();
-	old_auto_atoms = root -> autoAtoms ();
-	root -> setCaptions (captions, atoms);
-	bool ret = LOAD (file_name);
-	clear_context ();
-	root -> setCaptions (old_caption_id, old_auto_atoms);
-	return ret;
-}
-
 extern char * load_plugin_module (char * name);
 bool PrologLoader :: LOAD (char * file_name) {
 	bool ret;
