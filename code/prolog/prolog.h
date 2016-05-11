@@ -478,9 +478,10 @@ public:
 
 class PrologLoader : public PrologReader {
 private:
-	void close (void);
-public:
 	PrologElement * instructions;
+	void close (void);
+	void drop_instructions (void);
+public:
 	bool drop_main;
 	bool echo;
 	bool reload;
@@ -495,6 +496,7 @@ public:
 	bool load (char * file_name, int captions, bool atoms);
 	bool load_without_main (char * file_name);
 	bool LOAD (char * file_name);
+	PrologElement * takeInstructions (void);
 	PrologLoader (PrologRoot * root);
 	~ PrologLoader (void);
 };

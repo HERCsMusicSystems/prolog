@@ -33,7 +33,10 @@ PrologLoader :: PrologLoader (PrologRoot * root) {
 	setRoot (root);
 }
 
-PrologLoader :: ~ PrologLoader (void) {}
+PrologLoader :: ~ PrologLoader (void) {drop_instructions ();}
+
+void PrologLoader :: drop_instructions (void) {if (instructions != 0) delete instructions; instructions = 0;}
+PrologElement * PrologLoader :: takeInstructions (void) {PrologElement * ret = instructions; instructions = 0; return ret;}
 
 void PrologLoader :: message (char * text) {root -> print (text); root -> print (root -> new_line_caption);}
 void PrologLoader :: message_v (char * text, char * variable) {
@@ -104,6 +107,7 @@ bool PrologLoader :: LOAD (char * file_name) {
 	AREA command;
 	ri = NULL;
 	fi = NULL;
+	drop_instructions ();
 	if (root -> resource_loader != NULL) ri = root -> resource_loader -> load (file_name);
 	if (ri == NULL) {
 		fi = fopen (file_name, "rb");
@@ -313,20 +317,11 @@ bool PrologLoader :: LOAD (char * file_name) {
 				if (symbol_control == 21) {
 					if (echo) message ("");
 					root -> close ();
-					if (clause != NULL) {
-						if (instructions != 0 && instructions -> isPair ()) instructions -> setRight (clause);
-						else if (drop_main) {
+					if (clause != 0) {
+						instructions = clause;
+						if (drop_main) {
 							root -> getValue (clause, command, 0);
 							root -> message ("Illegal instructions dropped", command);
-							delete clause;
-						} else {
-							if (root -> main_query != NULL) {
-								root -> getValue (root -> main_query, command, 0);
-								root -> message ("Instructions dropped", command);
-								root -> removeMainQuery ();
-							}
-							clause = root -> pair (root -> head (NULL), clause);
-							root -> main_query = clause;
 						}
 					}
 					close ();
