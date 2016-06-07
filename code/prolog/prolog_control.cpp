@@ -133,14 +133,15 @@ public:
 #endif
 	bool code (PrologElement * parameters, PrologResolution * resolution);
 	bool port_not_found (void);
-	serial_code (char * location, PrologRoot * root, PrologAtom * atom, PrologAtom * callback);
+	serial_code (PrologRoot * root, PrologAtom * atom, PrologAtom * callback, char * location, int rate, int size, int stop_bits, int parity, int dtr_control, int timeout);
 	~ serial_code (void);
 };
-
 #ifdef WIN32
 static int tmread (HANDLE fd) {
 	int ind = 0;
-	ReadFile (fd, & ind, 1, NULL, NULL);
+	DWORD read = 0;
+	ReadFile (fd, & ind, 1, & read, NULL);
+	if (read < 1) return -1;
 	return ind;
 }
 #else
@@ -196,7 +197,8 @@ bool serial_code :: code (PrologElement * parameters, PrologResolution * resolut
 #endif
 		}
 		if (el -> isVar ()) {
-			int ind = tmread (fd);
+			int ind = -1;
+			while (ind < 0) ind = tmread (fd);
 			el -> setInteger (ind);
 		}
 		parameters = parameters -> getRight ();
@@ -210,7 +212,7 @@ bool serial_code :: port_not_found (void) {
 	return fd < 0;
 #endif
 }
-serial_code :: serial_code (char * location, PrologRoot * root, PrologAtom * atom, PrologAtom * callback) {
+serial_code :: serial_code (PrologRoot * root, PrologAtom * atom, PrologAtom * callback, char * location, int rate, int size, int stop_bits, int parity, int dtr_control, int timeout) {
 	this -> should_continue = false;
 	this -> root = root;
 	this -> atom = atom;
@@ -218,6 +220,22 @@ serial_code :: serial_code (char * location, PrologRoot * root, PrologAtom * ato
 	if (callback != 0) {COLLECTOR_REFERENCE_INC (callback);}
 #ifdef WIN32
 	fd = CreateFile (location, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+	DCB dcb; dcb . DCBlength = sizeof (DCB);
+	GetCommState (fd, & dcb);
+	if (rate >= 0) dcb . BaudRate = rate;
+	if (size >= 0) dcb . ByteSize = size;
+	if (stop_bits >= 0) dcb . StopBits = stop_bits;
+	if (parity >= 0) dcb . Parity = parity;
+	if (dtr_control >= 0) dcb . fDtrControl = dtr_control;
+	SetCommState (fd, & dcb);
+	if (timeout >= 0) {
+		COMMTIMEOUTS cmt;
+		GetCommTimeouts (fd, & cmt);
+		cmt . ReadIntervalTimeout = timeout;
+		cmt . ReadTotalTimeoutMultiplier = 1;
+		cmt . ReadTotalTimeoutConstant = 1;
+		SetCommTimeouts (fd, & cmt);
+	}
 #else
 	fd = open (location, O_RDWR | O_NONBLOCK);
 #endif
@@ -323,19 +341,29 @@ public:
 		PrologElement * path = 0;
 		PrologElement * atom = 0;
 		PrologElement * callback = 0;
+		int rate = -1, size = -1, stop_bits = -1, parity = -1, dtr_control = -1, timeout = -1;
 		while (parameters -> isPair ()) {
 			PrologElement * el = parameters -> getLeft ();
 			if (el -> isText ()) path = el;
 			if (el -> isVar ()) el -> setAtom (new PrologAtom ());
 			if (el -> isAtom ()) {if (atom == 0) atom = el; else callback = el;}
+			if (el -> isInteger ()) {
+				if (rate < 0) rate = el -> getInteger ();
+				else if (size < 0) size = el -> getInteger ();
+				else if (stop_bits < 0) stop_bits = el -> getInteger ();
+				else if (parity < 0) parity = el -> getInteger ();
+				else if (dtr_control < 0) dtr_control = el -> getInteger ();
+				else timeout = el -> getInteger ();
+			}
 			parameters = parameters -> getRight ();
 		}
+		if (timeout < 0) timeout = 10;
 		if (atom == 0) return false;
 		if (atom -> getAtom () -> getMachine () != 0) return false;
 		char * serial_location;
 		if (path != 0) serial_location = path -> getText ();
 		else serial_location = "/dev/ttyACM0";
-		serial_code * sc = new serial_code (serial_location, root, atom -> getAtom (), callback != 0 ? callback -> getAtom () : 0);
+		serial_code * sc = new serial_code (root, atom -> getAtom (), callback != 0 ? callback -> getAtom () : 0, serial_location, rate, size, stop_bits, parity, dtr_control, timeout);
 		if (sc -> port_not_found ()) {delete sc; return false;}
 		if (atom -> getAtom () -> setMachine (sc)) return true;
 		delete sc;
