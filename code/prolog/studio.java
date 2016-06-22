@@ -15,5 +15,6 @@ public class studio {
 		}
 		// root . insertCommander (System . out); default value in PrologRoot
 		root . resolution (name);
+		System . exit (root . exit_code);
 	}
 }

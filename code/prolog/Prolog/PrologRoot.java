@@ -84,6 +84,7 @@ public class PrologRoot {
 	public PrologAtom preprocessor = null;
 	public int current_foreground = 0xffff00;
 	public int current_background = 0;
+	public int exit_code = 0;
 	public PrologDirectory root = new PrologDirectory ("user!", null);
 	public void set_uap32_captions () {
 		caption_id = 0;
