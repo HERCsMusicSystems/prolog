@@ -27,7 +27,7 @@ program studio #machine := "prolog.studio"
 		timestamp
 		is_atom is_integer is_double is_number is_var is_head is_text has_machine
 		text_list text_term e32 query_stack object_counter
-		exit command save_history load_history inner inner_addcl inner_call minimise maximise
+		exit halt command save_history load_history inner inner_addcl inner_call minimise maximise
 		res not eq rres ures lazy random_cl explode TRY ONE PROBE SELECT APPEND LENGTH REVERSE AT ONLIST INLIST NODUP MAP
 		sort divide
 		WHILE FOR FOREVER forever REPEAT IF
@@ -178,6 +178,7 @@ program studio #machine := "prolog.studio"
 #machine copy := "copy"
 #machine execute := "execute"
 #machine exit := "exit_code"
+#machine halt := "halt_code"
 #machine operating_system := "operating_system"
 #machine implementation := "implementation"
 #machine save_history := "save_history"

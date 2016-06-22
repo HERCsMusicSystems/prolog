@@ -2225,6 +2225,16 @@ class exit_code extends PrologNativeCode {
 	public exit_code (PrologRoot root) {this . root = root;}
 };
 
+class halt_code extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) System . exit (0);
+		parameters = parameters . getLeft ();
+		if (! parameters . isInteger ()) return false;
+		System . exit (parameters . getInteger ());
+		return true;
+	}
+};
+
 /*
 
 class make_directory : public PrologNativeCode {
@@ -3174,6 +3184,7 @@ class PrologStudio extends PrologServiceClass {
 	if (strcmp (name, "execute") == 0) return new execute (root);
 	*/
 		if (name . equals ("exit_code")) return new exit_code (root);
+		if (name . equals ("halt_code")) return new halt_code ();
 	/*s
 	if (strcmp (name, "make_directory") == 0) return new make_directory (root);
 	if (strcmp (name, "erase") == 0) return new erase_file (root);

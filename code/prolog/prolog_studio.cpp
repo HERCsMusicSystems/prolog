@@ -21,6 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 #include "prolog_studio.h"
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #define _USE_MATH_DEFINES
@@ -2939,6 +2940,17 @@ public:
 	exit_code (PrologRoot * root) {this -> root = root;}
 };
 
+class halt_code : public PrologNativeCode {
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) exit (0);
+		parameters = parameters -> getLeft ();
+		if (! parameters -> isInteger ()) return false;
+		exit (parameters -> getInteger ());
+		return true;
+	}
+};
+
 class make_directory : public PrologNativeCode {
 private:
 	PrologRoot * root;
@@ -3754,7 +3766,7 @@ public:
 // CRACKER //
 /////////////
 
-class wait : public PrologNativeCode {
+class wait_code : public PrologNativeCode {
 public:
 	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -3766,7 +3778,7 @@ public:
 		root -> wait (parameters -> getInteger ());
 		return true;
 	}
-	wait (PrologRoot * root) {this -> root = root;}
+	wait_code (PrologRoot * root) {this -> root = root;}
 };
 
 class timeout_class : public PrologNativeCode {
@@ -4265,7 +4277,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "query_stack") == 0) return new query_stack (root);
 	if (strcmp (name, "object_counter") == 0) return new object_counter_class ();
 	if (strcmp (name, "crack") == 0) return new crack (root);
-	if (strcmp (name, "wait") == 0) return new wait (root);
+	if (strcmp (name, "wait") == 0) return new wait_code (root);
 	if (strcmp (name, "timeout") == 0) return new timeout_class (root);
 	if (strcmp (name, "semaphore") == 0) return new semaphore_maker (directory);
 	if (strcmp (name, "msemaphore") == 0) return new semaphore_maker (directory, true);
@@ -4289,6 +4301,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "edit") == 0) return new edit (root);
 	if (strcmp (name, "execute") == 0) return new execute (root);
 	if (strcmp (name, "exit_code") == 0) return new exit_code (root);
+	if (strcmp (name, "halt_code") == 0) return new halt_code ();
 	if (strcmp (name, "make_directory") == 0) return new make_directory (root);
 	if (strcmp (name, "erase") == 0) return new erase_file (root);
 	if (strcmp (name, "erase_directory") == 0) return new erase_directory (root);
