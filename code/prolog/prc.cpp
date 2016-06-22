@@ -138,12 +138,13 @@ int main (int args, char * argv []) {
 
 	root -> insertCommander (console);
 	int ctrl = root -> resolution (name);
+	int exit_code = root -> exit_code;
 	delete root;
 	delete console;
 	if (object_left ()) drop_object_counter ();
 #ifdef _DEBUG
 	getchar ();
 #endif
-	return 0;
+	return exit_code;
 }
 

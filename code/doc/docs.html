@@ -1260,10 +1260,16 @@
 <div class="doc_predicate">
     <a id="predicate_exit">
         <div class="doc_predicate_header">
-            [exit]
+            [exit]<br />
+            [exit code]
         </div>
         <div class="doc_predicate_body">
-            Stops the interactive session.
+            Stops the interactive session.<br />
+            The version with code parameter controls the exit code of the program,
+            which is subsequently communicated to the operating system.<br />
+            <b>Note:</b> [exit] stops session or batch file only if it is used on its own.
+            To control the exit code only (without exiting) it can be used within other commands,
+            i. e. [res [exit]]
         </div>
     </a>
 </div>

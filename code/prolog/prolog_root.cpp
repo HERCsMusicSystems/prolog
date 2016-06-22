@@ -39,6 +39,7 @@ PrologRoot :: PrologRoot (void) TRACKING (5) {
 	serial_shift = 0;
 	current_foreground = 0xffff00;
 	current_background = 0;
+	exit_code = 0;
 }
 
 void PrologRoot :: deleteSearchDirectories (void) {

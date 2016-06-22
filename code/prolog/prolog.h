@@ -314,6 +314,7 @@ public:
 	int serial_shift;
 	int current_foreground;
 	int current_background;
+	int exit_code;
 	PrologRoot (void);
 	~ PrologRoot (void);
 	int captionId (void);

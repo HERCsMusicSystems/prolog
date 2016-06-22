@@ -177,6 +177,7 @@ program studio #machine := "prolog.studio"
 #machine move := "move"
 #machine copy := "copy"
 #machine execute := "execute"
+#machine exit := "exit_code"
 #machine operating_system := "operating_system"
 #machine implementation := "implementation"
 #machine save_history := "save_history"
@@ -439,8 +440,6 @@ program studio #machine := "prolog.studio"
 
 ; command processor
 
-[[exit]]
-
 ;[[inner [[*atom : *] : *] []]]
 [[inner [* : *] []]]
 [[inner *x *y] [pr *y]]
@@ -456,8 +455,8 @@ program studio #machine := "prolog.studio"
 [[inner_call *command] [preprocessor *preprocessor] [is_atom *preprocessor] / [*preprocessor [*command] *c] : *c]
 [[inner_call *command] *command]
 
-[[command [exit]]]
-[[command [[exit]]]]
+[[command [exit : *]]]
+[[command [[exit : *]]]]
 [[command *x] [inner [*y *z]] [command *y *z] / [command [*y : *z]]]
 [[command *x] [write "Doesn't work"] [nl] / [command *x]]
 [[command] [command [command]]]

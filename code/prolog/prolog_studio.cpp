@@ -2925,6 +2925,20 @@ public:
 	execute (PrologRoot * root) {this -> root = root;}
 };
 
+class exit_code : public PrologNativeCode {
+private:
+	PrologRoot * root;
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return true;
+		parameters = parameters -> getLeft ();
+		if (! parameters -> isInteger ()) return false;
+		root -> exit_code = parameters -> getInteger ();
+		return true;
+	}
+	exit_code (PrologRoot * root) {this -> root = root;}
+};
+
 class make_directory : public PrologNativeCode {
 private:
 	PrologRoot * root;
@@ -4274,6 +4288,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "ARGS") == 0) return new ARGS (root);
 	if (strcmp (name, "edit") == 0) return new edit (root);
 	if (strcmp (name, "execute") == 0) return new execute (root);
+	if (strcmp (name, "exit_code") == 0) return new exit_code (root);
 	if (strcmp (name, "make_directory") == 0) return new make_directory (root);
 	if (strcmp (name, "erase") == 0) return new erase_file (root);
 	if (strcmp (name, "erase_directory") == 0) return new erase_directory (root);
