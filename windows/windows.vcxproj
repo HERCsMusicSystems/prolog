@@ -171,6 +171,7 @@
     <None Include="..\code\prolog\sql.prc" />
     <None Include="..\code\prolog\store.prc" />
     <None Include="..\code\prolog\studio.prc" />
+    <None Include="..\code\prolog\test.prc" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\code\doc\hercs_prolog_syntax.txt" />

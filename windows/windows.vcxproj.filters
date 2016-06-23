@@ -215,6 +215,9 @@
     <None Include="..\code\prolog\database.sql">
       <Filter>Documents</Filter>
     </None>
+    <None Include="..\code\prolog\test.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">

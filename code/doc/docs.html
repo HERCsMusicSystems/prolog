@@ -1266,11 +1266,12 @@
         </div>
         <div class="doc_predicate_body">
             Stops the interactive session.<br />
+            Exit on its own ([exit]) does nothing. In other words, there is no default exit code.<br />
             The version with code parameter controls the exit code of the program,
-            which is subsequently communicated to the operating system.<br />
+            which is subsequently communicated to the operating system after program terminates.<br />
             <b>Note:</b> [exit] stops session or batch file only if it is used on its own.
             To control the exit code only (without exiting) it can be used within other commands,
-            i. e. [res [exit]]
+            i. e. [res [exit 0]]
         </div>
     </a>
 </div>
