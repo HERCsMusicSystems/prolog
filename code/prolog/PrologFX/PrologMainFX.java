@@ -6,6 +6,7 @@ import Prolog . *;
 import javafx . application . Application;
 import javafx . application . Platform;
 import javafx . stage . Stage;
+import javafx . stage . Modality;
 import javafx . scene . Scene;
 import javafx . scene . layout . StackPane;
 import javafx . scene . layout . HBox;
@@ -28,8 +29,8 @@ class emitter extends java . io . OutputStream {
 class Swallower extends java . io . InputStream {
 	private TextArea area;
 	public String command = "    [list]" + (char) 13 + (char) 10;
-	public int readd () {try {int ind = System . in . read (); area . appendText ("" + (char) ind); return ind;} catch (Exception ex) {return 0;}}
-	public int read () {
+	public int read () {try {int ind = System . in . read (); area . appendText ("" + (char) ind); return ind;} catch (Exception ex) {return 0;}}
+	public int readd () {
 		if (command . length () > 0) {
 			int ind = command . charAt (0);
 			command = command . substring (1);
@@ -51,23 +52,36 @@ public class PrologMainFX extends Application {
 		Label command_label = new Label ("Command:");
 		TextArea area = new TextArea ();
 		main_root . insertCommander (new java . io . PrintStream (new emitter (area)));
-		Swallower swallower = new Swallower (area);
-		main_root . insertReader (swallower);
+		//Swallower swallower = new Swallower (area);
+		//main_root . insertReader (swallower);
 		TextField command = new TextField ();
 		command . setOnAction ((ActionEvent event) -> {area . appendText (command . getText () + "\n"); System . out . println (command . getText ()); command . setText ("");});
 		Platform . runLater (new Runnable () {public void run () {command . requestFocus ();}});
+		Button extra = new Button ();
+		extra . setText ("Extra");
+		extra . setOnAction ((ActionEvent event) -> {
+			area . appendText ("extras....");
+			Stage dialog = new Stage ();
+			dialog . initModality (Modality . NONE);
+			dialog . initOwner (null);
+			StackPane pane = new StackPane ();
+			Scene dialog_scene = new Scene (pane, 200, 200);
+			dialog . setScene (dialog_scene);
+			dialog . show ();
+		});
 		//===============================
 		GridPane root = new GridPane ();
 		//root . setGridLinesVisible (true);
 		root . setHgap (4);
 		root . setVgap (4);
 		root . setPadding (new Insets (4));
-		root . add (area, 0, 0, 3, 1);
+		root . add (area, 0, 0, 4, 1);
 		root . add (command_label, 0, 1);
 		root . add (command, 1, 1);
 		root . add (exit, 2, 1);
+		root . add (extra, 3, 1);
 		//===============================
-		Scene scene = new Scene (root, 300, 200);
+		Scene scene = new Scene (root, 360, 200);
 		stage . setTitle ("sonda");
 		stage . setScene (scene);
 		stage . show ();
