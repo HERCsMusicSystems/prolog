@@ -24,14 +24,25 @@
 		</jar>
 	</target>
 
-	<target name="run" depends="jar">
+	<target name="fxjar" depends="compile">
+		<jar destfile="fx.jar">
+			<fileset dir="." includes="PrologFX/*.class"/>
+			<fileset dir="../code/prolog" includes="fx.prc"/>
+		</jar>
+	</target>
+
+	<target name="run" depends="jar,fxjar">
 		<!-- <java jar="studio.jar" fork="true">
 			<arg value="studio"/>
 			<arg value="a"/>
 			<arg value="b"/>
 			<arg value="c"/>
 		</java> -->
-		<java classname="studio" classpath="studio.jar"/>
+		<java classname="studio" classpath="fx.jar;studio.jar;jfxrt.jar"/>
+	</target>
+
+	<target name="fx" depends="jar,fxjar">
+		<java classname="studio" classpath="fx.jar;studio.jar;jfxrt.jar"><arg value="fx"/></java>
 	</target>
 
 	<target name="test" depends="jar">
