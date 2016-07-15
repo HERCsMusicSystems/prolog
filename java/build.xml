@@ -1,5 +1,7 @@
 <project default="run">
 
+	<property environment="env" />
+
 	<target name="clean">
 		<delete>
 			<fileset dir="." includes="studio*"/>
@@ -42,7 +44,7 @@
 	</target>
 
 	<target name="fx" depends="jar,fxjar">
-		<java classname="studio" classpath="fx.jar;studio.jar;jfxrt.jar"><arg value="fx"/></java>
+		<java classname="studio" classpath="fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"><arg value="fx"/></java>
 	</target>
 
 	<target name="test" depends="jar">
