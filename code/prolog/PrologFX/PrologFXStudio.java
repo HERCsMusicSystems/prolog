@@ -26,8 +26,9 @@ import Prolog . *;
 
 class fx_start extends PrologNativeCode {
 	public PrologRoot root = null;
-	public boolean code (PrologElement parameters, PrologResolution resolution) {PrologMainFX . main (new String [0], root); return true;}
-	fx_start (PrologRoot root) {this . root = root;}
+	public java . io . PrintStream oout = null;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {PrologMainFX . main (new String [0], root, oout); return true;}
+	fx_start (PrologRoot root, java . io . PrintStream oout) {this . root = root; this . oout = oout;}
 }
 
 class fx_stop extends PrologNativeCode {
@@ -37,9 +38,17 @@ class fx_stop extends PrologNativeCode {
 public class PrologFXStudio extends PrologServiceClass {
 	public PrologRoot root;
 	public PrologDirectory directory;
-	public void init (PrologRoot root, PrologDirectory directory) {this . root = root; this . directory = directory;}
+	public java . io . PrintStream oout;
+	public void init (PrologRoot root, PrologDirectory directory) {
+		this . root = root; this . directory = directory;
+		java . io . PipedInputStream pipedInput = new java . io . PipedInputStream ();
+		java . io . PipedOutputStream pipedOutput = new java . io . PipedOutputStream ();
+		oout = new java . io . PrintStream (pipedOutput);
+		try {pipedInput . connect (pipedOutput);} catch (Exception ex) {ex . printStackTrace ();}
+		root . insertReader (pipedInput);
+	}
 	public PrologNativeCode getNativeCode (String name) {
-		if (name . equals ("fx_start")) return new fx_start (root);
+		if (name . equals ("fx_start")) return new fx_start (root, oout);
 		if (name . equals ("fx_stop")) return new fx_stop ();
 		return null;
 	}

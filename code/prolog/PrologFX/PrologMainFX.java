@@ -22,12 +22,18 @@ import javafx . geometry . Insets;
 
 class emitter extends java . io . OutputStream {
 	private TextArea area;
-	public void write (int ind) {area . appendText ("" + (char) ind);}
+	private String text = "";
+	public void write (int ind) {
+		text += (char) ind;
+		if (ind == 10) {area . appendText (text); text = "";}
+		//area . appendText ("" + (char) ind);
+	}
 	emitter (TextArea area) {this . area = area;}
 }
 
 public class PrologMainFX extends Application {
 	public static PrologRoot main_root = null;
+	public static java . io . PrintStream oout = null;
 	public void start (Stage stage) {
 		Button exit = new Button ();
 		exit . setText ("_Exit");
@@ -36,17 +42,10 @@ public class PrologMainFX extends Application {
 		Label command_label = new Label ("Command:");
 		TextArea area = new TextArea ();
 		main_root . insertCommander (new java . io . PrintStream (new emitter (area)));
-		java . io . PipedInputStream pipedInput = new java . io . PipedInputStream ();
-		java . io . PipedOutputStream pipedOutput = new java . io . PipedOutputStream ();
-		java . io . PrintStream oout = new java . io . PrintStream (pipedOutput);
-		try {pipedInput . connect (pipedOutput);} catch (Exception ex) {ex . printStackTrace ();}
-		main_root . insertReader (pipedInput);
 		TextField command = new TextField ();
 		command . setOnAction ((ActionEvent event) -> {
-			String c = command . getText () + "\n";
 			oout . print (command . getText () + "\n");
-			area . appendText (command . getText () + "\n");
-			System . out . println (command . getText ());
+			//area . appendText (command . getText () + "\n");
 			command . setText ("");
 		});
 		Platform . runLater (new Runnable () {public void run () {command . requestFocus ();}});
@@ -79,8 +78,9 @@ public class PrologMainFX extends Application {
 		stage . setScene (scene);
 		stage . show ();
 	}
-	public static void main (String [] args, PrologRoot root) {
+	public static void main (String [] args, PrologRoot root, java . io . PrintStream ps) {
 		main_root = root;
+		oout = ps;
 		launch (args);
 	}
 	public static void stop_fx () {Platform . exit ();}
