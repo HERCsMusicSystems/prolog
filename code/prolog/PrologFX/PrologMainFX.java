@@ -26,22 +26,6 @@ class emitter extends java . io . OutputStream {
 	emitter (TextArea area) {this . area = area;}
 }
 
-class Swallower extends java . io . InputStream {
-	private TextArea area;
-	public String command = "    [list]" + (char) 13 + (char) 10;
-	public int read () {try {int ind = System . in . read (); area . appendText ("" + (char) ind); return ind;} catch (Exception ex) {return 0;}}
-	public int readd () {
-		if (command . length () > 0) {
-			int ind = command . charAt (0);
-			command = command . substring (1);
-			System . out . println ("<" + (char) ind + ">");
-			return ind;
-		}
-		return -1;
-	}
-	Swallower (TextArea area) {this . area = area;}
-}
-
 public class PrologMainFX extends Application {
 	public static PrologRoot main_root = null;
 	public void start (Stage stage) {
@@ -52,10 +36,19 @@ public class PrologMainFX extends Application {
 		Label command_label = new Label ("Command:");
 		TextArea area = new TextArea ();
 		main_root . insertCommander (new java . io . PrintStream (new emitter (area)));
-		//Swallower swallower = new Swallower (area);
-		//main_root . insertReader (swallower);
+		java . io . PipedInputStream pipedInput = new java . io . PipedInputStream ();
+		java . io . PipedOutputStream pipedOutput = new java . io . PipedOutputStream ();
+		java . io . PrintStream oout = new java . io . PrintStream (pipedOutput);
+		try {pipedInput . connect (pipedOutput);} catch (Exception ex) {ex . printStackTrace ();}
+		main_root . insertReader (pipedInput);
 		TextField command = new TextField ();
-		command . setOnAction ((ActionEvent event) -> {area . appendText (command . getText () + "\n"); System . out . println (command . getText ()); command . setText ("");});
+		command . setOnAction ((ActionEvent event) -> {
+			String c = command . getText () + "\n";
+			oout . print (command . getText () + "\n");
+			area . appendText (command . getText () + "\n");
+			System . out . println (command . getText ());
+			command . setText ("");
+		});
 		Platform . runLater (new Runnable () {public void run () {command . requestFocus ();}});
 		Button extra = new Button ();
 		extra . setText ("Extra");
