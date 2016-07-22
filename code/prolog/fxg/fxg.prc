@@ -2,8 +2,9 @@
 import studio
 import fx
 
-program '01gurps' #machine := "fxg.PrologFXGStudio" [
+program fxg #machine := "fxg.PrologFXGStudio" [
 					Viewport
+					Location Position Size Scaling Mode Rotation Side Sides Text
 					]
 
 
