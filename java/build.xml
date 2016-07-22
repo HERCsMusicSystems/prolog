@@ -33,7 +33,14 @@
 		</jar>
 	</target>
 
-	<target name="run" depends="jar,fxjar">
+	<target name="fxgjar" depends="compile">
+		<jar destfile="fxg.jar">
+			<fileset dir="." includes="fxg/*.class"/>
+			<fileset dir="../code/prolog/fxg" includes="01gurps.prc"/>
+		</jar>
+	</target>
+
+	<target name="run" depends="jar,fxjar,fxgjar">
 		<!-- <java jar="studio.jar" fork="true">
 			<arg value="studio"/>
 			<arg value="a"/>
@@ -45,6 +52,10 @@
 
 	<target name="fx" depends="jar,fxjar">
 		<java classname="studio" classpath="fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"><arg value="fx"/></java>
+	</target>
+
+	<target name="fxg" depends="jar,fxjar,fxgjar">
+		<java classname="studio" classpath="fxg.jar;fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"><arg value="01gurps"/></java>
 	</target>
 
 	<target name="test" depends="jar">
