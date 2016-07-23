@@ -113,7 +113,6 @@ public class PrologLoader extends PrologReader {
 			if (service_class == null) return rc ("Service class crashed or not found: " + symbol);
 			get_symbol ();
 			directory = root . createDirectory (program_name, service_class);
-			service_class . init (root, directory);
 		} else directory = root . createDirectory (program_name);
 		root . auto_atoms = false;
 		switch (symbol_control) {
@@ -141,6 +140,7 @@ public class PrologLoader extends PrologReader {
 			break;
 		default: return rdc ("Syntax error: atome list expected.");
 		}
+		if (service_class != null) service_class . init (root, directory);
 		if (directory != null) search_context = directory . duplicate (search_context);
 		PrologDirectory dt = search_context;
 		if (dt != null) {

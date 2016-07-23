@@ -156,7 +156,6 @@ bool PrologLoader :: LOAD (char * file_name) {
 		if (service_class == NULL) {message_v ("Service class crashed or not found: ", symbol); close (); return false;}
 		get_symbol ();
 		directory = root -> createDirectory (program_name, service_class);
-		service_class -> init (root, directory);
 	} else directory = root -> createDirectory (program_name);
 	root -> auto_atoms = false;
 	switch (symbol_control) {
@@ -200,6 +199,7 @@ bool PrologLoader :: LOAD (char * file_name) {
 	default: message ("Syntax error: atome list expected."); root -> drop (); close (); return false;
 	}
 	//
+	if (service_class != 0) service_class -> init (root, directory);
 	if (directory != NULL) search_context = directory -> duplicate (search_context);
 	PrologDirectory * dt = search_context;
 	if (dt != NULL) {
