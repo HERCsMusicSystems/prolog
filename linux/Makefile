@@ -361,8 +361,11 @@ prcgtk_prc.o: $(pc)prcgtk.prc
 studio: ~/bin/studio
 	cp ~/bin/studio studio
 
-/usr/lib/prcgtk.so: $(pc)prcgtk.cpp prcgtk_prc.o
-	g++ -Wno-write-strings -fPIC -shared prcgtk_prc.o $(pc)prcgtk.cpp -o /usr/lib/prcgtk.so `pkg-config --cflags gtk+-2.0 --libs gtk+-2.0`
+~/bin/prcgtk: $(pc)prcgtk.cpp prcgtk_prc.o
+	g++ -Wno-write-strings -fPIC -shared prcgtk_prc.o $(pc)prcgtk.cpp -o ~/bin/prcgtk `pkg-config --cflags gtk+-2.0 --libs gtk+-2.0`
+
+/usr/lib/prcgtk.so: ~/bin/prcgtk
+	sudo cp ~/bin/prcgtk /usr/lib/prcgtk.so
 
 prcgtk: /usr/lib/prcgtk.so
 
