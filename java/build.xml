@@ -18,6 +18,7 @@
 			<!--<fileset dir="." excludes="studio.jar build.xml"/>-->
 			<fileset dir="." includes="studio.class"/>
 			<fileset dir="." includes="Prolog/*.class"/>
+			<fileset dir="." includes="Prolog/geometry/*.class"/>
 			<fileset dir="../code/prolog" includes="studio.prc"/>
 			<fileset dir="../code/prolog" includes="keyboard.prc"/>
 			<fileset dir="../code/prolog" includes="test.prc"/>

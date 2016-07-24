@@ -22,5 +22,9 @@
 
 package Prolog . geometry;
 
-public class Point {}
+public class Point {
+	public double x, y;
+	public Point (double x, double y) {this . x = x; this . y = y;}
+	public Point (Point point) {x = point . x; y = point . y;}
+}
 

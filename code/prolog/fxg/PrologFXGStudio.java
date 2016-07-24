@@ -2,6 +2,7 @@
 package fxg;
 
 import Prolog . *;
+import Prolog . geometry . *;
 
 import javafx . application . Platform;
 import javafx . stage . Stage;
@@ -13,20 +14,20 @@ class boarder_viewport {
 	public PrologAtom atom;
 	public String viewport_name;
 	public Stage viewport;
-	public double locations [];
-	public void build (String name, double locations []) {
-		this . locations = locations;
+	public Rect location;
+	public void build (String name, Rect location) {
+		this . location = new Rect (location);
 		viewport = new Stage ();
 		viewport . setTitle (viewport_name);
 		viewport . initModality (Modality . NONE);
 		viewport . initOwner (null);
 		StackPane pane = new StackPane ();
-		Scene viewport_scene = new Scene (pane, locations [2], locations [3]);
+		Scene viewport_scene = new Scene (pane, location . size . x, location . size . y);
 		viewport . setScene (viewport_scene);
-		viewport . setX (locations [0]); viewport . setY (locations [1]);
+		viewport . setX (location . position . x); viewport . setY (location . position . y);
 		viewport . show ();
 	}
-	public void setBoarderPosition (double x, double y) {viewport . setX (locations [0] = x); viewport . setY (locations [1] = y);}
+	public void setBoarderPosition (double x, double y) {viewport . setX (location . position . x); viewport . setY (location . position . y);}
 	public boarder_viewport (PrologAtom atom, String viewport_name) {this . atom = atom; this . viewport_name = viewport_name;}
 }
 
@@ -41,9 +42,9 @@ class viewport_action extends PrologNativeCode {
 		if (! atom . isAtom ()) return false;
 		if (atom . getAtom () == fxg . position_atom) {
 			if (parameters . isVar ()) {
-				parameters . setPair (); parameters . getLeft () . setDouble (viewport . locations [0]);
+				parameters . setPair (); parameters . getLeft () . setDouble (viewport . location . position . x);
 				parameters = parameters . getRight (); parameters . setPair ();
-				parameters . getLeft () . setDouble (viewport . locations [1]);
+				parameters . getLeft () . setDouble (viewport . location . position . y);
 				return true;
 			}
 			if (! parameters . isPair ()) return false;
@@ -160,7 +161,9 @@ class viewport_class extends PrologNativeCode {
 		if (! atom . getAtom () . setMachine (machine)) return false;
 		final String viewport_name = name != null ? name . getText () : atom . getAtom () . name ();
 		machine . viewport = fxg . insert_viewport (atom . getAtom (), viewport_name);
-		Platform . runLater (new Runnable () {public void run () {machine . viewport . build (viewport_name, locations);}});
+		Platform . runLater (new Runnable () {public void run () {
+			machine . viewport . build (viewport_name, new Rect (locations [0], locations [1], locations [2], locations [3]));
+		}});
 		return true;
 	}
 	public viewport_class (PrologFXGStudio fxg) {this . fxg = fxg;}
