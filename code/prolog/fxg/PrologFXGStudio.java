@@ -15,6 +15,17 @@ class boarder_viewport {
 	public String viewport_name;
 	public Stage viewport;
 	public Rect location;
+	enum edit_modes {
+		move, select,
+		create_rectangle, create_circle,
+		create_tetrahedron, create_cube, create_dice,
+		create_octahedron, create_deltahedron, create_deltahedron_10,
+		create_dodecahedron, create_icosahedron,
+		create_text, create_grid, create_deck,
+		edit_size, edit_indexing, edit_rotation, edit_side, edit_scaling, edit_ordering,
+		edit, shuffle
+	};
+	public edit_modes edit_mode = edit_modes . move;
 	public void build (String name, Rect location) {
 		this . location = new Rect (location);
 		viewport = new Stage ();
@@ -40,6 +51,13 @@ class viewport_action extends PrologNativeCode {
 		if (! parameters . isPair ()) return false;
 		PrologElement atom = parameters . getLeft (); parameters = parameters . getRight ();
 		if (! atom . isAtom ()) return false;
+		if (atom . getAtom () == fxg . mode_atom) {
+			if (parameters . isVar ()) {parameters . setInteger (viewport . edit_mode . ordinal ()); return true;}
+			if (! parameters . isPair ()) return false; parameters = parameters . getLeft ();
+			if (! parameters . isInteger ()) return false;
+			viewport . edit_mode = boarder_viewport . edit_modes . values () [parameters . getInteger ()];
+			return true;
+		}
 		if (atom . getAtom () == fxg . position_atom) {
 			if (parameters . isVar ()) {
 				parameters . setPair (); parameters . getLeft () . setDouble (viewport . location . position . x);
