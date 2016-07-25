@@ -4,6 +4,8 @@ package fxg;
 import Prolog . *;
 import Prolog . geometry . *;
 
+import java . io . FileWriter;
+
 import javafx . application . Platform;
 import javafx . stage . Stage;
 import javafx . stage . Modality;
@@ -17,7 +19,9 @@ class boarder_viewport {
 	public String viewport_name;
 	public Stage viewport;
 	public Rect location;
+	public Point board_position = new Point (0.0, 0.0);
 	public double scaling = 1.0;
+	public boarder_viewport next;
 	enum edit_modes {
 		move, select,
 		create_rectangle, create_circle,
@@ -29,8 +33,7 @@ class boarder_viewport {
 		edit, shuffle
 	};
 	public edit_modes edit_mode = edit_modes . move;
-	public void build (String name, Rect loc) {
-		this . location = new Rect (loc);
+	public void build () {
 		viewport = new Stage ();
 		viewport . setTitle (viewport_name);
 		viewport . initModality (Modality . NONE);
@@ -39,21 +42,31 @@ class boarder_viewport {
 		Scene viewport_scene = new Scene (pane, location . size . x, location . size . y);
 		viewport . setScene (viewport_scene);
 		viewport . setX (location . position . x); viewport . setY (location . position . y);
-		viewport . widthProperty () . addListener (new ChangeListener<Number> () {
-			public void changed (ObservableValue<? extends Number> o, Number old, Number current) {location . size . x = (double) current;}
+		viewport . widthProperty () . addListener (new ChangeListener <Number> () {
+			public void changed (ObservableValue <? extends Number> o, Number old, Number current) {location . size . x = (double) current;}
 		});
-		viewport . heightProperty () . addListener (new ChangeListener<Number> () {
-			public void changed (ObservableValue<? extends Number> o, Number old, Number current) {location . size . y = (double) current;}
+		viewport . heightProperty () . addListener (new ChangeListener <Number> () {
+			public void changed (ObservableValue <? extends Number> o, Number old, Number current) {location . size . y = (double) current;}
 		});
-		viewport . xProperty () . addListener (new ChangeListener<Number> () {
-			public void changed (ObservableValue<? extends Number> o, Number old, Number current) {location . position . x = (double) current;}
+		viewport . xProperty () . addListener (new ChangeListener <Number> () {
+			public void changed (ObservableValue <? extends Number> o, Number old, Number current) {location . position . x = (double) current;}
 		});
-		viewport . yProperty () . addListener (new ChangeListener<Number> () {
-			public void changed (ObservableValue<? extends Number> o, Number old, Number current) {location . position . y = (double) current;}
+		viewport . yProperty () . addListener (new ChangeListener <Number> () {
+			public void changed (ObservableValue <? extends Number> o, Number old, Number current) {location . position . y = (double) current;}
 		});
 		viewport . show ();
 	}
-	public void setBoarderPosition (double x, double y) {viewport . setX (location . position . x = x); viewport . setY (location . position . y = y);}
+	public void save (FileWriter tc) throws java . io . IOException {
+		if (next != null) next . save (tc);
+		tc . write ("[Viewport " + atom . name () + " \"" + viewport_name + "\" "
+			+ location . position . x + " " + location . position . y + " " + location . size . x + " " + location . size . y + "]\n");
+		if (! board_position . eq (new Point (0.0, 0.0))) tc . write ("[" + atom . name () + " Position " + board_position . x + " " + board_position . y + "]\n");
+		if (scaling != 1.0) tc . write ("[" + atom . name () + " Scaling " + scaling + "]\n");
+		if (edit_mode != edit_modes . move) tc . write ("[" + atom . name () + " Mode " + edit_mode . ordinal () + "]\n");
+		tc . write ("\n");
+	}
+	public void erase () {}
+	public void setBoarderPosition (double x, double y) {board_position . x = x; board_position . y = y;}
 	public void setWindowSize (double w, double h) {viewport . setWidth (location . size . x = w); viewport . setHeight (location . size . y = h);}
 	public void setWindowLocation (double x, double y, double w, double h) {
 		viewport . setX (location . position . x = x);
@@ -62,7 +75,15 @@ class boarder_viewport {
 		viewport . setHeight (location . size . y = h);
 	}
 	public void change_viewport_name () {viewport . setTitle (viewport_name + " [" + edit_mode . name () + "]");}
-	public boarder_viewport (PrologAtom atom, String viewport_name) {this . atom = atom; this . viewport_name = viewport_name;}
+	public boarder_viewport (PrologAtom atom, String viewport_name, Rect location, boarder_viewport next) {
+		this . atom = atom;
+		this . viewport_name = viewport_name;
+		this . location = new Rect (location);
+		this . next = next;
+		Platform . runLater (new Runnable () {public void run () {build ();}});
+//			machine . viewport . build (viewport_name, new Rect (locations [0], locations [1], locations [2], locations [3]));
+//		}});
+	}
 }
 
 class viewport_action extends PrologNativeCode {
@@ -101,9 +122,9 @@ class viewport_action extends PrologNativeCode {
 		}
 		if (atom . getAtom () == fxg . position_atom) {
 			if (parameters . isVar ()) {
-				parameters . setPair (); parameters . getLeft () . setDouble (viewport . location . position . x);
+				parameters . setPair (); parameters . getLeft () . setDouble (viewport . board_position . x);
 				parameters = parameters . getRight (); parameters . setPair ();
-				parameters . getLeft () . setDouble (viewport . location . position . y);
+				parameters . getLeft () . setDouble (viewport . board_position . y);
 				return true;
 			}
 			if (! parameters . isPair ()) return false;
@@ -163,10 +184,7 @@ class viewport_class extends PrologNativeCode {
 		viewport_action machine = new viewport_action (fxg);
 		if (! atom . getAtom () . setMachine (machine)) return false;
 		final String viewport_name = name != null ? name . getText () : atom . getAtom () . name ();
-		machine . viewport = fxg . insert_viewport (atom . getAtom (), viewport_name);
-		Platform . runLater (new Runnable () {public void run () {
-			machine . viewport . build (viewport_name, new Rect (locations [0], locations [1], locations [2], locations [3]));
-		}});
+		machine . viewport = fxg . insert_viewport (atom . getAtom (), viewport_name, new Rect (locations [0], locations [1], locations [2], locations [3]));
 		return true;
 	}
 	public viewport_class (PrologFXGStudio fxg) {this . fxg = fxg;}
@@ -188,14 +206,59 @@ class viewport_class extends PrologNativeCode {
 
 *////////////
 
+class erase_class extends PrologNativeCode {
+	public PrologFXGStudio fxg;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {fxg . erase (); return true;}
+	public erase_class (PrologFXGStudio fxg) {this . fxg = fxg;}
+}
+
+class clean_class extends PrologNativeCode {
+	public PrologFXGStudio fxg;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {fxg . clean = true; return true;}
+	public clean_class (PrologFXGStudio fxg) {this . fxg = fxg;}
+}
+
+class is_clean_class extends PrologNativeCode {
+	public PrologFXGStudio fxg;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {return fxg . clean;}
+	public is_clean_class (PrologFXGStudio fxg) {this . fxg = fxg;}
+}
+
+class save_board_class extends PrologNativeCode {
+	public PrologFXGStudio fxg;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false; parameters = parameters . getLeft (); if (! parameters . isText ()) return false;
+		fxg . save (parameters . getText ());
+		return true;
+	}
+	public save_board_class (PrologFXGStudio fxg) {this . fxg = fxg;}
+}
 
 public class PrologFXGStudio extends PrologServiceClass {
 	public PrologRoot root;
 	public PrologDirectory directory;
 	public PrologAtom location_atom, size_atom, position_atom, scaling_atom, repaint_atom, mode_atom;
 	public void remove_viewport (boarder_viewport viewport) {}
-	public boarder_viewport insert_viewport (PrologAtom atom, String name) {return new boarder_viewport (atom, name);}
+	public boarder_viewport insert_viewport (PrologAtom atom, String name, Rect location) {return viewports = new boarder_viewport (atom, name, location, viewports);}
 	public boolean clean = true;
+	public boarder_viewport viewports;
+	public void save (String file_name) {
+		try {
+			FileWriter tc = new FileWriter (file_name);
+			tc . write ("[auto_atoms]\n\n");
+			tc . write ("[Erase]\n");
+			if (viewports != null) viewports . save (tc);
+			tc . write ("[wait 100]\n");
+			tc . write ("[Clean]\n");
+			tc . write ("[exit]\n\n");
+			tc . close ();
+		} catch (Exception ex) {return;}
+		clean = true;
+	}
+	public void erase () {
+		if (viewports != null) viewports . erase (); viewports = null;
+		clean = true;
+	}
 	public void init (PrologRoot root, PrologDirectory directory) {
 		this . root = root; this . directory = directory;
 		if (location_atom == null && directory != null) {
@@ -209,6 +272,10 @@ public class PrologFXGStudio extends PrologServiceClass {
 	}
 	public PrologNativeCode getNativeCode (String name) {
 		if (name . equals ("Viewport")) return new viewport_class (this);
+		if (name . equals ("Erase")) return new erase_class (this);
+		if (name . equals ("Clean")) return new clean_class (this);
+		if (name . equals ("Clean?")) return new is_clean_class (this);
+		if (name . equals ("SaveBoard")) return new save_board_class (this);
 		return null;
 	}
 }
