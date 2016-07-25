@@ -9,12 +9,15 @@ import javafx . stage . Stage;
 import javafx . stage . Modality;
 import javafx . scene . Scene;
 import javafx . scene . layout . StackPane;
+import javafx . beans . value . ChangeListener;
+import javafx . beans . value . ObservableValue;
 
 class boarder_viewport {
 	public PrologAtom atom;
 	public String viewport_name;
 	public Stage viewport;
 	public Rect location;
+	public double scaling = 1.0;
 	enum edit_modes {
 		move, select,
 		create_rectangle, create_circle,
@@ -26,8 +29,8 @@ class boarder_viewport {
 		edit, shuffle
 	};
 	public edit_modes edit_mode = edit_modes . move;
-	public void build (String name, Rect location) {
-		this . location = new Rect (location);
+	public void build (String name, Rect loc) {
+		this . location = new Rect (loc);
 		viewport = new Stage ();
 		viewport . setTitle (viewport_name);
 		viewport . initModality (Modality . NONE);
@@ -36,9 +39,29 @@ class boarder_viewport {
 		Scene viewport_scene = new Scene (pane, location . size . x, location . size . y);
 		viewport . setScene (viewport_scene);
 		viewport . setX (location . position . x); viewport . setY (location . position . y);
+		viewport . widthProperty () . addListener (new ChangeListener<Number> () {
+			public void changed (ObservableValue<? extends Number> o, Number old, Number current) {location . size . x = (double) current;}
+		});
+		viewport . heightProperty () . addListener (new ChangeListener<Number> () {
+			public void changed (ObservableValue<? extends Number> o, Number old, Number current) {location . size . y = (double) current;}
+		});
+		viewport . xProperty () . addListener (new ChangeListener<Number> () {
+			public void changed (ObservableValue<? extends Number> o, Number old, Number current) {location . position . x = (double) current;}
+		});
+		viewport . yProperty () . addListener (new ChangeListener<Number> () {
+			public void changed (ObservableValue<? extends Number> o, Number old, Number current) {location . position . y = (double) current;}
+		});
 		viewport . show ();
 	}
-	public void setBoarderPosition (double x, double y) {viewport . setX (location . position . x); viewport . setY (location . position . y);}
+	public void setBoarderPosition (double x, double y) {viewport . setX (location . position . x = x); viewport . setY (location . position . y = y);}
+	public void setWindowSize (double w, double h) {viewport . setWidth (location . size . x = w); viewport . setHeight (location . size . y = h);}
+	public void setWindowLocation (double x, double y, double w, double h) {
+		viewport . setX (location . position . x = x);
+		viewport . setY (location . position . y = y);
+		viewport . setWidth (location . size . x = w);
+		viewport . setHeight (location . size . y = h);
+	}
+	public void change_viewport_name () {viewport . setTitle (viewport_name + " [" + edit_mode . name () + "]");}
 	public boarder_viewport (PrologAtom atom, String viewport_name) {this . atom = atom; this . viewport_name = viewport_name;}
 }
 
@@ -56,6 +79,24 @@ class viewport_action extends PrologNativeCode {
 			if (! parameters . isPair ()) return false; parameters = parameters . getLeft ();
 			if (! parameters . isInteger ()) return false;
 			viewport . edit_mode = boarder_viewport . edit_modes . values () [parameters . getInteger ()];
+			Platform . runLater (new Runnable () {public void run () {viewport . change_viewport_name ();}});
+			return true;
+		}
+		if (atom . getAtom () == fxg . location_atom) {
+			if (parameters . isVar ()) {
+				parameters . setPair (); parameters . getLeft () . setDouble (viewport . location . position . x); parameters = parameters . getRight ();
+				parameters . setPair (); parameters . getLeft () . setDouble (viewport . location . position . y); parameters = parameters . getRight ();
+				parameters . setPair (); parameters . getLeft () . setDouble (viewport . location . size . x); parameters = parameters . getRight ();
+				parameters . setPair (); parameters . getLeft () . setDouble (viewport . location . size . y);
+				return true;
+			}
+			if (! parameters . isPair ()) return false;
+			PrologElement x = parameters . getLeft (); if (! x . isNumber ()) return false; parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+			PrologElement y = parameters . getLeft (); if (! y . isNumber ()) return false; parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+			PrologElement w = parameters . getLeft (); if (! w . isNumber ()) return false; parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+			PrologElement h = parameters . getLeft (); if (! h . isNumber ()) return false;
+			Platform . runLater (new Runnable () {public void run () {viewport . setWindowLocation (x . getNumber (), y . getNumber (), w . getNumber (), h . getNumber ());}});
+			fxg . clean = false;
 			return true;
 		}
 		if (atom . getAtom () == fxg . position_atom) {
@@ -73,89 +114,33 @@ class viewport_action extends PrologNativeCode {
 			fxg . clean = false;
 			return true;
 		}
-		return true;
+		if (atom . getAtom () == fxg . size_atom) {
+			if (parameters . isVar ()) {
+				parameters . setPair (); parameters . getLeft () . setDouble (viewport . location . size . x); parameters = parameters . getRight ();
+				parameters . setPair (); parameters . getLeft () . setDouble (viewport . location . size . y);
+				return true;
+			}
+			if (! parameters . isPair ()) return false;
+			PrologElement w = parameters . getLeft (); if (! w . isNumber ()) return false; parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
+			PrologElement h = parameters . getLeft (); if (! h . isNumber ()) return false;
+			Platform . runLater (new Runnable () {public void run () {viewport . setWindowSize (w . getNumber (), h . getNumber ());}});
+			fxg . clean = false;
+			return true;
+		}
+		if (atom . getAtom () == fxg . scaling_atom) {
+			if (parameters . isVar ()) {parameters . setPair (); parameters . getLeft () . setDouble (viewport . scaling); return true;}
+			if (! parameters . isPair ()) return false;
+			PrologElement scaling = parameters . getLeft (); if (! scaling . isNumber ()) return false;
+			viewport . scaling = scaling . getNumber ();
+			fxg . clean = false;
+			return true;
+		}
+		//if (atom . getAtom () == fxg . repaint_atom) {....}
+		return false;
 	}
 	public viewport_action (PrologFXGStudio fxg) {this . fxg = fxg;}
 }
-/*
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (atom -> getAtom () == mode_atom ) {
-			if (parameters -> isVar ()) {parameters -> setInteger ((int) viewport -> edit_mode); return true;}
-			if (! parameters -> isPair ()) return false; parameters = parameters -> getLeft ();
-			if (! parameters -> isInteger ()) return false;
-			viewport -> edit_mode = (boarder_viewport :: edit_modes) parameters -> getInteger ();
-			g_idle_add ((GSourceFunc) ChangeViewportNameIdleCode, viewport);
-			return true;
-		}
-		if (atom -> getAtom () == location_atom) {
-			if (parameters -> isVar ()) {
-				parameters -> setPair ();
-				parameters -> getLeft () -> setInteger ((int) viewport -> location . position . x);
-				parameters = parameters -> getRight (); parameters -> setPair ();
-				parameters -> getLeft () -> setInteger ((int) viewport -> location . position . y);
-				parameters = parameters -> getRight (); parameters -> setPair ();
-				parameters -> getLeft () -> setInteger ((int) viewport -> location . size . x);
-				parameters = parameters -> getRight (); parameters -> setPair ();
-				parameters -> getLeft () -> setInteger ((int) viewport -> location . size . y);
-				return true;
-			}
-			if (! parameters -> isPair ()) return false;
-			PrologElement * x = parameters -> getLeft (); if (! x -> isInteger ()) return false; parameters = parameters -> getRight ();
-			if (! parameters -> isPair ()) return false;
-			PrologElement * y = parameters -> getLeft (); if (! y -> isInteger ()) return false; parameters = parameters -> getRight ();
-			if (! parameters -> isPair ()) return false;
-			PrologElement * width = parameters -> getLeft (); if (! width -> isInteger ()) return false; parameters = parameters -> getRight ();
-			if (! parameters -> isPair ()) return false;
-			PrologElement * height = parameters -> getLeft (); if (! height -> isInteger ()) return false; parameters = parameters -> getRight ();
-			viewport -> setWindowLocation (rect (x -> getInteger (), y -> getInteger (), width -> getInteger (), height -> getInteger ()));
-			boarder_clean = false;
-			return true;
-		}
-		if (atom -> getAtom () == position_atom) {
-			if (parameters -> isVar ()) {
-				parameters -> setPair ();
-				parameters -> getLeft () -> setInteger ((int) viewport -> board_position . x);
-				parameters = parameters -> getRight (); parameters -> setPair ();
-				parameters -> getLeft () -> setInteger ((int) viewport -> board_position . y);
-				return true;
-			}
-			if (! parameters -> isPair ()) return false;
-			PrologElement * x = parameters -> getLeft (); if (! x -> isInteger ()) return false; parameters = parameters -> getRight ();
-			if (! parameters -> isPair ()) return false;
-			PrologElement * y = parameters -> getLeft (); if (! y -> isInteger ()) return false; parameters = parameters -> getRight ();
-			viewport -> setBoardPosition (point (x -> getInteger (), y -> getInteger ()));
-			boarder_clean = false;
-			return true;
-		}
-		if (atom -> getAtom () == size_atom) {
-			if (parameters -> isVar ()) {
-				parameters -> setPair ();
-				parameters -> getLeft () -> setInteger ((int) viewport -> location . size . x);
-				parameters = parameters -> getRight (); parameters -> setPair ();
-				parameters -> getLeft () -> setInteger ((int) viewport -> location . size . y);
-				return true;
-			}
-			if (! parameters -> isPair ()) return false;
-			PrologElement * width = parameters -> getLeft (); if (! width -> isInteger ()) return false; parameters = parameters -> getRight ();
-			if (! parameters -> isPair ()) return false;
-			PrologElement * height = parameters -> getLeft (); if (! height -> isInteger ()) return false; parameters = parameters -> getRight ();
-			viewport -> setWindowSize (point (width -> getInteger (), height -> getInteger ()));
-			boarder_clean = false;
-			return true;
-		}
-		if (atom -> getAtom () == scaling_atom) {
-			if (parameters -> isVar ()) {parameters -> setPair (); parameters -> getLeft () -> setDouble (viewport -> scaling); return true;}
-			if (! parameters -> isPair ()) return false;
-			PrologElement * scaling = parameters -> getLeft ();
-			if (scaling -> isDouble ()) {viewport -> scaling = scaling -> getDouble (); boarder_clean = false; return true;}
-			if (scaling -> isInteger ()) {viewport -> scaling = (int) scaling -> getInteger (); boarder_clean = false; return true;}
-			return false;
-		}
-		if (atom -> getAtom () == repaint_atom) {gtk_widget_queue_draw (viewport -> window); return true;}
-		return false;
-	}
-};
-*/
+
 class viewport_class extends PrologNativeCode {
 	public PrologFXGStudio fxg;
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
