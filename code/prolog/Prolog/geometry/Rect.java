@@ -24,6 +24,7 @@ package Prolog . geometry;
 
 public class Rect {
 	public Point position, size;
+	public boolean eq (Rect r) {return r . position . eq (position) && r . size . eq (size);}
 	public Rect (Point position, Point size) {this . position = new Point (position); this . size = new Point (size);}
 	public Rect (double x, double y, double width, double height) {position = new Point (x, y); size = new Point (width, height);}
 	public Rect (Rect location) {position = new Point (location . position); size = new Point (location . size);}
