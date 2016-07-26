@@ -9,12 +9,15 @@ import java . io . FileWriter;
 import javafx . application . Platform;
 import javafx . stage . Stage;
 import javafx . stage . Modality;
+import javafx . stage . WindowEvent;
+import javafx . event . EventHandler;
 import javafx . scene . Scene;
 import javafx . scene . layout . StackPane;
 import javafx . beans . value . ChangeListener;
 import javafx . beans . value . ObservableValue;
 
 class boarder_viewport {
+	public viewport_action action;
 	public PrologAtom atom;
 	public String viewport_name;
 	public Stage viewport;
@@ -54,8 +57,10 @@ class boarder_viewport {
 		viewport . yProperty () . addListener (new ChangeListener <Number> () {
 			public void changed (ObservableValue <? extends Number> o, Number old, Number current) {location . position . y = (double) current;}
 		});
+		viewport . setOnCloseRequest (new EventHandler <WindowEvent> () {public void handle (WindowEvent e) {action . close ();}});
 		viewport . show ();
 	}
+	public void close () {viewport . close ();}
 	public void save (FileWriter tc) throws java . io . IOException {
 		if (next != null) next . save (tc);
 		tc . write ("[Viewport " + atom . name () + " \"" + viewport_name + "\" "
@@ -65,7 +70,7 @@ class boarder_viewport {
 		if (edit_mode != edit_modes . move) tc . write ("[" + atom . name () + " Mode " + edit_mode . ordinal () + "]\n");
 		tc . write ("\n");
 	}
-	public void erase () {}
+	public void erase () {action . close (); Platform . runLater (new Runnable () {public void run () {viewport . close ();}}); if (next == null) return; next . erase ();}
 	public void setBoarderPosition (double x, double y) {board_position . x = x; board_position . y = y;}
 	public void setWindowSize (double w, double h) {viewport . setWidth (location . size . x = w); viewport . setHeight (location . size . y = h);}
 	public void setWindowLocation (double x, double y, double w, double h) {
@@ -75,14 +80,13 @@ class boarder_viewport {
 		viewport . setHeight (location . size . y = h);
 	}
 	public void change_viewport_name () {viewport . setTitle (viewport_name + " [" + edit_mode . name () + "]");}
-	public boarder_viewport (PrologAtom atom, String viewport_name, Rect location, boarder_viewport next) {
+	public boarder_viewport (viewport_action action, PrologAtom atom, String viewport_name, Rect location, boarder_viewport next) {
+		this . action = action;
 		this . atom = atom;
 		this . viewport_name = viewport_name;
 		this . location = new Rect (location);
 		this . next = next;
 		Platform . runLater (new Runnable () {public void run () {build ();}});
-//			machine . viewport . build (viewport_name, new Rect (locations [0], locations [1], locations [2], locations [3]));
-//		}});
 	}
 }
 
@@ -90,8 +94,9 @@ class viewport_action extends PrologNativeCode {
 	public PrologFXGStudio fxg;
 	public PrologAtom location_atom, size_atom, position_atom, scaling_atom, repaint_atom, mode_atom;
 	public boarder_viewport viewport;
+	public void close () {fxg . clean = false; viewport . atom . setMachine (null); fxg . remove_viewport (viewport);}
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
-		if (parameters . isEarth ()) {fxg . clean = false; viewport . atom . setMachine (null); fxg . remove_viewport (viewport); return true;}
+		if (parameters . isEarth ()) {close (); Platform . runLater (new Runnable () {public void run () {viewport . close ();}}); return true;}
 		if (! parameters . isPair ()) return false;
 		PrologElement atom = parameters . getLeft (); parameters = parameters . getRight ();
 		if (! atom . isAtom ()) return false;
@@ -184,27 +189,11 @@ class viewport_class extends PrologNativeCode {
 		viewport_action machine = new viewport_action (fxg);
 		if (! atom . getAtom () . setMachine (machine)) return false;
 		final String viewport_name = name != null ? name . getText () : atom . getAtom () . name ();
-		machine . viewport = fxg . insert_viewport (atom . getAtom (), viewport_name, new Rect (locations [0], locations [1], locations [2], locations [3]));
+		machine . viewport = fxg . insert_viewport (machine, atom . getAtom (), viewport_name, new Rect (locations [0], locations [1], locations [2], locations [3]));
 		return true;
 	}
 	public viewport_class (PrologFXGStudio fxg) {this . fxg = fxg;}
 }
-
-/*////////////
-		viewport_action * machine = new viewport_action (directory);
-		if (! atom -> getAtom () -> setMachine (machine)) {delete machine; return false;}
-		PROLOG_STRING viewport_name;
-		if (name == 0) prolog_string_copy (viewport_name, "VIEWPORT");
-		else prolog_string_copy (viewport_name, name -> getText ());
-		machine -> viewport = board -> insert_viewport (atom -> getAtom (), viewport_name, rect (locations));
-		//CreateViewportIdleCode (machine -> viewport);
-		g_idle_add ((GSourceFunc) CreateViewportIdleCode, machine -> viewport);
-		return true;
-	}
-	viewport (PrologDirectory * directory) {this -> directory = directory;}
-};
-
-*////////////
 
 class erase_class extends PrologNativeCode {
 	public PrologFXGStudio fxg;
@@ -238,8 +227,15 @@ public class PrologFXGStudio extends PrologServiceClass {
 	public PrologRoot root;
 	public PrologDirectory directory;
 	public PrologAtom location_atom, size_atom, position_atom, scaling_atom, repaint_atom, mode_atom;
-	public void remove_viewport (boarder_viewport viewport) {}
-	public boarder_viewport insert_viewport (PrologAtom atom, String name, Rect location) {return viewports = new boarder_viewport (atom, name, location, viewports);}
+	public void remove_viewport (boarder_viewport viewport) {
+		if (viewports == null) return;
+		if (viewports == viewport) {viewports = viewports . next; return;}
+		boarder_viewport v = viewports;
+		while (v . next != null) {if (v . next == viewport) {v . next = v . next . next; return;} v = v . next;}
+	}
+	public boarder_viewport insert_viewport (viewport_action action, PrologAtom atom, String name, Rect location) {
+		return viewports = new boarder_viewport (action, atom, name, location, viewports);
+	}
 	public boolean clean = true;
 	public boarder_viewport viewports;
 	public void save (String file_name) {
