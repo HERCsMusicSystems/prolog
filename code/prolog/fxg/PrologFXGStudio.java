@@ -12,6 +12,10 @@ import javafx . stage . Modality;
 import javafx . stage . WindowEvent;
 import javafx . event . EventHandler;
 import javafx . scene . Scene;
+import javafx . scene . Group;
+import javafx . scene . canvas . Canvas;
+import javafx . scene . canvas . GraphicsContext;
+import javafx . scene . paint . Color;
 import javafx . scene . layout . StackPane;
 import javafx . beans . value . ChangeListener;
 import javafx . beans . value . ObservableValue;
@@ -41,9 +45,21 @@ class boarder_viewport {
 		viewport . setTitle (viewport_name);
 		viewport . initModality (Modality . NONE);
 		viewport . initOwner (null);
-		StackPane pane = new StackPane ();
-		Scene viewport_scene = new Scene (pane, location . size . x, location . size . y);
-		viewport . setScene (viewport_scene);
+		//=========
+		Group g = new Group ();
+		Canvas c = new Canvas (location . size . x, location . size . y);
+		GraphicsContext gc = c . getGraphicsContext2D ();
+		gc . setFill (Color . GREEN);
+		gc . setStroke (Color . BLUE);
+		gc . setLineWidth (5);
+		gc . strokeLine (40, 10, 10, 40);
+		g . getChildren () . add (c);
+		viewport . setScene (new Scene (g));
+		//=============
+		//StackPane pane = new StackPane ();
+		//Scene viewport_scene = new Scene (pane, location . size . x, location . size . y);
+		//viewport . setScene (viewport_scene);
+		//==============
 		viewport . setX (location . position . x); viewport . setY (location . position . y);
 		viewport . widthProperty () . addListener (new ChangeListener <Number> () {
 			public void changed (ObservableValue <? extends Number> o, Number old, Number current) {location . size . x = (double) current;}
