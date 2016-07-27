@@ -24,6 +24,9 @@ package Prolog . geometry;
 
 public class Point {
 	public double x, y;
+	public Point half () {return new Point (x * 0.5, y * 0.5);}
+	public Point times (double d) {return new Point (x * d, y * d);}
+	public Point add (Point p) {return new Point (p . x + x, p . y + y);}
 	public boolean eq (Point p) {return p . x == x && p . y == y;}
 	public Point (double x, double y) {this . x = x; this . y = y;}
 	public Point (Point point) {x = point . x; y = point . y;}

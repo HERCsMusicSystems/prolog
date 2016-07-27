@@ -82,12 +82,62 @@ class save_board_class extends PrologNativeCode {
 	public save_board_class (PrologFXGStudio fxg) {this . fxg = fxg;}
 }
 
+class repaint_class extends PrologNativeCode {
+	public PrologFXGStudio fxg;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {fxg . repaint (); return true;}
+	public repaint_class (PrologFXGStudio fxg) {this . fxg = fxg;}
+}
+
+class create_rectangle_class extends PrologNativeCode {
+	public PrologFXGStudio fxg;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement atom = parameters . getLeft ();
+		if (atom . isVar ()) atom . setAtom (new PrologAtom ());
+		if (! atom . isAtom ()) return false;
+		if (atom . getAtom () . getMachine () != null) return false;
+		Token machine = new RectangleToken (fxg, atom . getAtom (), fxg . default_rectangle_foreground, fxg . default_rectangle_background);
+		if (! atom . getAtom () . setMachine (machine)) return false;
+		fxg . insert_token (machine);
+		fxg . clean = false;
+		return true;
+	}
+	public create_rectangle_class (PrologFXGStudio fxg) {this . fxg = fxg;}
+}
+
 public class PrologFXGStudio extends PrologServiceClass {
 	public PrologRoot root;
 	public PrologDirectory directory;
-	public PrologAtom location_atom, size_atom, position_atom, scaling_atom, repaint_atom, mode_atom;
+	public PrologAtom location_atom, size_atom, position_atom, scaling_atom, repaint_atom, mode_atom, rotation_atom, rounding_atom;
 	public boolean clean = true;
 	public Viewport viewports;
+	public Token tokens;
+	public Token deck;
+	public Colour default_rectangle_foreground = new Colour (1.0, 1.0, 0.0), default_rectangle_background = new Colour (0.0, 0.0, 1.0);
+	public void repaint () {
+		Viewport v = viewports;
+		while (v != null) {v . draw (); v = v .next;}
+	}
+	public void draw (javafx . scene . canvas . GraphicsContext gc, Viewport v) {
+		Token t = tokens;
+		while (t != null) {t . token_draw (gc, v); t = t . next;}
+	}
+	public Token insert_token (Token token) {
+		if (deck != null) {
+			if (! deck . can_insert ()) return null;
+			return deck . insert (token);
+		}
+		token . next = tokens;
+		return tokens = token;
+	}
+	public void remove_token (Token token) {
+		if (tokens == token) {tokens = tokens . next; token . next = null; return;}
+		Token t = tokens;
+		while (t . next != null) {
+			if (t . next == token) {t . next = token . next; token . next = null; return;}
+			t = t . next;
+		}
+	}
 	public void remove_viewport (Viewport viewport) {
 		if (viewports == null) return;
 		if (viewports == viewport) {viewports = viewports . next; return;}
@@ -120,6 +170,8 @@ public class PrologFXGStudio extends PrologServiceClass {
 			scaling_atom = directory . searchAtom ("Scaling");
 			repaint_atom = directory . searchAtom ("Repaint");
 			mode_atom = directory . searchAtom ("Mode");
+			rotation_atom = directory . searchAtom ("Rotation");
+			rounding_atom = directory . searchAtom ("Rounding");
 		}
 	}
 	public PrologNativeCode getNativeCode (String name) {
@@ -128,6 +180,8 @@ public class PrologFXGStudio extends PrologServiceClass {
 		if (name . equals ("Clean")) return new clean_class (this);
 		if (name . equals ("Clean?")) return new is_clean_class (this);
 		if (name . equals ("SaveBoard")) return new save_board_class (this);
+		if (name . equals ("Repaint")) return new repaint_class (this);
+		if (name . equals ("CreateRectangle")) return new create_rectangle_class (this);
 		return null;
 	}
 }

@@ -60,6 +60,9 @@ public class Viewport extends PrologNativeCode {
 	public edit_modes edit_mode = edit_modes . move;
 	public Viewport next;
 	public Stage viewport;
+	public GraphicsContext gc;
+	public Canvas canvas;
+	public void draw () {gc . clearRect (0, 0, canvas . getWidth (), canvas . getHeight ()); fxg . draw (gc, this);}
 	public void build () {
 		viewport = new Stage ();
 		viewport . setTitle (viewport_name);
@@ -67,13 +70,10 @@ public class Viewport extends PrologNativeCode {
 		viewport . initOwner (null);
 		//=========
 		Group g = new Group ();
-		Canvas c = new Canvas (location . size . x, location . size . y);
-		GraphicsContext gc = c . getGraphicsContext2D ();
-		gc . setFill (Color . GREEN);
-		gc . setStroke (Color . BLUE);
-		gc . setLineWidth (5);
-		gc . strokeLine (40, 10, 10, 40);
-		g . getChildren () . add (c);
+		canvas = new Canvas (location . size . x, location . size . y);
+		gc = canvas . getGraphicsContext2D ();
+		draw ();
+		g . getChildren () . add (canvas);
 		viewport . setScene (new Scene (g));
 		//=============
 		//StackPane pane = new StackPane ();
