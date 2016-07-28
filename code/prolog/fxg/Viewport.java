@@ -40,13 +40,9 @@ import javafx . scene . canvas . GraphicsContext;
 import javafx . beans . value . ChangeListener;
 import javafx . beans . value . ObservableValue;
 
-public class Viewport extends PrologNativeCode {
-	public PrologFXGStudio fxg;
-	public PrologAtom atom;
+public class Viewport extends Token {
 	public String viewport_name;
-	public Rect location;
-	public Point board_position = new Point (0.0, 0.0);
-	public double scaling = 1.0;
+	public Point screen_position = new Point (0.0, 0.0);
 	enum edit_modes {
 		move, select,
 		create_rectangle, create_circle,
@@ -57,12 +53,13 @@ public class Viewport extends PrologNativeCode {
 		edit_size, edit_indexing, edit_rotation, edit_side, edit_scaling, edit_ordering,
 		edit, shuffle
 	};
-	public edit_modes edit_mode = edit_modes . move;
-	public Viewport next;
 	public Stage viewport;
 	public GraphicsContext gc;
 	public Canvas canvas;
-	public void draw () {gc . clearRect (0, 0, canvas . getWidth (), canvas . getHeight ()); fxg . draw (gc, this);}
+	public void repaint () {
+		canvas . setWidth (location . size . x); canvas . setHeight (location . size . y);
+		gc . clearRect (0, 0, canvas . getWidth (), canvas . getHeight ()); fxg . draw (gc, this);
+	}
 	public void build () {
 		viewport = new Stage ();
 		viewport . setTitle (viewport_name);
@@ -72,7 +69,7 @@ public class Viewport extends PrologNativeCode {
 		Group g = new Group ();
 		canvas = new Canvas (location . size . x, location . size . y);
 		gc = canvas . getGraphicsContext2D ();
-		draw ();
+		repaint ();
 		g . getChildren () . add (canvas);
 		viewport . setScene (new Scene (g));
 		//=============
@@ -82,10 +79,16 @@ public class Viewport extends PrologNativeCode {
 		//==============
 		viewport . setX (location . position . x); viewport . setY (location . position . y);
 		viewport . widthProperty () . addListener (new ChangeListener <Number> () {
-			public void changed (ObservableValue <? extends Number> o, Number old, Number current) {location . size . x = (double) current;}
+			public void changed (ObservableValue <? extends Number> o, Number old, Number current) {
+				location . size . x = (double) current;
+				Platform . runLater (new Runnable () {public void run () {repaint ();}});
+			}
 		});
 		viewport . heightProperty () . addListener (new ChangeListener <Number> () {
-			public void changed (ObservableValue <? extends Number> o, Number old, Number current) {location . size . y = (double) current;}
+			public void changed (ObservableValue <? extends Number> o, Number old, Number current) {
+				location . size . y = (double) current;
+				Platform . runLater (new Runnable () {public void run () {repaint ();}});
+			}
 		});
 		viewport . xProperty () . addListener (new ChangeListener <Number> () {
 			public void changed (ObservableValue <? extends Number> o, Number old, Number current) {location . position . x = (double) current;}
@@ -96,8 +99,8 @@ public class Viewport extends PrologNativeCode {
 		viewport . setOnCloseRequest (new EventHandler <WindowEvent> () {public void handle (WindowEvent e) {close ();}});
 		viewport . show ();
 	}
-	public void change_viewport_name () {viewport . setTitle (viewport_name + " [" + edit_mode . name () + "]");}
-	public void setBoarderPosition (double x, double y) {board_position . x = x; board_position . y = y;}
+	public void change_viewport_name () {viewport . setTitle (viewport_name + " [" + edit_modes . values () [side] . name () + "]");}
+	public void setPosition (double x, double y) {screen_position . x = x; screen_position . y = y;}
 	public void setWindowSize (double w, double h) {viewport . setWidth (location . size . x = w); viewport . setHeight (location . size . y = h);}
 	public void setWindowLocation (double x, double y, double w, double h) {
 		viewport . setX (location . position . x = x);
@@ -105,29 +108,33 @@ public class Viewport extends PrologNativeCode {
 		viewport . setWidth (location . size . x = w);
 		viewport . setHeight (location . size . y = h);
 	}
-	public void erase () {close (); Platform . runLater (new Runnable () {public void run () {viewport . close ();}}); if (next == null) return; next . erase ();}
+	public void erase () {close (); Platform . runLater (new Runnable () {public void run () {viewport . close ();}}); super . erase ();}
 	public void close () {fxg . clean = false; atom . setMachine (null); fxg . remove_viewport (this);}
-	public void save (FileWriter tc) throws java . io . IOException {
-		if (next != null) next . save (tc);
-		tc . write ("[Viewport " + atom . name () + " \"" + viewport_name + "\" "
-			+ location . position . x + " " + location . position . y + " " + location . size . x + " " + location . size . y + "]\n");
-		if (! board_position . eq (new Point (0.0, 0.0))) tc . write ("[" + atom . name () + " Position " + board_position . x + " " + board_position . y + "]\n");
-		if (scaling != 1.0) tc . write ("[" + atom . name () + " Scaling " + scaling + "]\n");
-		if (edit_mode != edit_modes . move) tc . write ("[" + atom . name () + " Mode " + edit_mode . ordinal () + "]\n");
-		tc . write ("\n");
+	public void save (FileWriter tc) {
+		super . save (tc);
+		try {
+			tc . write ("[Viewport " + atom . name () + " \"" + viewport_name + "\" "
+				+ location . position . x + " " + location . position . y + " " + location . size . x + " " + location . size . y + "]\n");
+			if (! screen_position . eq (new Point (0.0, 0.0))) tc . write ("[" + atom . name () + " Position " + screen_position . x + " " + screen_position . y + "]\n");
+			if (scaling != 1.0) tc . write ("[" + atom . name () + " Scaling " + scaling + "]\n");
+			if (side != edit_modes . move . ordinal ()) tc . write ("[" + atom . name () + " Mode " + side + "]\n");
+			tc . write ("\n");
+		} catch (Exception ex) {}
 	}
+	public void sideChanged () {Platform . runLater (new Runnable () {public void run () {change_viewport_name ();}});}
+	public int numberOfSides () {return edit_modes . values () . length;}
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
 		if (parameters . isEarth ()) {close (); Platform . runLater (new Runnable () {public void run () {viewport . close ();}}); return true;}
 		if (! parameters . isPair ()) return false;
 		PrologElement atom = parameters . getLeft (); parameters = parameters . getRight ();
 		if (! atom . isAtom ()) return false;
-		if (atom . getAtom () == fxg . mode_atom) {
-			if (parameters . isVar ()) {parameters . setInteger (edit_mode . ordinal ()); return true;}
+		if (atom . getAtom () == fxg . side_atom) {
+			if (parameters . isVar ()) {parameters . setInteger (side); return true;}
 			if (! parameters . isPair ()) return false; parameters = parameters . getLeft ();
 			if (! parameters . isInteger ()) return false;
-			edit_mode = edit_modes . values () [parameters . getInteger ()];
-			Platform . runLater (new Runnable () {public void run () {change_viewport_name ();}});
-			return true;
+			int ind = parameters . getInteger ();
+			if (ind < 0 || ind >= numberOfSides ()) return false;
+			side = ind; sideChanged (); return true;
 		}
 		if (atom . getAtom () == fxg . location_atom) {
 			if (parameters . isVar ()) {
@@ -148,16 +155,16 @@ public class Viewport extends PrologNativeCode {
 		}
 		if (atom . getAtom () == fxg . position_atom) {
 			if (parameters . isVar ()) {
-				parameters . setPair (); parameters . getLeft () . setDouble (board_position . x);
+				parameters . setPair (); parameters . getLeft () . setDouble (screen_position . x);
 				parameters = parameters . getRight (); parameters . setPair ();
-				parameters . getLeft () . setDouble (board_position . y);
+				parameters . getLeft () . setDouble (screen_position . y);
 				return true;
 			}
 			if (! parameters . isPair ()) return false;
 			PrologElement x = parameters . getLeft (); if (! x . isNumber ()) return false; parameters = parameters . getRight ();
 			if (! parameters . isPair ()) return false;
 			PrologElement y = parameters . getLeft (); if (! y . isNumber ()) return false; parameters = parameters . getRight ();
-			Platform . runLater (new Runnable () {public void run () {setBoarderPosition (x . getNumber (), y . getNumber ());}});
+			Platform . runLater (new Runnable () {public void run () {setPosition (x . getNumber (), y . getNumber ());}});
 			fxg . clean = false;
 			return true;
 		}
@@ -185,8 +192,11 @@ public class Viewport extends PrologNativeCode {
 		//if (atom . getAtom () == fxg . repaint_atom) {....}
 		return false;
 	}
-	public Viewport (PrologFXGStudio fxg, PrologAtom atom, String viewport_name, Rect location, Viewport next) {
-		this . fxg = fxg; this . atom = atom; this . viewport_name = viewport_name; this . location = new Rect (location); this . next = next;
+	public Viewport (PrologFXGStudio fxg, PrologAtom atom, Colour foreground, Colour background, String viewport_name, Rect location, Token next) {
+		super (fxg, atom, foreground, background);
+		this . viewport_name = viewport_name;
+		this . location = new Rect (new Point (0.0, 0.0), location . size);
+		this . screen_position = new Point (location . position);
 		Platform . runLater (new Runnable () {public void run () {build ();}});
 	}
 }

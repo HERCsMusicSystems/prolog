@@ -25,6 +25,8 @@ package fxg;
 import Prolog . *;
 import Prolog . geometry . *;
 
+import java . io . FileWriter;
+
 import javafx . scene . paint . Color;
 import javafx . scene . canvas . GraphicsContext;
 
@@ -32,14 +34,17 @@ public class Token extends PrologNativeCode {
 	public PrologFXGStudio fxg;
 	public PrologAtom atom;
 	public Point rounding = new Point (0.0, 0.0);
-	public Rect location = new Rect (new Point (10.0, 10.0), new Point (60.0, 60.0));
+	public Rect location = new Rect (new Point (0.0, 0.0), new Point (60.0, 60.0));
 	public double rotation = 0.0;
+	public double scaling = 1.0;
+	public int side = 0;
 	public Colour foreground;
 	public Colour background;
 	public Token next;
 	public Color fgcc () {return Color . color (foreground . red, foreground . green, foreground . blue, foreground . alpha);}
 	public Color bgcc () {return Color . color (background . red, background . green, background . blue, background . alpha);}
 	public boolean can_insert () {return false;}
+	public void repaint () {}
 	public void token_draw (GraphicsContext gc, Viewport v) {gc . save (); draw (gc, v); gc . restore ();}
 	public void draw (GraphicsContext gc, Viewport v) {}
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
@@ -62,6 +67,13 @@ public class Token extends PrologNativeCode {
 			}
 			if (! parameters . isPair ()) return false; PrologElement h = parameters . getLeft (); if (! h . isNumber ()) return false;
 			location = new Rect (new Point (x . getNumber (), y . getNumber ()), new Point (w . getNumber (), h . getNumber ())); fxg . clean = false; return true;
+		}
+		if (atom . getAtom () == fxg . scaling_atom) {
+			if (parameters . isVar ()) {parameters . setPair (); parameters . getLeft () . setDouble (scaling); return true;}
+			if (! parameters . isPair ()) return false;
+			PrologElement sc = parameters . getLeft (); if (! sc . isNumber ()) return false;
+			scaling = sc . getNumber ();
+			fxg . clean = false; return true;
 		}
 		if (atom . getAtom () == fxg . rotation_atom) {
 			if (parameters . isVar ()) {parameters . setPair (); parameters . getLeft () . setDouble (rotation); return true;}
@@ -267,6 +279,11 @@ public class Token extends PrologNativeCode {
 	}
 	*/
 	public Token insert (Token token) {return null;}
+	public void erase () {if (next != null) next . erase ();}
+	public void save (FileWriter tc) {if (next != null) next . save (tc);}
+	public void setPosition (double x, double y) {location . position . x = x; location . position . y = y;}
+	public void sideChanged () {}
+	public int numberOfSides () {return 1;}
 	public Token (PrologFXGStudio fxg, PrologAtom atom, Colour foreground, Colour background) {
 		this . fxg = fxg;
 		this . atom = atom;

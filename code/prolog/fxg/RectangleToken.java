@@ -27,6 +27,7 @@ import Prolog . geometry . *;
 
 class RectangleToken extends Token {
 	public void draw (javafx . scene . canvas . GraphicsContext gc, Viewport v) {
+		gc . scale (v . scaling, v . scaling);
 		if (rotation != 0.0) {
 			Point half = location . size . half ();
 			Point shift = half . add (location . position);

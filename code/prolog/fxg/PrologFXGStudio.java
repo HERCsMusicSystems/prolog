@@ -47,7 +47,10 @@ class viewport_class extends PrologNativeCode {
 		if (! atom . isAtom ()) return false;
 		if (atom . getAtom () . getMachine () != null) return false;
 		Rect location = new Rect (locations [0], locations [1], locations [2], locations [3]);
-		fxg . viewports = new Viewport (fxg, atom . getAtom (), name != null ? name . getText () : atom . getAtom () . name (), location, fxg . viewports);
+		fxg . viewports = new Viewport (fxg, atom . getAtom (),
+				fxg . default_viewport_foreground, fxg . default_viewport_background,
+				name != null ? name . getText () : atom . getAtom () . name (),
+				location, fxg . viewports);
 		if (! atom . getAtom () . setMachine (fxg . viewports)) return false;
 		return true;
 	}
@@ -108,15 +111,17 @@ class create_rectangle_class extends PrologNativeCode {
 public class PrologFXGStudio extends PrologServiceClass {
 	public PrologRoot root;
 	public PrologDirectory directory;
-	public PrologAtom location_atom, size_atom, position_atom, scaling_atom, repaint_atom, mode_atom, rotation_atom, rounding_atom;
+	public PrologAtom location_atom, size_atom, position_atom, scaling_atom, repaint_atom, rotation_atom, rounding_atom;
+	public PrologAtom side_atom, sides_atom;
 	public boolean clean = true;
-	public Viewport viewports;
+	public Token viewports;
 	public Token tokens;
 	public Token deck;
+	public Colour default_viewport_foreground = new Colour (0.0, 0.0, 0.0), default_viewport_background = new Colour (0.0, 0.0, 1.0);
 	public Colour default_rectangle_foreground = new Colour (1.0, 1.0, 0.0), default_rectangle_background = new Colour (0.0, 0.0, 1.0);
 	public void repaint () {
-		Viewport v = viewports;
-		while (v != null) {v . draw (); v = v .next;}
+		Token v = viewports;
+		while (v != null) {v . repaint (); v = v . next;}
 	}
 	public void draw (javafx . scene . canvas . GraphicsContext gc, Viewport v) {
 		Token t = tokens;
@@ -138,10 +143,10 @@ public class PrologFXGStudio extends PrologServiceClass {
 			t = t . next;
 		}
 	}
-	public void remove_viewport (Viewport viewport) {
+	public void remove_viewport (Token viewport) {
 		if (viewports == null) return;
 		if (viewports == viewport) {viewports = viewports . next; return;}
-		Viewport v = viewports;
+		Token v = viewports;
 		while (v . next != null) {if (v . next == viewport) {v . next = v . next . next; return;} v = v . next;}
 	}
 	public void save (String file_name) {
@@ -169,9 +174,10 @@ public class PrologFXGStudio extends PrologServiceClass {
 			position_atom = directory . searchAtom ("Position");
 			scaling_atom = directory . searchAtom ("Scaling");
 			repaint_atom = directory . searchAtom ("Repaint");
-			mode_atom = directory . searchAtom ("Mode");
 			rotation_atom = directory . searchAtom ("Rotation");
 			rounding_atom = directory . searchAtom ("Rounding");
+			side_atom = directory . searchAtom ("Side");
+			sides_atom = directory . searchAtom ("Sides");
 		}
 	}
 	public PrologNativeCode getNativeCode (String name) {
