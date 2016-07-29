@@ -77,7 +77,7 @@ public class Viewport extends Token {
 		//Scene viewport_scene = new Scene (pane, location . size . x, location . size . y);
 		//viewport . setScene (viewport_scene);
 		//==============
-		viewport . setX (location . position . x); viewport . setY (location . position . y);
+		viewport . setX (screen_position . x); viewport . setY (screen_position . y);
 		viewport . widthProperty () . addListener (new ChangeListener <Number> () {
 			public void changed (ObservableValue <? extends Number> o, Number old, Number current) {
 				location . size . x = (double) current;
@@ -91,109 +91,41 @@ public class Viewport extends Token {
 			}
 		});
 		viewport . xProperty () . addListener (new ChangeListener <Number> () {
-			public void changed (ObservableValue <? extends Number> o, Number old, Number current) {location . position . x = (double) current;}
+			public void changed (ObservableValue <? extends Number> o, Number old, Number current) {screen_position . x = (double) current;}
 		});
 		viewport . yProperty () . addListener (new ChangeListener <Number> () {
-			public void changed (ObservableValue <? extends Number> o, Number old, Number current) {location . position . y = (double) current;}
+			public void changed (ObservableValue <? extends Number> o, Number old, Number current) {screen_position . y = (double) current;}
 		});
-		viewport . setOnCloseRequest (new EventHandler <WindowEvent> () {public void handle (WindowEvent e) {close ();}});
+		viewport . setOnCloseRequest (new EventHandler <WindowEvent> () {public void handle (WindowEvent e) {ui_close ();}});
 		viewport . show ();
 	}
 	public void change_viewport_name () {viewport . setTitle (viewport_name + " [" + edit_modes . values () [side] . name () + "]");}
-	public void setPosition (double x, double y) {screen_position . x = x; screen_position . y = y;}
-	public void setWindowSize (double w, double h) {viewport . setWidth (location . size . x = w); viewport . setHeight (location . size . y = h);}
-	public void setWindowLocation (double x, double y, double w, double h) {
-		viewport . setX (location . position . x = x);
-		viewport . setY (location . position . y = y);
-		viewport . setWidth (location . size . x = w);
-		viewport . setHeight (location . size . y = h);
+	public void setPosition (double x, double y) {
+		screen_position = new Point (x, y);
+		Platform . runLater (new Runnable () {public void run () {viewport . setX (screen_position . x); viewport . setY (screen_position . y);}});
 	}
-	public void erase () {close (); Platform . runLater (new Runnable () {public void run () {viewport . close ();}}); super . erase ();}
-	public void close () {fxg . clean = false; atom . setMachine (null); fxg . remove_viewport (this);}
+	public Point getPosition () {return new Point (screen_position . x, screen_position . y);}
+	public void sizeChanged () {
+		Platform . runLater (new Runnable () {public void run () {viewport . setWidth (location . size . x); viewport . setHeight (location . size . y);}});
+	}
+	public void erase () {programmatic_close (); atom . setMachine (null); super . erase ();}
+	public void programmatic_close () {fxg . remove_viewport (this); Platform . runLater (new Runnable () {public void run () {viewport . close ();}});}
+	public void ui_close () {fxg . remove_viewport (this); atom . setMachine (null); fxg . clean = false;}
 	public void save (FileWriter tc) {
 		super . save (tc);
 		try {
 			tc . write ("[Viewport " + atom . name () + " \"" + viewport_name + "\" "
 				+ location . position . x + " " + location . position . y + " " + location . size . x + " " + location . size . y + "]\n");
 			if (! screen_position . eq (new Point (0.0, 0.0))) tc . write ("[" + atom . name () + " Position " + screen_position . x + " " + screen_position . y + "]\n");
-			if (scaling != 1.0) tc . write ("[" + atom . name () + " Scaling " + scaling + "]\n");
+			if (! scaling . eq (new Point (1.0, 1.0))) tc . write ("[" + atom . name () + " Scaling " + scaling . x + " " + scaling . y + "]\n");
 			if (side != edit_modes . move . ordinal ()) tc . write ("[" + atom . name () + " Mode " + side + "]\n");
 			tc . write ("\n");
 		} catch (Exception ex) {}
 	}
 	public void sideChanged () {Platform . runLater (new Runnable () {public void run () {change_viewport_name ();}});}
 	public int numberOfSides () {return edit_modes . values () . length;}
-	public boolean code (PrologElement parameters, PrologResolution resolution) {
-		if (parameters . isEarth ()) {close (); Platform . runLater (new Runnable () {public void run () {viewport . close ();}}); return true;}
-		if (! parameters . isPair ()) return false;
-		PrologElement atom = parameters . getLeft (); parameters = parameters . getRight ();
-		if (! atom . isAtom ()) return false;
-		if (atom . getAtom () == fxg . side_atom) {
-			if (parameters . isVar ()) {parameters . setInteger (side); return true;}
-			if (! parameters . isPair ()) return false; parameters = parameters . getLeft ();
-			if (! parameters . isInteger ()) return false;
-			int ind = parameters . getInteger ();
-			if (ind < 0 || ind >= numberOfSides ()) return false;
-			side = ind; sideChanged (); return true;
-		}
-		if (atom . getAtom () == fxg . location_atom) {
-			if (parameters . isVar ()) {
-				parameters . setPair (); parameters . getLeft () . setDouble (location . position . x); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setDouble (location . position . y); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setDouble (location . size . x); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setDouble (location . size . y);
-				return true;
-			}
-			if (! parameters . isPair ()) return false;
-			PrologElement x = parameters . getLeft (); if (! x . isNumber ()) return false; parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
-			PrologElement y = parameters . getLeft (); if (! y . isNumber ()) return false; parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
-			PrologElement w = parameters . getLeft (); if (! w . isNumber ()) return false; parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
-			PrologElement h = parameters . getLeft (); if (! h . isNumber ()) return false;
-			Platform . runLater (new Runnable () {public void run () {setWindowLocation (x . getNumber (), y . getNumber (), w . getNumber (), h . getNumber ());}});
-			fxg . clean = false;
-			return true;
-		}
-		if (atom . getAtom () == fxg . position_atom) {
-			if (parameters . isVar ()) {
-				parameters . setPair (); parameters . getLeft () . setDouble (screen_position . x);
-				parameters = parameters . getRight (); parameters . setPair ();
-				parameters . getLeft () . setDouble (screen_position . y);
-				return true;
-			}
-			if (! parameters . isPair ()) return false;
-			PrologElement x = parameters . getLeft (); if (! x . isNumber ()) return false; parameters = parameters . getRight ();
-			if (! parameters . isPair ()) return false;
-			PrologElement y = parameters . getLeft (); if (! y . isNumber ()) return false; parameters = parameters . getRight ();
-			Platform . runLater (new Runnable () {public void run () {setPosition (x . getNumber (), y . getNumber ());}});
-			fxg . clean = false;
-			return true;
-		}
-		if (atom . getAtom () == fxg . size_atom) {
-			if (parameters . isVar ()) {
-				parameters . setPair (); parameters . getLeft () . setDouble (location . size . x); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setDouble (location . size . y);
-				return true;
-			}
-			if (! parameters . isPair ()) return false;
-			PrologElement w = parameters . getLeft (); if (! w . isNumber ()) return false; parameters = parameters . getRight (); if (! parameters . isPair ()) return false;
-			PrologElement h = parameters . getLeft (); if (! h . isNumber ()) return false;
-			Platform . runLater (new Runnable () {public void run () {setWindowSize (w . getNumber (), h . getNumber ());}});
-			fxg . clean = false;
-			return true;
-		}
-		if (atom . getAtom () == fxg . scaling_atom) {
-			if (parameters . isVar ()) {parameters . setPair (); parameters . getLeft () . setDouble (scaling); return true;}
-			if (! parameters . isPair ()) return false;
-			PrologElement el = parameters . getLeft (); if (! el . isNumber ()) return false;
-			scaling = el . getNumber ();
-			fxg . clean = false;
-			return true;
-		}
-		//if (atom . getAtom () == fxg . repaint_atom) {....}
-		return false;
-	}
 	public Viewport (PrologFXGStudio fxg, PrologAtom atom, Colour foreground, Colour background, String viewport_name, Rect location, Token next) {
-		super (fxg, atom, foreground, background);
+		super (fxg, atom, foreground, background, next);
 		this . viewport_name = viewport_name;
 		this . location = new Rect (new Point (0.0, 0.0), location . size);
 		this . screen_position = new Point (location . position);

@@ -7,6 +7,7 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 					SaveBoard Erase Clean Clean? Repaint
 					CreateRectangle Rectangle
 					Location Position Size Scaling Rotation Rounding Side Sides Text
+					ForegroundColour BackgroundColour
 					re
 					]
 

@@ -113,6 +113,7 @@ public class PrologFXGStudio extends PrologServiceClass {
 	public PrologDirectory directory;
 	public PrologAtom location_atom, size_atom, position_atom, scaling_atom, repaint_atom, rotation_atom, rounding_atom;
 	public PrologAtom side_atom, sides_atom;
+	public PrologAtom foreground_atom, background_atom;
 	public boolean clean = true;
 	public Token viewports;
 	public Token tokens;
@@ -178,6 +179,8 @@ public class PrologFXGStudio extends PrologServiceClass {
 			rounding_atom = directory . searchAtom ("Rounding");
 			side_atom = directory . searchAtom ("Side");
 			sides_atom = directory . searchAtom ("Sides");
+			foreground_atom = directory . searchAtom ("ForegroundColour");
+			background_atom = directory . searchAtom ("BackgroundColour");
 		}
 	}
 	public PrologNativeCode getNativeCode (String name) {
