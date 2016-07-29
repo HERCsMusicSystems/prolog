@@ -273,7 +273,7 @@ public class Token extends PrologNativeCode {
 	}
 	*/
 	public Token insert (Token token) {return null;}
-	public void erase () {if (next != null) next . erase ();}
+	public void erase () {programmatic_close (); atom . setMachine (null); if (next != null) next . erase ();}
 	public void programmatic_close () {fxg . remove_token (this);}
 	public void save (FileWriter tc) {if (next != null) next . save (tc);}
 	public void setPosition (double x, double y) {location . position . x = x; location . position . y = y;}

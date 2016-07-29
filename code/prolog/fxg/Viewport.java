@@ -108,7 +108,6 @@ public class Viewport extends Token {
 	public void sizeChanged () {
 		Platform . runLater (new Runnable () {public void run () {viewport . setWidth (location . size . x); viewport . setHeight (location . size . y);}});
 	}
-	public void erase () {programmatic_close (); atom . setMachine (null); super . erase ();}
 	public void programmatic_close () {fxg . remove_viewport (this); Platform . runLater (new Runnable () {public void run () {viewport . close ();}});}
 	public void ui_close () {fxg . remove_viewport (this); atom . setMachine (null); fxg . clean = false;}
 	public void save (FileWriter tc) {

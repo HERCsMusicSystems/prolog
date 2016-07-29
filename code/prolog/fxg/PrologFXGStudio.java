@@ -165,6 +165,7 @@ public class PrologFXGStudio extends PrologServiceClass {
 	}
 	public void erase () {
 		if (viewports != null) viewports . erase (); viewports = null;
+		if (tokens != null) tokens . erase (); tokens = null;
 		clean = true;
 	}
 	public void init (PrologRoot root, PrologDirectory directory) {
