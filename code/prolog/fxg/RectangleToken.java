@@ -27,7 +27,8 @@ import Prolog . geometry . *;
 
 class RectangleToken extends Token {
 	public void draw (javafx . scene . canvas . GraphicsContext gc, Viewport v) {
-		gc . scale (v . scaling, v . scaling);
+		gc . scale (v . scaling . x, v . scaling . y);
+		gc . translate (- v . location . position . x, - v . location . position . y);
 		if (rotation != 0.0) {
 			Point half = location . size . half ();
 			Point shift = half . add (location . position);
@@ -39,5 +40,5 @@ class RectangleToken extends Token {
 		gc . setStroke (fgcc ());
 		gc . fillRoundRect (location . position . x, location . position . y, location . size . x, location . size . y, rounding . x, rounding . y);
 	}
-	public RectangleToken (PrologFXGStudio fxg, PrologAtom atom, Colour foreground, Colour background) {super (fxg, atom, foreground, background);}
+	public RectangleToken (PrologFXGStudio fxg, PrologAtom atom, Colour foreground, Colour background, Token next) {super (fxg, atom, foreground, background, next);}
 }

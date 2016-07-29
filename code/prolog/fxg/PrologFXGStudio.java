@@ -99,7 +99,7 @@ class create_rectangle_class extends PrologNativeCode {
 		if (atom . isVar ()) atom . setAtom (new PrologAtom ());
 		if (! atom . isAtom ()) return false;
 		if (atom . getAtom () . getMachine () != null) return false;
-		Token machine = new RectangleToken (fxg, atom . getAtom (), fxg . default_rectangle_foreground, fxg . default_rectangle_background);
+		Token machine = new RectangleToken (fxg, atom . getAtom (), fxg . default_rectangle_foreground, fxg . default_rectangle_background, null);
 		if (! atom . getAtom () . setMachine (machine)) return false;
 		fxg . insert_token (machine);
 		fxg . clean = false;
