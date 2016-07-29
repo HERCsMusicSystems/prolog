@@ -36,6 +36,7 @@ class RectangleToken extends Token {
 			gc . rotate (rotation * 15.0);
 			gc . translate (- shift . x, - shift . y);
 		}
+		gc . scale (scaling . x, scaling . y);
 		gc . setFill (bgcc ());
 		gc . setStroke (fgcc ());
 		gc . fillRoundRect (location . position . x, location . position . y, location . size . x, location . size . y, rounding . x, rounding . y);
