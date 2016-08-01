@@ -35,6 +35,11 @@ public class PrologMainFX extends Application {
 	public static PrologRoot main_root = null;
 	public static java . io . PrintStream oout = null;
 	public void start (Stage stage) {
+		if (main_root == null) {
+			main_root = new PrologRoot ();
+			main_root . set_uap32_captions ();
+			main_root . resolution ("fx");
+		}
 		Button exit = new Button ();
 		exit . setText ("_Exit");
 		exit . setOnAction ((ActionEvent event) -> {Platform . exit ();});
@@ -67,9 +72,11 @@ public class PrologMainFX extends Application {
 		stage . show ();
 	}
 	public static void main (String [] args, PrologRoot root, java . io . PrintStream ps) {
-		main_root = root;
 		oout = ps;
-		launch (args);
+		if (main_root == null) {
+			main_root = root;
+			launch (args);
+		}
 	}
 	public static void stop_fx () {Platform . exit ();}
 }
