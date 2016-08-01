@@ -30,7 +30,7 @@
 	<target name="fxjar" depends="compile">
 		<jar destfile="fx.jar">
 			<fileset dir="." includes="PrologFX/*.class"/>
-			<fileset dir="../code/prolog" includes="fx.prc"/>
+			<fileset dir="../code/prolog/PrologFX" includes="fx.prc"/>
 		</jar>
 	</target>
 
