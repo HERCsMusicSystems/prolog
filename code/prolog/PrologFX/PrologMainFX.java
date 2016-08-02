@@ -7,6 +7,7 @@ import javafx . application . Application;
 import javafx . application . Platform;
 import javafx . stage . Stage;
 import javafx . stage . Modality;
+import javafx . stage . Screen;
 import javafx . scene . Scene;
 import javafx . scene . layout . StackPane;
 import javafx . scene . layout . HBox;
@@ -17,8 +18,12 @@ import javafx . scene . control . Label;
 import javafx . scene . control . TextField;
 import javafx . scene . control . ListView;
 import javafx . scene . control . TextArea;
+import javafx . scene . canvas . Canvas;
+import javafx . scene . canvas . GraphicsContext;
+import javafx . scene . paint . Color;
 import javafx . event . ActionEvent;
 import javafx . geometry . Insets;
+import javafx . geometry . Rectangle2D;
 
 class emitter extends java . io . OutputStream {
 	private TextArea area;
@@ -34,7 +39,11 @@ class emitter extends java . io . OutputStream {
 public class PrologMainFX extends Application {
 	public static PrologRoot main_root = null;
 	public static java . io . PrintStream oout = null;
+	public static Stage stage = null;
+	public static Canvas canvas = null;
+	public static GraphicsContext gc = null;
 	public void start (Stage stage) {
+		this . stage = stage;
 		if (main_root == null) {
 			main_root = new PrologRoot ();
 			main_root . set_uap32_captions ();
@@ -65,8 +74,12 @@ public class PrologMainFX extends Application {
 		root . add (command_label, 0, 1);
 		root . add (command, 1, 1);
 		root . add (exit, 2, 1);
+		Rectangle2D bounds = Screen . getPrimary () . getVisualBounds ();
+		canvas = new Canvas (bounds . getWidth (), bounds . getHeight ());
+		gc = canvas . getGraphicsContext2D ();
+		root . add (canvas, 0, 2, 3, 1);
 		//===============================
-		Scene scene = new Scene (root, 500, 200);
+		Scene scene = new Scene (root, bounds . getWidth (), bounds . getHeight ());
 		stage . setTitle ("sonda");
 		stage . setScene (scene);
 		stage . show ();

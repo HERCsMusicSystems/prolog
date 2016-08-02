@@ -3,7 +3,7 @@ import studio
 import fx
 
 program fxg #machine := "fxg.PrologFXGStudio" [
-					Viewport
+					Viewport MainViewport
 					SaveBoard Erase Clean Clean? Repaint
 					CreateRectangle Rectangle
 					Location Position Size Scaling Rotation Rounding Side Sides Text
@@ -13,6 +13,7 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 
 
 #machine Viewport := "Viewport"
+#machine MainViewport := "MainViewport"
 
 #machine Clean := "Clean"
 #machine Clean? := "Clean?"

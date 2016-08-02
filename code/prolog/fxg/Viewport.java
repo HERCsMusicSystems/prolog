@@ -123,11 +123,16 @@ public class Viewport extends Token {
 	}
 	public void sideChanged () {Platform . runLater (new Runnable () {public void run () {change_viewport_name ();}});}
 	public int numberOfSides () {return edit_modes . values () . length;}
-	public Viewport (PrologFXGStudio fxg, PrologAtom atom, Colour foreground, Colour background, String viewport_name, Rect location, Token next) {
+	public Viewport (PrologFXGStudio fxg, PrologAtom atom, Colour foreground, Colour background, String viewport_name, Rect location, boolean main, Token next) {
 		super (fxg, atom, foreground, background, next);
 		this . viewport_name = viewport_name;
 		this . location = new Rect (new Point (0.0, 0.0), location . size);
 		this . screen_position = new Point (location . position);
-		Platform . runLater (new Runnable () {public void run () {build ();}});
+		if (main) {
+			this . viewport = PrologFX . PrologMainFX . stage;
+			canvas = PrologFX . PrologMainFX . canvas;
+			gc = PrologFX . PrologMainFX . gc;
+			Platform . runLater (new Runnable () {public void run () {repaint ();}});
+		} else Platform . runLater (new Runnable () {public void run () {build ();}});
 	}
 }

@@ -29,6 +29,7 @@ import java . io . FileWriter;
 
 class viewport_class extends PrologNativeCode {
 	public PrologFXGStudio fxg;
+	public boolean main;
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
 		PrologElement name = null;
 		PrologElement atom = null;
@@ -50,11 +51,11 @@ class viewport_class extends PrologNativeCode {
 		fxg . viewports = new Viewport (fxg, atom . getAtom (),
 				fxg . default_viewport_foreground, fxg . default_viewport_background,
 				name != null ? name . getText () : atom . getAtom () . name (),
-				location, fxg . viewports);
+				location, main, fxg . viewports);
 		if (! atom . getAtom () . setMachine (fxg . viewports)) return false;
 		return true;
 	}
-	public viewport_class (PrologFXGStudio fxg) {this . fxg = fxg;}
+	public viewport_class (PrologFXGStudio fxg, boolean main) {this . fxg = fxg; this . main = main;}
 }
 
 class erase_class extends PrologNativeCode {
@@ -185,7 +186,8 @@ public class PrologFXGStudio extends PrologServiceClass {
 		}
 	}
 	public PrologNativeCode getNativeCode (String name) {
-		if (name . equals ("Viewport")) return new viewport_class (this);
+		if (name . equals ("Viewport")) return new viewport_class (this, false);
+		if (name . equals ("MainViewport")) return new viewport_class (this, true);
 		if (name . equals ("Erase")) return new erase_class (this);
 		if (name . equals ("Clean")) return new clean_class (this);
 		if (name . equals ("Clean?")) return new is_clean_class (this);
