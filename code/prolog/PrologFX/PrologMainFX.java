@@ -75,7 +75,7 @@ public class PrologMainFX extends Application {
 		root . add (command, 1, 1);
 		root . add (exit, 2, 1);
 		Rectangle2D bounds = Screen . getPrimary () . getVisualBounds ();
-		canvas = new Canvas (bounds . getWidth (), bounds . getHeight ());
+		canvas = new Canvas (bounds . getWidth (), bounds . getHeight () * 0.5);
 		gc = canvas . getGraphicsContext2D ();
 		root . add (canvas, 0, 2, 3, 1);
 		//===============================
