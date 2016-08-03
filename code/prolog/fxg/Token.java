@@ -167,8 +167,8 @@ public class Token extends PrologNativeCode {
 			fxg . clean = false; return true;
 		}
 		// REPAINT
-		if (at == fxg . repaint_atom) {repaint ();}
-		return true;
+		if (at == fxg . repaint_atom) {repaint (); return true;}
+		return false;
 	}
 	/*
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
