@@ -17,23 +17,25 @@ import javafx . scene . control . Tooltip;
 import javafx . scene . control . Label;
 import javafx . scene . control . TextField;
 import javafx . scene . control . ListView;
-import javafx . scene . control . TextArea;
 import javafx . scene . canvas . Canvas;
 import javafx . scene . canvas . GraphicsContext;
 import javafx . scene . paint . Color;
+import javafx . scene . text . TextAlignment;
 import javafx . event . ActionEvent;
 import javafx . geometry . Insets;
 import javafx . geometry . Rectangle2D;
+import javafx . geometry . VPos;
 
 class emitter extends java . io . OutputStream {
-	private TextArea area;
 	private String text = "";
 	public void write (int ind) {
 		text += (char) ind;
-		if (ind == 10) {area . appendText (text); text = "";}
-		//area . appendText ("" + (char) ind);
+		if (ind == 10) {
+			PrologMainFX . text += text;
+			text = "";
+			Platform . runLater (new Runnable () {public void run () {PrologMainFX . repaint ();}});
+		}
 	}
-	emitter (TextArea area) {this . area = area;}
 }
 
 public class PrologMainFX extends Application {
@@ -42,6 +44,13 @@ public class PrologMainFX extends Application {
 	public static Stage stage = null;
 	public static Canvas canvas = null;
 	public static GraphicsContext gc = null;
+	public static String text = "";
+	public static void repaint () {
+		gc . setTextBaseline(VPos . TOP);
+		gc . setFont (new javafx . scene . text . Font ("Monospaced", 20));
+		gc . setFill (new Color (0.0, 0.0, 1.0, 1.0));
+		gc . fillText(text, 0.0, 0.0);
+	}
 	public void start (Stage stage) {
 		this . stage = stage;
 		if (main_root == null) {
@@ -54,8 +63,7 @@ public class PrologMainFX extends Application {
 		exit . setOnAction ((ActionEvent event) -> {Platform . exit ();});
 		Tooltip . install (exit, new Tooltip ("exit control"));
 		Label command_label = new Label ("Command:");
-		TextArea area = new TextArea ();
-		main_root . insertCommander (new java . io . PrintStream (new emitter (area)));
+		main_root . insertCommander (new java . io . PrintStream (new emitter ()));
 		TextField command = new TextField ();
 		command . setPrefWidth (400);
 		command . setOnAction ((ActionEvent event) -> {
@@ -70,14 +78,17 @@ public class PrologMainFX extends Application {
 		root . setHgap (4);
 		root . setVgap (4);
 		root . setPadding (new Insets (4));
-		root . add (area, 0, 0, 3, 1);
-		root . add (command_label, 0, 1);
-		root . add (command, 1, 1);
-		root . add (exit, 2, 1);
+		root . add (command_label, 0, 0);
+		root . add (command, 1, 0);
+		root . add (exit, 2, 0);
 		Rectangle2D bounds = Screen . getPrimary () . getVisualBounds ();
 		canvas = new Canvas (bounds . getWidth (), bounds . getHeight () * 0.5);
 		gc = canvas . getGraphicsContext2D ();
-		root . add (canvas, 0, 2, 3, 1);
+		for (String name : javafx . scene . text . Font . getFamilies ()) {
+			System . out . println (name);
+		}
+		repaint ();
+		root . add (canvas, 0, 1, 3, 1);
 		//===============================
 		Scene scene = new Scene (root, bounds . getWidth (), bounds . getHeight ());
 		stage . setTitle ("sonda");

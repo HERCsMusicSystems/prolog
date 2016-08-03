@@ -56,9 +56,11 @@ public class Viewport extends Token {
 	public Stage viewport;
 	public GraphicsContext gc;
 	public Canvas canvas;
+	public boolean main;
 	public void repaint () {
 		canvas . setWidth (location . size . x); canvas . setHeight (location . size . y);
 		gc . clearRect (0, 0, canvas . getWidth (), canvas . getHeight ()); fxg . draw (gc, this);
+		if (main) PrologFX . PrologMainFX . repaint ();
 	}
 	public void build () {
 		viewport = new Stage ();
@@ -126,13 +128,17 @@ public class Viewport extends Token {
 	public Viewport (PrologFXGStudio fxg, PrologAtom atom, Colour foreground, Colour background, String viewport_name, Rect location, boolean main, Token next) {
 		super (fxg, atom, foreground, background, next);
 		this . viewport_name = viewport_name;
-		this . location = new Rect (new Point (0.0, 0.0), location . size);
 		this . screen_position = new Point (location . position);
+		this . main = main;
 		if (main) {
 			this . viewport = PrologFX . PrologMainFX . stage;
 			canvas = PrologFX . PrologMainFX . canvas;
 			gc = PrologFX . PrologMainFX . gc;
+			this . location = new Rect (new Point (0.0, 0.0), new Point (canvas . getWidth (), canvas . getHeight ()));
 			Platform . runLater (new Runnable () {public void run () {repaint ();}});
-		} else Platform . runLater (new Runnable () {public void run () {build ();}});
+		} else {
+			Platform . runLater (new Runnable () {public void run () {build ();}});
+			this . location = new Rect (new Point (0.0, 0.0), location . size);
+		}
 	}
 }
