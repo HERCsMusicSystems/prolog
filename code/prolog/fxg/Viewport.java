@@ -60,7 +60,7 @@ public class Viewport extends Token {
 	public void repaint () {
 		canvas . setWidth (location . size . x); canvas . setHeight (location . size . y);
 		gc . clearRect (0, 0, canvas . getWidth (), canvas . getHeight ()); fxg . draw (gc, this);
-		if (main) PrologFX . PrologMainFX . repaint ();
+		//if (main) PrologFX . PrologMainFX . repaint ();
 	}
 	public void build () {
 		viewport = new Stage ();

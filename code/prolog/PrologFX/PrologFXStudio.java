@@ -36,7 +36,7 @@ import javafx . stage . FileChooser;
 class fx_start extends PrologNativeCode {
 	public PrologRoot root = null;
 	public java . io . PrintStream oout = null;
-	public boolean code (PrologElement parameters, PrologResolution resolution) {PrologMainFX . main (new String [0], root, oout); return true;}
+	public boolean code (PrologElement parameters, PrologResolution resolution) {PrologMainFX . activate (root, oout); return true;}
 	public fx_start (PrologRoot root, java . io . PrintStream oout) {this . root = root; this . oout = oout;}
 }
 

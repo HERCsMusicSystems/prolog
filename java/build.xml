@@ -61,6 +61,14 @@
 		<java classname="studio" classpath="fxg.jar;fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"><arg value="fxg"/></java>
 	</target>
 
+	<target name="fxc" depends="jar,fxjar">
+		<java classname="PrologFX.PrologMainFX" classpath="fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"></java>
+	</target>
+
+	<target name="fxgc" depends="jar,fxjar,fxgjar">
+		<java classname="fxg.PrologFXGStudio" classpath="fxg.jar;fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"></java>
+	</target>
+
 	<target name="test" depends="jar">
 		<java classname="studio" classpath="studio.jar">
 			<arg value="test.prb"/>
