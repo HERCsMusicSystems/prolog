@@ -50,11 +50,11 @@
 			<arg value="b"/>
 			<arg value="c"/>
 		</java> -->
-		<java classname="studio" classpath="fx.jar;studio.jar;jfxrt.jar"/>
+		<java classname="studio" classpath="fxg.jar;fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"/>
 	</target>
 
 	<target name="fx" depends="jar,fxjar">
-		<java classname="studio" classpath="fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"><arg value="fx"/></java>
+		<java classname="studio" classpath="fxg.jar;fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"><arg value="fx"/></java>
 	</target>
 
 	<target name="fxg" depends="jar,fxjar,fxgjar">
@@ -62,7 +62,7 @@
 	</target>
 
 	<target name="fxc" depends="jar,fxjar">
-		<java classname="PrologFX.PrologMainFX" classpath="fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"></java>
+		<java classname="PrologFX.PrologMainFX" classpath="fxg.jar;fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"></java>
 	</target>
 
 	<target name="fxgc" depends="jar,fxjar,fxgjar">

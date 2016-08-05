@@ -26,4 +26,4 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 
 [[re : *command] *command [Repaint]]
 
-end := [[crack [command] [fx_stop]] [fx_start]] .
+end := [[fx_command]] .
