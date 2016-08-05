@@ -42,7 +42,6 @@ public class PrologMainFX extends Application {
 		query = root . pair (query, root . earth ());
 		query = root . pair (root . head (null), query);
 		root . resolution (query);
-		System . out . println ("I am here!: " + stage . getWidth () + " " + stage . getHeight ());
 	}
 	public void start (Stage stage) {
 		System . out . println ("START");

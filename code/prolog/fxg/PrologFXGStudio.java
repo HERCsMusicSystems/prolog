@@ -196,5 +196,10 @@ public class PrologFXGStudio extends PrologServiceClass {
 		if (name . equals ("CreateRectangle")) return new create_rectangle_class (this);
 		return null;
 	}
+	public static void main (String [] args) {
+		PrologRoot root = new PrologRoot ();
+		root . set_uap32_captions ();
+		root . resolution ("fxg");
+	}
 }
 

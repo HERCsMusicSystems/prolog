@@ -8,7 +8,7 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 					CreateRectangle Rectangle
 					Location Position Size Scaling Rotation Rounding Side Sides Text
 					ForegroundColour BackgroundColour
-					re
+					re mv
 					]
 
 
@@ -26,4 +26,6 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 
 [[re : *command] *command [Repaint]]
 
-end := [[fx_command]] .
+[[fx_resize_callback *x *y] [show "resized: " [*x *y]] [Repaint]]
+
+end := [[crack [wait 1000] [MainViewport mv]] [fx_command]] .

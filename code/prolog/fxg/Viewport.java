@@ -58,15 +58,15 @@ public class Viewport extends Token {
 	public Canvas canvas;
 	public boolean main;
 	public void repaint () {
-		canvas . setWidth (location . size . x); canvas . setHeight (location . size . y);
+		canvas . setWidth (location . size . x = viewport . getWidth ()); canvas . setHeight (location . size . y = viewport . getHeight ());
 		gc . clearRect (0, 0, canvas . getWidth (), canvas . getHeight ()); fxg . draw (gc, this);
-		//if (main) PrologFX . PrologMainFX . repaint ();
 	}
 	public void build () {
 		viewport = new Stage ();
 		viewport . setTitle (viewport_name);
 		viewport . initModality (Modality . NONE);
 		viewport . initOwner (null);
+		viewport . setWidth (location . size . x); viewport . setHeight (location . size . y);
 		//=========
 		Group g = new Group ();
 		canvas = new Canvas (location . size . x, location . size . y);
@@ -137,8 +137,8 @@ public class Viewport extends Token {
 			this . location = new Rect (new Point (0.0, 0.0), new Point (canvas . getWidth (), canvas . getHeight ()));
 			Platform . runLater (new Runnable () {public void run () {repaint ();}});
 		} else {
-			Platform . runLater (new Runnable () {public void run () {build ();}});
 			this . location = new Rect (new Point (0.0, 0.0), location . size);
+			Platform . runLater (new Runnable () {public void run () {build ();}});
 		}
 	}
 }

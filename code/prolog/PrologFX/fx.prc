@@ -10,6 +10,4 @@ program fx #machine := "PrologFX.PrologFXStudio" [fx_command fx_start fx_stop fi
 
 [[fx_command] [crack [command] [fx_stop]] [fx_start]]
 
-[[fx_resize_callback *x *y] [show "resized: " [*x *y]]]
-
 end := [[fx_command]] .
