@@ -52,7 +52,7 @@ public class PrologMainFX extends Application {
 		root . insertCommander (new java . io . PrintStream (new emitter ()));
 		TextField kn = new TextField ();
 		TextField command = new TextField ();
-		command . setOnAction ((ActionEvent event) -> {oout . print (command . getText () + "\n"); command . setText ("");});
+		command . setOnAction ((ActionEvent event) -> {oout . print ("[" + command . getText () + "]\n"); command . setText ("");});
 		Platform . runLater (new Runnable () {public void run () {command . requestFocus ();}});
 		Button keyboard = new Button ("KB");
 		keyboard . setOnAction ((ActionEvent event) -> {Platform . runLater (new Runnable () {public void run () {command . requestFocus ();}});});
