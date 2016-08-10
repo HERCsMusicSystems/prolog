@@ -45,10 +45,12 @@ public class Token extends PrologNativeCode {
 	public boolean indexed = true;
 	public Colour foreground;
 	public Colour background;
+	public boolean selected = false;
 	public Token next;
 	public Color fgcc () {return Color . color (foreground . red, foreground . green, foreground . blue, foreground . alpha);}
 	public Color bgcc () {return Color . color (background . red, background . green, background . blue, background . alpha);}
 	public boolean can_insert () {return false;}
+	public boolean hitTest (Point position) {return selected = location . contains (position . add (location . size . half ()));}
 	public void repaint () {}
 	public void token_draw (GraphicsContext gc, Viewport v) {gc . save (); draw (gc, v); gc . restore ();}
 	public void draw (GraphicsContext gc, Viewport v) {}
@@ -120,25 +122,7 @@ public class Token extends PrologNativeCode {
 			setPosition (position);
 			fxg . clean = false;
 			return true;
-		}/*
-		if (atom -> getAtom () == position_atom) {
-			if (! parameters -> isPair ()) return false; PrologElement * x = parameters -> getLeft ();
-			if (x -> isAtom ()) {
-				PrologNativeCode * machine = x -> getAtom () -> getMachine ();
-				if (machine == 0) return false;
-				if (! machine -> isTypeOf (token_actions :: name ())) return false;
-				parameters = parameters -> getRight ();
-				if (! parameters -> isPair ()) return false; x = parameters -> getLeft (); if (! x -> isInteger ()) return false; parameters = parameters -> getRight ();
-				if (! parameters -> isPair ()) return false; PrologElement * y = parameters -> getLeft (); if (! y -> isInteger ()) return false;
-				if (token -> moveOnGrid (((token_actions *) machine) -> token, point (x -> getInteger (), y -> getInteger ()))) return true;
-				return ((token_actions *) machine) -> token -> moveOnGrid (token, point (x -> getInteger (), y -> getInteger ()));
-			}
-			if (! x -> isInteger ()) return false; parameters = parameters -> getRight ();
-			if (! parameters -> isPair ()) return false; PrologElement * y = parameters -> getLeft (); if (! y -> isInteger ()) return false; parameters = parameters -> getRight ();
-			token -> set_position (point (x -> getInteger (), y -> getInteger ()));
-			boarder_clean = false;
-			return true;
-		}*/
+		}
 		// SCALING
 		if (at == fxg . scaling_atom) {
 			if (parameters . isVar ()) {
@@ -223,6 +207,10 @@ public class Token extends PrologNativeCode {
 			else background = new Colour (red . getNumber (), green . getNumber (), blue . getNumber (), alpha == null ? 1.0 : alpha . getNumber ());
 			fxg . clean = false; return true;
 		}
+		// SELECTING
+		if (at == fxg . select_atom) {selected = true; fxg . clean = false; return true;}
+		if (at == fxg . deselect_atom) {selected = false; fxg . clean = false; return true;}
+		if (at == fxg . selected_atom) return selected;
 		// REPAINT
 		if (at == fxg . repaint_atom) {repaint (); return true;}
 		return false;
@@ -240,9 +228,6 @@ public class Token extends PrologNativeCode {
 		if (atom -> getAtom () == lock_atom) {token -> locked = true; boarder_clean = false; return true;}
 		if (atom -> getAtom () == unlock_atom) {token -> locked = false; boarder_clean = false; return true;}
 		if (atom -> getAtom () == is_locked_atom) {return token -> locked;}
-		if (atom -> getAtom () == select_atom) {token -> selected = true; return true;}
-		if (atom -> getAtom () == deselect_atom) {token -> selected = false; return true;}
-		if (atom -> getAtom () == is_selected_atom) {return token -> selected;}
 		if (atom -> getAtom () == select_deck_atom) {if (! token -> can_insert ()) return false; board -> deck = token; return true;}
 		if (atom -> getAtom () == shuffle_atom) {return token -> shuffle ();}
 		if (atom -> getAtom () == insert_atom) {

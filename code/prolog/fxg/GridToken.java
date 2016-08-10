@@ -76,7 +76,7 @@ public class GridToken extends Token {
 		Point half = location . size . half ();
 		Point quarter = location . size . times (0.25);
 		Point three = location . size . times (0.75);
-		Point p = location . position . sub (half);
+		Point p = half . times (-1.0);
 		Color fgcc = fgcc ();
 		gc . setStroke (fgcc);
 		gc . setLineWidth (1.5);
@@ -120,7 +120,7 @@ public class GridToken extends Token {
 		Point half = location . size . half ();
 		Point quarter = location . size . times (0.25);
 		Point three = location . size . times (0.75);
-		Point p = location . position . sub (half);
+		Point p = half . times (-1.0);
 		Color fgcc = fgcc ();
 		gc . setStroke (fgcc);
 		gc . setLineWidth (1.5);

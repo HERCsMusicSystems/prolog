@@ -175,7 +175,7 @@ public class PrologFXGStudio extends PrologServiceClass {
 	public PrologAtom location_atom, size_atom, position_atom, scaling_atom, repaint_atom, rotation_atom, rounding_atom;
 	public PrologAtom side_atom, sides_atom;
 	public PrologAtom foreground_atom, background_atom;
-	public PrologAtom indexing_atom, indexed_atom;
+	public PrologAtom indexing_atom, indexed_atom, select_atom, deselect_atom, selected_atom;
 	public boolean clean = true;
 	public Token viewports;
 	public Token tokens;
@@ -234,6 +234,17 @@ public class PrologFXGStudio extends PrologServiceClass {
 		if (tokens != null) tokens . erase (); tokens = null;
 		clean = true;
 	}
+	public void moveSelectedTokens (Point delta) {
+		Token t = tokens;
+		while (t != null) {
+			if (t . selected) t . location . position = t . location . position . add (delta);
+			t = t . next;
+		}
+	}
+	public void hardSelectTokens (Point position) {
+		Token t = tokens;
+		while (t != null) {t . hitTest (position); t = t . next;}
+	}
 	public void init (PrologRoot root, PrologDirectory directory) {
 		this . root = root; this . directory = directory;
 		if (location_atom == null && directory != null) {
@@ -250,6 +261,9 @@ public class PrologFXGStudio extends PrologServiceClass {
 			background_atom = directory . searchAtom ("BackgroundColour");
 			indexing_atom = directory . searchAtom ("Indexing");
 			indexed_atom = directory . searchAtom ("Indexed?");
+			select_atom = directory . searchAtom ("Select");
+			deselect_atom = directory . searchAtom ("Deselect");
+			selected_atom = directory . searchAtom ("Selected?");
 		}
 	}
 	public PrologNativeCode getNativeCode (String name) {

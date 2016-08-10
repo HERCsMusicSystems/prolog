@@ -35,10 +35,9 @@ import javafx . event . EventHandler;
 import javafx . scene . Scene;
 import javafx . scene . Group;
 import javafx . scene . paint . Color;
-import javafx . scene . canvas . Canvas;
-import javafx . scene . canvas . GraphicsContext;
-import javafx . beans . value . ChangeListener;
-import javafx . beans . value . ObservableValue;
+import javafx . scene . canvas . *;
+import javafx . scene . input . *;
+import javafx . beans . value . *;
 
 public class Viewport extends Token {
 	public String viewport_name;
@@ -57,9 +56,27 @@ public class Viewport extends Token {
 	public GraphicsContext gc;
 	public Canvas canvas;
 	public boolean main;
+	public Point drag = new Point (0.0, 0.0);
 	public void repaint () {
 		canvas . setWidth (location . size . x = viewport . getWidth ()); canvas . setHeight (location . size . y = viewport . getHeight ());
 		gc . setFill (bgcc ()); gc . fillRect (0, 0, canvas . getWidth (), canvas . getHeight ()); fxg . draw (gc, this);
+	}
+	public void addEvents (Canvas c) {
+		c . setOnMousePressed (new EventHandler <MouseEvent> () {
+			public void handle (MouseEvent e) {
+				drag . x = e . getX (); drag . y = e . getY ();
+				fxg . hardSelectTokens (drag . sub (screen_position));
+			}
+		});
+		c . setOnMouseDragged (new EventHandler <MouseEvent> () {
+			public void handle (MouseEvent e) {
+				Point p = new Point (e . getX (), e . getY ());
+				Point delta = p . sub (drag);
+				drag = p;
+				fxg . moveSelectedTokens (delta);
+				repaint ();
+			}
+		});
 	}
 	public void build () {
 		viewport = new Stage ();
@@ -70,6 +87,7 @@ public class Viewport extends Token {
 		//=========
 		Group g = new Group ();
 		canvas = new Canvas (location . size . x, location . size . y);
+		addEvents (canvas);
 		gc = canvas . getGraphicsContext2D ();
 		repaint ();
 		g . getChildren () . add (canvas);
@@ -135,7 +153,7 @@ public class Viewport extends Token {
 			canvas = PrologFX . PrologMainFX . canvas;
 			gc = PrologFX . PrologMainFX . gc;
 			this . location = new Rect (new Point (0.0, 0.0), new Point (canvas . getWidth (), canvas . getHeight ()));
-			Platform . runLater (new Runnable () {public void run () {repaint ();}});
+			Platform . runLater (new Runnable () {public void run () {repaint (); addEvents (canvas);}});
 		} else {
 			this . location = new Rect (new Point (0.0, 0.0), location . size);
 			Platform . runLater (new Runnable () {public void run () {build ();}});

@@ -6,7 +6,7 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 					Viewport MainViewport
 					SaveBoard Erase Clean Clean? Repaint
 					Rectangle Grid Circle Text
-					Location Position Size Scaling Rotation Rounding Side Sides Text Indexing Indexed?
+					Location Position Size Scaling Rotation Rounding Side Sides Text Indexing Indexed? Select Deselect Selected?
 					ForegroundColour BackgroundColour
 					re mv
 					r c g sonda

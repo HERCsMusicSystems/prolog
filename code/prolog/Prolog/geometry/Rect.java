@@ -25,6 +25,14 @@ package Prolog . geometry;
 public class Rect {
 	public Point position, size;
 	public boolean eq (Rect r) {return r . position . eq (position) && r . size . eq (size);}
+	public boolean contains (Point p) {return p . x >= position . x && p . y >= position . y && p . x <= position . x + size . x && p . y <= position . y + size . y;}
+	public boolean overlaps (Rect area) {
+		return
+			position . x <= area . position . x + area . size . x &&
+			position . x + size . x >= area . position . x &&
+			position . y <= area . position . y + area . size . y &&
+			position . y + size . y >= area . position . y;
+	}
 	public Rect (Point position, Point size) {this . position = new Point (position); this . size = new Point (size);}
 	public Rect (double x, double y, double width, double height) {position = new Point (x, y); size = new Point (width, height);}
 	public Rect (Rect location) {position = new Point (location . position); size = new Point (location . size);}
