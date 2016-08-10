@@ -59,7 +59,7 @@ public class Viewport extends Token {
 	public boolean main;
 	public void repaint () {
 		canvas . setWidth (location . size . x = viewport . getWidth ()); canvas . setHeight (location . size . y = viewport . getHeight ());
-		gc . clearRect (0, 0, canvas . getWidth (), canvas . getHeight ()); fxg . draw (gc, this);
+		gc . setFill (bgcc ()); gc . fillRect (0, 0, canvas . getWidth (), canvas . getHeight ()); fxg . draw (gc, this);
 	}
 	public void build () {
 		viewport = new Stage ();
@@ -102,8 +102,8 @@ public class Viewport extends Token {
 		viewport . show ();
 	}
 	public void change_viewport_name () {viewport . setTitle (viewport_name + " [" + edit_modes . values () [side] . name () + "]");}
-	public void setPosition (double x, double y) {
-		screen_position = new Point (x, y);
+	public void setPosition (Point position) {
+		screen_position = new Point (position);
 		Platform . runLater (new Runnable () {public void run () {viewport . setX (screen_position . x); viewport . setY (screen_position . y);}});
 	}
 	public Point getPosition () {return new Point (screen_position . x, screen_position . y);}

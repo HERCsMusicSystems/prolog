@@ -26,24 +26,35 @@ import Prolog . *;
 import Prolog . geometry . *;
 
 import javafx . scene . canvas . *;
-import javafx . scene . paint . *;
+import javafx . scene . text . *;
+import javafx . geometry . *;
 
-class RectangleToken extends Token {
+public class TextToken extends Token {
 	public void draw (GraphicsContext gc, Viewport v) {
 		gc . scale (v . scaling . x, v . scaling . y);
 		gc . translate (- v . location . position . x, - v . location . position . y);
 		gc . translate (location . position . x, location . position . y);
 		gc . scale (scaling . x, scaling . y);
 		if (rotation != 0.0) gc . rotate (rotation * 15.0);
-		Point half = location . size . half ();
+		Point half = location . size . half () . times (-1.0);
+		gc . setStroke (fgcc ());
+		gc . setTextAlign (TextAlignment . CENTER);
+		gc . setTextBaseline (VPos . CENTER);
+		gc . setFont (new Font (location . size . y));
 		if (background . alpha > 0.0) {
 			gc . setFill (bgcc ());
-			gc . fillRoundRect (- half . x, - half . y, location . size . x, location . size . y, rounding . x, rounding . y);
+			gc . fillText (text, 0.0, 0.0);
+			System . out . println ("text filled....");
 		}
 		if (! foreground . eq (background)) {
 			gc . setStroke (fgcc ());
-			gc . strokeRoundRect (- half . x, - half . y, location . size . x, location . size . y, rounding . x, rounding . y);
+			gc . strokeText (text, 0.0, 0.0);
+			System . out . println ("text stroked....");
 		}
 	}
-	public RectangleToken (PrologFXGStudio fxg, PrologAtom atom, Colour foreground, Colour background, Token next) {super (fxg, atom, foreground, background, next);}
+	public TextToken (PrologFXGStudio fxg, PrologAtom atom, String text, double font_height, Colour foreground, Colour background, Token next) {
+		super (fxg, atom, foreground, background, next);
+		this . text = text;
+		this . location . size . y = font_height;
+	}
 }

@@ -5,10 +5,11 @@ import fx
 program fxg #machine := "fxg.PrologFXGStudio" [
 					Viewport MainViewport
 					SaveBoard Erase Clean Clean? Repaint
-					CreateRectangle Rectangle
-					Location Position Size Scaling Rotation Rounding Side Sides Text
+					Rectangle Grid Circle Text
+					Location Position Size Scaling Rotation Rounding Side Sides Text Indexing Indexed?
 					ForegroundColour BackgroundColour
 					re mv
+					r c g sonda
 					]
 
 
@@ -21,11 +22,13 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 #machine SaveBoard := "SaveBoard"
 #machine Repaint := "Repaint"
 
-#machine CreateRectangle := "CreateRectangle"
-#machine Rectangle := "CreateRectangle"
+#machine Rectangle := "Rectangle"
+#machine Grid := "Grid"
+#machine Circle := "Circle"
+#machine Text := "Text"
 
 [[re : *command] *command [Repaint]]
 
 [[fx_resize_callback *x *y] [show "resized: " [*x *y]] [Repaint]]
 
-end := [[crack [wait 1000] [MainViewport mv]] [fx_command]] .
+end := [[crack [wait 1000] [MainViewport mv] [mv Location -100 -100] [Rectangle r] [Circle c] [Grid g] [g Side 1] [g Indexing 1 1 7 7]] [fx_command]] .

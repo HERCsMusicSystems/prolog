@@ -26,24 +26,14 @@ import Prolog . *;
 import Prolog . geometry . *;
 
 import javafx . scene . canvas . *;
-import javafx . scene . paint . *;
 
-class RectangleToken extends Token {
+public class CircleToken extends Token {
 	public void draw (GraphicsContext gc, Viewport v) {
 		gc . scale (v . scaling . x, v . scaling . y);
 		gc . translate (- v . location . position . x, - v . location . position . y);
-		gc . translate (location . position . x, location . position . y);
-		gc . scale (scaling . x, scaling . y);
-		if (rotation != 0.0) gc . rotate (rotation * 15.0);
-		Point half = location . size . half ();
-		if (background . alpha > 0.0) {
-			gc . setFill (bgcc ());
-			gc . fillRoundRect (- half . x, - half . y, location . size . x, location . size . y, rounding . x, rounding . y);
-		}
-		if (! foreground . eq (background)) {
-			gc . setStroke (fgcc ());
-			gc . strokeRoundRect (- half . x, - half . y, location . size . x, location . size . y, rounding . x, rounding . y);
-		}
+		gc . setFill (bgcc ());
+		gc . setStroke (fgcc ());
+		gc . strokeRect (-1.0, -1.0, 1.0, 1.0);
 	}
-	public RectangleToken (PrologFXGStudio fxg, PrologAtom atom, Colour foreground, Colour background, Token next) {super (fxg, atom, foreground, background, next);}
+	public CircleToken (PrologFXGStudio fxg, PrologAtom atom, Colour foreground, Colour background, Token next) {super (fxg, atom, foreground, background, next);}
 }

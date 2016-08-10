@@ -31,13 +31,18 @@ import javafx . scene . paint . Color;
 import javafx . scene . canvas . GraphicsContext;
 
 public class Token extends PrologNativeCode {
+	//public String codeName () {return "FXToken";}
+	//public boolean isTypeOf (String code_name) {if (codeName () == code_name) return true; return super . isTypeOf (code_name);}
 	public PrologFXGStudio fxg;
 	public PrologAtom atom;
+	public String text = "";
 	public Point rounding = new Point (0.0, 0.0);
-	public Rect location = new Rect (new Point (0.0, 0.0), new Point (60.0, 60.0));
+	public Rect location = new Rect (new Point (0.0, 0.0), new Point (61.0, 61.0));
 	public double rotation = 0.0;
 	public Point scaling = new Point (1.0, 1.0);
 	public int side = 0;
+	public Rect indexing = new Rect (new Point (0.0, 0.0), new Point (4.0, 4.0));
+	public boolean indexed = true;
 	public Colour foreground;
 	public Colour background;
 	public Token next;
@@ -47,6 +52,7 @@ public class Token extends PrologNativeCode {
 	public void repaint () {}
 	public void token_draw (GraphicsContext gc, Viewport v) {gc . save (); draw (gc, v); gc . restore ();}
 	public void draw (GraphicsContext gc, Viewport v) {}
+	public boolean moveOnGrid (Token token, Point position) {return false;}
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
 		// CLOSE
 		if (parameters . isEarth ()) {atom . setMachine (null); fxg . clean = false; programmatic_close (); return true;}
@@ -94,12 +100,45 @@ public class Token extends PrologNativeCode {
 				parameters . setPair (); parameters . getLeft () . setDouble (position . x); parameters = parameters . getRight ();
 				parameters . setPair (); parameters . getLeft () . setDouble (position . y); return true;
 			}
-			if (! parameters . isPair ()) return false;
-			PrologElement x = parameters . getLeft (); if (! x . isNumber ()) return false; parameters = parameters . getRight ();
-			if (! parameters . isPair ()) return false;
-			PrologElement y = parameters . getLeft (); if (! y . isNumber ()) return false; parameters = parameters . getRight ();
-			setPosition (x . getNumber (), y . getNumber ()); fxg . clean = false; return true;
-		}
+			PrologElement x = null, y = null, att = null;
+			while (parameters . isPair ()) {
+				PrologElement el = parameters . getLeft ();
+				if (el . isAtom ()) att = el;
+				if (el . isNumber ()) {if (x == null) x = el; else y = el;}
+				parameters = parameters . getRight ();
+			}
+			if (x == null || y == null) return false;
+			Point position = new Point (x . getNumber (), y . getNumber ());
+			if (att != null) {
+				PrologNativeCode machine = att . getAtom () . getMachine ();
+				if (machine == null) return false;
+				if (! (machine instanceof Token)) return false;
+				Token token = (Token) machine;
+				if (moveOnGrid (token, position)) return true;
+				return token . moveOnGrid (this, position);
+			}
+			setPosition (position);
+			fxg . clean = false;
+			return true;
+		}/*
+		if (atom -> getAtom () == position_atom) {
+			if (! parameters -> isPair ()) return false; PrologElement * x = parameters -> getLeft ();
+			if (x -> isAtom ()) {
+				PrologNativeCode * machine = x -> getAtom () -> getMachine ();
+				if (machine == 0) return false;
+				if (! machine -> isTypeOf (token_actions :: name ())) return false;
+				parameters = parameters -> getRight ();
+				if (! parameters -> isPair ()) return false; x = parameters -> getLeft (); if (! x -> isInteger ()) return false; parameters = parameters -> getRight ();
+				if (! parameters -> isPair ()) return false; PrologElement * y = parameters -> getLeft (); if (! y -> isInteger ()) return false;
+				if (token -> moveOnGrid (((token_actions *) machine) -> token, point (x -> getInteger (), y -> getInteger ()))) return true;
+				return ((token_actions *) machine) -> token -> moveOnGrid (token, point (x -> getInteger (), y -> getInteger ()));
+			}
+			if (! x -> isInteger ()) return false; parameters = parameters -> getRight ();
+			if (! parameters -> isPair ()) return false; PrologElement * y = parameters -> getLeft (); if (! y -> isInteger ()) return false; parameters = parameters -> getRight ();
+			token -> set_position (point (x -> getInteger (), y -> getInteger ()));
+			boarder_clean = false;
+			return true;
+		}*/
 		// SCALING
 		if (at == fxg . scaling_atom) {
 			if (parameters . isVar ()) {
@@ -135,6 +174,24 @@ public class Token extends PrologNativeCode {
 			if (! parameters . isInteger ()) return false;
 			return setSides (parameters . getInteger ());
 		}
+		// INDEXING
+		if (at == fxg . indexing_atom) {
+			if (parameters . isEarth ()) {indexed = ! indexed; fxg . clean = false; return true;}
+			if (parameters . isVar ()) {
+				parameters . setPair (); parameters . getLeft () . setInteger ((int) indexing . position . x); parameters = parameters . getRight ();
+				parameters . setPair (); parameters . getLeft () . setInteger ((int) indexing . position . y); parameters = parameters . getRight ();
+				parameters . setPair (); parameters . getLeft () . setInteger ((int) indexing . size . x); parameters = parameters . getRight ();
+				parameters . setPair (); parameters . getLeft () . setInteger ((int) indexing . size . y); return true;
+			}
+			PrologElement el = null;
+			if (parameters . isPair ()) {el = parameters . getLeft (); if (el . isNumber ()) indexing . position . x = el . getNumber (); parameters = parameters . getRight ();}
+			if (parameters . isPair ()) {el = parameters . getLeft (); if (el . isNumber ()) indexing . position . y = el . getNumber (); parameters = parameters . getRight ();}
+			if (parameters . isPair ()) {el = parameters . getLeft (); if (el . isNumber ()) indexing . size . x = el . getNumber (); parameters = parameters . getRight ();}
+			if (parameters . isPair ()) {el = parameters . getLeft (); if (el . isNumber ()) indexing . size . y = el . getNumber ();}
+			fxg . clean = false;
+			return true;
+		}
+		if (at == fxg . indexed_atom) return indexed;
 		// ROUNDING
 		if (at == fxg . rounding_atom) {
 			if (parameters . isVar ()) {
@@ -172,51 +229,6 @@ public class Token extends PrologNativeCode {
 	}
 	/*
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (atom -> getAtom () == position_atom) {
-			if (parameters -> isVar ()) {
-				parameters -> setPair ();
-				rect token_location = token -> get_location ();
-				parameters -> getLeft () -> setInteger ((int) token_location . position . x); parameters = parameters -> getRight (); parameters -> setPair ();
-				parameters -> getLeft () -> setInteger ((int) token_location . position . y);
-				return true;
-			}
-			if (! parameters -> isPair ()) return false; PrologElement * x = parameters -> getLeft ();
-			if (x -> isAtom ()) {
-				PrologNativeCode * machine = x -> getAtom () -> getMachine ();
-				if (machine == 0) return false;
-				if (! machine -> isTypeOf (token_actions :: name ())) return false;
-				parameters = parameters -> getRight ();
-				if (! parameters -> isPair ()) return false; x = parameters -> getLeft (); if (! x -> isInteger ()) return false; parameters = parameters -> getRight ();
-				if (! parameters -> isPair ()) return false; PrologElement * y = parameters -> getLeft (); if (! y -> isInteger ()) return false;
-				if (token -> moveOnGrid (((token_actions *) machine) -> token, point (x -> getInteger (), y -> getInteger ()))) return true;
-				return ((token_actions *) machine) -> token -> moveOnGrid (token, point (x -> getInteger (), y -> getInteger ()));
-			}
-			if (! x -> isInteger ()) return false; parameters = parameters -> getRight ();
-			if (! parameters -> isPair ()) return false; PrologElement * y = parameters -> getLeft (); if (! y -> isInteger ()) return false; parameters = parameters -> getRight ();
-			token -> set_position (point (x -> getInteger (), y -> getInteger ()));
-			boarder_clean = false;
-			return true;
-		}
-		if (atom -> getAtom () == indexing_atom) {
-			if (parameters -> isEarth ()) {token -> no_indexing = false; boarder_clean = false; return true;}
-			if (parameters -> isVar ()) {
-				parameters -> setPair ();
-				parameters -> getLeft () -> setInteger ((int) token -> indexing . position . x); parameters = parameters -> getRight (); parameters -> setPair ();
-				parameters -> getLeft () -> setInteger ((int) token -> indexing . position . y); parameters = parameters -> getRight (); parameters -> setPair ();
-				parameters -> getLeft () -> setInteger ((int) token -> indexing . size . x); parameters = parameters -> getRight (); parameters -> setPair ();
-				parameters -> getLeft () -> setInteger ((int) token -> indexing . size . y);
-				return true;
-			}
-			if (! parameters -> isPair ()) return false; PrologElement * x = parameters -> getLeft (); if (! x -> isInteger ()) return false; parameters = parameters -> getRight ();
-			if (! parameters -> isPair ()) return false; PrologElement * y = parameters -> getLeft (); if (! y -> isInteger ()) return false; parameters = parameters -> getRight ();
-			if (! parameters -> isPair ()) return false; PrologElement * width = parameters -> getLeft (); if (! width -> isInteger ()) return false; parameters = parameters -> getRight ();
-			if (! parameters -> isPair ()) return false; PrologElement * height = parameters -> getLeft (); if (! height -> isInteger ()) return false; parameters = parameters -> getRight ();
-			token -> indexing = rect (x -> getInteger (), y -> getInteger (), width -> getInteger (), height -> getInteger ());
-			boarder_clean = false;
-			return true;
-		}
-		if (atom -> getAtom () == no_indexing_atom) {token -> no_indexing = true; boarder_clean = false; return true;}
-		if (atom -> getAtom () == indexed_atom) return ! token -> no_indexing;
 		if (atom -> getAtom () == roll_atom) {
 			int ret = token -> randomise_side ();
 			boarder_clean = false;
@@ -276,7 +288,7 @@ public class Token extends PrologNativeCode {
 	public void erase () {programmatic_close (); atom . setMachine (null); if (next != null) next . erase ();}
 	public void programmatic_close () {fxg . remove_token (this);}
 	public void save (FileWriter tc) {if (next != null) next . save (tc);}
-	public void setPosition (double x, double y) {location . position . x = x; location . position . y = y;}
+	public void setPosition (Point position) {location . position = new Point (position);}
 	public Point getPosition () {return new Point (location . position . x, location . position . y);}
 	public void sizeChanged () {}
 	public void sideChanged () {}

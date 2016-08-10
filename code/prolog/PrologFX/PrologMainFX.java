@@ -52,7 +52,11 @@ public class PrologMainFX extends Application {
 		root . insertCommander (new java . io . PrintStream (new emitter ()));
 		TextField kn = new TextField ();
 		TextField command = new TextField ();
-		command . setOnAction ((ActionEvent event) -> {oout . print ("[" + command . getText () + "]\n"); command . setText ("");});
+		command . setOnAction ((ActionEvent event) -> {
+			String cmd = command . getText ();
+			if (cmd . charAt (0) != '[' && cmd . charAt (0) != '(') cmd = "[" + cmd + "]";
+			oout . print (cmd + "\n"); command . setText ("");
+		});
 		Platform . runLater (new Runnable () {public void run () {command . requestFocus ();}});
 		Button keyboard = new Button ("KB");
 		keyboard . setOnAction ((ActionEvent event) -> {Platform . runLater (new Runnable () {public void run () {command . requestFocus ();}});});
@@ -61,7 +65,7 @@ public class PrologMainFX extends Application {
 		AnchorPane anchor = new AnchorPane ();
 		canvas = new Canvas (initial_width, initial_height);
 		gc = canvas . getGraphicsContext2D ();
-		feedback = new Label ();
+		feedback = new Label (); feedback . setTextFill (Color . YELLOW);
 		AnchorPane . setLeftAnchor (feedback, 4.0);
 		AnchorPane . setBottomAnchor (feedback, (double) Math . round (initial_height / 2));
 		AnchorPane . setLeftAnchor (canvas, 0.0);

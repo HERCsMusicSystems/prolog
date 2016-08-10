@@ -58,7 +58,7 @@ Applicable to: rectangle, circle, picture, dice, grid, text and deck.
 [token Indexing x y rows columns]                   => indexing
 [token Indexing : *x]                               => return indexing
 [token NoIndexing]                                  => cancels indexing
-[token Indexed?]                                    => fails in not indexed
+[token Indexed?]                                    => fails if not indexed
 [token Roll ((:) *x)]                               => select side at random (and optionally returns it)
 [token (Lock | Unlock | Locked?)]                   => locking / unlocking, test fails if un-locked
 [token (Select | Deselect | Selected?)]             => selecting / deselecting, test fails if deselected

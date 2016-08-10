@@ -92,7 +92,7 @@ class repaint_class extends PrologNativeCode {
 	public repaint_class (PrologFXGStudio fxg) {this . fxg = fxg;}
 }
 
-class create_rectangle_class extends PrologNativeCode {
+class rectangle_class extends PrologNativeCode {
 	public PrologFXGStudio fxg;
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
 		if (! parameters . isPair ()) return false;
@@ -106,7 +106,67 @@ class create_rectangle_class extends PrologNativeCode {
 		fxg . clean = false;
 		return true;
 	}
-	public create_rectangle_class (PrologFXGStudio fxg) {this . fxg = fxg;}
+	public rectangle_class (PrologFXGStudio fxg) {this . fxg = fxg;}
+}
+
+class circle_class extends PrologNativeCode {
+	public PrologFXGStudio fxg;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement atom = parameters . getLeft ();
+		if (atom . isVar ()) atom . setAtom (new PrologAtom ());
+		if (! atom . isAtom ()) return false;
+		if (atom . getAtom () . getMachine () != null) return false;
+		Token machine = new CircleToken (fxg, atom . getAtom (), fxg . default_rectangle_foreground, fxg . default_rectangle_background, null);
+		if (! atom . getAtom () . setMachine (machine)) return false;
+		fxg . insert_token (machine);
+		fxg . clean = false;
+		return true;
+	}
+	public circle_class (PrologFXGStudio fxg) {this . fxg = fxg;}
+}
+
+class grid_class extends PrologNativeCode {
+	public PrologFXGStudio fxg;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement atom = parameters . getLeft ();
+		if (atom . isVar ()) atom . setAtom (new PrologAtom ());
+		if (! atom . isAtom ()) return false;
+		if (atom . getAtom () . getMachine () != null) return false;
+		Token machine = new GridToken (fxg, atom . getAtom (), fxg . default_grid_foreground, fxg . default_grid_background, null);
+		if (! atom . getAtom () . setMachine (machine)) return false;
+		fxg . insert_token (machine);
+		fxg . clean = false;
+		return true;
+	}
+	public grid_class (PrologFXGStudio fxg) {this . fxg = fxg;}
+}
+
+class text_class extends PrologNativeCode {
+	public PrologFXGStudio fxg;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement atom = parameters . getLeft ();
+		if (atom . isVar ()) atom . setAtom (new PrologAtom ());
+		if (! atom . isAtom ()) return false;
+		if (atom . getAtom () . getMachine () != null) return false;
+		parameters = parameters . getRight ();
+		String text = atom . getAtom () . name ();
+		double font_height = 16.0;
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isNumber ()) font_height = el . getNumber ();
+			if (el . isText ()) text = el . getText ();
+			parameters = parameters . getRight ();
+		}
+		Token machine = new TextToken (fxg, atom . getAtom (), text, font_height, fxg . default_text_foreground, fxg . default_text_background, null);
+		if (! atom . getAtom () . setMachine (machine)) return false;
+		fxg . insert_token (machine);
+		fxg . clean = false;
+		return true;
+	}
+	public text_class (PrologFXGStudio fxg) {this . fxg = fxg;}
 }
 
 public class PrologFXGStudio extends PrologServiceClass {
@@ -115,12 +175,15 @@ public class PrologFXGStudio extends PrologServiceClass {
 	public PrologAtom location_atom, size_atom, position_atom, scaling_atom, repaint_atom, rotation_atom, rounding_atom;
 	public PrologAtom side_atom, sides_atom;
 	public PrologAtom foreground_atom, background_atom;
+	public PrologAtom indexing_atom, indexed_atom;
 	public boolean clean = true;
 	public Token viewports;
 	public Token tokens;
 	public Token deck;
 	public Colour default_viewport_foreground = new Colour (0.0, 0.0, 0.0), default_viewport_background = new Colour (0.0, 0.0, 1.0);
-	public Colour default_rectangle_foreground = new Colour (1.0, 1.0, 0.0), default_rectangle_background = new Colour (0.0, 0.0, 1.0);
+	public Colour default_rectangle_foreground = new Colour (1.0, 1.0, 0.0), default_rectangle_background = new Colour (0.0, 0.0, 0.0);
+	public Colour default_grid_foreground = new Colour (1.0, 1.0, 1.0), default_grid_background = new Colour (0.0, 0.0, 0.0, 0.0);
+	public Colour default_text_foreground = new Colour (1.0, 1.0, 0.0), default_text_background = new Colour (1.0, 1.0, 0.0);
 	public void repaint () {
 		Token v = viewports;
 		while (v != null) {v . repaint (); v = v . next;}
@@ -134,8 +197,10 @@ public class PrologFXGStudio extends PrologServiceClass {
 			if (! deck . can_insert ()) return null;
 			return deck . insert (token);
 		}
-		token . next = tokens;
-		return tokens = token;
+		if (tokens == null) return tokens = token;
+		Token tk = tokens;
+		while (tk . next != null) tk = tk . next;
+		return tk . next = token;
 	}
 	public void remove_token (Token token) {
 		if (tokens == token) {tokens = tokens . next; token . next = null; return;}
@@ -183,6 +248,8 @@ public class PrologFXGStudio extends PrologServiceClass {
 			sides_atom = directory . searchAtom ("Sides");
 			foreground_atom = directory . searchAtom ("ForegroundColour");
 			background_atom = directory . searchAtom ("BackgroundColour");
+			indexing_atom = directory . searchAtom ("Indexing");
+			indexed_atom = directory . searchAtom ("Indexed?");
 		}
 	}
 	public PrologNativeCode getNativeCode (String name) {
@@ -193,7 +260,10 @@ public class PrologFXGStudio extends PrologServiceClass {
 		if (name . equals ("Clean?")) return new is_clean_class (this);
 		if (name . equals ("SaveBoard")) return new save_board_class (this);
 		if (name . equals ("Repaint")) return new repaint_class (this);
-		if (name . equals ("CreateRectangle")) return new create_rectangle_class (this);
+		if (name . equals ("Rectangle")) return new rectangle_class (this);
+		if (name . equals ("Circle")) return new circle_class (this);
+		if (name . equals ("Grid")) return new grid_class (this);
+		if (name . equals ("Text")) return new text_class (this);
 		return null;
 	}
 	public static void main (String [] args) {
