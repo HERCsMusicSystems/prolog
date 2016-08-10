@@ -46,11 +46,12 @@ public class Token extends PrologNativeCode {
 	public Colour foreground;
 	public Colour background;
 	public boolean selected = false;
+	public boolean locked = false;
 	public Token next;
 	public Color fgcc () {return Color . color (foreground . red, foreground . green, foreground . blue, foreground . alpha);}
 	public Color bgcc () {return Color . color (background . red, background . green, background . blue, background . alpha);}
 	public boolean can_insert () {return false;}
-	public boolean hitTest (Point position) {return selected = location . contains (position . add (location . size . half ()));}
+	public boolean hitTest (Point position) {if (locked) return selected = false; return selected = location . contains (position . add (location . size . half ()));}
 	public void repaint () {}
 	public void token_draw (GraphicsContext gc, Viewport v) {gc . save (); draw (gc, v); gc . restore ();}
 	public void draw (GraphicsContext gc, Viewport v) {}
@@ -207,6 +208,10 @@ public class Token extends PrologNativeCode {
 			else background = new Colour (red . getNumber (), green . getNumber (), blue . getNumber (), alpha == null ? 1.0 : alpha . getNumber ());
 			fxg . clean = false; return true;
 		}
+		// LOCKING
+		if (at == fxg . lock_atom) {locked = true; fxg . clean = false; return true;}
+		if (at == fxg . unlock_atom) {locked = false; fxg . clean = false; return true;}
+		if (at == fxg . locked_atom) return locked;
 		// SELECTING
 		if (at == fxg . select_atom) {selected = true; fxg . clean = false; return true;}
 		if (at == fxg . deselect_atom) {selected = false; fxg . clean = false; return true;}
@@ -225,9 +230,6 @@ public class Token extends PrologNativeCode {
 			if (parameters -> isVar ()) {parameters -> setInteger (ret); return true;}
 			return false;
 		}
-		if (atom -> getAtom () == lock_atom) {token -> locked = true; boarder_clean = false; return true;}
-		if (atom -> getAtom () == unlock_atom) {token -> locked = false; boarder_clean = false; return true;}
-		if (atom -> getAtom () == is_locked_atom) {return token -> locked;}
 		if (atom -> getAtom () == select_deck_atom) {if (! token -> can_insert ()) return false; board -> deck = token; return true;}
 		if (atom -> getAtom () == shuffle_atom) {return token -> shuffle ();}
 		if (atom -> getAtom () == insert_atom) {

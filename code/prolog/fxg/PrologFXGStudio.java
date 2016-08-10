@@ -176,6 +176,7 @@ public class PrologFXGStudio extends PrologServiceClass {
 	public PrologAtom side_atom, sides_atom;
 	public PrologAtom foreground_atom, background_atom;
 	public PrologAtom indexing_atom, indexed_atom, select_atom, deselect_atom, selected_atom;
+	public PrologAtom lock_atom, unlock_atom, locked_atom;
 	public boolean clean = true;
 	public Token viewports;
 	public Token tokens;
@@ -264,6 +265,9 @@ public class PrologFXGStudio extends PrologServiceClass {
 			select_atom = directory . searchAtom ("Select");
 			deselect_atom = directory . searchAtom ("Deselect");
 			selected_atom = directory . searchAtom ("Selected?");
+			lock_atom = directory . searchAtom ("Lock");
+			unlock_atom = directory . searchAtom ("Unlock");
+			locked_atom = directory . searchAtom ("Locked?");
 		}
 	}
 	public PrologNativeCode getNativeCode (String name) {
