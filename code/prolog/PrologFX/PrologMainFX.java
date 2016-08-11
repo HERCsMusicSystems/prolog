@@ -2,6 +2,7 @@
 package PrologFX;
 
 import Prolog . *;
+import Prolog . geometry . *;
 
 import javafx . application . *;
 import javafx . stage . *;
@@ -34,7 +35,7 @@ public class PrologMainFX extends Application {
 	public static Label feedback = null;
 	public static GraphicsContext gc = null;
 	public static String call_arguments [] = new String [0];
-	public static double initial_width = 0.0, initial_height = 0.0;
+	public static Point initial_size = new Point (512.0, 512.0);
 	public void call_repaint () {
 		if (root == null) return;
 		PrologAtom atom = root . search ("fx_resize_callback"); if (atom == null) return;
@@ -47,7 +48,7 @@ public class PrologMainFX extends Application {
 		System . out . println ("START");
 		this . stage = stage;
 		Rectangle2D bounds = Screen . getPrimary () . getVisualBounds ();
-		if (initial_width == 0.0) {initial_width = bounds . getWidth (); initial_height = bounds . getHeight ();}
+		if (initial_size . eq (new Point (0.0, 0.0))) initial_size = new Point (bounds . getWidth (), bounds . getHeight ());
 		build_uap_system ();
 		root . insertCommander (new java . io . PrintStream (new emitter ()));
 		TextField kn = new TextField ();
@@ -63,11 +64,13 @@ public class PrologMainFX extends Application {
 		//===============================
 		//================================
 		AnchorPane anchor = new AnchorPane ();
-		canvas = new Canvas (initial_width, initial_height);
+		canvas = new Canvas (initial_size . x, initial_size . y);
 		gc = canvas . getGraphicsContext2D ();
+		gc . setFill (Color . BLACK);
+		gc . fillRect (0.0, 0.0, initial_size . x, initial_size . y);
 		feedback = new Label (); feedback . setTextFill (Color . YELLOW);
 		AnchorPane . setLeftAnchor (feedback, 4.0);
-		AnchorPane . setBottomAnchor (feedback, (double) Math . round (initial_height / 2));
+		AnchorPane . setBottomAnchor (feedback, (double) Math . round (initial_size . y * 0.75));
 		AnchorPane . setLeftAnchor (canvas, 0.0);
 		AnchorPane . setRightAnchor (canvas, 0.0);
 		AnchorPane . setTopAnchor (canvas, 0.0);
@@ -79,7 +82,7 @@ public class PrologMainFX extends Application {
 		AnchorPane . setRightAnchor (keyboard, 1.0);
 		anchor . getChildren () . addAll (canvas, feedback, command, keyboard);
 		//===============================
-		Scene scene = new Scene (anchor, initial_width, initial_height);
+		Scene scene = new Scene (anchor, initial_size . x, initial_size . y);
 		stage . setTitle ("sonda");
 		stage . setScene (scene);
 		stage . show ();
@@ -101,6 +104,7 @@ public class PrologMainFX extends Application {
 		root . resolution ("fx");
 	}
 	public static void main (String [] args) {
+		initial_size = new Point (0.0, 0.0);
 		System . out . println ("MAIN solo");
 		call_arguments = args;
 		build_uap_system ();
@@ -110,7 +114,6 @@ public class PrologMainFX extends Application {
 		root = uap_system;
 		oout = out;
 		System . out . println ("ACTIVATING....");
-		if (initial_width == 0.0) {initial_width = initial_height = 512.0;}
 		if (stage == null) launch (call_arguments);
 	}
 	public static void stop_fx () {Platform . exit ();}
