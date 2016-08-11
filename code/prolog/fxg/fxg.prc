@@ -9,6 +9,7 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 					Location Position Size Scaling Rotation Rounding Side Sides Text Indexing Indexed?
 					Select Deselect Selected? Lock Unlock Locked?
 					ForegroundColour BackgroundColour
+					ASaveBoard
 					re mv
 					r c g sonda
 					]
@@ -27,6 +28,8 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 #machine Grid := "Grid"
 #machine Circle := "Circle"
 #machine Text := "Text"
+
+[[ASaveBoard *text] [android_storage *text *file] [SaveBoard *file]]
 
 [[re : *command] *command [Repaint]]
 

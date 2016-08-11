@@ -10,7 +10,7 @@
 	</target>
 
 	<target name="compile">
-		<javac srcdir="../code/prolog" destdir="." includeantruntime="false"/>
+		<javac srcdir="../code/prolog" destdir="." includeantruntime="false" classpath="${env.ANDROID_HOME}/platforms/android-24/android.jar"/>
 	</target>
 
 	<target name="jar" depends="compile">
