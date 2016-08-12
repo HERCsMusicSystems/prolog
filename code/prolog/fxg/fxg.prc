@@ -5,7 +5,7 @@ import fx
 program fxg #machine := "fxg.PrologFXGStudio" [
 					Viewport MainViewport
 					SaveBoard Erase Clean Clean? Repaint
-					Rectangle Grid Circle Text
+					Rectangle Grid Circle Text Picture
 					Location Position Size Scaling Rotation Rounding Side Sides Text Indexing Indexed?
 					Select Deselect Selected? Lock Unlock Locked?
 					ForegroundColour BackgroundColour
@@ -28,6 +28,7 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 #machine Grid := "Grid"
 #machine Circle := "Circle"
 #machine Text := "Text"
+#machine Picture := "Picture"
 
 [[ASaveBoard *text] [android_storage *text *file] [SaveBoard *file]]
 

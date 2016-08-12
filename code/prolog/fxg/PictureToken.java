@@ -25,9 +25,15 @@ package fxg;
 import Prolog . *;
 import Prolog . geometry . *;
 
-import javafx . scene . canvas . *;
+import java . util . ArrayList;
 
-public class CircleToken extends Token {
+import javafx . scene . canvas . *;
+import javafx . scene . image . *;
+
+public class PictureToken extends Token {
+	public ArrayList <Image> images = new ArrayList <Image> ();
+	public int numberOfSides () {return images . size () + 1;}
+	public void sideChanged () {if (side >= images . size ()) return; Image i = images . get (side); location . size = new Point (i . getWidth (), i . getHeight ());}
 	public void draw (GraphicsContext gc, Viewport v) {
 		gc . scale (v . scaling . x, v . scaling . y);
 		gc . translate (- v . location . position . x, - v . location . position . y);
@@ -35,14 +41,19 @@ public class CircleToken extends Token {
 		gc . scale (scaling . x, scaling . y);
 		if (rotation != 0.0) gc . rotate (rotation * 15.0);
 		Point half = location . size . half ();
+		if (side < images . size ()) {gc . drawImage (images . get (side), - half . x, - half . y); return;}
 		if (background . alpha > 0.0) {
 			gc . setFill (bgcc ());
-			gc . fillOval (- half . x, - half . y, location . size . x, location . size . y);
+			gc . fillRoundRect (- half . x, - half . y, location . size . x, location . size . y, rounding . x, rounding . y);
 		}
 		if (! foreground . eq (background)) {
 			gc . setStroke (fgcc ());
-			gc . strokeOval (- half . x, - half . y, location . size . x, location . size . y);
+			gc . strokeRoundRect (- half . x, - half . y, location . size . x, location . size . y, rounding . x, rounding . y);
 		}
 	}
-	public CircleToken (PrologFXGStudio fxg, PrologAtom atom, Colour foreground, Colour background, Token next) {super (fxg, atom, foreground, background, next);}
+	public PictureToken (PrologFXGStudio fxg, PrologAtom atom, ArrayList <String> pictures, Colour foreground, Colour background, Token next) {
+		super (fxg, atom, foreground, background, next);
+		for (String name : pictures) images . add (new Image (name));
+		sideChanged ();
+	}
 }

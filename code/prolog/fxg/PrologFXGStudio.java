@@ -26,6 +26,7 @@ import Prolog . *;
 import Prolog . geometry . *;
 
 import java . io . FileWriter;
+import java . util . ArrayList;
 
 class viewport_class extends PrologNativeCode {
 	public PrologFXGStudio fxg;
@@ -169,6 +170,30 @@ class text_class extends PrologNativeCode {
 	public text_class (PrologFXGStudio fxg) {this . fxg = fxg;}
 }
 
+class picture_class extends PrologNativeCode {
+	public PrologFXGStudio fxg;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		PrologElement atom = null;
+		ArrayList <String> pictures = new ArrayList <String> ();
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isVar ()) atom = el;
+			if (el . isAtom ()) atom = el;
+			if (el . isText ()) pictures . add ("file:" + el . getText ());
+			parameters = parameters . getRight ();
+		}
+		if (atom == null) return false;
+		if (atom . isVar ()) atom . setAtom (new PrologAtom ());
+		if (! atom . isAtom ()) return false;
+		Token machine = new PictureToken (fxg, atom . getAtom (), pictures, fxg . default_picture_foreground, fxg . default_picture_background, null);
+		if (! atom . getAtom () . setMachine (machine)) return false;
+		fxg . insert_token (machine);
+		fxg . clean = false;
+		return true;
+	}
+	public picture_class (PrologFXGStudio fxg) {this . fxg = fxg;}
+}
+
 public class PrologFXGStudio extends PrologServiceClass {
 	public PrologRoot root;
 	public PrologDirectory directory;
@@ -185,6 +210,7 @@ public class PrologFXGStudio extends PrologServiceClass {
 	public Colour default_rectangle_foreground = new Colour (1.0, 1.0, 0.0), default_rectangle_background = new Colour (0.0, 0.0, 0.0);
 	public Colour default_grid_foreground = new Colour (1.0, 1.0, 1.0), default_grid_background = new Colour (0.0, 0.0, 0.0, 0.0);
 	public Colour default_text_foreground = new Colour (1.0, 1.0, 0.0), default_text_background = new Colour (1.0, 1.0, 0.0);
+	public Colour default_picture_foreground = new Colour (1.0, 1.0, 0.0), default_picture_background = new Colour (1.0, 1.0, 0.0);
 	public void repaint () {
 		Token v = viewports;
 		while (v != null) {v . repaint (); v = v . next;}
@@ -282,6 +308,7 @@ public class PrologFXGStudio extends PrologServiceClass {
 		if (name . equals ("Circle")) return new circle_class (this);
 		if (name . equals ("Grid")) return new grid_class (this);
 		if (name . equals ("Text")) return new text_class (this);
+		if (name . equals ("Picture")) return new picture_class (this);
 		return null;
 	}
 	public static void main (String [] args) {
