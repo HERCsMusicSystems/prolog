@@ -44,12 +44,10 @@ public class TextToken extends Token {
 		if (background . alpha > 0.0) {
 			gc . setFill (bgcc ());
 			gc . fillText (text, 0.0, 0.0);
-			System . out . println ("text filled....");
 		}
 		if (! foreground . eq (background)) {
 			gc . setStroke (fgcc ());
 			gc . strokeText (text, 0.0, 0.0);
-			System . out . println ("text stroked....");
 		}
 	}
 	public TextToken (PrologFXGStudio fxg, PrologAtom atom, String text, double font_height, Colour foreground, Colour background, Token next) {

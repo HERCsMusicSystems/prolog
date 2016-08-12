@@ -185,6 +185,7 @@ class picture_class extends PrologNativeCode {
 		if (atom == null) return false;
 		if (atom . isVar ()) atom . setAtom (new PrologAtom ());
 		if (! atom . isAtom ()) return false;
+		if (atom . getAtom () . getMachine () != null) return false;
 		Token machine = new PictureToken (fxg, atom . getAtom (), pictures, fxg . default_picture_foreground, fxg . default_picture_background, null);
 		if (! atom . getAtom () . setMachine (machine)) return false;
 		fxg . insert_token (machine);
@@ -192,6 +193,33 @@ class picture_class extends PrologNativeCode {
 		return true;
 	}
 	public picture_class (PrologFXGStudio fxg) {this . fxg = fxg;}
+}
+
+class dice_class extends PrologNativeCode {
+	public PrologFXGStudio fxg;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		PrologElement atom = null, sides = null, shift = null, multiplier = null;
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isVar ()) atom = el;
+			if (el . isAtom ()) atom = el;
+			if (el . isInteger ()) {if (sides == null) sides = el; else if (shift == null) shift = el; else multiplier = el;}
+			parameters = parameters . getRight ();
+		}
+		if (atom == null) return false;
+		if (atom . isVar ()) atom . setAtom (new PrologAtom ());
+		if (! atom . isAtom ()) return false;
+		if (atom . getAtom () . getMachine () != null) return false;
+		Token machine = new DiceToken (fxg, atom . getAtom (),
+																			sides != null ? sides . getInteger () : 0,
+																			shift != null ? shift . getInteger () : 1,
+																			multiplier != null ? multiplier . getInteger () : 1, null);
+		if (! atom . getAtom () . setMachine (machine)) return false;
+		fxg . insert_token (machine);
+		fxg . clean = false;
+		return true;
+	}
+	public dice_class (PrologFXGStudio fxg) {this . fxg = fxg;}
 }
 
 public class PrologFXGStudio extends PrologServiceClass {
@@ -212,6 +240,40 @@ public class PrologFXGStudio extends PrologServiceClass {
 	public Colour default_grid_foreground = new Colour (1.0, 1.0, 1.0), default_grid_background = new Colour (0.0, 0.0, 0.0, 0.0);
 	public Colour default_text_foreground = new Colour (1.0, 1.0, 0.0), default_text_background = new Colour (1.0, 1.0, 0.0);
 	public Colour default_picture_foreground = new Colour (1.0, 1.0, 0.0), default_picture_background = new Colour (1.0, 1.0, 0.0);
+	public Colour default_dice_foreground = new Colour (0.0, 0.0, 0.0), default_dice_background = new Colour (1.0, 1.0, 1.0);
+	public Colour default_tetrahedron_foreground = new Colour (0.0, 0.0, 0.0), default_tetrahedron_background = new Colour (1.0, 0.0, 0.0);
+	public Colour default_cube_foreground = new Colour (0.0, 0.0, 0.0), default_cube_background = new Colour (0.0, 0.0, 1.0);
+	public Colour default_octahedron_foreground = new Colour (0.0, 0.0, 0.0), default_octahedron_background = new Colour (0.0, 1.0, 0.0);
+	public Colour default_deltahedron_foreground = new Colour (0.0, 0.0, 0.0), default_deltahedron_background = new Colour (1.0, 1.0, 0.0);
+	public Colour default_deltahedron_10_foreground = new Colour (0.0, 0.0, 0.0), default_deltahedron_10_background = new Colour (1.0, 0.5, 0.0);
+	public Colour default_dodecahedron_foreground = new Colour (0.0, 0.0, 0.0), default_dodecahedron_background = new Colour (0.5, 1.0, 0.0);
+	public Colour default_icosahedron_foreground = new Colour (0.0, 0.0, 0.0), default_icosahedron_background = new Colour (0.25, 0.0, 1.0);
+	public Colour dice_foreground (int sides, int multiplier) {
+		switch (sides) {
+		case 0: return default_dice_foreground;
+		case 4: return default_tetrahedron_foreground;
+		case 6: return default_cube_foreground;
+		case 8: return default_octahedron_foreground;
+		case 10: return multiplier == 10 ? default_deltahedron_10_foreground : default_deltahedron_foreground;
+		case 12: return default_dodecahedron_foreground;
+		case 20: return default_icosahedron_foreground;
+		default: break;
+		}
+		return default_dice_foreground;
+	}
+	public Colour dice_background (int sides, int multiplier) {
+		switch (sides) {
+		case 0: return default_dice_background;
+		case 4: return default_tetrahedron_background;
+		case 6: return default_cube_background;
+		case 8: return default_octahedron_background;
+		case 10: return multiplier == 10 ? default_deltahedron_10_background : default_deltahedron_background;
+		case 12: return default_dodecahedron_background;
+		case 20: return default_icosahedron_background;
+		default: break;
+		}
+		return default_dice_background;
+	}
 	public void repaint () {
 		Token v = viewports;
 		while (v != null) {v . repaint (); v = v . next;}
@@ -311,6 +373,8 @@ public class PrologFXGStudio extends PrologServiceClass {
 		if (name . equals ("Grid")) return new grid_class (this);
 		if (name . equals ("Text")) return new text_class (this);
 		if (name . equals ("Picture")) return new picture_class (this);
+		if (name . equals ("Dice")) return new dice_class (this);
+		if (name . equals ("Deck")) return new dice_class (this);
 		return null;
 	}
 	public static void main (String [] args) {

@@ -26,7 +26,6 @@ import Prolog . *;
 import Prolog . geometry . *;
 
 import javafx . scene . canvas . *;
-import javafx . scene . paint . *;
 
 class RectangleToken extends Token {
 	public void draw (GraphicsContext gc, Viewport v) {

@@ -5,14 +5,14 @@ import fx
 program fxg #machine := "fxg.PrologFXGStudio" [
 					Viewport MainViewport
 					SaveBoard Erase Clean Clean? Repaint
-					Rectangle Grid Circle Text Picture
+					Rectangle Grid Circle Text Picture Dice Deck
 					Location Position Size Scaling Rotation Rounding Side Sides Text Indexing Indexed?
 					Select Deselect Selected? Lock Unlock Locked?
 					Roll
 					ForegroundColour BackgroundColour
 					ASaveBoard
 					re mv
-					r c g sonda
+					r g
 					]
 
 
@@ -30,6 +30,8 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 #machine Circle := "Circle"
 #machine Text := "Text"
 #machine Picture := "Picture"
+#machine Dice := "Dice"
+#machine Deck := "Deck"
 
 [[ASaveBoard *text] [android_storage *text *file] [SaveBoard *file]]
 
@@ -37,4 +39,4 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 
 [[fx_resize_callback *x *y] [show "resized: " [*x *y]] [Repaint]]
 
-end := [[crack [wait 1000] [MainViewport mv] [mv Location -100 -100] [Rectangle r] [Circle c] [Grid g] [g Side 1] [g Indexing 1 1 7 7]] [fx_command]] .
+end := [[crack [wait 1000] [MainViewport mv] [mv Location -100 -100] [Dice r 4] [Grid g] [g Side 1] [g Indexing 1 1 7 7]] [fx_command]] .
