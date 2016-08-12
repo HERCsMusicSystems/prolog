@@ -56,6 +56,7 @@ public class Token extends PrologNativeCode {
 	public void token_draw (GraphicsContext gc, Viewport v) {gc . save (); draw (gc, v); gc . restore ();}
 	public void draw (GraphicsContext gc, Viewport v) {}
 	public boolean moveOnGrid (Token token, Point position) {return false;}
+	public int randomise_side () {return side;}
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
 		// CLOSE
 		if (parameters . isEarth ()) {atom . setMachine (null); fxg . clean = false; programmatic_close (); return true;}
@@ -216,20 +217,20 @@ public class Token extends PrologNativeCode {
 		if (at == fxg . select_atom) {selected = true; fxg . clean = false; return true;}
 		if (at == fxg . deselect_atom) {selected = false; fxg . clean = false; return true;}
 		if (at == fxg . selected_atom) return selected;
+		// ROLLING
+		if (at == fxg . roll_atom) {
+			int ret = randomise_side ();
+			if (parameters . isPair ()) parameters = parameters . getLeft ();
+			if (parameters . isVar ()) parameters . setInteger (ret);
+			fxg . clean = false;
+			return true;
+		}
 		// REPAINT
 		if (at == fxg . repaint_atom) {repaint (); return true;}
 		return false;
 	}
 	/*
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (atom -> getAtom () == roll_atom) {
-			int ret = token -> randomise_side ();
-			boarder_clean = false;
-			if (parameters -> isEarth ()) return true;
-			if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-			if (parameters -> isVar ()) {parameters -> setInteger (ret); return true;}
-			return false;
-		}
 		if (atom -> getAtom () == select_deck_atom) {if (! token -> can_insert ()) return false; board -> deck = token; return true;}
 		if (atom -> getAtom () == shuffle_atom) {return token -> shuffle ();}
 		if (atom -> getAtom () == insert_atom) {

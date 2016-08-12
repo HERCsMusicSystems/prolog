@@ -33,6 +33,7 @@ import javafx . scene . image . *;
 public class PictureToken extends Token {
 	public ArrayList <Image> images = new ArrayList <Image> ();
 	public int numberOfSides () {return images . size () + 1;}
+	public int randomise_side () {return side = (int) (Math . random () * images . size ());}
 	public void sideChanged () {if (side >= images . size ()) return; Image i = images . get (side); location . size = new Point (i . getWidth (), i . getHeight ());}
 	public void draw (GraphicsContext gc, Viewport v) {
 		gc . scale (v . scaling . x, v . scaling . y);

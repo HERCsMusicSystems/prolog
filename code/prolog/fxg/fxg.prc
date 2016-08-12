@@ -8,6 +8,7 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 					Rectangle Grid Circle Text Picture
 					Location Position Size Scaling Rotation Rounding Side Sides Text Indexing Indexed?
 					Select Deselect Selected? Lock Unlock Locked?
+					Roll
 					ForegroundColour BackgroundColour
 					ASaveBoard
 					re mv
