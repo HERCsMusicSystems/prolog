@@ -67,8 +67,7 @@ public class Viewport extends Token {
 				drag . x = e . getX (); drag . y = e . getY ();
 				fxg . hardSelectTokens (drag . sub (screen_position));
 				if (e . getClickCount () == 2) {
-					fxg . doubleAction ();
-					repaint ();
+					if (fxg . doubleAction ()) repaint ();
 				}
 			}
 		});

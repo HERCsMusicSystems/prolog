@@ -49,7 +49,7 @@ public class Token extends PrologNativeCode {
 	public Color fgcc () {return Color . color (foreground . red, foreground . green, foreground . blue, foreground . alpha);}
 	public Color bgcc () {return Color . color (background . red, background . green, background . blue, background . alpha);}
 	public Point actionLocation = new Point (0.0, 0.0);
-	public void doubleAction () {}
+	public boolean doubleAction () {return false;}
 	public boolean moveAction () {location . position = actionLocation; return true;}
 	public boolean releaseAction () {return false;}
 	public boolean can_insert () {return false;}

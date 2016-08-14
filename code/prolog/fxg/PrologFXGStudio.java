@@ -346,9 +346,11 @@ public class PrologFXGStudio extends PrologServiceClass {
 		while (t != null) {if (t . releaseAction ()) ret = true; t = t . next;}
 		return ret;
 	}
-	public void doubleAction () {
+	public boolean doubleAction () {
 		Token t = tokens;
-		while (t != null) {t . doubleAction (); t = t . next;}
+		boolean ret = false;
+		while (t != null) {if (t . doubleAction ()) ret = true; t = t . next;}
+		return ret;
 	}
 	public void init (PrologRoot root, PrologDirectory directory) {
 		this . root = root; this . directory = directory;

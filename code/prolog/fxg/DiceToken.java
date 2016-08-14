@@ -33,7 +33,7 @@ import javafx . geometry . *;
 public class DiceToken extends Token {
 	public int sides = 6, shift = 1, multiplier = 1;
 	public int numberOfSides () {return sides < 1 ? 6 : sides;}
-	public void doubleAction () {if (selected) randomise_side ();}
+	public boolean doubleAction () {if (selected) {randomise_side (); return true;} return false;}
 	public int randomise_side () {
 		rotation += Math . random () * 5.0 + 1.0;
 		rotation = (double) ((int) rotation % 24);
