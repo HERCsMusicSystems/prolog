@@ -324,16 +324,31 @@ public class PrologFXGStudio extends PrologServiceClass {
 		if (tokens != null) tokens . erase (); tokens = null;
 		clean = true;
 	}
-	public void moveSelectedTokens (Point delta) {
+	public boolean moveSelectedTokens (Point delta) {
 		Token t = tokens;
+		boolean ret = false;
 		while (t != null) {
-			if (t . selected) t . location . position = t . location . position . add (delta);
+			if (t . selected) {
+				t . actionLocation = t . actionLocation . add (delta);
+				if (t . moveAction ()) ret = true;
+			}
 			t = t . next;
 		}
+		return ret;
 	}
 	public void hardSelectTokens (Point position) {
 		Token t = tokens;
-		while (t != null) {t . hitTest (position); t = t . next;}
+		while (t != null) {if (t . hitTest (position)) t . actionLocation = t . location . position; t = t . next;}
+	}
+	public boolean releaseSelectedTokens () {
+		Token t = tokens;
+		boolean ret = false;
+		while (t != null) {if (t . releaseAction ()) ret = true; t = t . next;}
+		return ret;
+	}
+	public void doubleAction () {
+		Token t = tokens;
+		while (t != null) {t . doubleAction (); t = t . next;}
 	}
 	public void init (PrologRoot root, PrologDirectory directory) {
 		this . root = root; this . directory = directory;

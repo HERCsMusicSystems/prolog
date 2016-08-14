@@ -31,8 +31,6 @@ import javafx . scene . paint . Color;
 import javafx . scene . canvas . GraphicsContext;
 
 public class Token extends PrologNativeCode {
-	//public String codeName () {return "FXToken";}
-	//public boolean isTypeOf (String code_name) {if (codeName () == code_name) return true; return super . isTypeOf (code_name);}
 	public PrologFXGStudio fxg;
 	public PrologAtom atom;
 	public String text = "";
@@ -50,8 +48,15 @@ public class Token extends PrologNativeCode {
 	public Token next;
 	public Color fgcc () {return Color . color (foreground . red, foreground . green, foreground . blue, foreground . alpha);}
 	public Color bgcc () {return Color . color (background . red, background . green, background . blue, background . alpha);}
+	public Point actionLocation = new Point (0.0, 0.0);
+	public void doubleAction () {}
+	public boolean moveAction () {location . position = actionLocation; return true;}
+	public boolean releaseAction () {return false;}
 	public boolean can_insert () {return false;}
-	public boolean hitTest (Point position) {if (locked) return selected = false; return selected = location . contains (position . add (location . size . half ()));}
+	public boolean hitTest (Point position) {
+		if (locked) return selected = false;
+		return selected = location . contains (position . add (location . size . half ()));
+	}
 	public void repaint () {}
 	public void token_draw (GraphicsContext gc, Viewport v) {gc . save (); draw (gc, v); gc . restore ();}
 	public void draw (GraphicsContext gc, Viewport v) {}

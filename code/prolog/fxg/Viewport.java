@@ -66,6 +66,10 @@ public class Viewport extends Token {
 			public void handle (MouseEvent e) {
 				drag . x = e . getX (); drag . y = e . getY ();
 				fxg . hardSelectTokens (drag . sub (screen_position));
+				if (e . getClickCount () == 2) {
+					fxg . doubleAction ();
+					repaint ();
+				}
 			}
 		});
 		c . setOnMouseDragged (new EventHandler <MouseEvent> () {
@@ -73,9 +77,11 @@ public class Viewport extends Token {
 				Point p = new Point (e . getX (), e . getY ());
 				Point delta = p . sub (drag);
 				drag = p;
-				fxg . moveSelectedTokens (delta);
-				repaint ();
+				if (fxg . moveSelectedTokens (delta)) repaint ();
 			}
+		});
+		c . setOnMouseReleased (new EventHandler <MouseEvent> () {
+			public void handle (MouseEvent e) {if (fxg . releaseSelectedTokens ()) repaint ();}
 		});
 	}
 	public void build () {
