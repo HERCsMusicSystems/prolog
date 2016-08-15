@@ -62,64 +62,65 @@ public class Token extends PrologNativeCode {
 	public void draw (GraphicsContext gc, Viewport v) {}
 	public boolean moveOnGrid (Token token, Point position) {return false;}
 	public int randomise_side () {return side;}
+	private void set_2 (PrologElement var, double a, double b) {
+		var . setPair (); var . getLeft () . setDouble (a); var = var . getRight ();
+		var . setPair (); var . getLeft () . setDouble (b);
+	}
+	private void set_4 (PrologElement var, double a, double b, double c, double d) {
+		var . setPair (); var . getLeft () . setDouble (a); var = var . getRight ();
+		var . setPair (); var . getLeft () . setDouble (b); var = var . getRight ();
+		var . setPair (); var . getLeft () . setDouble (c); var = var . getRight ();
+		var . setPair (); var . getLeft () . setDouble (d);
+	}
+	private void set_4i (PrologElement var, Rect p) {
+		var . setPair (); var . getLeft () . setInteger ((int) p . position . x); var = var . getRight ();
+		var . setPair (); var . getLeft () . setInteger ((int) p . position . y); var = var . getRight ();
+		var . setPair (); var . getLeft () . setInteger ((int) p . size . x); var = var . getRight ();
+		var . setPair (); var . getLeft () . setInteger ((int) p . size . y);
+	}
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
 		// CLOSE
 		if (parameters . isEarth ()) {atom . setMachine (null); fxg . clean = false; programmatic_close (); return true;}
-		if (! parameters . isPair ()) return false;
-		PrologElement atom = parameters . getLeft (); parameters = parameters . getRight ();
-		if (! atom . isAtom ()) return false;
-		PrologAtom at = atom . getAtom ();
+		PrologAtom at = null, grid = null;
+		PrologElement a = null, b = null, c = null, d = null, var = null;
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isAtom ()) {if (at == null) at = el . getAtom (); else grid = el . getAtom ();}
+			else if (el . isNumber ()) {if (a == null) a = el; else if (b == null) b = el; else if (c == null) c = el; else d = el;}
+			else if (el . isVar ()) var = el;
+			parameters = parameters . getRight ();
+		}
+		if (parameters . isVar ()) var = parameters;
+		if (at == null) return false;
 		// LOCATION
 		if (at == fxg . location_atom) {
-			if (parameters . isVar ()) {
-				parameters . setPair (); parameters . getLeft () . setDouble (location . position . x); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setDouble (location . position . y); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setDouble (location . size . x); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setDouble (location . size . y); return true;
-			}
-			if (! parameters . isPair ()) return false; PrologElement x = parameters . getLeft (); if (! x . isNumber ()) return false; parameters = parameters . getRight ();
-			if (! parameters . isPair ()) return false; PrologElement y = parameters . getLeft (); if (! y . isNumber ()) return false; parameters = parameters . getRight ();
-			if (parameters . isEarth ()) {location . position = new Point (x . getNumber (), y . getNumber ()); fxg . clean = false; return true;}
-			if (! parameters . isPair ()) return false; PrologElement w = parameters . getLeft (); if (! w . isNumber ()) return false; parameters = parameters . getRight ();
-			if (parameters . isEarth ()) {
-				location = new Rect (new Point (x . getNumber (), y . getNumber ()), new Point (w . getNumber (), w . getNumber ()));
-				fxg . clean = false; sizeChanged (); return true;
-			}
-			if (! parameters . isPair ()) return false; PrologElement h = parameters . getLeft (); if (! h . isNumber ()) return false;
-			location = new Rect (new Point (x . getNumber (), y . getNumber ()), new Point (w . getNumber (), h . getNumber ()));
-			sizeChanged (); fxg . clean = false; return true;
+			if (var != null) {set_4 (var, location . position . x, location . position . y, location . size . x, location . size . y); return true;}
+			if (b == null) return false;
+			location . position = new Point (a . getNumber (), b . getNumber ());
+			fxg . clean = false;
+			if (c == null) return true;
+			double cc = c . getNumber ();
+			location . size = new Point (cc, d == null ? cc : d . getNumber ());
+			sizeChanged ();
+			return true;
 		}
 		// SIZE
 		if (at == fxg . size_atom) {
-			if (parameters . isVar ()) {
-				parameters . setPair (); parameters . getLeft () . setDouble (location . size . x); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setDouble (location . size . y); return true;
-			}
-			if (! parameters . isPair ()) return false;
-			PrologElement w = parameters . getLeft (); if (! w . isNumber ()) return false; parameters = parameters . getRight ();
-			if (parameters . isEarth ()) {location . size = new Point (w . getNumber (), w . getNumber ()); sizeChanged (); fxg . clean = false; return true;}
-			if (! parameters . isPair ()) return false;
-			PrologElement h = parameters . getLeft (); if (! h . isNumber ()) return false;
-			location . size = new Point (w . getNumber (), h . getNumber ()); sizeChanged (); fxg . clean = false; return true;
+			if (var != null) {set_2 (var, location . size . x, location . size . y); return true;}
+			if (a == null) return false;
+			double aa = a . getNumber ();
+			location . size = new Point (aa, b == null ? aa : b . getNumber ());
+			sizeChanged (); fxg . clean = false;
+			return true;
 		}
 		// POSITION
 		if (at == fxg . position_atom) {
-			if (parameters . isVar ()) {
-				Point position = getPosition ();
-				parameters . setPair (); parameters . getLeft () . setDouble (position . x); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setDouble (position . y); return true;
-			}
-			PrologElement x = null, y = null, att = null;
-			while (parameters . isPair ()) {
-				PrologElement el = parameters . getLeft ();
-				if (el . isAtom ()) att = el;
-				if (el . isNumber ()) {if (x == null) x = el; else y = el;}
-				parameters = parameters . getRight ();
-			}
-			if (x == null || y == null) return false;
-			Point position = new Point (x . getNumber (), y . getNumber ());
-			if (att != null) {
-				PrologNativeCode machine = att . getAtom () . getMachine ();
+			if (var != null) {Point position = getPosition (); set_2 (var, position . x, position . y); return true;}
+			if (b == null) return false;
+			fxg . clean = false;
+			Point position = new Point (a . getNumber (), b . getNumber ());
+			if (grid != null) {
+				PrologNativeCode machine = grid . getMachine ();
 				if (machine == null) return false;
 				if (! (machine instanceof Token)) return false;
 				Token token = (Token) machine;
@@ -127,92 +128,68 @@ public class Token extends PrologNativeCode {
 				return token . moveOnGrid (this, position);
 			}
 			setPosition (position);
-			fxg . clean = false;
 			return true;
 		}
 		// SCALING
 		if (at == fxg . scaling_atom) {
-			if (parameters . isVar ()) {
-				parameters . setPair (); parameters . getLeft () . setDouble (scaling . x); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setDouble (scaling . y); return true;
-			}
-			if (! parameters . isPair ()) return false;
-			PrologElement x = parameters . getLeft (); if (! x . isNumber ()) return false;
-			parameters = parameters . getRight (); if (parameters . isEarth ()) {scaling . x = scaling . y = x . getNumber (); fxg . clean = false; return true;}
-			if (! parameters . isPair ()) return false;
-			PrologElement y = parameters . getLeft (); if (! y . isNumber ()) return false;
-			scaling . x = x . getNumber (); scaling . y = y . getNumber (); fxg . clean = false; return true;
+			if (var != null) {set_2 (var, scaling . x, scaling . y); return true;}
+			if (a == null) return false;
+			double aa = a . getNumber ();
+			scaling = new Point (aa, b == null ? aa : b . getNumber ());
+			fxg . clean = false;
+			return true;
 		}
 		// ROTATION
 		if (at == fxg . rotation_atom) {
-			if (parameters . isVar ()) {parameters . setPair (); parameters . getLeft () . setDouble (rotation); return true;}
-			if (! parameters . isPair ()) return false;
-			PrologElement r = parameters . getLeft (); if (! r . isNumber ()) return false; rotation = r . getNumber (); fxg . clean = false; return true;
+			if (var != null) {var . setPair (); var . getLeft () . setDouble (rotation); return true;}
+			if (a == null) return false;
+			rotation = a . getNumber ();
+			fxg . clean = false;
+			return true;
 		}
 		// SIDE
 		if (at == fxg . side_atom) {
-			if (parameters . isVar ()) {parameters . setInteger (side); return true;}
-			if (! parameters . isPair ()) return false; parameters = parameters . getLeft ();
-			if (! parameters . isInteger ()) return false;
-			int ind = parameters . getInteger ();
+			if (var != null) {var . setInteger (side); return true;}
+			if (a == null || ! a . isInteger ()) return false;
+			int ind = a . getInteger ();
 			if (ind < 0 || ind >= numberOfSides ()) return false;
-			side = ind; sideChanged (); fxg . clean = false; return true;
+			side = ind; sideChanged (); fxg . clean = false;
+			return true;
 		}
 		// SIDES
 		if (at == fxg . sides_atom) {
-			if (parameters . isPair ()) parameters = parameters . getLeft ();
-			if (parameters . isVar ()) {parameters . setInteger (numberOfSides ()); return true;}
-			if (! parameters . isInteger ()) return false;
-			return setSides (parameters . getInteger ());
+			if (var != null) {var . setInteger (numberOfSides ()); return true;}
+			if (a == null || ! a . isInteger ()) return false;
+			return setSides (a . getInteger ());
 		}
 		// INDEXING
 		if (at == fxg . indexing_atom) {
-			if (parameters . isEarth ()) {indexed = ! indexed; fxg . clean = false; return true;}
-			if (parameters . isVar ()) {
-				parameters . setPair (); parameters . getLeft () . setInteger ((int) indexing . position . x); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setInteger ((int) indexing . position . y); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setInteger ((int) indexing . size . x); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setInteger ((int) indexing . size . y); return true;
-			}
-			PrologElement el = null;
-			if (parameters . isPair ()) {el = parameters . getLeft (); if (el . isNumber ()) indexing . position . x = el . getNumber (); parameters = parameters . getRight ();}
-			if (parameters . isPair ()) {el = parameters . getLeft (); if (el . isNumber ()) indexing . position . y = el . getNumber (); parameters = parameters . getRight ();}
-			if (parameters . isPair ()) {el = parameters . getLeft (); if (el . isNumber ()) indexing . size . x = el . getNumber (); parameters = parameters . getRight ();}
-			if (parameters . isPair ()) {el = parameters . getLeft (); if (el . isNumber ()) indexing . size . y = el . getNumber ();}
+			if (var != null) {set_4i (var, indexing); return true;}
 			fxg . clean = false;
+			if (a != null) indexing . position . x = a . getNumber (); else {indexed = ! indexed; return false;}
+			if (b != null) indexing . position . y = b . getNumber ();
+			if (c != null) indexing . size . x = c . getNumber ();
+			if (d != null) indexing . size . y = d . getNumber ();
 			return true;
 		}
 		if (at == fxg . indexed_atom) return indexed;
 		// ROUNDING
 		if (at == fxg . rounding_atom) {
-			if (parameters . isVar ()) {
-				parameters . setPair (); parameters . getLeft () . setDouble (rounding . x); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setDouble (rounding . y); return true;
-			}
-			if (! parameters . isPair ()) return false;
-			PrologElement x = parameters . getLeft (); if (! x . isNumber ()) return false;
-			parameters = parameters . getRight (); if (parameters . isEarth ()) {rounding . x = rounding . y = x . getNumber (); fxg . clean = false; return true;}
-			if (! parameters . isPair ()) return false;
-			PrologElement y = parameters . getLeft (); if (! y . isNumber ()) return false;
-			rounding . x = x . getNumber (); rounding . y = y . getNumber (); fxg . clean = false; return true;
+			if (var != null) {set_2 (var, rounding . x, rounding . y); return true;}
+			if (a == null) return false;
+			double aa = a . getNumber ();
+			rounding = new Point (aa, b == null ? aa : b . getNumber ());
+			fxg . clean = false;
+			return true;
 		}
 		// FOREGROUND / BACKGROUND
 		if (at == fxg . foreground_atom || at == fxg . background_atom) {
-			if (parameters . isVar ()) {
-				Colour c = at == fxg . foreground_atom ? foreground : background;
-				parameters . setPair (); parameters . getLeft () . setDouble (c . red  ); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setDouble (c . green); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setDouble (c . blue ); parameters = parameters . getRight ();
-				parameters . setPair (); parameters . getLeft () . setDouble (c . alpha); return true;
-			}
-			if (! parameters . isPair ()) return false; PrologElement red   = parameters . getLeft (); if (! red   . isNumber ()) return false; parameters = parameters . getRight ();
-			if (! parameters . isPair ()) return false; PrologElement green = parameters . getLeft (); if (! green . isNumber ()) return false; parameters = parameters . getRight ();
-			if (! parameters . isPair ()) return false; PrologElement blue  = parameters . getLeft (); if (! blue  . isNumber ()) return false; parameters = parameters . getRight ();
-			PrologElement alpha = null;
-			if (parameters . isPair ()) {alpha = parameters . getLeft (); if (! alpha . isNumber ()) return false;}
-			if (at == fxg . foreground_atom) foreground = new Colour (red . getNumber (), green . getNumber (), blue . getNumber (), alpha == null ? 1.0 : alpha . getNumber ());
-			else background = new Colour (red . getNumber (), green . getNumber (), blue . getNumber (), alpha == null ? 1.0 : alpha . getNumber ());
-			fxg . clean = false; return true;
+			if (var != null) {Colour cl = at == fxg . foreground_atom ? foreground : background; set_4 (var, cl . red, cl . green, cl . blue, cl . alpha); return true;}
+			if (c == null) return false;
+			Colour cl = new Colour (a . getNumber (), b . getNumber (), c . getNumber (), d == null ? 1.0 : d . getNumber ());
+			if (at == fxg . foreground_atom) foreground = cl; else background = cl;
+			fxg . clean = false;
+			return true;
 		}
 		// LOCKING
 		if (at == fxg . lock_atom) {locked = true; fxg . clean = false; return true;}
@@ -225,8 +202,7 @@ public class Token extends PrologNativeCode {
 		// ROLLING
 		if (at == fxg . roll_atom) {
 			int ret = randomise_side ();
-			if (parameters . isPair ()) parameters = parameters . getLeft ();
-			if (parameters . isVar ()) parameters . setInteger (ret);
+			if (var != null) var . setInteger (ret);
 			fxg . clean = false;
 			return true;
 		}
