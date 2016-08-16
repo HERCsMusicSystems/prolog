@@ -247,7 +247,7 @@ public class PrologFXGStudio extends PrologServiceClass {
 	public Colour default_deltahedron_foreground = new Colour (0.0, 0.0, 0.0), default_deltahedron_background = new Colour (1.0, 1.0, 0.0);
 	public Colour default_deltahedron_10_foreground = new Colour (0.0, 0.0, 0.0), default_deltahedron_10_background = new Colour (1.0, 0.5, 0.0);
 	public Colour default_dodecahedron_foreground = new Colour (0.0, 0.0, 0.0), default_dodecahedron_background = new Colour (0.5, 1.0, 0.0);
-	public Colour default_icosahedron_foreground = new Colour (0.0, 0.0, 0.0), default_icosahedron_background = new Colour (0.25, 0.0, 1.0);
+	public Colour default_icosahedron_foreground = new Colour (1.0, 1.0, 0.0), default_icosahedron_background = new Colour (0.25, 0.0, 1.0);
 	public Colour dice_foreground (int sides, int multiplier) {
 		switch (sides) {
 		case 0: return default_dice_foreground;

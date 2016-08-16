@@ -27,6 +27,8 @@ public class Point {
 	public Point half () {return new Point (x * 0.5, y * 0.5);}
 	public Point times (double d) {return new Point (x * d, y * d);}
 	public Point times (Point d) {return new Point (x * d . x, y * d . y);}
+	public Point divide (double d) {if (d != 0.0) return new Point (x / d, y / d); return new Point (x, y);}
+	public Point divide (Point d) {return new Point (d . x != 0.0 ? x / d . x : x, d . y != 0.0 ? y / d . y : y);}
 	public Point add (Point p) {return new Point (p . x + x, p . y + y);}
 	public Point sub (Point p) {return new Point (x - p . x, y - p . y);}
 	public boolean eq (Point p) {return p . x == x && p . y == y;}
