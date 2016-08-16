@@ -146,6 +146,70 @@ public class DiceToken extends Token {
 		gc . setFill (fgcc);
 		gc . fillText ("" + (side * multiplier + shift), 0.0, half . y * -0.125);
 	}
+	public void draw_deltahedron (GraphicsContext gc, Viewport v) {
+		double across = location . size . y * 3.0 / 4.0;
+		double gridside = across / 1.11178594;
+		double half_angle = 0.45227844665387872478834364742025;
+		double skirt_angle = 1.1185178801410178944429780442195;
+		double angled_across_angle = 0.5 * (half_angle + skirt_angle);
+		double angled_across = gridside / Math . cos (angled_across_angle - half_angle);
+		double skirt_side = gridside * Math . sin (2.0 * 0.45227844665387872478834364742025);
+		Point start = new Point (0.0, - location . size . y * 0.375);
+		Point p1 = start . add (new Point (skirt_side * Math . sin (skirt_angle), skirt_side * Math . cos (skirt_angle)));
+		Point p2 = start . add (new Point (angled_across * Math . sin (angled_across_angle), angled_across * Math . cos (angled_across_angle)));
+		Point p3 = start . add (new Point (0.0, across));
+		Point p4 = start . add (new Point (angled_across * Math . sin (- angled_across_angle), angled_across * Math . cos (- angled_across_angle)));
+		Point p5 = start . add (new Point (skirt_side * Math . sin (- skirt_angle), skirt_side * Math . cos (- skirt_angle)));
+		Point p6 = start . add (new Point (gridside * Math . sin (half_angle), gridside * Math . cos (half_angle)));
+		Point p7 = start . add (new Point (gridside * Math . sin (- half_angle), gridside * Math . cos (- half_angle)));
+		Color fgcc = fgcc ();
+		double [] xx = {start . x, p1 . x, p2 . x, p3 . x, p4 . x, p5 . x};
+		double [] yy = {start . y, p1 . y, p2 . y, p3 . y, p4 . y, p5 . y};
+		if (background . alpha > 0.0) {gc . setFill (bgcc ()); gc . fillPolygon (xx, yy, 6);}
+		if (! foreground . eq (background)) {
+			gc . setStroke (fgcc); gc . strokePolygon (xx, yy, 6);
+			gc . strokeLine (start . x, start . y, p6 . x, p6 . y);
+			gc . strokeLine (start . x, start . y, p7 . x, p7 . y);
+		}
+		gc . setFont (new Font (location . size . y * 0.3));
+		gc . setTextAlign (TextAlignment . CENTER);
+		gc . setTextBaseline (VPos . CENTER);
+		gc . setFill (fgcc);
+		gc . fillText ("" + (side * multiplier + shift), 0.0, location . size . y * 0.0625);
+	}
+	public void draw_dodecahedron (GraphicsContext gc, Viewport v) {
+		Point half = location . size . half ();
+		Point inner = location . size . times (0.30901699437494742410229341718283);
+		double step = Math . PI / 5.0;
+		double hour = step * 1.5;
+		double [] xx = new double [10];
+		double [] yy = new double [10];
+		for (int ind = 0; ind < 10; ind++) {
+			xx [ind] = half . x * Math . cos (hour);
+			yy [ind] = half . y * Math . sin (hour);
+			hour += step;
+		}
+		double [] xi = new double [5];
+		double [] yi = new double [5];
+		hour = step * 1.5;
+		for (int ind = 0; ind < 5; ind++) {
+			xi [ind] = inner . x * Math . cos (hour);
+			yi [ind] = inner . y * Math . sin (hour);
+			hour += step + step;
+		}
+		Color fgcc = fgcc ();
+		if (background . alpha > 0.0) {gc . setFill (bgcc ()); gc . fillPolygon (xx, yy, 10);}
+		if (! foreground . eq (background)) {
+			gc . setStroke (fgcc); gc . strokePolygon (xx, yy, 10);
+			gc . strokePolygon (xi, yi, 5);
+			for (int ind = 0; ind < 5; ind++) gc . strokeLine (xi [ind], yi [ind], xx [ind + ind], yy [ind + ind]);
+		}
+		gc . setFont (new Font (location . size . y * 0.3));
+		gc . setTextAlign (TextAlignment . CENTER);
+		gc . setTextBaseline (VPos . CENTER);
+		gc . setFill (fgcc);
+		gc . fillText ("" + (side * multiplier + shift), 0.0, half . y * -0.0625);
+	}
 	public void draw_icosahedron (GraphicsContext gc, Viewport v) {
 		Point half = location . size . half ();
 		Point inner = location . size . times (0.30901699437494742410229341718283);
@@ -186,40 +250,7 @@ public class DiceToken extends Token {
 		gc . setTextBaseline (VPos . CENTER);
 		gc . setFill (fgcc);
 		gc . fillText ("" + (side * multiplier + shift), 0.0, half . y * -0.0625);
-}
-	public void draw_dodecahedron (GraphicsContext gc, Viewport v) {
-		Point half = location . size . half ();
-		Point inner = location . size . times (0.30901699437494742410229341718283);
-		double step = Math . PI / 5.0;
-		double hour = step * 1.5;
-		double [] xx = new double [10];
-		double [] yy = new double [10];
-		for (int ind = 0; ind < 10; ind++) {
-			xx [ind] = half . x * Math . cos (hour);
-			yy [ind] = half . y * Math . sin (hour);
-			hour += step;
-		}
-		double [] xi = new double [5];
-		double [] yi = new double [5];
-		hour = step * 1.5;
-		for (int ind = 0; ind < 5; ind++) {
-			xi [ind] = inner . x * Math . cos (hour);
-			yi [ind] = inner . y * Math . sin (hour);
-			hour += step + step;
-		}
-		Color fgcc = fgcc ();
-		if (background . alpha > 0.0) {gc . setFill (bgcc ()); gc . fillPolygon (xx, yy, 10);}
-		if (! foreground . eq (background)) {
-			gc . setStroke (fgcc); gc . strokePolygon (xx, yy, 10);
-			gc . strokePolygon (xi, yi, 5);
-			for (int ind = 0; ind < 5; ind++) gc . strokeLine (xi [ind], yi [ind], xx [ind + ind], yy [ind + ind]);
-		}
-		gc . setFont (new Font (location . size . y * 0.3));
-		gc . setTextAlign (TextAlignment . CENTER);
-		gc . setTextBaseline (VPos . CENTER);
-		gc . setFill (fgcc);
-		gc . fillText ("" + (side * multiplier + shift), 0.0, half . y * -0.0625);
-}
+	}
 	public void draw (GraphicsContext gc, Viewport v) {
 		gc . scale (v . scaling . x, v . scaling . y);
 		gc . translate (- v . location . position . x, - v . location . position . y);
@@ -231,9 +262,9 @@ public class DiceToken extends Token {
 		case 4: draw_tetrahedron (gc, v); break;
 		case 6: draw_cube (gc, v); break;
 		case 8: draw_octahedron (gc, v); break;
+		case 10: draw_deltahedron (gc, v); break;
 		case 12: draw_dodecahedron (gc, v); break;
-		case 20: draw_icosahedron (gc, v); break;
-		default: draw_cube (gc, v); break;
+		default: draw_icosahedron (gc, v); break;
 		}
 	}
 	public DiceToken (PrologFXGStudio fxg, PrologAtom atom, int sides, int shift, int multiplier, Token next) {
