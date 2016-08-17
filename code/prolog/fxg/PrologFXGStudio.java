@@ -222,6 +222,30 @@ class dice_class extends PrologNativeCode {
 	public dice_class (PrologFXGStudio fxg) {this . fxg = fxg;}
 }
 
+class deck_class extends PrologNativeCode {
+	public PrologFXGStudio fxg;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		PrologElement atom = null, text = null;
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isVar ()) atom = el;
+			if (el . isAtom ()) atom = el;
+			if (el . isText ()) text = el;
+			parameters = parameters . getRight ();
+		}
+		if (atom == null) return false;
+		if (atom . isVar ()) atom . setAtom (new PrologAtom ());
+		if (! atom . isAtom ()) return false;
+		if (atom . getAtom () . getMachine () != null) return false;
+		Token machine = new DeckToken (fxg, atom . getAtom (), text == null ? atom . getAtom () . name () : text . getText (), null);
+		if (! atom . getAtom () . setMachine (machine)) return false;
+		fxg . insert_token (machine);
+		fxg . clean = false;
+		return true;
+	}
+	public deck_class (PrologFXGStudio fxg) {this . fxg = fxg;}
+}
+
 public class PrologFXGStudio extends PrologServiceClass {
 	public PrologRoot root;
 	public PrologDirectory directory;
@@ -230,7 +254,7 @@ public class PrologFXGStudio extends PrologServiceClass {
 	public PrologAtom foreground_atom, background_atom;
 	public PrologAtom indexing_atom, indexed_atom, select_atom, deselect_atom, selected_atom;
 	public PrologAtom lock_atom, unlock_atom, locked_atom;
-	public PrologAtom roll_atom;
+	public PrologAtom roll_atom, text_atom;
 	public boolean clean = true;
 	public Token viewports;
 	public Token tokens;
@@ -248,6 +272,7 @@ public class PrologFXGStudio extends PrologServiceClass {
 	public Colour default_deltahedron_10_foreground = new Colour (0.0, 0.0, 0.0), default_deltahedron_10_background = new Colour (1.0, 0.5, 0.0);
 	public Colour default_dodecahedron_foreground = new Colour (0.0, 0.0, 0.0), default_dodecahedron_background = new Colour (0.5, 1.0, 0.0);
 	public Colour default_icosahedron_foreground = new Colour (1.0, 1.0, 0.0), default_icosahedron_background = new Colour (0.25, 0.0, 1.0);
+	public Colour default_deck_foreground = new Colour (0.0, 0.0, 0.0), default_deck_background = new Colour (1.0, 1.0, 0.0);
 	public Colour dice_foreground (int sides, int multiplier) {
 		switch (sides) {
 		case 0: return default_dice_foreground;
@@ -375,6 +400,7 @@ public class PrologFXGStudio extends PrologServiceClass {
 			unlock_atom = directory . searchAtom ("Unlock");
 			locked_atom = directory . searchAtom ("Locked?");
 			roll_atom = directory . searchAtom ("Roll");
+			text_atom = directory . searchAtom ("Text");
 		}
 	}
 	public PrologNativeCode getNativeCode (String name) {
@@ -391,7 +417,7 @@ public class PrologFXGStudio extends PrologServiceClass {
 		if (name . equals ("Text")) return new text_class (this);
 		if (name . equals ("Picture")) return new picture_class (this);
 		if (name . equals ("Dice")) return new dice_class (this);
-		if (name . equals ("Deck")) return new dice_class (this);
+		if (name . equals ("Deck")) return new deck_class (this);
 		return null;
 	}
 	public static void main (String [] args) {

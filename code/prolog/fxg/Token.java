@@ -83,11 +83,13 @@ public class Token extends PrologNativeCode {
 		if (parameters . isEarth ()) {atom . setMachine (null); fxg . clean = false; programmatic_close (); return true;}
 		PrologAtom at = null, grid = null;
 		PrologElement a = null, b = null, c = null, d = null, var = null;
+		String t = null;
 		while (parameters . isPair ()) {
 			PrologElement el = parameters . getLeft ();
 			if (el . isAtom ()) {if (at == null) at = el . getAtom (); else grid = el . getAtom ();}
 			else if (el . isNumber ()) {if (a == null) a = el; else if (b == null) b = el; else if (c == null) c = el; else d = el;}
 			else if (el . isVar ()) var = el;
+			else if (el . isText ()) t = "" + el . getText ();
 			parameters = parameters . getRight ();
 		}
 		if (parameters . isVar ()) var = parameters;
@@ -206,6 +208,13 @@ public class Token extends PrologNativeCode {
 			fxg . clean = false;
 			return true;
 		}
+		if (at == fxg . text_atom) {
+			if (var != null) {var . setText (text); return true;}
+			if (t == null) return false;
+			text = t;
+			fxg . clean = false;
+			return true;
+		}
 		// REPAINT
 		if (at == fxg . repaint_atom) {repaint (); return true;}
 		return false;
@@ -242,12 +251,6 @@ public class Token extends PrologNativeCode {
 			if (parameters -> isPair ()) parameters = parameters -> getLeft ();
 			if (parameters -> isVar ()) parameters -> setAtom (btp -> atom);
 			return true;
-		}
-		if (atom -> getAtom () == text_atom) {
-			if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-			if (parameters -> isVar ()) {parameters -> setText (token -> get_text ()); return true;}
-			if (! parameters -> isText ()) return false;
-			return token -> set_text (parameters -> getText ());
 		}
 		if (atom -> getAtom () == is_deck_atom) {return token -> can_insert ();}
 		return false;

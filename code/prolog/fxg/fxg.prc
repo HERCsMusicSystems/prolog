@@ -12,7 +12,7 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 					ForegroundColour BackgroundColour
 					ASaveBoard
 					re mv
-					r g
+					r g d
 					]
 
 
