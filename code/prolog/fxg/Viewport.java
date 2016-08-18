@@ -80,7 +80,10 @@ public class Viewport extends Token {
 			}
 		});
 		c . setOnMouseReleased (new EventHandler <MouseEvent> () {
-			public void handle (MouseEvent e) {if (fxg . releaseSelectedTokens ()) repaint ();}
+			public void handle (MouseEvent e) {
+				Point p = new Point (e . getX (), e . getY ()) . sub (screen_position . times (scaling)) . divide (scaling);
+				if (fxg . releaseSelectedTokens (p)) repaint ();
+			}
 		});
 	}
 	public void build () {

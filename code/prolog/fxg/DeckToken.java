@@ -31,6 +31,16 @@ import javafx . scene . text . *;
 import javafx . geometry . *;
 
 public class DeckToken extends Token {
+	public Token tokens = null;
+	public void insert_token (Token token) {token . selected = false; token . next = tokens; tokens = token;}
+	public Token release_token (Point p) {
+		if (tokens == null) return null;
+		Token ret = tokens;
+		tokens = ret . next;
+		ret . next = null;
+		ret . location . position = new Point (p);
+		return ret;
+	}
 	public void draw (GraphicsContext gc, Viewport v) {
 		gc . scale (v . scaling . x, v . scaling . y);
 		gc . translate (- v . location . position . x, - v . location . position . y);

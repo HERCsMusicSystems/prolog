@@ -258,7 +258,7 @@ public class PrologFXGStudio extends PrologServiceClass {
 	public boolean clean = true;
 	public Token viewports;
 	public Token tokens;
-	public Token deck;
+	public DeckToken currentDeck = null;
 	public Colour default_viewport_foreground = new Colour (0.0, 0.0, 0.0), default_viewport_background = new Colour (0.0, 0.0, 1.0);
 	public Colour default_rectangle_foreground = new Colour (1.0, 1.0, 0.0), default_rectangle_background = new Colour (0.0, 0.0, 0.0);
 	public Colour default_grid_foreground = new Colour (1.0, 1.0, 1.0), default_grid_background = new Colour (0.0, 0.0, 0.0, 0.0);
@@ -308,10 +308,6 @@ public class PrologFXGStudio extends PrologServiceClass {
 		while (t != null) {t . token_draw (gc, v); t = t . next;}
 	}
 	public Token insert_token (Token token) {
-		if (deck != null) {
-			if (! deck . can_insert ()) return null;
-			return deck . insert (token);
-		}
 		if (tokens == null) return tokens = token;
 		Token tk = tokens;
 		while (tk . next != null) tk = tk . next;
@@ -364,8 +360,32 @@ public class PrologFXGStudio extends PrologServiceClass {
 	public void hardSelectTokens (Point position) {
 		Token t = tokens;
 		while (t != null) {if (t . hitTest (position)) t . actionLocation = t . location . position; t = t . next;}
+		currentDeck = findDeck (position);
 	}
-	public boolean releaseSelectedTokens () {
+	public DeckToken findDeck (Point p) {
+		Token t = tokens;
+		while (t != null) {
+			if (t instanceof DeckToken && t . locked && t . location . contains (p . add (t . location . size . half ()))) return (DeckToken) t;
+			t = t . next;
+		}
+		return null;
+	}
+	public boolean insertSelectedTokensToDeck (DeckToken deck) {
+		boolean inserted = false;
+		while (tokens != null && tokens . selected) {inserted = true; Token t = tokens . next; deck . insert_token (tokens); tokens = t;}
+		Token t = tokens;
+		while (t != null) {
+			while (t . next != null && t . next . selected) {
+				inserted = true; Token tt = t . next . next; deck . insert_token (t . next); t . next = tt;
+			}
+			t = t . next;
+		}
+		return inserted;
+	}
+	public boolean releaseSelectedTokens (Point p) {
+		if (currentDeck != null) {Token t = currentDeck . release_token (p); if (t != null) insert_token (t); currentDeck = null; return t != null;}
+		DeckToken deck = findDeck (p);
+		if (deck != null) {if (insertSelectedTokensToDeck (deck)) return true;}
 		Token t = tokens;
 		boolean ret = false;
 		while (t != null) {if (t . releaseAction ()) ret = true; t = t . next;}
