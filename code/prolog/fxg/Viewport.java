@@ -97,7 +97,7 @@ public class Viewport extends Token {
 		c . setOnDragDropped (new EventHandler <DragEvent> () {
 			public void handle (DragEvent e) {
 				Dragboard db = e . getDragboard ();
-				Point p = new Point (e . getX (), e . getY ()) . sub (location . position . times (scaling)) . divide (scaling);
+				Point p = new Point (e . getX (), e . getY ()) . add (location . position . times (scaling)) . divide (scaling);
 				if (db . hasFiles ()) {
 					Point pp = new Point (0.0, 0.0);
 					for (File file : db . getFiles ()) {
