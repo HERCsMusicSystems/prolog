@@ -25,7 +25,9 @@ package fxg;
 import Prolog . *;
 import Prolog . geometry . *;
 
+import java . io . File;
 import java . io . FileWriter;
+import java . util . ArrayList;
 
 import javafx . application . Platform;
 import javafx . stage . Stage;
@@ -65,7 +67,7 @@ public class Viewport extends Token {
 		c . setOnMousePressed (new EventHandler <MouseEvent> () {
 			public void handle (MouseEvent e) {
 				drag = new Point (e . getX (), e . getY ());
-				fxg . hardSelectTokens (drag . sub (screen_position . times (scaling)) . divide (scaling));
+				fxg . hardSelectTokens (drag . add (location . position . times (scaling)) . divide (scaling));
 				if (e . getClickCount () == 2) {
 					if (fxg . doubleAction ()) repaint ();
 				}
@@ -81,8 +83,38 @@ public class Viewport extends Token {
 		});
 		c . setOnMouseReleased (new EventHandler <MouseEvent> () {
 			public void handle (MouseEvent e) {
-				Point p = new Point (e . getX (), e . getY ()) . sub (screen_position . times (scaling)) . divide (scaling);
+				Point p = new Point (e . getX (), e . getY ()) . add (location . position . times (scaling)) . divide (scaling);
 				if (fxg . releaseSelectedTokens (p)) repaint ();
+			}
+		});
+		c . setOnDragOver (new EventHandler <DragEvent> () {
+			public void handle (DragEvent e) {
+				Dragboard db = e . getDragboard ();
+				if (db . hasFiles ()) e . acceptTransferModes (TransferMode . COPY);
+				else e . consume ();
+			}
+		});
+		c . setOnDragDropped (new EventHandler <DragEvent> () {
+			public void handle (DragEvent e) {
+				Dragboard db = e . getDragboard ();
+				Point p = new Point (e . getX (), e . getY ()) . sub (location . position . times (scaling)) . divide (scaling);
+				if (db . hasFiles ()) {
+					Point pp = new Point (0.0, 0.0);
+					for (File file : db . getFiles ()) {
+						ArrayList <String> pictures = new ArrayList <String> ();
+						pictures . add ("file:" + file . getAbsolutePath ());
+						PrologAtom atom = new PrologAtom ();
+						Token machine = new PictureToken (fxg, atom, pictures, fxg . default_picture_foreground, fxg . default_picture_background, null);
+						machine . location . position = p . add (pp);
+						pp = pp . add (machine . location . size . half ());
+						atom . setMachine (machine);
+						fxg . insert_token (machine);
+						fxg . clean = false;
+					}
+					e . setDropCompleted (true);
+				} else e . setDropCompleted (false);
+				e . consume ();
+				repaint ();
 			}
 		});
 	}
