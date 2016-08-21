@@ -78,7 +78,8 @@ public class Viewport extends Token {
 				Point p = new Point (e . getX (), e . getY ());
 				Point delta = p . sub (drag) . divide (scaling);
 				drag = p;
-				if (fxg . moveSelectedTokens (delta)) repaint ();
+				if (! fxg . moveSelectedTokens (delta)) location . position = location . position . sub (delta);
+				repaint ();
 			}
 		});
 		c . setOnMouseReleased (new EventHandler <MouseEvent> () {
