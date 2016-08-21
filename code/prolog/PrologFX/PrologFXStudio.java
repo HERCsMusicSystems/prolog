@@ -85,8 +85,8 @@ class android_storage extends PrologNativeCode {
 		}
 		if (parameters . isVar ()) var = parameters;
 		if (var == null) return false;
-		String text = android . os . Environment . getExternalStorageDirectory () . toString ();
-		if (path != null) text += "/" + path . getText ();
+		String text = android . os . Environment . getExternalStorageDirectory () . toString () + "/" + fxg . android_path;
+		if (path != null) text += path . getText ();
 		var . setText (text);
 		return true;
 	}
