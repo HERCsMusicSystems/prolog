@@ -92,6 +92,23 @@ class android_storage extends PrologNativeCode {
 	}
 }
 
+class acd_class extends PrologNativeCode {
+	public PrologFXStudio fxg;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isEarth ()) fxg . android_path = fxg . android_path . substring (0, 1 + fxg . android_path . lastIndexOf ("/", fxg . android_path . length () - 2));
+			if (el . isText ()) fxg . android_path += el . getText () + "/";
+			if (el . isAtom ()) fxg . android_path += el . getAtom () . name () + "/";
+			if (el . isVar ()) el . setText (fxg . android_path);
+			parameters = parameters . getRight ();
+		}
+		if (parameters . isVar ()) parameters . setText (fxg . android_path);
+		return true;
+	}
+	public acd_class (PrologFXStudio fxg) {this . fxg = fxg;}
+}
+
 class file_writer_chooser extends PrologNativeCode {
 	public PrologRoot root;
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
@@ -122,6 +139,7 @@ public class PrologFXStudio extends PrologServiceClass {
 	public PrologRoot root;
 	public PrologDirectory directory;
 	public java . io . PrintStream oout;
+	public String android_path = "";
 	public void init (PrologRoot root, PrologDirectory directory) {
 		this . root = root; this . directory = directory;
 		java . io . PipedInputStream pipedInput = new java . io . PipedInputStream ();
@@ -136,6 +154,7 @@ public class PrologFXStudio extends PrologServiceClass {
 		if (name . equals ("file_reader_chooser")) return new file_reader_chooser (root);
 		if (name . equals ("file_writer_chooser")) return new file_writer_chooser (root);
 		if (name . equals ("android_storage")) return new android_storage ();
+		if (name . equals ("acd")) return new acd_class (this);
 		return null;
 	}
 }
