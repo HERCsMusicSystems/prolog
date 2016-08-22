@@ -463,7 +463,7 @@ program studio #machine := "prolog.studio"
 [[command] [command [command]]]
 [[command [[*atom : *t1] : *t2] []] [inner_addcl [[*atom : *t1] :*t2]]]
 [[command [[*atom : *t1] : *t2] []] [write "Can not add clause: " [[[*atom : *t1] : *t2]] "\n"] / fail]
-[[command [*x : *y] []] / [inner_call [*x : *y]]]
+[[command [*x : *y] []] / [inner_call [*x : *y]] [show [*x : *y]]]
 [[command *x *y] [inner_call [*x : *y]]]
 
 [[bootstrap *command] [shebang_reader *atom *command] / [batch [batch] *atom]]
