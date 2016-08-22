@@ -329,12 +329,13 @@ public class PrologRoot {
 		String [] locations = text . split (";");
 		for (int ind = 0; ind < locations . length; ind++) {addSearchDirectory (locations [ind]);}
 	}
-	public void cd (String path) {
-		if (path == null || path . length () < 1 || path . equals ("..")) {pwd = pwd . substring (0, pwd . lastIndexOf ("/")); return;}
-		if (path . charAt (0) == '/') {pwd = "" + path; return;}
-		if (path . length () > 2 && path . charAt (1) == ':') {pwd = "" + path; return;}
-		pwd += "/" + path;
+	public String ccd (String path) {
+		if (path == null || path . length () < 1 || path . equals ("..")) return pwd . substring (0, pwd . lastIndexOf ("/"));
+		if (path . charAt (0) == '/') return "" + path;
+		if (path . length () > 2 && path . charAt (1) == ':') return "" + path;
+		return pwd + "/" + path;
 	}
+	public void cd (String path) {pwd = ccd (path);}
 	public void addArg (String arg) {if (args == null) args = new ArrayList <String> (); args . add (arg);}
 	public int captionId () {return caption_id;}
 	public boolean autoAtoms () {return auto_atoms;}
