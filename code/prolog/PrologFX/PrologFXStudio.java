@@ -74,6 +74,7 @@ class file_reader_chooser extends PrologNativeCode {
 }
 
 class android_storage extends PrologNativeCode {
+	public PrologFXStudio fx;
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
 		PrologElement path = null;
 		PrologElement var = null;
@@ -85,11 +86,12 @@ class android_storage extends PrologNativeCode {
 		}
 		if (parameters . isVar ()) var = parameters;
 		if (var == null) return false;
-		String text = android . os . Environment . getExternalStorageDirectory () . toString () + "/" + fxg . android_path;
+		String text = android . os . Environment . getExternalStorageDirectory () . toString () + "/" + fx . android_path;
 		if (path != null) text += path . getText ();
 		var . setText (text);
 		return true;
 	}
+	public android_storage (PrologFXStudio fx) {this . fx = fx;}
 }
 
 class acd_class extends PrologNativeCode {
@@ -153,7 +155,7 @@ public class PrologFXStudio extends PrologServiceClass {
 		if (name . equals ("fx_stop")) return new fx_stop ();
 		if (name . equals ("file_reader_chooser")) return new file_reader_chooser (root);
 		if (name . equals ("file_writer_chooser")) return new file_writer_chooser (root);
-		if (name . equals ("android_storage")) return new android_storage ();
+		if (name . equals ("android_storage")) return new android_storage (this);
 		if (name . equals ("acd")) return new acd_class (this);
 		return null;
 	}
