@@ -10,7 +10,7 @@
 	</target>
 
 	<target name="compile">
-		<javac srcdir="../code/prolog" destdir="." includeantruntime="false"/>
+		<javac srcdir="../code/prolog" destdir="." includeantruntime="false" listfiles="yes" classpath="${env.ANDROID_HOME}/platforms/android-24/android.jar"/>
 	</target>
 
 	<target name="jar" depends="compile">
@@ -18,6 +18,8 @@
 			<!--<fileset dir="." excludes="studio.jar build.xml"/>-->
 			<fileset dir="." includes="studio.class"/>
 			<fileset dir="." includes="Prolog/*.class"/>
+			<fileset dir="." includes="Prolog/geometry/*.class"/>
+			<fileset dir="." includes="Prolog/studio/*.class"/>
 			<fileset dir="../code/prolog" includes="studio.prc"/>
 			<fileset dir="../code/prolog" includes="keyboard.prc"/>
 			<fileset dir="../code/prolog" includes="test.prc"/>
@@ -29,7 +31,7 @@
 	<target name="fxjar" depends="compile">
 		<jar destfile="fx.jar">
 			<fileset dir="." includes="PrologFX/*.class"/>
-			<fileset dir="../code/prolog" includes="fx.prc"/>
+			<fileset dir="../code/prolog/PrologFX" includes="fx.prc"/>
 		</jar>
 	</target>
 
@@ -48,15 +50,23 @@
 			<arg value="b"/>
 			<arg value="c"/>
 		</java> -->
-		<java classname="studio" classpath="fx.jar;studio.jar;jfxrt.jar"/>
+		<java classname="studio" classpath="fxg.jar;fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"/>
 	</target>
 
 	<target name="fx" depends="jar,fxjar">
-		<java classname="studio" classpath="fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"><arg value="fx"/></java>
+		<java classname="studio" classpath="fxg.jar;fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"><arg value="fx"/></java>
 	</target>
 
 	<target name="fxg" depends="jar,fxjar,fxgjar">
 		<java classname="studio" classpath="fxg.jar;fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"><arg value="fxg"/></java>
+	</target>
+
+	<target name="fxc" depends="jar,fxjar">
+		<java classname="PrologFX.PrologMainFX" classpath="fxg.jar;fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"></java>
+	</target>
+
+	<target name="fxgc" depends="jar,fxjar,fxgjar">
+		<java classname="fxg.PrologFXGStudio" classpath="fxg.jar;fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"></java>
 	</target>
 
 	<target name="test" depends="jar">
