@@ -85,6 +85,7 @@ public class PrologRoot {
 	public int current_foreground = 0xffff00;
 	public int current_background = 0;
 	public int exit_code = 0;
+	public String pwd = System . getProperty ("user.dir");
 	public PrologDirectory root = new PrologDirectory ("user!", null);
 	public void set_uap32_captions () {
 		caption_id = 0;
@@ -327,6 +328,12 @@ public class PrologRoot {
 		if (text == null) return;
 		String [] locations = text . split (";");
 		for (int ind = 0; ind < locations . length; ind++) {addSearchDirectory (locations [ind]);}
+	}
+	public void cd (String path) {
+		if (path == null || path . length () < 1 || path . equals ("..")) {pwd = pwd . substring (0, pwd . lastIndexOf ("/")); return;}
+		if (path . charAt (0) == '/') {pwd = "" + path; return;}
+		if (path . length () > 2 && path . charAt (1) == ':') {pwd = "" + path; return;}
+		pwd += "/" + path;
 	}
 	public void addArg (String arg) {if (args == null) args = new ArrayList <String> (); args . add (arg);}
 	public int captionId () {return caption_id;}
