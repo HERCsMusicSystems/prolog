@@ -149,6 +149,7 @@ public class PrologFXStudio extends PrologServiceClass {
 		oout = new java . io . PrintStream (pipedOutput);
 		try {pipedInput . connect (pipedOutput);} catch (Exception ex) {ex . printStackTrace ();}
 		root . insertReader (pipedInput);
+		try {root . pwd = android . os . Environment . getExternalStorageDirectory () . toString ();} catch (Error e) {}
 	}
 	public PrologNativeCode getNativeCode (String name) {
 		if (name . equals ("fx_start")) return new fx_start (root, oout);
