@@ -1807,7 +1807,7 @@ class file_writer extends PrologNativeCode {
 		if (symbol . isVar ()) symbol . setAtom (new PrologAtom ());
 		PrologAtom atom = symbol . getAtom ();
 		if (atom . getMachine () != null) return false;
-		Prolog . studio . FileWriter fw = new Prolog . studio . FileWriter (atom, root, name . getText ());
+		Prolog . studio . FileWriter fw = new Prolog . studio . FileWriter (atom, root, root . ccd (name . getText ()));
 		if (fw . fw == null) return false;
 		return atom . setMachine (fw);
 	}
@@ -1830,7 +1830,7 @@ class file_reader extends PrologNativeCode {
 		if (symbol . isVar ()) symbol . setAtom (new PrologAtom ());
 		PrologAtom atom = symbol . getAtom ();
 		if (atom . getMachine () != null) return false;
-		Prolog . studio . FileReader fr = new Prolog . studio . FileReader (atom, root, name . getText ());
+		Prolog . studio . FileReader fr = new Prolog . studio . FileReader (atom, root, root . ccd (name . getText ()));
 		if (fr . fi == null) return false;
 		return atom . setMachine (fr);
 	}
@@ -1853,7 +1853,7 @@ class shebang_reader extends PrologNativeCode {
 		if (symbol . isVar ()) symbol . setAtom (new PrologAtom ());
 		PrologAtom atom = symbol . getAtom ();
 		if (atom . getMachine () != null) return false;
-		Prolog . studio . FileReader fr = new Prolog . studio . FileReader (atom, root, name . getText ());
+		Prolog . studio . FileReader fr = new Prolog . studio . FileReader (atom, root, root . ccd (name . getText ()));
 		if (fr . fi == null) return false;
 		fr . sr . shebang ();
 		return atom . setMachine (fr);
@@ -2008,20 +2008,23 @@ class search_directories extends PrologNativeCode {
 	public search_directories (PrologRoot root) {this . root = root;}
 }
 
-/*
-class cd : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {return root -> change_directory ("..");}
-		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		if (parameters -> isVar ()) {parameters -> setText (root -> getCWD ()); return true;}
-		if (parameters -> isText ()) return root -> change_directory (parameters -> getText ());
-		return false;
+class cd extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isEarth ()) {root . cd (null); return true;}
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isEarth ()) root . cd (null);
+			if (el . isText ()) root . cd (el . getText ());
+			if (el . isAtom ()) root . cd (el . getAtom () . name ());
+			if (el . isVar ()) el . setText (root . pwd);
+			parameters = parameters . getRight ();
+		}
+		if (parameters . isVar ()) parameters . setText (root . pwd);
+		return true;
 	}
-	cd (PrologRoot * root) {this -> root = root;}
-};
-*/
+	public cd (PrologRoot root) {this . root = root;}
+}
 
 class relativise_path extends PrologNativeCode {
 	public String relativise (String path, String pwd) {
@@ -3069,9 +3072,7 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("create_module")) return new create_module (root);
 		if (name . equals ("add_search_directory")) return new add_search_directory (root);
 		if (name . equals ("search_directories")) return new search_directories (root);
-	/*
-	if (strcmp (name, "cd") == 0) return new cd (root);
-	*/
+		if (name . equals ("cd")) return new cd (root);
 		if (name . equals ("relativise_path")) return new relativise_path ();
 	/*
 	if (strcmp (name, "DIR") == 0) return new DIR (root);

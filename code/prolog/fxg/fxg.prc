@@ -10,7 +10,6 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 					Select Deselect Selected? Lock Unlock Locked?
 					Roll
 					ForegroundColour BackgroundColour
-					ASaveBoard
 					re mv
 					r g d
 					]
@@ -32,8 +31,6 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 #machine Picture := "Picture"
 #machine Dice := "Dice"
 #machine Deck := "Deck"
-
-[[ASaveBoard *text] [android_storage *text *file] [SaveBoard *file]]
 
 [[re : *command] *command [Repaint]]
 

@@ -179,7 +179,7 @@ class picture_class extends PrologNativeCode {
 			PrologElement el = parameters . getLeft ();
 			if (el . isVar ()) atom = el;
 			if (el . isAtom ()) atom = el;
-			if (el . isText ()) pictures . add ("file:" + el . getText ());
+			if (el . isText ()) pictures . add ("file:" + fxg . root . ccd (el . getText ()));
 			parameters = parameters . getRight ();
 		}
 		if (atom == null) return false;
