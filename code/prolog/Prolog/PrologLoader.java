@@ -56,7 +56,7 @@ public class PrologLoader extends PrologReader {
 		fi = PrologLoader . class . getResourceAsStream ("/" + file_name);
 		if (fi == null) {
 			try {
-				fi = new FileInputStream (file_name);
+				fi = new FileInputStream (root . ccd (file_name));
 				int search_index = 0;
 				while (fi == null && search_index < root . search_directories . size ()) {
 					fi = new FileInputStream (root . search_directories . get (search_index++) + file_name);

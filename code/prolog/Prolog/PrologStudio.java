@@ -1807,7 +1807,7 @@ class file_writer extends PrologNativeCode {
 		if (symbol . isVar ()) symbol . setAtom (new PrologAtom ());
 		PrologAtom atom = symbol . getAtom ();
 		if (atom . getMachine () != null) return false;
-		Prolog . studio . FileWriter fw = new Prolog . studio . FileWriter (atom, root, name . getText ());
+		Prolog . studio . FileWriter fw = new Prolog . studio . FileWriter (atom, root, root . ccd (name . getText ()));
 		if (fw . fw == null) return false;
 		return atom . setMachine (fw);
 	}
@@ -1830,7 +1830,7 @@ class file_reader extends PrologNativeCode {
 		if (symbol . isVar ()) symbol . setAtom (new PrologAtom ());
 		PrologAtom atom = symbol . getAtom ();
 		if (atom . getMachine () != null) return false;
-		Prolog . studio . FileReader fr = new Prolog . studio . FileReader (atom, root, name . getText ());
+		Prolog . studio . FileReader fr = new Prolog . studio . FileReader (atom, root, root . ccd (name . getText ()));
 		if (fr . fi == null) return false;
 		return atom . setMachine (fr);
 	}
@@ -1853,7 +1853,7 @@ class shebang_reader extends PrologNativeCode {
 		if (symbol . isVar ()) symbol . setAtom (new PrologAtom ());
 		PrologAtom atom = symbol . getAtom ();
 		if (atom . getMachine () != null) return false;
-		Prolog . studio . FileReader fr = new Prolog . studio . FileReader (atom, root, name . getText ());
+		Prolog . studio . FileReader fr = new Prolog . studio . FileReader (atom, root, root . ccd (name . getText ()));
 		if (fr . fi == null) return false;
 		fr . sr . shebang ();
 		return atom . setMachine (fr);
