@@ -103,7 +103,7 @@ public class Viewport extends Token {
 					Point pp = new Point (0.0, 0.0);
 					for (File file : db . getFiles ()) {
 						ArrayList <String> pictures = new ArrayList <String> ();
-						pictures . add ("file:" + file . getAbsolutePath ());
+						pictures . add ("file:" + fxg . root . ccd (file . getAbsolutePath ()));
 						PrologAtom atom = new PrologAtom ();
 						Token machine = new PictureToken (fxg, atom, pictures, fxg . default_picture_foreground, fxg . default_picture_background, null);
 						machine . location . position = p . add (pp);
