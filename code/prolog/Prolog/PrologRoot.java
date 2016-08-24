@@ -335,6 +335,23 @@ public class PrologRoot {
 		if (path . length () > 2 && path . charAt (1) == ':') return "" + path;
 		return pwd + "/" + path;
 	}
+	public String relativise (String path, String pwd) {
+		int ipwd = 0;
+		int ipath = 0;
+		String relative = "";
+		if (path . length () <= 0) return pwd;
+		while (pwd . length () > ipwd && (pwd . charAt (ipwd) == path . charAt (ipath) || (pwd . charAt (ipwd) == '\\' && path . charAt (ipath) == '/'))) {ipwd++; ipath++;}
+		if (path . charAt (ipath) == '/' || path . charAt (ipath) == '\\') ipath++;
+		boolean should_escape = false;
+		while (pwd . length () > ipwd) {
+			if (pwd . charAt (ipwd) == '/' || pwd . charAt (ipwd) == '\\') {should_escape = false; relative += "../";}
+			else should_escape = true;
+			ipwd++;
+		}
+		if (should_escape) relative += "../";
+		return relative + path . substring (ipath);
+	}
+	public String relativise (String path) {return relativise (path, pwd);}
 	public void cd (String path) {pwd = ccd (path);}
 	public void addArg (String arg) {if (args == null) args = new ArrayList <String> (); args . add (arg);}
 	public int captionId () {return caption_id;}

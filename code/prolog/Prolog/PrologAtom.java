@@ -29,7 +29,7 @@ public class PrologAtom {
 	public boolean Protected = false;
 	public PrologElement firstClause = null;
 	public PrologNativeCode machine = null;
-	public PrologAtom () {atomName = "<" + this . toString () + "#" + System . currentTimeMillis () + ">";}
+	public PrologAtom () {atomName = "<" + this . toString () . replace ("@", "=") . replace ("Prolog.Prolog", "") + "#" + System . currentTimeMillis () + ">";}
 	public PrologAtom (String name) {atomName = "" + name;}
 	public PrologAtom (String name, PrologAtom root) {atomName = "" + name; next = root;}
 	public String name () {return atomName;}
