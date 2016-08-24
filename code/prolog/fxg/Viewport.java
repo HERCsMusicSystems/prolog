@@ -105,7 +105,7 @@ public class Viewport extends Token {
 					Point pp = new Point (0.0, 0.0);
 					for (File file : db . getFiles ()) {
 						ArrayList <String> pictures = new ArrayList <String> ();
-						pictures . add ("file:" + fxg . root . ccd (file . getAbsolutePath ()));
+						pictures . add (file . getAbsolutePath ());
 						PrologAtom atom = new PrologAtom ();
 						Token machine = new PictureToken (fxg, atom, pictures, fxg . default_picture_foreground, fxg . default_picture_background, null);
 						machine . location . position = p . add (pp);
@@ -171,14 +171,15 @@ public class Viewport extends Token {
 	public void sizeChanged () {
 		Platform . runLater (new Runnable () {public void run () {viewport . setWidth (location . size . x); viewport . setHeight (location . size . y);}});
 	}
-	public void programmatic_close () {fxg . remove_viewport (this); Platform . runLater (new Runnable () {public void run () {viewport . close ();}});}
+	public void programmatic_close () {fxg . remove_viewport (this); if (! main) Platform . runLater (new Runnable () {public void run () {viewport . close ();}});}
 	public void ui_close () {fxg . remove_viewport (this); atom . setMachine (null); fxg . clean = false;}
 	public void save (FileWriter tc) {
-		super . save (tc);
 		try {
-			tc . write ("[Viewport " + atom . name () + " \"" + viewport_name + "\" "
+			if (main) tc . write ("[MainViewport " + atom . name () + " \"" + viewport_name + "\"]\n");
+			else tc . write ("[Viewport " + atom . name () + " \"" + viewport_name + "\" "
 				+ location . position . x + " " + location . position . y + " " + location . size . x + " " + location . size . y + "]\n");
-			if (! screen_position . eq (new Point (0.0, 0.0))) tc . write ("[" + atom . name () + " Position " + screen_position . x + " " + screen_position . y + "]\n");
+			if (! main && ! screen_position . eq (new Point (0.0, 0.0)))
+				tc . write ("[" + atom . name () + " Position " + screen_position . x + " " + screen_position . y + "]\n");
 			if (! scaling . eq (new Point (1.0, 1.0))) tc . write ("[" + atom . name () + " Scaling " + scaling . x + " " + scaling . y + "]\n");
 			if (side != edit_modes . move . ordinal ()) tc . write ("[" + atom . name () + " Mode " + side + "]\n");
 			tc . write ("\n");

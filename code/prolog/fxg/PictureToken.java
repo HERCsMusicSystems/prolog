@@ -26,12 +26,14 @@ import Prolog . *;
 import Prolog . geometry . *;
 
 import java . util . ArrayList;
+import java . io . FileWriter;
 
 import javafx . scene . canvas . *;
 import javafx . scene . image . *;
 
 public class PictureToken extends Token {
 	public ArrayList <Image> images = new ArrayList <Image> ();
+	public ArrayList <String> locations;
 	public int numberOfSides () {return images . size () + 1;}
 	public int randomise_side () {return side = (int) (Math . random () * images . size ());}
 	public void sideChanged () {
@@ -56,9 +58,19 @@ public class PictureToken extends Token {
 			gc . strokeRoundRect (- half . x, - half . y, location . size . x, location . size . y, rounding . x, rounding . y);
 		}
 	}
+	public void save (FileWriter tc) {
+		try {
+			tc . write ("[Picture " + atom . name ());
+			for (String location : locations) tc . write (" \"" + fxg . root . relativise (location) + "\"");
+			tc . write ("]\n");
+			tc . write ("[" + atom . name () + " Location " + location . position . x + " " + location . position . y + "]\n");
+			tc . write ("\n");
+		} catch (Exception ex) {}
+	}
 	public PictureToken (PrologFXGStudio fxg, PrologAtom atom, ArrayList <String> pictures, Colour foreground, Colour background, Token next) {
 		super (fxg, atom, foreground, background, next);
-		for (String name : pictures) images . add (new Image (name));
+		locations = pictures;
+		for (String name : pictures) images . add (new Image ("file:" + fxg . root . ccd (name)));
 		sideChanged ();
 	}
 }

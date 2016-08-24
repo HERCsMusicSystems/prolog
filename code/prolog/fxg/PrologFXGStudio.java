@@ -179,7 +179,7 @@ class picture_class extends PrologNativeCode {
 			PrologElement el = parameters . getLeft ();
 			if (el . isVar ()) atom = el;
 			if (el . isAtom ()) atom = el;
-			if (el . isText ()) pictures . add ("file:" + fxg . root . ccd (el . getText ()));
+			if (el . isText ()) pictures . add (el . getText ());
 			parameters = parameters . getRight ();
 		}
 		if (atom == null) return false;
@@ -314,10 +314,10 @@ public class PrologFXGStudio extends PrologServiceClass {
 		return tk . next = token;
 	}
 	public void remove_token (Token token) {
-		if (tokens == token) {tokens = tokens . next; token . next = null; return;}
+		if (tokens == token) {tokens = tokens . next; return;}
 		Token t = tokens;
 		while (t . next != null) {
-			if (t . next == token) {t . next = token . next; token . next = null; return;}
+			if (t . next == token) {t . next = token . next; return;}
 			t = t . next;
 		}
 	}
@@ -331,8 +331,10 @@ public class PrologFXGStudio extends PrologServiceClass {
 		try {
 			FileWriter tc = new FileWriter (file_name);
 			tc . write ("[auto_atoms]\n\n");
-			tc . write ("[Erase]\n");
-			if (viewports != null) viewports . save (tc);
+			tc . write ("[Erase]\n\n");
+			Token token = tokens;
+			while (token != null) {token . save (tc); token = token . next;}
+			if (viewports != null) viewports . save_stack (tc);
 			tc . write ("[wait 100]\n");
 			tc . write ("[Clean]\n");
 			tc . write ("[exit]\n\n");
