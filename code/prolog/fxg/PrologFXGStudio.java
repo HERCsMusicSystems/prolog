@@ -28,6 +28,8 @@ import Prolog . geometry . *;
 import java . io . FileWriter;
 import java . util . ArrayList;
 
+import javafx . scene . paint . Color;
+
 class viewport_class extends PrologNativeCode {
 	public PrologFXGStudio fxg;
 	public boolean main;
@@ -260,6 +262,8 @@ public class PrologFXGStudio extends PrologServiceClass {
 	public Token tokens;
 	public DeckToken currentDeck = null;
 	public Colour default_viewport_foreground = new Colour (0.0, 0.0, 0.0), default_viewport_background = new Colour (0.0, 0.0, 1.0);
+	public Color vbgcc () {return Color . color (default_viewport_background . red, default_viewport_background . green,
+												default_viewport_background . blue, default_viewport_background . alpha);}
 	public Colour default_rectangle_foreground = new Colour (1.0, 1.0, 0.0), default_rectangle_background = new Colour (0.0, 0.0, 0.0);
 	public Colour default_grid_foreground = new Colour (1.0, 1.0, 1.0), default_grid_background = new Colour (0.0, 0.0, 0.0, 0.0);
 	public Colour default_text_foreground = new Colour (1.0, 1.0, 0.0), default_text_background = new Colour (1.0, 1.0, 0.0);

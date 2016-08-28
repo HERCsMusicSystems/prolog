@@ -61,7 +61,7 @@ public class Viewport extends Token {
 	public Point drag = new Point (0.0, 0.0);
 	public void repaint () {
 		canvas . setWidth (location . size . x = viewport . getWidth ()); canvas . setHeight (location . size . y = viewport . getHeight ());
-		gc . setFill (bgcc ()); gc . fillRect (0, 0, canvas . getWidth (), canvas . getHeight ()); fxg . draw (gc, this);
+		gc . setFill (fxg . vbgcc ()); gc . fillRect (0, 0, canvas . getWidth (), canvas . getHeight ()); fxg . draw (gc, this);
 	}
 	public void addEvents (Canvas c) {
 		c . setOnMousePressed (new EventHandler <MouseEvent> () {
