@@ -10,6 +10,7 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 					Select Deselect Selected? Lock Unlock Locked?
 					Roll
 					ForegroundColour BackgroundColour
+					DefaultBackground
 					re mv
 					r g d
 					]
@@ -31,6 +32,8 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 #machine Picture := "Picture"
 #machine Dice := "Dice"
 #machine Deck := "Deck"
+
+#machine DefaultBackground := "DefaultBackground"
 
 [[re : *command] *command [Repaint]]
 

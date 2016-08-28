@@ -248,6 +248,38 @@ class deck_class extends PrologNativeCode {
 	public deck_class (PrologFXGStudio fxg) {this . fxg = fxg;}
 }
 
+class DefaultBackgroundClass extends PrologNativeCode {
+	public PrologFXGStudio fxg;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		PrologElement c [] = new PrologElement [4];
+		int count = 0;
+		PrologElement var = null;
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isVar ()) var = el;
+			if (el . isNumber () && count < 4) c [count++] = el;
+			parameters = parameters . getRight ();
+		}
+		if (parameters . isVar ()) var = parameters;
+		if (var != null) {
+			var . setPair (); var . getLeft () . setDouble (fxg . default_viewport_background . red); var = var . getRight ();
+			var . setPair (); var . getLeft () . setDouble (fxg . default_viewport_background . green); var = var . getRight ();
+			var . setPair (); var . getLeft () . setDouble (fxg . default_viewport_background . blue); var = var . getRight ();
+			var . setPair (); var . getLeft () . setDouble (fxg . default_viewport_background . alpha); return true;
+		}
+		if (count == 3) {
+			fxg . default_viewport_background = new Colour (c [0] . getNumber (), c [1] . getNumber (), c [2] . getNumber ());
+			return true;
+		}
+		if (count == 4) {
+			fxg . default_viewport_background = new Colour (c [0] . getNumber (), c [1] . getNumber (), c [2] . getNumber (), c [3] . getNumber ());
+			return true;
+		}
+		return false;
+	}
+	public DefaultBackgroundClass (PrologFXGStudio fxg) {this . fxg = fxg;}
+}
+
 public class PrologFXGStudio extends PrologServiceClass {
 	public PrologRoot root;
 	public PrologDirectory directory;
@@ -336,6 +368,9 @@ public class PrologFXGStudio extends PrologServiceClass {
 			FileWriter tc = new FileWriter (file_name);
 			tc . write ("[auto_atoms]\n\n");
 			tc . write ("[Erase]\n\n");
+			if (! default_viewport_background . eq (new Colour (0.0, 0.0, 1.0)))
+				tc . write ("[DefaultBackground " + default_viewport_background . red + " " + default_viewport_background . green + " "
+				+ default_viewport_background . blue + " " + default_viewport_background . alpha + "]\n\n");
 			Token token = tokens;
 			while (token != null) {token . save (tc); token = token . next;}
 			if (viewports != null) viewports . save_stack (tc);
@@ -347,6 +382,7 @@ public class PrologFXGStudio extends PrologServiceClass {
 		clean = true;
 	}
 	public void erase () {
+		default_viewport_background = new Colour (0.0, 0.0, 1.0);
 		if (viewports != null) viewports . erase (); viewports = null;
 		if (tokens != null) tokens . erase (); tokens = null;
 		clean = true;
@@ -444,6 +480,7 @@ public class PrologFXGStudio extends PrologServiceClass {
 		if (name . equals ("Picture")) return new picture_class (this);
 		if (name . equals ("Dice")) return new dice_class (this);
 		if (name . equals ("Deck")) return new deck_class (this);
+		if (name . equals ("DefaultBackground")) return new DefaultBackgroundClass (this);
 		return null;
 	}
 	public static void main (String [] args) {

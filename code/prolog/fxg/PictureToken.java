@@ -61,7 +61,7 @@ public class PictureToken extends Token {
 	public void save (FileWriter tc) {
 		try {
 			tc . write ("[Picture " + atom . name ());
-			for (String location : locations) tc . write (" \"" + fxg . root . relativise (location) + "\"");
+			for (String location : locations) tc . write (" \"" + fxg . root . relativise (fxg . root . ccd (location)) + "\"");
 			tc . write ("]\n");
 			tc . write ("[" + atom . name () + " Location " + location . position . x + " " + location . position . y + "]\n");
 			tc . write ("\n");
