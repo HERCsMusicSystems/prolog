@@ -25,6 +25,8 @@ package fxg;
 import Prolog . *;
 import Prolog . geometry . *;
 
+import java . io . FileWriter;
+
 import javafx . scene . canvas . *;
 import javafx . scene . paint . *;
 import javafx . scene . text . *;
@@ -62,8 +64,27 @@ public class DeckToken extends Token {
 		gc . setTextBaseline (VPos . CENTER);
 		gc . fillText (text, 0.0, 0.0);
 	}
+	public void save (FileWriter tc) {
+		try {
+			tc . write ("[Deck " + atom . name () + " \"" + text . replace ("\"", "\\\"") + "\"]\n");
+			save_location_and_size (tc);
+			save_scaling (tc);
+			save_rotation (tc);
+			save_rounding (tc);
+			save_foreground (tc, fxg . default_deck_foreground);
+			save_background (tc, fxg . default_deck_background);
+			save_lock (tc);
+			if (locked && tokens != null) {
+				tc . write ("[" + atom . name () + " Select]\n\n");
+				tokens . save_stack (tc);
+				tc . write ("[" + atom . name () + " Deselect]\n");
+			}
+			tc . write ("\n");
+		} catch (Exception ex) {}
+	}
 	public DeckToken (PrologFXGStudio fxg, PrologAtom atom, String text, Token next) {
 		super (fxg, atom, fxg . default_deck_foreground, fxg . default_deck_background, next);
 		this . text = "" + text;
 	}
 }
+

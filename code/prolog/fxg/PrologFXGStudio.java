@@ -344,6 +344,8 @@ public class PrologFXGStudio extends PrologServiceClass {
 		while (t != null) {t . token_draw (gc, v); t = t . next;}
 	}
 	public Token insert_token (Token token) {
+		DeckToken deck = findSelectedDeck ();
+		if (deck != null) {token . next = deck . tokens; return deck . tokens = token;}
 		if (tokens == null) return tokens = token;
 		Token tk = tokens;
 		while (tk . next != null) tk = tk . next;
@@ -408,6 +410,14 @@ public class PrologFXGStudio extends PrologServiceClass {
 		Token t = tokens;
 		while (t != null) {
 			if (t instanceof DeckToken && t . locked && t . location . contains (p . add (t . location . size . half ()))) return (DeckToken) t;
+			t = t . next;
+		}
+		return null;
+	}
+	public DeckToken findSelectedDeck () {
+		Token t = tokens;
+		while (t != null) {
+			if (t instanceof DeckToken & t . locked & t . selected) return (DeckToken) t;
 			t = t . next;
 		}
 		return null;
