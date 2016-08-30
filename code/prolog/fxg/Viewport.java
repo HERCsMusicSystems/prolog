@@ -175,13 +175,12 @@ public class Viewport extends Token {
 	public void ui_close () {fxg . remove_viewport (this); atom . setMachine (null); fxg . clean = false;}
 	public void save (FileWriter tc) {
 		try {
-			if (main) tc . write ("[MainViewport " + atom . name () + " \"" + viewport_name + "\"]\n");
-			else tc . write ("[Viewport " + atom . name () + " \"" + viewport_name + "\" "
-				+ location . position . x + " " + location . position . y + " " + location . size . x + " " + location . size . y + "]\n");
-			if (! main && ! screen_position . eq (new Point (0.0, 0.0)))
-				tc . write ("[" + atom . name () + " Position " + screen_position . x + " " + screen_position . y + "]\n");
-			if (! scaling . eq (new Point (1.0, 1.0))) tc . write ("[" + atom . name () + " Scaling " + scaling . x + " " + scaling . y + "]\n");
-			if (side != edit_modes . move . ordinal ()) tc . write ("[" + atom . name () + " Mode " + side + "]\n");
+			if (main) {
+				tc . write ("[MainViewport " + atom . name () + " \"" + viewport_name + "\"]\n");
+			} else tc . write ("[Viewport " + atom . name () + " \"" + viewport_name + "\" "
+				+ screen_position . x + " " + screen_position . y + " " + location . size . x + " " + location . size . y + "]\n");
+			save_location (tc);
+			save_scaling (tc);
 			tc . write ("\n");
 		} catch (Exception ex) {}
 	}

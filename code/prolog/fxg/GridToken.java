@@ -25,6 +25,8 @@ package fxg;
 import Prolog . *;
 import Prolog . geometry . *;
 
+import java . io . FileWriter;
+
 import javafx . scene . canvas . *;
 import javafx . scene . text . *;
 import javafx . scene . paint . *;
@@ -174,6 +176,19 @@ public class GridToken extends Token {
 		case 4: draw_horizontal_hex_grid (gc, v, true); break;
 		default: draw_square_grid (gc, v); break;
 		}
+	}
+	public void save (FileWriter tc) {
+		try {
+			tc . write ("[Grid " + atom . name () + "]\n");
+			save_location_and_size (tc);
+			save_scaling (tc);
+			save_rotation (tc);
+			save_side (tc);
+			save_indexing (tc);
+			save_foreground (tc, fxg . default_picture_foreground);
+			save_lock (tc);
+			tc . write ("\n");
+		} catch (Exception ex) {}
 	}
 	public GridToken (PrologFXGStudio fxg, PrologAtom atom, Colour foreground, Colour background, Token next) {super (fxg, atom, foreground, background, next);}
 }

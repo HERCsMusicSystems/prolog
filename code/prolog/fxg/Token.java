@@ -258,7 +258,53 @@ public class Token extends PrologNativeCode {
 	public void erase () {programmatic_close (); atom . setMachine (null); if (next != null) next . erase ();}
 	public void programmatic_close () {fxg . remove_token (this);}
 	public void save_stack (FileWriter tc) {if (next != null) next . save_stack (tc); save (tc);}
-	public void save (FileWriter rc) {}
+	public void save (FileWriter tc) {}
+	public void save_location (FileWriter tc) {
+		if (! location . position . eq (new Point (0.0, 0.0)))
+			try {tc . write ("[" + atom . name () + " Location " + location . position . x + " " + location . position . y + "]\n");} catch (Exception ex) {}
+	}
+	public void save_location_and_size (FileWriter tc) {
+		try {
+			tc . write ("[" + atom . name () + " Location " + location . position . x + " " + location . position . y + " "
+			+ location . size . x + " " + location . size . y + "]\n");
+		} catch (Exception e) {}
+	}
+	public void save_scaling (FileWriter tc) {
+		if (! scaling . eq (new Point (1.0, 1.0)))
+			try {tc . write ("[" + atom . name () + " Scaling " + scaling . x + " " + scaling . y + "]\n");} catch (Exception ex) {}
+	}
+	public void save_rotation (FileWriter tc) {
+		if (rotation != 0.0) try {tc . write ("[" + atom . name () + " Rotation " + rotation + "]\n");} catch (Exception ex) {}
+	}
+	public void save_rounding (FileWriter tc) {
+		if (! rounding . eq (new Point (0.0, 0.0)))
+			try {tc . write ("[" + atom . name () + " Rounding " + rounding . x + " " + rounding . y + "]\n");} catch (Exception ex) {}
+	}
+	public void save_indexing (FileWriter tc) {
+		try {
+			tc . write ("[" + atom . name () + " Indexing " + indexing . position . x + " " + indexing . position . y + " "
+			+ indexing . size . x + " " + indexing . size . y + "]\n");
+			if (! indexed) tc . write ("[" + atom . name () + " Indexing]\n");
+		} catch (Exception ex) {}
+	}
+	public void save_lock (FileWriter tc) {if (locked) try {tc . write ("[" + atom . name () + " Lock]\n");} catch (Exception ex) {}}
+	public void save_foreground (FileWriter tc, Colour c) {
+		if (! foreground . eq (c))
+			try {
+				tc . write ("[" + atom . name () + " ForegroundColour " + foreground . red + " " + foreground . green + " " + foreground . blue);
+				if (foreground . alpha != c . alpha) tc . write (" " + foreground . alpha);
+				tc . write ("]\n");
+			} catch (Exception ex) {}
+	}
+	public void save_background (FileWriter tc, Colour c) {
+		if (! background . eq (c))
+			try {
+				tc . write ("[" + atom . name () + " BackgroundColour " + background . red + " " + background . green + " " + background . blue);
+				if (background . alpha != c . alpha) tc . write (" " + background . alpha);
+				tc . write ("]\n");
+			} catch (Exception ex) {}
+	}
+	public void save_side (FileWriter tc) {if (side != 0) try {tc . write ("[" + atom . name () + " Side " + side + "]\n");} catch (Exception ex) {}}
 	public void setPosition (Point position) {location . position = new Point (position);}
 	public Point getPosition () {return new Point (location . position . x, location . position . y);}
 	public void sizeChanged () {}

@@ -63,7 +63,14 @@ public class PictureToken extends Token {
 			tc . write ("[Picture " + atom . name ());
 			for (String location : locations) tc . write (" \"" + fxg . root . relativise (fxg . root . ccd (location)) + "\"");
 			tc . write ("]\n");
-			tc . write ("[" + atom . name () + " Location " + location . position . x + " " + location . position . y + "]\n");
+			save_location (tc);
+			save_scaling (tc);
+			save_rotation (tc);
+			save_side (tc);
+			save_rounding (tc);
+			save_foreground (tc, fxg . default_picture_foreground);
+			save_background (tc, fxg . default_picture_background);
+			save_lock (tc);
 			tc . write ("\n");
 		} catch (Exception ex) {}
 	}
