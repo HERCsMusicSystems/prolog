@@ -64,6 +64,7 @@ public class DeckToken extends Token {
 		gc . setTextBaseline (VPos . CENTER);
 		gc . fillText (text, 0.0, 0.0);
 	}
+	public void erase () {if (tokens != null) tokens . erase (); tokens = null; super . erase ();}
 	public void save (FileWriter tc) {
 		try {
 			tc . write ("[Deck " + atom . name () + " \"" + text . replace ("\"", "\\\"") + "\"]\n");

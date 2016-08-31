@@ -25,6 +25,8 @@ package fxg;
 import Prolog . *;
 import Prolog . geometry . *;
 
+import java . io . FileWriter;
+
 import javafx . scene . canvas . *;
 import javafx . scene . text . *;
 import javafx . scene . paint . *;
@@ -267,9 +269,23 @@ public class DiceToken extends Token {
 		default: draw_icosahedron (gc, v); break;
 		}
 	}
+	public void save (FileWriter tc) {
+		try {
+			tc . write ("[Dice " + atom . name () + " " + sides + " " + shift + " " + multiplier + "]\n");
+			save_location_and_size (tc);
+			save_scaling (tc);
+			save_rotation (tc);
+			save_side (tc);
+			save_foreground (tc, fxg . dice_foreground (sides, multiplier));
+			save_background (tc, fxg . dice_background (sides, multiplier));
+			save_lock (tc);
+			tc . write ("\n");
+		} catch (Exception ex) {}
+	}
 	public DiceToken (PrologFXGStudio fxg, PrologAtom atom, int sides, int shift, int multiplier, Token next) {
 		super (fxg, atom, fxg . dice_foreground (sides, multiplier), fxg . dice_background (sides, multiplier), next);
 		this . sides = sides; this . shift = shift; this . multiplier = multiplier;
 		this . rounding = new Point (16.0, 16.0);
 	}
 }
+
