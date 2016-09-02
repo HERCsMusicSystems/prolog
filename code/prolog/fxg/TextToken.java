@@ -25,6 +25,8 @@ package fxg;
 import Prolog . *;
 import Prolog . geometry . *;
 
+import java . io . FileWriter;
+
 import javafx . scene . canvas . *;
 import javafx . scene . text . *;
 import javafx . geometry . *;
@@ -49,6 +51,19 @@ public class TextToken extends Token {
 			gc . setStroke (fgcc ());
 			gc . strokeText (text, 0.0, 0.0);
 		}
+	}
+	public void save (FileWriter tc) {
+		try {
+			tc . write ("[Text " + atom . name () + "\"" + text . replace ("\"", "\\\"") + "\"]\n");
+			save_location_and_size (tc);
+			save_scaling (tc);
+			save_rotation (tc);
+			save_rounding (tc);
+			save_foreground (tc, fxg . default_deck_foreground);
+			save_background (tc, fxg . default_deck_background);
+			save_lock (tc);
+			tc . write ("\n");
+		} catch (Exception ex) {}
 	}
 	public TextToken (PrologFXGStudio fxg, PrologAtom atom, String text, double font_height, Colour foreground, Colour background, Token next) {
 		super (fxg, atom, foreground, background, next);

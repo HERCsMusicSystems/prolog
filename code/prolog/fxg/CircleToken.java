@@ -25,6 +25,8 @@ package fxg;
 import Prolog . *;
 import Prolog . geometry . *;
 
+import java . io . FileWriter;
+
 import javafx . scene . canvas . *;
 
 public class CircleToken extends Token {
@@ -44,5 +46,19 @@ public class CircleToken extends Token {
 			gc . strokeOval (- half . x, - half . y, location . size . x, location . size . y);
 		}
 	}
+	public void save (FileWriter tc) {
+		try {
+			tc . write ("[Circle " + atom . name () + "]\n");
+			save_location_and_size (tc);
+			save_scaling (tc);
+			save_rotation (tc);
+			save_rounding (tc);
+			save_foreground (tc, fxg . default_deck_foreground);
+			save_background (tc, fxg . default_deck_background);
+			save_lock (tc);
+			tc . write ("\n");
+		} catch (Exception ex) {}
+	}
 	public CircleToken (PrologFXGStudio fxg, PrologAtom atom, Colour foreground, Colour background, Token next) {super (fxg, atom, foreground, background, next);}
 }
+
