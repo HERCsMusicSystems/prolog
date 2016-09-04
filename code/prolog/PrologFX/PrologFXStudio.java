@@ -99,6 +99,25 @@ class file_writer_chooser extends PrologNativeCode {
 	public file_writer_chooser (PrologRoot root) {this . root = root;}
 }
 
+class fxedit_class extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		PrologElement file_name = null;
+		while (parameters . isPair ()) {PrologElement el = parameters . getLeft (); if (el . isText ()) file_name = el; parameters = parameters . getRight ();}
+		if (parameters . isText ()) file_name = parameters;
+		PrologMainFX . fxedit_command (file_name == null ? null : file_name . getText ());
+		return true;
+	}
+}
+
+class fxsave_class extends PrologNativeCode {
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		PrologElement file_name = null;
+		while (parameters . isPair ()) {PrologElement el = parameters . getLeft (); if (el . isText ()) file_name = el; parameters = parameters . getRight ();}
+		if (parameters . isText ()) file_name = parameters;
+		return PrologMainFX . fxsave_command (file_name == null ? null : file_name . getText ());
+	}
+}
+
 public class PrologFXStudio extends PrologServiceClass {
 	public PrologRoot root;
 	public PrologDirectory directory;
@@ -118,6 +137,8 @@ public class PrologFXStudio extends PrologServiceClass {
 		if (name . equals ("fx_stop")) return new fx_stop ();
 		if (name . equals ("file_reader_chooser")) return new file_reader_chooser (root);
 		if (name . equals ("file_writer_chooser")) return new file_writer_chooser (root);
+		if (name . equals ("fxedit")) return new fxedit_class ();
+		if (name . equals ("fxsave")) return new fxsave_class ();
 		return null;
 	}
 }
