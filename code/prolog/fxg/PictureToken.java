@@ -68,6 +68,7 @@ public class PictureToken extends Token {
 			save_rotation (tc);
 			save_side (tc);
 			save_rounding (tc);
+			save_index (tc);
 			save_foreground (tc, fxg . default_picture_foreground);
 			save_background (tc, fxg . default_picture_background);
 			save_lock (tc);

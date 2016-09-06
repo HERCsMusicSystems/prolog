@@ -367,7 +367,7 @@ public class PrologFXGStudio extends PrologServiceClass {
 	}
 	public void save (String file_name) {
 		try {
-			FileWriter tc = new FileWriter (file_name);
+			FileWriter tc = new FileWriter (root . ccd (file_name));
 			tc . write ("[auto_atoms]\n\n");
 			tc . write ("[Erase]\n\n");
 			if (! default_viewport_background . eq (new Colour (0.0, 0.0, 1.0)))

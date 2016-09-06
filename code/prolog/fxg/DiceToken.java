@@ -275,6 +275,7 @@ public class DiceToken extends Token {
 			save_location_and_size (tc);
 			save_scaling (tc);
 			save_rotation (tc);
+			save_index (tc);
 			save_side (tc);
 			save_foreground (tc, fxg . dice_foreground (sides, multiplier));
 			save_background (tc, fxg . dice_background (sides, multiplier));

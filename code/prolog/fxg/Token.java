@@ -218,43 +218,6 @@ public class Token extends PrologNativeCode {
 		if (at == fxg . repaint_atom) {repaint (); return true;}
 		return false;
 	}
-	/*
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (atom -> getAtom () == select_deck_atom) {if (! token -> can_insert ()) return false; board -> deck = token; return true;}
-		if (atom -> getAtom () == shuffle_atom) {return token -> shuffle ();}
-		if (atom -> getAtom () == insert_atom) {
-			if (parameters -> isEarth ()) {
-				if (board -> deck == 0) return false;
-				return board -> transfer_token_to_deck (board -> deck, token);
-			}
-			if (! parameters -> isPair ()) return false;
-			PrologElement * deck_element = parameters -> getLeft (); if (! deck_element -> isAtom ()) return false;
-			PrologAtom * deck_atom = deck_element -> getAtom (); if (deck_atom == 0) return false;
-			PrologNativeCode * deck_machine = deck_atom -> getMachine (); if (deck_machine == 0) return false;
-			if (! deck_machine -> isTypeOf (token_actions :: name ())) return false;
-			boarder_token * deck_token = ((token_actions *) deck_machine) -> token; if (deck_token == 0) return false;
-			if (deck_token -> can_insert ()) return board -> transfer_token_to_deck (deck_token, token);
-			if (token -> can_insert ()) return board -> transfer_token_to_deck (token, deck_token);
-			return false;
-		}
-		if (atom -> getAtom () == release_atom) {
-			boarder_token * btp = board -> release_token_from_deck (token);
-			if (btp == 0) return false;
-			if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-			if (parameters -> isVar ()) parameters -> setAtom (btp -> atom);
-			return true;
-		}
-		if (atom -> getAtom () == release_random_atom) {
-			boarder_token * btp = board -> release_random_token_from_deck (token);
-			if (btp == 0) return false;
-			if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-			if (parameters -> isVar ()) parameters -> setAtom (btp -> atom);
-			return true;
-		}
-		if (atom -> getAtom () == is_deck_atom) {return token -> can_insert ();}
-		return false;
-	}
-	*/
 	public void erase () {programmatic_close (); atom . setMachine (null); if (next != null) next . erase ();}
 	public void programmatic_close () {fxg . remove_token (this);}
 	public void save_stack (FileWriter tc) {if (next != null) next . save_stack (tc); save (tc);}
@@ -279,6 +242,12 @@ public class Token extends PrologNativeCode {
 	public void save_rounding (FileWriter tc) {
 		if (! rounding . eq (new Point (0.0, 0.0)))
 			try {tc . write ("[" + atom . name () + " Rounding " + rounding . x + " " + rounding . y + "]\n");} catch (Exception ex) {}
+	}
+	public void save_index (FileWriter tc) {
+		if (! indexing . position . eq (new Point (0.0, 0.0)))
+			try {
+				tc . write ("[" + atom . name () + " Indexing " + indexing . position . x + " " + indexing . position . y + "]\n");
+			} catch (Exception ex) {}
 	}
 	public void save_indexing (FileWriter tc) {
 		try {

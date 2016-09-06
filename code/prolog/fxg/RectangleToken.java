@@ -53,6 +53,7 @@ class RectangleToken extends Token {
 			save_scaling (tc);
 			save_rotation (tc);
 			save_rounding (tc);
+			save_index (tc);
 			save_foreground (tc, fxg . default_deck_foreground);
 			save_background (tc, fxg . default_deck_background);
 			save_lock (tc);

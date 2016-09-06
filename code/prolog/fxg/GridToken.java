@@ -36,6 +36,7 @@ public class GridToken extends Token {
 	public int numberOfSides () {return 5;}
 	public boolean moveOnGrid (Token token, Point position) {
 		Point gsc = new Point (1.0, 1.0);
+		token . indexing . position = new Point (position);
 		position = position . sub (indexing . position);
 		switch ((int) side) {
 			case 1: if ((int) position . x % 2 != 0) position . y += 0.5; gsc = new Point (0.75, 0.866025404); break;
