@@ -20,7 +20,7 @@ program studio #machine := "prolog.studio"
 		operating_system implementation version
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
 		create_atom create_atoms search_atom search_atom_c unique_atoms preprocessor prompt
-		+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^
+		+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^ :=
 		add add1 sub sub1 mult div mod and or xor sum times mac less less_eq greater greater_eq max min
 		abs cos degrad e exp log2 log10 ln log pi pow sin tan trunc DFT FFT
 		StringToLower StringToUpper StringReplaceOnce StringReplaceAll
@@ -496,6 +496,19 @@ program studio #machine := "prolog.studio"
 [[args : *args] [ARGS : *texts] / [args_tail *texts *args]]
 [[args_tail [] []] /]
 [[args_tail [*t1 : *t] *a] [text_term *t1 : *b] [APPEND *b *c *a] / [args_tail *t *c]]
+
+[[:= *x pi] / [pi *x]]
+[[:= *x e] / [e *x]]
+[[:= *x [*f *arg]] [is_atom *f] [:= *ff *arg] [*f *ff *x]]
+[[:= *x [*f *a *b]] [is_atom *f] [:= *aa *a] [:= *bb *b] [*f *aa *bb *x]]
+[[:= *x [*a : *b]] / [:= *x *a : *b] /]
+[[:= *x *x] [is_number *x] /]
+[[:= *x *a ^ *b : *c] / [:= *aa *a] [:= *bb *b] [pow *aa *bb *aaa] / [:= *x *aaa : *c]]
+[[:= *x *a / *b : *c] / [:= *aa *a] [:= *bb *b] [div *aa *bb *aaa] / [:= *x *aaa : *c]]
+[[:= *x *a - : *b] / [:= *x *a + -1 : *b] /]
+[[:= *x *a + : *b] / [:= *aa *a] [:= *bb *b] [add *x *aa *bb]]
+[[:= *x *a *b ^ *n : *c] / [:= *bb *b] [:= *nn *n] [pow *bb *nn *bbb] / [:= *x *a *bbb : *c]]
+[[:= *x *a *b : *c] / [:= *aa *a] [:= *bb *b] [mult *aaa *aa *bb] / [:= *x *aaa : *c] /]
 
 protect [
 	+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^
