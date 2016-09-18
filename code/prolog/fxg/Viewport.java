@@ -42,6 +42,7 @@ import javafx . scene . input . *;
 import javafx . beans . value . *;
 
 public class Viewport extends Token {
+	public int drag_count = 0;
 	public String viewport_name;
 	public Point screen_position = new Point (0.0, 0.0);
 	enum edit_modes {
@@ -66,6 +67,7 @@ public class Viewport extends Token {
 	public void addEvents (Canvas c) {
 		c . setOnMousePressed (new EventHandler <MouseEvent> () {
 			public void handle (MouseEvent e) {
+				drag_count = 0;
 				drag = new Point (e . getX (), e . getY ());
 				fxg . hardSelectTokens (drag . add (location . position . times (scaling)) . divide (scaling));
 				if (e . getClickCount () == 2) {
@@ -75,6 +77,7 @@ public class Viewport extends Token {
 		});
 		c . setOnMouseDragged (new EventHandler <MouseEvent> () {
 			public void handle (MouseEvent e) {
+				drag_count++;
 				Point p = new Point (e . getX (), e . getY ());
 				Point delta = p . sub (drag) . divide (scaling);
 				drag = p;
@@ -87,7 +90,8 @@ public class Viewport extends Token {
 		c . setOnMouseReleased (new EventHandler <MouseEvent> () {
 			public void handle (MouseEvent e) {
 				Point p = new Point (e . getX (), e . getY ()) . add (location . position . times (scaling)) . divide (scaling);
-				if (fxg . releaseSelectedTokens (p)) repaint ();
+				if (drag_count > 4 && fxg . releaseSelectedTokens (p)) repaint ();
+				drag_count = 0;
 			}
 		});
 		c . setOnDragOver (new EventHandler <DragEvent> () {

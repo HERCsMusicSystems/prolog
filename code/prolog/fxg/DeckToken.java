@@ -26,6 +26,8 @@ import Prolog . *;
 import Prolog . geometry . *;
 
 import java . io . FileWriter;
+import java . util . ArrayList;
+import java . util . Collections;
 
 import javafx . scene . canvas . *;
 import javafx . scene . paint . *;
@@ -34,8 +36,42 @@ import javafx . geometry . *;
 
 public class DeckToken extends Token {
 	public Token tokens = null;
-	public void insert_token (Token token) {token . selected = false; token . next = tokens; tokens = token;}
+	public boolean shuffled = false;
+	public int content_size () {
+		int ret = 0;
+		Token tk = tokens;
+		while (tk != null) {tk = tk . next; ret++;}
+		return ret;
+	}
+	public boolean doubleAction () {if (fxg . currentDeck == this) {randomise_side (); return true;} return false;}
+	public int randomise_side () {
+		ArrayList <Token> list = new ArrayList <Token> ();
+		while (tokens != null) {list . add (tokens); tokens = tokens . next;}
+		Collections . shuffle (list);
+		for (Token tk : list) {tk . next = tokens; tokens = tk;}
+		shuffled = true;
+		return 0;
+	}
+	public int randomise_sided () {
+		int ind = content_size ();
+		if (ind < 2) return 0;
+		Token tk = null;
+		while (ind > 0) {
+			int sub = (int) (Math . random () * (double) ind);
+			ind--;
+			if (sub == 0) {Token tkk = tokens; tokens = tokens . next; tkk . next = tk; tk = tkk;}
+			else {
+				Token tkk = tokens;
+				while (sub > 1) {tkk = tkk . next; sub--;}
+			}
+		}
+		tokens = tk;
+		shuffled = true;
+		return 0;
+	}
+	public void insert_token (Token token) {shuffled = false; token . selected = false; token . next = tokens; tokens = token;}
 	public Token release_token (Point p) {
+		shuffled = false;
 		if (tokens == null) return null;
 		Token ret = tokens;
 		tokens = ret . next;
@@ -62,7 +98,7 @@ public class DeckToken extends Token {
 		gc . setFill (fgcc);
 		gc . setTextAlign (TextAlignment . CENTER);
 		gc . setTextBaseline (VPos . CENTER);
-		gc . fillText (text, 0.0, 0.0);
+		gc . fillText (text + " (" + (shuffled ? "shuffled " : "") + content_size () + ")", 0.0, 0.0);
 	}
 	public void erase () {if (tokens != null) tokens . erase (); tokens = null; super . erase ();}
 	public void save (FileWriter tc) {
