@@ -85,6 +85,7 @@
     <ul>
         <li><a href="#arithmetic_logic">Arithmetic and Logic</a>
             <br />
+            <a href="#predicate_arithmetic">:=</a>
             <a href="#predicate_abs">abs</a>
             <a href="#predicate_add">add</a>
             <a href="#predicate_add1">add1</a>
@@ -356,6 +357,23 @@
 <div class="doc_library"><a id="studio">LIBRARY: <b>studio</b></a></div>
 
 <div class="doc_library_section"><a id="arithmetic_logic">Arithmetic and Logic Predicates</a></div>
+
+<div class="doc_predicate">
+    <a id="predicate_arithmetic">
+        <div class="doc_predicate_header">
+            [:= *x ....mathematical expression....]
+        </div>
+        <div class="doc_predicate_body">
+            Calculates the value of arithmetic expression.
+            The accepted operators are: +, -, ^, / (please note multiplication does not require operator).
+            It can also process mathematical constants (e or pi) and one- or two-argument functions.<br />
+            Examples:<br />
+            [:= *x 2 + 3 + 4 - 1 + 6] (adding and subtracting)<br />
+            [:= *x 2 8 / 4 7] (multiplications and divisions)<br />
+            [:= *x [cos [2 pi]]] (functions and constants)
+        </div>
+    </a>
+</div>
 
 <div class="doc_predicate">
     <a id="predicate_abs">
