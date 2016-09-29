@@ -127,8 +127,8 @@ public class PrologReader {
 		if (root . mid_caption . indexOf ((char) act_znak) >= 0) {
 			symbol = "" + (char) act_znak;
 			act_znak = move_z ();
-			symbol += (char) act_znak;
-			if (root . if_atom_caption . equals (symbol)) {act_znak = move_z (); symbol_control = 11;} else symbol_control = 3;
+			while (":=<>|/!+-" . indexOf ((char) act_znak) >= 0) {symbol += (char) act_znak; act_znak = move_z ();}
+			symbol_control = symbol . length () == 1 ? 3 : 11;
 			return;
 		}
 		if (root . dot_caption . indexOf ((char) act_znak) >= 0) {symbol_control = 21; symbol = "" + root . dot_caption; act_znak = move_z (); return;}

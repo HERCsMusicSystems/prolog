@@ -227,14 +227,10 @@ void PrologReader :: get_symbol (void) {
 		return;
 	}
 	if (indexOf (root -> mid_caption, (char) act_znak) >= 0) {
-		symbol [0] = (char) act_znak;
+		ind = area_cat (symbol, 0, (char) act_znak);
 		act_znak = move_z ();
-		symbol [1] = (char) act_znak;
-		symbol [2] = '\0';
-		if (strcmp (root -> if_atom_caption, symbol) == 0) {
-			act_znak = move_z ();
-			symbol_control = 11;
-		} else symbol_control = 3;
+		while (indexOf (":=<>|/!+-", (char) act_znak) >= 0) {ind = area_cat (symbol, ind, (char) act_znak); act_znak = move_z ();}
+		symbol_control = strlen (symbol) == 1 ? 3 : 11;
 		return;
 	}
 	if (indexOf (root -> dot_caption, (char) act_znak) >= 0) {
