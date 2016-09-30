@@ -340,7 +340,7 @@ public class PrologRoot {
 		int ipath = 0;
 		String relative = "";
 		if (path . length () <= 0) return pwd;
-		while (pwd . length () > ipwd && (pwd . charAt (ipwd) == path . charAt (ipath) || (pwd . charAt (ipwd) == '\\' && path . charAt (ipath) == '/'))) {ipwd++; ipath++;}
+		while (pwd . length () > ipwd && (pwd . charAt (ipwd) == path . charAt (ipath) || ("\\/" . indexOf (pwd . charAt (ipwd)) >= 0 && "\\/" . indexOf (path . charAt (ipath)) >= 0))) {ipwd++; ipath++;}
 		if (path . charAt (ipath) == '/' || path . charAt (ipath) == '\\') ipath++;
 		boolean should_escape = false;
 		while (pwd . length () > ipwd) {

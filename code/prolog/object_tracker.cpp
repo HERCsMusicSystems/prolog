@@ -207,7 +207,7 @@ int area_cat_number (char * area, int ind, double db) {
 
 void relativise (char * path, char * pwd, char * relative) {
 	if (pwd == 0 || path == 0 || relative == 0) return;
-	while (* pwd != '\0' && (* pwd == * path || (* pwd == '\\' && * path == '/'))) {pwd++; path++;}
+	while (* pwd != '\0' && (* pwd == * path || (indexOf ("\\/", * pwd) >= 0 && indexOf ("\\/", * path) >= 0))) {pwd++; path++;}
 	if (* path == '/' || * path == '\\') path++;
 	int rpt = 0;
 	bool should_escape = false;
