@@ -22,8 +22,8 @@
 
 package fxg;
 
-import Prolog . *;
-import Prolog . geometry . *;
+import prolog . *;
+import prolog . geometry . *;
 
 import java . io . File;
 import java . io . FileWriter;
@@ -196,9 +196,9 @@ public class Viewport extends Token {
 		this . screen_position = new Point (location . position);
 		this . main = main;
 		if (main) {
-			this . viewport = PrologFX . PrologMainFX . stage;
-			canvas = PrologFX . PrologMainFX . canvas;
-			gc = PrologFX . PrologMainFX . gc;
+			this . viewport = prologFX . PrologMainFX . stage;
+			canvas = prologFX . PrologMainFX . canvas;
+			gc = prologFX . PrologMainFX . gc;
 			this . location = new Rect (new Point (0.0, 0.0), new Point (canvas . getWidth (), canvas . getHeight ()));
 			Platform . runLater (new Runnable () {public void run () {repaint (); addEvents (canvas);}});
 		} else {

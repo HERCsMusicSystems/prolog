@@ -20,7 +20,7 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-package Prolog . geometry;
+package prolog . geometry;
 
 public class Colour {
 	public double red, green, blue, alpha;

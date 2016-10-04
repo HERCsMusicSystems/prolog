@@ -21,7 +21,7 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 
-package Prolog;
+package prolog;
 
 import java . io . PrintStream;
 import java . io . InputStream;

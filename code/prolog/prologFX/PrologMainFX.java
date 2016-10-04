@@ -1,8 +1,8 @@
 
-package PrologFX;
+package prologFX;
 
-import Prolog . *;
-import Prolog . geometry . *;
+import prolog . *;
+import prolog . geometry . *;
 
 import javafx . application . *;
 import javafx . stage . *;

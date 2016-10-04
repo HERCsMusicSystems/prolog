@@ -20,7 +20,7 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-package Prolog;
+package prolog;
 
 public class PrologServiceClass {
 	public void init (PrologRoot root, PrologDirectory directory) {}

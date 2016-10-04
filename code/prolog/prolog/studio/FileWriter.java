@@ -20,9 +20,9 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-package Prolog . studio;
+package prolog . studio;
 
-import Prolog . *;
+import prolog . *;
 
 import java . io . FileOutputStream;
 

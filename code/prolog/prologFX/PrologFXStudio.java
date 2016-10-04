@@ -20,9 +20,9 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-package PrologFX;
+package prologFX;
 
-import Prolog . *;
+import prolog . *;
 
 import java . io . File;
 import java . io . FileInputStream;
@@ -60,7 +60,7 @@ class file_reader_chooser extends PrologNativeCode {
 						PrologElement el = parameters . getLeft ();
 						if (! el . isAtom ()) el . setAtom (new PrologAtom ());
 						PrologAtom a = el . getAtom ();
-						if (a . getMachine () == null) try {a . setMachine (new Prolog . studio . FileReader (a, root, new FileInputStream (f)));} catch (Exception ex) {}
+						if (a . getMachine () == null) try {a . setMachine (new prolog . studio . FileReader (a, root, new FileInputStream (f)));} catch (Exception ex) {}
 						parameters = parameters . getRight ();
 					}
 				}
@@ -88,7 +88,7 @@ class file_writer_chooser extends PrologNativeCode {
 					parameters = parameters . getLeft ();
 					if (! parameters . isAtom ()) parameters . setAtom (new PrologAtom ());
 					PrologAtom a = parameters . getAtom ();
-					if (a . getMachine () == null) try {a . setMachine (new Prolog . studio . FileWriter (a, root, new FileOutputStream (file)));} catch (Exception ex) {}
+					if (a . getMachine () == null) try {a . setMachine (new prolog . studio . FileWriter (a, root, new FileOutputStream (file)));} catch (Exception ex) {}
 				}
 				latch . countDown ();
 			}

@@ -20,7 +20,7 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-package Prolog . geometry;
+package prolog . geometry;
 
 public class Rect {
 	public Point position, size;
