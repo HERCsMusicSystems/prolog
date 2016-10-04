@@ -21,6 +21,7 @@ program studio #machine := "prolog.studio"
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
 		create_atom create_atoms search_atom search_atom_c unique_atoms preprocessor prompt
 		+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^ :=
+		::= toSymbolicForm addSymbolicForm multiplySymbolicForm sortSymbolicForm
 		add add1 sub sub1 mult div mod and or xor sum times mac less less_eq greater greater_eq max min
 		abs cos degrad e exp log2 log10 ln log pi pow sin tan trunc DFT FFT
 		StringToLower StringToUpper StringReplaceOnce StringReplaceAll
@@ -509,12 +510,41 @@ program studio #machine := "prolog.studio"
 [[:= *x *a *b ^ *n : *c] / [:= *bb *b] [:= *nn *n] [pow *bb *nn *bbb] / [:= *x *a *bbb : *c]]
 [[:= *x *a *b : *c] / [:= *aa *a] [:= *bb *b] [mult *aaa *aa *bb] / [:= *x *aaa : *c] /]
 
+[[toSymbolicForm *number [+ [*number]]] [is_number *number] /]
+[[toSymbolicForm *atom [+ [1 *atom]]] [is_atom *atom] /]
+[[toSymbolicForm [+ : *T] [+ : *T]] /]
+[[toSymbolicForm [*number : *T] [*number : *T]] [is_number *number] /]
+[[toSymbolicForm *a *ex] [::= *a *ex]]
+
+[[sortSymbolicForm *l1 *l2] [LENGTH *l1 *ll1] [LENGTH *l2 *ll2] [>= *ll1 *ll2]]
+
+[[addSymbolicForm [+] *x *x] /]
+[[addSymbolicForm [+ *A : *At] *B [+ : *SSF]] / [addSymbolicForm *A *B *AB] [addSymbolicForm [+ : *At] *AB [+ : *SF]] [<=> sortSymbolicForm *SF *SSF []]]
+[[addSymbolicForm [0 : *] [+] [+]] /]
+[[addSymbolicForm *x [+] [+ *x]] /]
+[[addSymbolicForm [*A : *T] [+ [*B : *T] : *Ts] [+ : *Tx]] [is_number *A] [is_number *B] / [add *A *B *AB] [addSymbolicForm [*AB : *T] [+ : *Ts] [+ : *Tx]]]
+[[addSymbolicForm *A [+ *B : *Ts] [+ *B : *Tx]] / [addSymbolicForm *A [+ : *Ts] [+ : *Tx]]]
+[[addSymbolicForm [*A : *T] [*B : *T] [+ [*AB : *T]]] [is_number *A] [is_number *B] / [add *A *B *AB]]
+[[addSymbolicForm *a *b [+ *a *b]]]
+
+[[multiplySymbolicForm [+] * [+]] /]
+[[multiplySymbolicForm [+ *A : *At] *B *C] / [multiplySymbolicForm *A *B *AB] [multiplySymbolicForm [+ : *At] *B *AtB] [addSymbolicForm *AB *AtB *C]]
+[[multiplySymbolicForm * [+] [+]] /]
+[[multiplySymbolicForm *A [+ *B : *Bt] [+ *AB : *ABt]] / [multiplySymbolicForm *A *B *AB] / [multiplySymbolicForm *A [+ : *Bt] [+ : *ABt]]]
+[[multiplySymbolicForm [*A : *At] [*B : *Bt] [*AB : *SABt]] [is_number *A] [is_number *B] / [mult *A *B *AB] [APPEND *At *Bt *ABt] [<=> *ABt *SABt]]
+
+[[::= *e *x] / [toSymbolicForm *x *e]]
+[[::= *e *x - : *t] / [::= *e *x + -1 : *t]]
+[[::= *e *x + : *t] / [toSymbolicForm *x *xse] [::= *ex : *t] / [addSymbolicForm *xse *ex *e]]
+[[::= *e *x *y : *t] / [toSymbolicForm *x *xse] [toSymbolicForm *y *yse] [multiplySymbolicForm *xse *yse *ex] [::= *e *ex : *t]]
+
 protect [
 	+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^
 	eq grnd
 	not res ONE ALL TRY PROBE SELECT APPEND LENGTH REVERSE ONLIST INLIST NODUP MAP
 	exit command inner inner_addcl inner_call random_cl explode
 	sort divide
+	toSymbolicForm sortSymbolicForm addSymbolicForm multiplySymbolicForm := ::=
 	]
 private [inner inner_addcl inner_call random_cl explode divide args_tail]
 

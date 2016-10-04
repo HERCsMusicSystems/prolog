@@ -427,6 +427,29 @@
 [TestEq ":= constant and function" 1.0 *x [:= *x [cos [2 pi]]]]
 [TestEq ":= plus minus multiply" 24 *x [:= *x 2 + 3 - 1 + 4 5]]
 
+[auto_atoms]
+
+[TestEq "adding similar elements" [+ [9 x]] *x [addSymbolicForm [4 x] [5 x] *x]]
+[TestEq "adding different elements" [+ [4 x] [5 y]] *x [addSymbolicForm [4 x] [5 y] *x]]
+
+[TestEq "adding ZERO elements" [+] *x [addSymbolicForm [0 x y] [+] *x]]
+[TestEq "adding non-ZERO elements" [+ [4 x y]] *x [addSymbolicForm [4 x y] [+] *x]]
+[TestEq "adding similar elements" [+ [5 y] [9 x]] *x [addSymbolicForm [4 x] [+ [5 x] [5 y]] *x]]
+[TestEq "adding different elements" [+ [4 a] [5 b] [4 x]] *x [addSymbolicForm [4 x] [+ [4 a] [5 b]] *x]]
+
+[TestEq "adding two vectors" [+ [4 a] [5 b] [7 x]] *x [addSymbolicForm [+ [4 x]] [+ [4 a] [3 x] [5 b]] *x]]
+[TestEq "two vectors again...." [+ [3 x x] [7 x] [24]] *x [addSymbolicForm [+ [2 x x] [6] [3 x]] [+ [1 x x] [4 x] [18]] *x]]
+
+[TestEq "Single multiply" [6 x x y z] *x [multiplySymbolicForm [2 x y] [3 x z] *x]]
+[TestEq "Single multiply again" [10 x y y z] *x [multiplySymbolicForm [2 x y] [5 y z] *x]]
+[TestEq "Single multiply by vector" [+ [6 x x y z] [10 x y y z]] *x [multiplySymbolicForm [2 x y] [+ [3 x z] [5 y z]] *x]]
+[TestEq "Multiply vector by vector" [+ [8 x x] [-2 x] [-15]] *x [multiplySymbolicForm [+ [2 x] [-3]] [+ [4 x] [5]] *x]]
+
+[TestEq "Eval 1" [+ [127]] *x [::= *x 127]]
+[TestEq "Eval 2" [+ [1 x] [9]] *x [::= *x 4 + x + 5]]
+[TestEq "Eval 3" [+ [20 x]] *x [::= *x 4 x 5]]
+[TestEq "Eval 4" [+ [-1 x] [9]] *x [::= *x 4 - x + 5]]
+
 [TestEq "StringToLower \"Sonda Academy\" *x" "sonda academy" *x [StringToLower "Sonda Academy" *x]]
 [TestEq "StringToLower *x \"Sonda Academy\"" "SONDA ACADEMY" *x [StringToLower *x : "Sonda Academy"]]
 [TestEq "StringToUpper \"Sonda Academy\" *x" "SONDA ACADEMY" *x [StringToUpper "Sonda Academy" *x]]
