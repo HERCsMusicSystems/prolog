@@ -20,7 +20,7 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-package Prolog;
+package prolog;
 
 import java . io . InputStream;
 import java . io . FileInputStream;

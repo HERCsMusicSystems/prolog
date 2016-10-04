@@ -20,14 +20,19 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-package Prolog . geometry;
+package prolog . geometry;
 
-public class Colour {
-	public double red, green, blue, alpha;
-	public static int toInt (double c) {return c >= 1.0 ? 255 : (int) (c * 256.0);}
-	public boolean eq (Colour c) {return c . red == red && c . green == green && c . blue == blue && c . alpha == alpha;}
-	public Colour (Colour c) {this . red = c . red; this . green = c . green; this . blue = c . blue; this . alpha = c . alpha;}
-	public Colour (double red, double green, double blue) {this . red = red; this . green = green; this . blue = blue; this . alpha = 1.0;}
-	public Colour (double red, double green, double blue, double alpha) {this . red = red; this . green = green; this . blue = blue; this . alpha = alpha;}
+public class Point {
+	public double x, y;
+	public Point half () {return new Point (x * 0.5, y * 0.5);}
+	public Point times (double d) {return new Point (x * d, y * d);}
+	public Point times (Point d) {return new Point (x * d . x, y * d . y);}
+	public Point divide (double d) {if (d != 0.0) return new Point (x / d, y / d); return new Point (x, y);}
+	public Point divide (Point d) {return new Point (d . x != 0.0 ? x / d . x : x, d . y != 0.0 ? y / d . y : y);}
+	public Point add (Point p) {return new Point (p . x + x, p . y + y);}
+	public Point sub (Point p) {return new Point (x - p . x, y - p . y);}
+	public boolean eq (Point p) {return p . x == x && p . y == y;}
+	public Point (double x, double y) {this . x = x; this . y = y;}
+	public Point (Point point) {x = point . x; y = point . y;}
 }
 

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////
-//                       Copyright (C) 2015 Robert P. Wolf                       //
+//                       Copyright (C) 2016 Robert P. Wolf                       //
 //                                                                               //
 // Permission is hereby granted, free of charge, to any person obtaining a copy  //
 // of this software and associated documentation files (the "Software"), to deal //
@@ -20,38 +20,14 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-package Prolog;
+package prolog . studio;
 
-public class PrologQuery {
-	PrologQuery stack;
-	PrologQuery context;
-	PrologQuery fail_target;
-	boolean original;
-	PrologElement query;
-	public PrologQuery (PrologQuery stack, PrologQuery context, PrologElement query) {
-		this . stack = stack;
-		this . context = context;
-		this . fail_target = null;
-		this . original = true;
-		this . query = query;
-	}
-	public PrologQuery (PrologQuery stack, PrologQuery context, PrologQuery fail_target, boolean original, PrologElement query) {
-		this . stack = stack;
-		this . context = context;
-		this . fail_target = fail_target;
-		this . original = original;
-		this . query = query;
-	}
-	public PrologQuery (PrologElement query) {
-		this . stack = null;
-		this . context = null;
-		this . fail_target = null;
-		this . original = true;
-		this . query = query;
-	}
-	public void drop_stack_to_fail_target () {
-		PrologQuery q1 = stack;
-		while (q1 != null && q1 != fail_target) q1 = q1 . stack;
-		stack = fail_target;
-	}
-};
+import prolog . *;
+
+import java . io . FileInputStream;
+
+public class SymbolReader extends PrologReader {
+	public FileInputStream fi;
+	public int move_z () {try {return fi . read ();} catch (Exception ex) {return -1;}}
+	public SymbolReader (PrologRoot root, FileInputStream fi) {this . fi = fi; setRoot (root);}
+}

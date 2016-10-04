@@ -20,19 +20,21 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-package Prolog . geometry;
+package prolog . geometry;
 
-public class Point {
-	public double x, y;
-	public Point half () {return new Point (x * 0.5, y * 0.5);}
-	public Point times (double d) {return new Point (x * d, y * d);}
-	public Point times (Point d) {return new Point (x * d . x, y * d . y);}
-	public Point divide (double d) {if (d != 0.0) return new Point (x / d, y / d); return new Point (x, y);}
-	public Point divide (Point d) {return new Point (d . x != 0.0 ? x / d . x : x, d . y != 0.0 ? y / d . y : y);}
-	public Point add (Point p) {return new Point (p . x + x, p . y + y);}
-	public Point sub (Point p) {return new Point (x - p . x, y - p . y);}
-	public boolean eq (Point p) {return p . x == x && p . y == y;}
-	public Point (double x, double y) {this . x = x; this . y = y;}
-	public Point (Point point) {x = point . x; y = point . y;}
+public class Rect {
+	public Point position, size;
+	public boolean eq (Rect r) {return r . position . eq (position) && r . size . eq (size);}
+	public boolean contains (Point p) {return p . x >= position . x && p . y >= position . y && p . x <= position . x + size . x && p . y <= position . y + size . y;}
+	public boolean overlaps (Rect area) {
+		return
+			position . x <= area . position . x + area . size . x &&
+			position . x + size . x >= area . position . x &&
+			position . y <= area . position . y + area . size . y &&
+			position . y + size . y >= area . position . y;
+	}
+	public Rect (Point position, Point size) {this . position = new Point (position); this . size = new Point (size);}
+	public Rect (double x, double y, double width, double height) {position = new Point (x, y); size = new Point (width, height);}
+	public Rect (Rect location) {position = new Point (location . position); size = new Point (location . size);}
 }
 

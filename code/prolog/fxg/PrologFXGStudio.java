@@ -22,8 +22,8 @@
 
 package fxg;
 
-import Prolog . *;
-import Prolog . geometry . *;
+import prolog . *;
+import prolog . geometry . *;
 
 import java . io . FileWriter;
 import java . util . ArrayList;
@@ -494,7 +494,7 @@ public class PrologFXGStudio extends PrologServiceClass {
 		return null;
 	}
 	public static void main (String [] args) {
-		PrologFX . PrologMainFX . initial_size = new Point (0.0, 0.0);
+		prologFX . PrologMainFX . initial_size = new Point (0.0, 0.0);
 		PrologRoot root = new PrologRoot ();
 		root . set_uap32_captions ();
 		root . resolution ("fxg");

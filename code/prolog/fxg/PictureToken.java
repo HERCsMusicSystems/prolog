@@ -22,8 +22,8 @@
 
 package fxg;
 
-import Prolog . *;
-import Prolog . geometry . *;
+import prolog . *;
+import prolog . geometry . *;
 
 import java . util . ArrayList;
 import java . io . FileWriter;

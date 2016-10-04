@@ -20,22 +20,7 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-package Prolog;
-
-/*
-PrologResolution :: PrologResolution (PrologRoot * root) TRACKING (7) {
-	this -> root = root;
-	q_root = NULL;
-	external_query_pointer = NULL;
-	root_actual = NULL;
-	root_formal = NULL;
-	var_root = NULL;
-	var_counter = 0;
-	next = this;
-	this -> timeout = 0;
-	this -> timeout_query = NULL;
-}
-*/
+package prolog;
 
 public class PrologResolution {
 	public PrologRoot root;

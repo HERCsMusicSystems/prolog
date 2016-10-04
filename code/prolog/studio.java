@@ -1,7 +1,7 @@
 
 import java . io . InputStream;
 
-import Prolog . *;
+import prolog . *;
 
 public class studio {
 	public static void main (String [] args) {

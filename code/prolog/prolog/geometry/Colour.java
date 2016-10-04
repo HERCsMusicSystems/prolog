@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////
-//                       Copyright (C) 2015 Robert P. Wolf                       //
+//                       Copyright (C) 2016 Robert P. Wolf                       //
 //                                                                               //
 // Permission is hereby granted, free of charge, to any person obtaining a copy  //
 // of this software and associated documentation files (the "Software"), to deal //
@@ -20,8 +20,14 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
+package prolog . geometry;
 
-package Prolog;
-
-public class PrologServiceClassLoader {public PrologServiceClass load (String name) {return null;}}
+public class Colour {
+	public double red, green, blue, alpha;
+	public static int toInt (double c) {return c >= 1.0 ? 255 : (int) (c * 256.0);}
+	public boolean eq (Colour c) {return c . red == red && c . green == green && c . blue == blue && c . alpha == alpha;}
+	public Colour (Colour c) {this . red = c . red; this . green = c . green; this . blue = c . blue; this . alpha = c . alpha;}
+	public Colour (double red, double green, double blue) {this . red = red; this . green = green; this . blue = blue; this . alpha = 1.0;}
+	public Colour (double red, double green, double blue, double alpha) {this . red = red; this . green = green; this . blue = blue; this . alpha = alpha;}
+}
 

@@ -6,7 +6,9 @@
 		<delete>
 			<fileset dir="." includes="studio*"/>
 		</delete>
-		<delete dir="Prolog"/>
+		<delete dir="prolog"/>
+		<delete dir="prologFX"/>
+		<delete dir="fxg"/>
 	</target>
 
 	<target name="compile">
@@ -17,9 +19,9 @@
 		<jar destfile="studio.jar">
 			<!--<fileset dir="." excludes="studio.jar build.xml"/>-->
 			<fileset dir="." includes="studio.class"/>
-			<fileset dir="." includes="Prolog/*.class"/>
-			<fileset dir="." includes="Prolog/geometry/*.class"/>
-			<fileset dir="." includes="Prolog/studio/*.class"/>
+			<fileset dir="." includes="prolog/*.class"/>
+			<fileset dir="." includes="prolog/geometry/*.class"/>
+			<fileset dir="." includes="prolog/studio/*.class"/>
 			<fileset dir="../code/prolog" includes="studio.prc"/>
 			<fileset dir="../code/prolog" includes="keyboard.prc"/>
 			<fileset dir="../code/prolog" includes="test.prc"/>
@@ -30,8 +32,8 @@
 
 	<target name="fxjar" depends="compile">
 		<jar destfile="fx.jar">
-			<fileset dir="." includes="PrologFX/*.class"/>
-			<fileset dir="../code/prolog/PrologFX" includes="fx.prc"/>
+			<fileset dir="." includes="prologFX/*.class"/>
+			<fileset dir="../code/prolog/prologFX" includes="fx.prc"/>
 		</jar>
 	</target>
 
@@ -62,7 +64,7 @@
 	</target>
 
 	<target name="fxc" depends="jar,fxjar">
-		<java classname="PrologFX.PrologMainFX" classpath="fxg.jar;fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"></java>
+		<java classname="prologFX.PrologMainFX" classpath="fxg.jar;fx.jar;studio.jar;${env.JRE_HOME}/lib/ext/jfxrt.jar"></java>
 	</target>
 
 	<target name="fxgc" depends="jar,fxjar,fxgjar">

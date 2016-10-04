@@ -20,7 +20,7 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-package Prolog;
+package prolog;
 
 public class PrologAtom {
 	public String atomName = null;

@@ -20,7 +20,7 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-package Prolog;
+package prolog;
 
 public class PrologNativeCode {
 	public static String name () {return "PrologNativeCode";}

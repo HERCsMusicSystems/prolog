@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////
-//                       Copyright (C) 2016 Robert P. Wolf                       //
+//                       Copyright (C) 2015 Robert P. Wolf                       //
 //                                                                               //
 // Permission is hereby granted, free of charge, to any person obtaining a copy  //
 // of this software and associated documentation files (the "Software"), to deal //
@@ -20,43 +20,21 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-package Prolog . studio;
+package prolog;
 
-import Prolog . *;
-
-import java . io . FileInputStream;
-
-public class FileReader extends PrologNativeCode {
-	public FileInputStream fi;
-	public SymbolReader sr;
-	public PrologAtom atom;
-	public boolean code (PrologElement parameters, PrologResolution resolution) {
-		if (fi == null) {if (! parameters . isEarth ()) return false; atom . setMachine (null); return true;}
-		if (parameters . isEarth ()) {try {fi . close ();} catch (Exception ex) {} fi = null; atom . setMachine (null); return true;}
-		if (! parameters . isPair ()) return false;
-		PrologElement el = parameters . getLeft ();
-		if (el . isText ()) {
-			parameters = parameters . getRight ();
-			if (! parameters . isPair ()) return false;
-			String area = sr . getString (el . getText ());
-			if (area == null) return false;
-			parameters . getLeft () . setText (area);
-			return true;
-		}
-		el = sr . readElement ();
-		if (el == null) return false;
-		parameters . setLeft (el);
-		return true;
+public class PrologMatch {
+	public int var_number;
+	public PrologVariable var;
+	public PrologMatch next;
+	public PrologMatch (int var_number, PrologVariable var, PrologMatch next) {this . var_number = var_number; this . var = var; this . next = next;}
+	public PrologMatch (int var_number, PrologMatch next, PrologResolution resolution) {this . var_number = var_number; var = resolution . newVariable (); this . next = next;}
+	public PrologMatch (int var_number, PrologElement term, boolean location, PrologMatch next, PrologResolution resolution) {
+		this . var_number = var_number; var = resolution . newVariable (term, location); this . next = next;
 	}
-	public FileReader (PrologAtom atom, PrologRoot root, String file_name) {
-		this . atom = atom;
-		try {fi = new FileInputStream (file_name);} catch (Exception ex) {fi = null;}
-		sr = new SymbolReader (root, fi);
+	public PrologMatch getVar (int i) {
+		PrologMatch pointer = this;
+		while (pointer != null) {if (pointer . var_number == i) return pointer; pointer = pointer . next;}
+		return null;
 	}
-	public FileReader (PrologAtom atom, PrologRoot root, FileInputStream fi) {
-		this . atom = atom;
-		this . fi = fi;
-		sr = new SymbolReader (root, fi);
-	}
+	public void connect_var (PrologVariable v1, PrologVariable v2) {PrologMatch mv = this; while (mv != null) {if (mv . var == v1) mv . var = v2; mv = mv . next;}}
 }
-
