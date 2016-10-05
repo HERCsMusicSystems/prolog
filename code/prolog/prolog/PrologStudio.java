@@ -22,10 +22,6 @@
 
 package prolog;
 
-import java . io . InputStream;
-import java . io . FileInputStream;
-import java . io . FileOutputStream;
-import java . io . ByteArrayInputStream;
 import java . util . concurrent . Semaphore;
 import java . util . ArrayList;
 import java . util . LinkedList;
@@ -570,18 +566,12 @@ class text_list extends PrologNativeCode {
 	}
 }
 
-class term_reader extends PrologReader {
-	public InputStream fi;
-	public int move_z () {try {return fi . read ();} catch (Exception ex) {return -1;}}
-	public term_reader (PrologRoot root, String text) {try {fi = new ByteArrayInputStream (text . getBytes ("UTF-8"));} catch (Exception ex) {fi = null;} setRoot (root);}
-}
-
 class text_term extends PrologNativeCode {
 	public PrologRoot root;
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
 		if (! parameters . isPair ()) return false;
 		if (parameters . getLeft () . isText ()) {
-			term_reader tr = new term_reader (root, parameters . getLeft () . getText ());
+			prolog . studio . TermReader tr = new prolog . studio . TermReader (root, parameters . getLeft () . getText ());
 			parameters = parameters . getRight ();
 			parameters . setEarth ();
 			PrologElement el = tr . readElement ();
