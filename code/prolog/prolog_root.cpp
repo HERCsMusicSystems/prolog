@@ -362,7 +362,7 @@ int PrologRoot :: getValue (PrologElement * el, char * area, int ind) {
 		return ind;
 	case 7: sprintf (command, "<%p>", el -> head); return area_cat (area, area_cat (area, ind, head_caption), command);
 	case 8: sprintf (command, "%i", el -> getInteger ()); return area_cat (area, ind, command);
-	case 9: sprintf (command, PROLOG_PRINTABLE_FLOAT, el -> getDouble ()); if (strstr (command, ".") == NULL) strcat (command, ".0"); return area_cat (area, ind, command);
+	case 9: sprintf (command, "%.15g", el -> getDouble ()); if (strstr (command, ".") == NULL && strstr (command, "e") == NULL) strcat (command, ".0"); return area_cat (area, ind, command);
 	default: return area_cat (area, ind, "Unknown element type.");
 	}
 }
@@ -397,7 +397,7 @@ int PrologRoot :: getTrueValue (PrologElement * el, char * area, int ind) {
 		return ind;
 	case 7: return area_cat (area, ind, head_caption);
 	case 8: sprintf (command, "%i", el -> getInteger ()); return area_cat (area, ind, command);
-	case 9: sprintf (command, "%f", el -> getDouble ()); return area_cat (area, ind, command);
+	case 9: sprintf (command, "%.20g", el -> getDouble ()); return area_cat (area, ind, command);
 	default: return area_cat (area, ind, "Unknown element type.");
 	}
 }

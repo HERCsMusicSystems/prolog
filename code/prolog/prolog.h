@@ -45,7 +45,6 @@ class API PrologCommand;
 
 #define PROLOG_STRING_SIZE 96
 #define PROLOG_STRING_SIZE_1 95
-#define PROLOG_PRINTABLE_FLOAT "%.80g"
 typedef char PROLOG_STRING [PROLOG_STRING_SIZE];
 extern API void prolog_string_copy (char * to, char * from);
 extern API void prolog_delimited_string_copy (char * to, char * from);
