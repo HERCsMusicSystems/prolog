@@ -155,26 +155,25 @@ public class PrologReader {
 			if (act_znak == '.') {
 				act_znak = move_z ();
 				symbol_control = 18;
-				double fraction = 1.0 / (double) int_multiplier;
 				int_symbol = 0;
+				int dot_shift = 0, e_shift = 0;
 				while ((int_shift = "0123456789abcdefABCDEFxX" . indexOf (act_znak)) >= 0) {
 					if ((int_shift == 14 || int_shift == 20) && int_multiplier != 16) {
 						boolean shift_negative = false;
 						act_znak = move_z ();
 						if (act_znak == '-') {shift_negative = true; act_znak = move_z ();}
-						int position_shift = 0;
-						while ((int_shift = "0123456789" . indexOf (act_znak)) >= 0) {position_shift *= 10; position_shift += int_shift; act_znak = move_z ();}
-						if (shift_negative) position_shift = - position_shift;
-						while (position_shift > 0) {double_symbol *= 10.0; position_shift--;}
-						while (position_shift < 0) {double_symbol /= 10.0; position_shift++;}
+						while ((int_shift = "0123456789" . indexOf (act_znak)) >= 0) {e_shift *= 10; e_shift += int_shift; act_znak = move_z ();}
+						if (shift_negative) e_shift = - e_shift;
 						break;
 					}
 					if (int_shift >= 16) {int_shift -= 6; int_multiplier = 16;}
 					if (int_shift >= 16) {int_shift = 0; int_multiplier = 16;}
-					double_symbol += (double) int_shift * fraction;
-					fraction /= (double) int_multiplier;
+					double_symbol *= (double) int_multiplier;
+					double_symbol += (double) int_shift;
+					dot_shift++;
 					act_znak = move_z ();
 				}
+				double_symbol /= Math . pow ((double) int_multiplier, (double) (dot_shift - e_shift));
 				if (negative) double_symbol = - double_symbol;
 				return;
 			}
