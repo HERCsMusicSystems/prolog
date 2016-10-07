@@ -37,19 +37,5 @@
 [TestEq "get_volume_serial_number *" "" *x [get_volume_serial_number *x]]
 [TestFails "security_check" [security_check]]
 
-[TestEq "relativise_path" "sonda.txt" *x [relativise_path "/root/files/sonda.txt" "/root/files/" *x]]
-[TestEq "relativise_path" "lib/sonda.txt" *x [relativise_path "/root/files/lib/sonda.txt" "/root/files/" *x]]
-[TestEq "relativise_path" "../sonda.txt" *x [relativise_path "/root/sonda.txt" "/root/files/" *x]]
-[TestEq "relativise_path" "../../sonda.txt" *x [relativise_path "/sonda.txt" "/root/files/" *x]]
-[TestEq "relativise_path" "../../../sonda.txt" *x [relativise_path "sonda.txt" "/root/files/" *x]]
-
-[TestEq "relativise_path" "sonda.txt" *x [relativise_path "/root/files/sonda.txt" "/root/files" *x]]
-[TestEq "relativise_path" "lib/sonda.txt" *x [relativise_path "/root/files/lib/sonda.txt" "/root/files" *x]]
-[TestEq "relativise_path" "../sonda.txt" *x [relativise_path "/root/sonda.txt" "/root/files" *x]]
-[TestEq "relativise_path" "../../sonda.txt" *x [relativise_path "/sonda.txt" "/root/files" *x]]
-[TestEq "relativise_path" "../../../sonda.txt" *x [relativise_path "sonda.txt" "/root/files" *x]]
-
-[TestEq "relativise_path" "../../sonda.txt" *x [relativise_path "/sonda.txt" "/root/files/" *x]]
-[TestEq "relativise_path" "../../sonda.txt" *x [relativise_path "/sonda.txt" "/root/files" *x]]
-
 [exit]
+
