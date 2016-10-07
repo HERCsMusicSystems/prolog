@@ -58,7 +58,8 @@ public:
 			}
 			if (el -> isAtom () && strcmp (el -> getAtom () -> name (), (char *) attr -> Value ()) != 0) {
 				delete el;
-				el = root -> text ((char *) attr -> Value ());
+				//el = root -> text ((char *) attr -> Value ());
+				el = root -> atomC ((char *) attr -> Value ());
 			}
 			clause = root -> pair (root -> pair (root -> atom (machine_atom),
 				root -> pair (root -> atom (attribute_atom), root -> pair (el, root -> earth ()
@@ -85,6 +86,11 @@ public:
 		}
 		return node_atom;
 	}
+	PrologAtom * atomC (char * name) {
+		PrologAtom * atom = root -> search (name);
+		if (atom == 0) atom = root -> createAtom (name);
+		return atom;
+	}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		PrologElement * path = 0;
 		PrologElement * atom = 0;
@@ -100,7 +106,7 @@ public:
 		if (tinyxml2 :: XML_NO_ERROR != doc . LoadFile ((const char *) path -> getText ())) return false;
 		tinyxml2 :: XMLElement * node = doc . FirstChildElement ();
 		if (node == 0) return false;
-		if (atom -> isVar ()) atom -> setAtom (path != 0 ? new PrologAtom ((char *) node -> Name ()) : new PrologAtom ());
+		if (atom -> isVar ()) atom -> setAtom (path != 0 ? atomC ((char *) node -> Name ()) : new PrologAtom ());
 		xml_term_reader reader;
 		reader . setRoot (root);
 		PrologAtom * node_atom = drop_nodes (0, node, & reader, atom -> getAtom ());
