@@ -4,12 +4,12 @@
 
 [TestFails "[xml]" [xml]]
 
-[TestEq "XML...." CATALOG *x [xml "plant_catalog.xml" sonda : *x]]
+[TestEq "XML...." CATALOG *x [xml "plant_catalog.xml" *x]]
 
-[TestEq "Plant 7" ".i" *x [xml_node sonda CATALOG PLANT *plant] [*plant ID 7] [*plant NAME *x]]
-[TestEq "Plant 6" ["Ginger, Wild" 9.03] [*x *y] [xml_node sonda CATALOG PLANT *plant] [*plant ID 6] [*plant NAME *x] [*plant PRICE *y]]
+[TestEq "Plant 7" '.i' *x [xml_node CATALOG CATALOG PLANT *plant] [*plant ID 7] [*plant NAME *x]]
+[TestEq "Plant 6" ['Ginger, Wild' 9.03] [*x *y] [xml_node CATALOG CATALOG PLANT *plant] [*plant ID 6] [*plant NAME *x] [*plant PRICE *y]]
 [TestEq "Plant 2" [Columbine "Aquilegia canadensis" 9.37] [*name *botanical *price]
-	[xml_node sonda CATALOG PLANT *plant] [*plant ID 2] [*plant NAME *name] [*plant PRICE *price] [xml_text *plant BOTANICAL *botanical]
+	[xml_node CATALOG CATALOG PLANT *plant] [*plant ID 2] [*plant NAME *name] [*plant PRICE *price] [xml_text *plant BOTANICAL *botanical]
 ]
 
 [exit]
