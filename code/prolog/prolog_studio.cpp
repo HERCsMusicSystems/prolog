@@ -809,20 +809,6 @@ public:
 	}
 };
 
-class term_reader : public PrologReader {
-public:
-	char * text;
-	virtual void message (char * text) {}
-	virtual int move_z (void) {
-		if (* text == '\0') return -1;
-		return * text++;
-	}
-	void init (PrologRoot * root, char * text) {
-		this -> text = text;
-		setRoot (root);
-	}
-};
-
 class text_term : public PrologNativeCode {
 public:
 	PrologRoot * root;

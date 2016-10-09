@@ -32,6 +32,20 @@ protected:
 	int move_z (void);
 };
 
+class term_reader : public PrologReader {
+public:
+	char * text;
+	virtual void message (char * text) {}
+	virtual int move_z (void) {
+		if (* text == '\0') return -1;
+		return * text++;
+	}
+	void init (PrologRoot * root, char * text) {
+		this -> text = text;
+		setRoot (root);
+	}
+};
+
 class PrologNoise TRACK {
 public:
 	int a, c, m, v, range;
