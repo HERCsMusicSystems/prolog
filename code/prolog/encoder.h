@@ -43,8 +43,8 @@ public:
 	bool validate_serial (char * serial);
 	bool validate_key (char * key);
 	void create_serial_number (char * out, char * header, unsigned long int volume);
-	void normalize_serial (char * out, char * serial);
-	void volumize_serial (char * out, char * serial, unsigned long int volume);
+	void normalise_serial (char * out, char * serial);
+	void volumise_serial (char * out, char * serial, unsigned long int volume);
 	void calculate_key (char * out, char * in, int shift = 0);
 	encoder (void);
 };

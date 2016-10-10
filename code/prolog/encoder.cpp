@@ -105,9 +105,7 @@ bool encoder :: check_serial (char * serial, char * key, int shift) {
 
 bool encoder :: check_serial (char * serial, unsigned long int volume, char * key, int shift) {
 	char command [64];
-	if (strlen (serial) != 12) return false;
-	volumize_serial (command, serial, volume);
-	if (strcmp (command, serial) != 0) return false;
+	volumise_serial (command, serial, volume);
 	return check_serial (command, key, shift);
 }
 
@@ -139,7 +137,7 @@ void encoder :: create_serial_number (char * out, char * header, unsigned long i
 	sprintf (out, "%s-%06X-%02X", header, (unsigned int) serial, checksum);
 }
 
-void encoder :: normalize_serial (char * out, char * serial) {
+void encoder :: normalise_serial (char * out, char * serial) {
 	strcpy (out, serial);
 	if (strlen (serial) != 12) return;
 	int checksum = 0;
@@ -159,7 +157,7 @@ void encoder :: normalize_serial (char * out, char * serial) {
 	* out = '\0';
 }
 
-void encoder :: volumize_serial (char * out, char * serial, unsigned long int volume) {
+void encoder :: volumise_serial (char * out, char * serial, unsigned long int volume) {
 	strcpy (out, serial);
 	if (strlen (serial) != 12) return;
 	char header [4];
