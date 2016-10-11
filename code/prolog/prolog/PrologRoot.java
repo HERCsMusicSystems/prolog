@@ -330,7 +330,12 @@ public class PrologRoot {
 		for (int ind = 0; ind < locations . length; ind++) {addSearchDirectory (locations [ind]);}
 	}
 	public String ccd (String path) {
-		if (path == null || path . length () < 1 || path . equals ("..")) return pwd . substring (0, pwd . lastIndexOf ("/"));
+		if (path == null || path . length () < 1 || path . equals ("..")) {
+			int index = pwd . lastIndexOf ("/");
+			if (index < 0) index = pwd . lastIndexOf ("\\");
+			if (index < 0) return pwd;
+			return pwd . substring (0, index);
+		}
 		if (path . charAt (0) == '/') return "" + path;
 		if (path . length () > 2 && path . charAt (1) == ':') return "" + path;
 		return pwd + "/" + path;

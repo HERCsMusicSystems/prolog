@@ -2034,23 +2034,28 @@ class relativise_path extends PrologNativeCode {
 	public relativise_path (PrologRoot root) {this . root = root;}
 };
 
-/*
-class DIR : public PrologNativeCode {
-private:
-	PrologRoot * root;
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * left = parameters -> getLeft ();
-		if (! left -> isText ()) return false;
-		PrologElement * el = root -> dir (left -> getText ());
-		if (el == 0) return false;
-		parameters -> setRight (el);
+class DIR extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement left = parameters . getLeft ();
+		if (! left . isText ()) return false;
+		java . io . File [] files = new java . io . File (root . ccd (left . getText () . replace ("*.*", "."))) . listFiles ();
+		if (files == null) return false;
+		parameters = parameters . getRight ();
+		parameters . setPair ();
+		left = parameters . getLeft (); left . setPair (); parameters = parameters . getRight ();
+		parameters . setPair (); parameters = parameters . getLeft ();
+		left . setPair (); left . getLeft () . setText ("."); left = left . getRight ();
+		left . setPair (); left . getLeft () . setText (".."); left = left . getRight ();
+		for (java . io . File file : files) {
+			if (file . isDirectory ()) {left . setPair (); left . getLeft () . setText (file . getName ()); left = left . getRight ();}
+			if (file . isFile ()) {parameters . setPair (); parameters . getLeft () . setText (file . getName ()); parameters = parameters . getRight ();}
+		}
 		return true;
 	}
-	DIR (PrologRoot * root) {this -> root = root;}
-};
-*/
+	public DIR (PrologRoot root) {this . root = root;}
+}
 
 class ARGS extends PrologNativeCode {
 	public PrologRoot root;
@@ -2112,91 +2117,71 @@ class halt_code extends PrologNativeCode {
 	}
 };
 
+class make_directory extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		while (parameters . isPair ()) {
+			PrologElement dir = parameters . getLeft ();
+			if (! dir . isText ()) return false;
+			if (! new java . io . File (root . ccd (dir . getText ())) . mkdir ()) return false;
+			parameters = parameters . getRight ();
+		}
+		return true;
+	}
+	public make_directory (PrologRoot root) {this . root = root;}
+}
+
+class erase_file extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		while (parameters . isPair ()) {
+			PrologElement eraser = parameters . getLeft ();
+			if (! eraser . isText ()) return false;
+			if (! new java . io . File (root . ccd (eraser . getText ())) . delete ()) return false;
+			parameters = parameters . getRight ();
+		}
+		return true;
+	}
+	public erase_file (PrologRoot root) {this . root = root;}
+}
+
+class move_file extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement from = parameters . getLeft ();
+		if (! from . isText ()) return false;
+		parameters = parameters . getRight ();
+		if (! parameters . isPair ()) return false;
+		parameters = parameters . getLeft ();
+		if (! parameters . isText ()) return false;
+		return new java . io . File (root . ccd (from . getText ())) . renameTo (new java . io . File (root . ccd (parameters . getText ())));
+	}
+	public move_file (PrologRoot root) {this . root = root;}
+}
+
+class copy_file extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement from = parameters . getLeft ();
+		if (! from . isText ()) return false;
+		parameters = parameters . getRight ();
+		if (! parameters . isPair ()) return false;
+		parameters = parameters . getLeft ();
+		if (! parameters . isText ()) return false;
+		try {
+			java . nio . file . Files . copy (
+				java . nio . file . Paths . get (root . ccd (from . getText ())),
+				java . nio . file . Paths . get (root . ccd (parameters . getText ()))
+				);
+		} catch (Exception ex) {return false;}
+		return true;
+	}
+	public copy_file (PrologRoot root) {this . root = root;}
+}
+
 /*
-
-class make_directory : public PrologNativeCode {
-private:
-	PrologRoot * root;
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		while (parameters -> isPair ()) {
-			PrologElement * dir = parameters -> getLeft ();
-			if (! dir -> isText ()) return false;
-			if (! root -> make_directory (dir -> getText ())) return false;
-			parameters = parameters -> getRight ();
-		}
-		return true;
-	}
-	make_directory (PrologRoot * root) {this -> root = root;}
-};
-
-class erase_file : public PrologNativeCode {
-private:
-	PrologRoot * root;
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		while (parameters -> isPair ()) {
-			PrologElement * eraser = parameters -> getLeft ();
-			if (! eraser -> isText ()) return false;
-			if (! root -> erase_file (eraser -> getText ())) return false;
-			parameters = parameters -> getRight ();
-		}
-		return true;
-	}
-	erase_file (PrologRoot * root) {this -> root = root;}
-};
-
-class erase_directory : public PrologNativeCode {
-private:
-	PrologRoot * root;
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		while (parameters -> isPair ()) {
-			PrologElement * eraser = parameters -> getLeft ();
-			if (! eraser -> isText ()) return false;
-			if (! root -> erase_directory (eraser -> getText ())) return false;
-			parameters = parameters -> getRight ();
-		}
-		return true;
-	}
-	erase_directory (PrologRoot * root) {this -> root = root;}
-};
-
-class move_file : public PrologNativeCode {
-private:
-	PrologRoot * root;
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * from = parameters -> getLeft ();
-		if (! from -> isText ()) return false;
-		parameters = parameters -> getRight ();
-
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (! parameters -> isText ()) return false;
-		return root -> move_file (from -> getText (), parameters -> getText ());
-	}
-	move_file (PrologRoot * root) {this -> root = root;}
-};
-
-class copy_file : public PrologNativeCode {
-private:
-	PrologRoot * root;
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * from = parameters -> getLeft ();
-		if (! from -> isText ()) return false;
-		parameters = parameters -> getRight ();
-		if (! parameters -> isPair ()) return false;
-		parameters = parameters -> getLeft ();
-		if (! parameters -> isText ()) return false;
-		return root -> copy_file (from -> getText (), parameters -> getText ());
-	}
-	copy_file (PrologRoot * root) {this -> root = root;}
-};
-
 class history : public PrologNativeCode {
 private:
 	PrologRoot * root;
@@ -3046,9 +3031,7 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("search_directories")) return new search_directories (root);
 		if (name . equals ("cd")) return new cd (root);
 		if (name . equals ("relativise_path")) return new relativise_path (root);
-	/*
-	if (strcmp (name, "DIR") == 0) return new DIR (root);
-	*/
+		if (name . equals ("DIR")) return new DIR (root);
 		if (name . equals ("ARGS")) return new ARGS (root);
 	/*
 	if (strcmp (name, "edit") == 0) return new edit (root);
@@ -3056,12 +3039,12 @@ class PrologStudio extends PrologServiceClass {
 	*/
 		if (name . equals ("exit_code")) return new exit_code (root);
 		if (name . equals ("halt_code")) return new halt_code ();
-	/*s
-	if (strcmp (name, "make_directory") == 0) return new make_directory (root);
-	if (strcmp (name, "erase") == 0) return new erase_file (root);
-	if (strcmp (name, "erase_directory") == 0) return new erase_directory (root);
-	if (strcmp (name, "move") == 0) return new move_file (root);
-	if (strcmp (name, "copy") == 0) return new copy_file (root);
+		if (name . equals ("make_directory")) return new make_directory (root);
+		if (name . equals ("erase")) return new erase_file (root);
+		if (name . equals ("erase_directory")) return new erase_file (root);
+		if (name . equals ("move")) return new move_file (root);
+		if (name . equals ("copy")) return new copy_file (root);
+	/*
 	if (strcmp (name, "save_history") == 0) return new history (root, true);
 	if (strcmp (name, "load_history") == 0) return new history (root, false);
 	*/
