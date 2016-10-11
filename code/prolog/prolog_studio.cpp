@@ -4101,7 +4101,7 @@ public:
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
 		char serial_number [64];
 		encoder e;
-		e . volumize_serial (serial_number, root -> serial_number, root -> volume_id);
+		e . volumise_serial (serial_number, root -> serial_number, root -> volume_id);
 		parameters -> setPair (root -> text (serial_number), root -> earth ());
 		return true;
 	}
@@ -4120,6 +4120,7 @@ public:
 
 class encoder_class : public PrologNativeCode {
 public:
+	PrologRoot * root;
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
 		PrologElement * el [4] = {0, 0, 0, 0};
 		int element_counter = 0;
@@ -4147,22 +4148,34 @@ public:
 			fclose (fr); fclose (tc);
 			return true;
 		}
-		if (element_counter == 3 && el [0] -> isText ()) {
-			e . normalize_serial (serial, el [0] -> getText ());
+		if (element_counter == 3 && el [0] -> isText () && ! el [1] -> isText ()) {
+			e . normalise_serial (serial, el [0] -> getText ());
 			e . calculate_key (key, serial);
 			el [1] -> setText (serial);
 			el [2] -> setText (key);
 			return true;
 		}
 		if (element_counter == 4 && el [0] -> isText () && el [1] -> isInteger ()) {
-			e . normalize_serial (serial, el [0] -> getText ());
+			e . normalise_serial (serial, el [0] -> getText ());
 			e . calculate_key (key, serial, el [1] -> getInteger ());
 			el [2] -> setText (serial);
 			el [3] -> setText (key);
 			return true;
 		}
+		if (el [0] != 0 && el [0] -> isText ()) {
+			root -> set_serial_number (el [0] -> getText ());
+			if (el [1] != 0 && el [1] -> isText ()) {
+				root -> set_key (el [1] -> getText ());
+				if (el [2] != 0 && el [2] -> isInteger ()) {
+					root -> set_serial_shift (el [2] -> getInteger ());
+					if (el [3] != 0 && el [3] -> isInteger ()) root -> set_volume_id ((unsigned long int) el [3] -> getInteger ());
+				}
+			}
+			return true;
+		}
 		return false;
 	}
+	encoder_class (PrologRoot * root) {this -> root = root;}
 };
 
 ///////////////////
@@ -4318,7 +4331,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 
 	if (strcmp (name, "get_volume_serial_number") == 0) return new get_volume_serial_number (root);
 	if (strcmp (name, "security_check") == 0) return new security_check (root);
-	if (strcmp (name, "encoder") == 0) return new encoder_class ();
+	if (strcmp (name, "encoder") == 0) return new encoder_class (root);
 
 	return NULL;
 }

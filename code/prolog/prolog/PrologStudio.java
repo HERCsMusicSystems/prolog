@@ -2857,80 +2857,76 @@ class fgcolour extends PrologNativeCode {
 // SERIAL NUMBER SERVICE //
 ///////////////////////////
 
-/*
-#include "encoder.h"
-
-class get_volume_serial_number : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		char serial_number [64];
-		encoder e;
-		e . volumize_serial (serial_number, root -> serial_number, root -> volume_id);
-		parameters -> setPair (root -> text (serial_number), root -> earth ());
+class get_volume_serial_number extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		parameters . setPair (root . text (new Encoder () . volumise_serial (root . serial_number, root . volume_id)), root . earth ());
 		return true;
 	}
-	get_volume_serial_number (PrologRoot * root) {this -> root = root;}
-};
+	public get_volume_serial_number (PrologRoot root) {this . root = root;}
+}
 
-class security_check : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		encoder e;
-		return e . check_serial (root -> serial_number, root -> volume_id, root -> key, root -> serial_shift);
+class security_check extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		return new Encoder () . check_serial (root . serial_number, root . volume_id, root . key, root . serial_shift);
 	}
-	security_check (PrologRoot * root) {this -> root = root;}
-};
+	public security_check (PrologRoot root) {this . root = root;}
+}
 
-class encoder_class : public PrologNativeCode {
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		PrologElement * el [4] = {0, 0, 0, 0};
+class encoder_class extends PrologNativeCode {
+	public PrologRoot root;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		PrologElement [] el = {null, null, null, null};
 		int element_counter = 0;
-		encoder e;
-		char serial [32];
-		char key [32];
-		while (parameters -> isPair () && element_counter < 4) {
-			el [element_counter++] = parameters -> getLeft ();
-			parameters = parameters -> getRight ();
+		while (parameters . isPair () && element_counter < 4) {el [element_counter++] = parameters . getLeft (); parameters = parameters . getRight ();}
+		if (element_counter == 3 && el [0] . isText () && el [1] . isText () && el [2] . isText ()) {
+			if (el [2] . getText () . length () < 2) return false;
+			System . out . println ("conding....");
+			try {
+				java . io . FileReader fr = new java . io . FileReader (el [0] . getText ()); if (fr == null) return false;
+				java . io . FileWriter tc = new java . io . FileWriter (el [1] . getText ()); if (tc == null) return false;
+				byte [] pp = el [2] . getText () . getBytes ();
+				int ch, ppi = 0;
+				while ((ch = fr . read ()) >= 0) {
+					ch ^= pp [ppi++];
+					tc . write (ch);
+					if (ppi >= pp . length) ppi = 0;
+				}
+				fr . close (); tc . close ();
+			} catch (Exception ex) {return false;}
+			return true;
 		}
-		if (element_counter == 3 && el [0] -> isText () && el [1] -> isText () && el [2] -> isText ()) {
-			if (strlen (el [2] -> getText ()) < 2) return false;
-			FILE * fr = fopen (el [0] -> getText (), "rb");
-			if (fr == 0) return false;
-			FILE * tc = fopen (el [1] -> getText (), "wb");
-			if (tc == 0) {fclose (fr); return false;}
-			char * pp = el [2] -> getText ();
-			int ch = fgetc (fr);
-			while (ch >= 0) {
-				ch ^= (int) (* pp++);
-				fputc (ch, tc);
-				if (* pp == '\0') pp = el [2] -> getText ();
-				ch = fgetc (fr);
+		Encoder e = new Encoder ();
+		if (element_counter == 3 && el [0] . isText () && ! el [1] . isText ()) {
+			String serial = e . normalise_serial (el [0] . getText ());
+			String key = e . calculate_key (serial, 0);
+			el [1] . setText (serial);
+			el [2] . setText (key);
+			return true;
+		}
+		if (element_counter == 4 && el [0] . isText () && el [1] . isInteger ()) {
+			String serial = e . normalise_serial (el [0] . getText ());
+			String key = e . calculate_key (serial, el [1] . getInteger ());
+			el [2] . setText (serial);
+			el [3] . setText (key);
+			return true;
+		}
+		if (el [0] != null && el [0] . isText ()) {
+			root . set_serial_number (el [0] . getText ());
+			if (el [1] != null && el [1] . isText ()) {
+				root . set_key (el [1] . getText ());
+				if (el [2] != null && el [2] . isInteger ()) {
+					root . set_serial_shift (el [2] . getInteger ());
+					if (el [3] != null && el [3] . isInteger ()) root . set_volume_id (el [3] . getInteger ());
+				}
 			}
-			fclose (fr); fclose (tc);
-			return true;
-		}
-		if (element_counter == 3 && el [0] -> isText ()) {
-			e . normalize_serial (serial, el [0] -> getText ());
-			e . calculate_key (key, serial);
-			el [1] -> setText (serial);
-			el [2] -> setText (key);
-			return true;
-		}
-		if (element_counter == 4 && el [0] -> isText () && el [1] -> isInteger ()) {
-			e . normalize_serial (serial, el [0] -> getText ());
-			e . calculate_key (key, serial, el [1] -> getInteger ());
-			el [2] -> setText (serial);
-			el [3] -> setText (key);
 			return true;
 		}
 		return false;
 	}
-};
-
-*/
+	public encoder_class (PrologRoot root) {this . root = root;}
+}
 
 ///////////////////
 // SERVICE CLASS //
@@ -3091,11 +3087,10 @@ class PrologStudio extends PrologServiceClass {
 	/*if (strcmp (name, "open_editor") == 0) return new open_editor (root);
 	if (strcmp (name, "close_editor") == 0) return new close_editor (root);
 	if (strcmp (name, "screen_coordinates") == 0) return new screen_coordinates (root);
-
-	if (strcmp (name, "get_volume_serial_number") == 0) return new get_volume_serial_number (root);
-	if (strcmp (name, "security_check") == 0) return new security_check (root);
-	if (strcmp (name, "encoder") == 0) return new encoder_class ();
-*/
+	*/
+		if (name . equals ("get_volume_serial_number")) return new get_volume_serial_number (root);
+		if (name . equals ("security_check")) return new security_check (root);
+		if (name . equals ("encoder")) return new encoder_class (root);
 		return new studio_code (name);
 	}
 }
