@@ -54,7 +54,8 @@ public class Token extends PrologNativeCode {
 	public boolean releaseAction () {return false;}
 	public boolean hitTest (Point position) {
 		if (locked) return selected = false;
-		return selected = location . contains (position . add (location . size . half ()));
+		Point size = location . size . times (scaling);
+		return selected = new Rect (location . position, size) . contains (position . add (size . half ()));
 	}
 	public void repaint () {}
 	public void token_draw (GraphicsContext gc, Viewport v) {gc . save (); draw (gc, v); gc . restore ();}

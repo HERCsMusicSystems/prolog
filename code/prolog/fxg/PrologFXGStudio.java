@@ -359,6 +359,20 @@ public class PrologFXGStudio extends PrologServiceClass {
 			t = t . next;
 		}
 	}
+	public void selected_tokens_to_front () {
+		Token stack = null;
+		Token t;
+		while (tokens != null && tokens . selected) {t = tokens; tokens = t . next; t . next = stack; stack = t;}
+		t = tokens;
+		while (t != null && t . next != null) {
+			if (t . next . selected) {Token tt = t . next; t . next = tt . next; tt . next = stack; stack = tt;}
+			t = t . next;
+		}
+		if (tokens == null) {tokens = stack; return;}
+		t = tokens;
+		while (t . next != null) t = t . next;
+		t . next = stack;
+	}
 	public void remove_viewport (Token viewport) {
 		if (viewports == null) return;
 		if (viewports == viewport) {viewports = viewports . next; return;}

@@ -77,6 +77,7 @@ public class Viewport extends Token {
 		});
 		c . setOnMouseDragged (new EventHandler <MouseEvent> () {
 			public void handle (MouseEvent e) {
+				if (drag_count < 1) fxg . selected_tokens_to_front ();
 				drag_count++;
 				Point p = new Point (e . getX (), e . getY ());
 				Point delta = p . sub (drag) . divide (scaling);
