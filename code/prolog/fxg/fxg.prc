@@ -39,6 +39,6 @@ program fxg #machine := "fxg.PrologFXGStudio" [
 
 [[fx_resize_callback *x *y] [Repaint]] ; [show "resized: " [*x *y]] [Repaint]]
 
-end := [[crack [wait 1000] [batch "sonda.txt"]] [fx_command]] .
+end := [[crack [wait 1000] [batch "warp.prb"]] [fx_command]] .
 
 end := [[crack [wait 1000] [MainViewport mv] [mv Location -100 -100] [Dice r 4] [Grid g] [g Side 1] [g Indexing 1 1 7 7]] [fx_command]] .
