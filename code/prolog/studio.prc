@@ -533,9 +533,13 @@ program studio #machine := "prolog.studio"
 [[multiplySymbolicForm *A [+ *B : *Bt] [+ *AB : *ABt]] / [multiplySymbolicForm *A *B *AB] / [multiplySymbolicForm *A [+ : *Bt] [+ : *ABt]]]
 [[multiplySymbolicForm [*A : *At] [*B : *Bt] [*AB : *SABt]] [is_number *A] [is_number *B] / [mult *A *B *AB] [APPEND *At *Bt *ABt] [<=> *ABt *SABt]]
 
+[[::= *e [*a : *b] : *t] [not eq *a +] / [::= *ab *a : *b] [::= *e *ab : *t]]
 [[::= *e *x] / [toSymbolicForm *x *e]]
+[[::= *e *x ^ *n : *t] [> *n 1] / [-- *n *next] [::= *e *x ^ *next *x : *t]]
+[[::= *e *x ^ *n : *t] / [::= *e *x : *t]]
 [[::= *e *x - : *t] / [::= *e *x + -1 : *t]]
 [[::= *e *x + : *t] / [toSymbolicForm *x *xse] [::= *ex : *t] / [addSymbolicForm *xse *ex *e]]
+[[::= *e *x *y ^ *n : *t] [> *n 1] / [-- *n *next] [::= *e *x *y ^ *next *y : *t]]
 [[::= *e *x *y : *t] / [toSymbolicForm *x *xse] [toSymbolicForm *y *yse] [multiplySymbolicForm *xse *yse *ex] [::= *e *ex : *t]]
 
 protect [

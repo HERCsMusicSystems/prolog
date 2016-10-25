@@ -426,6 +426,7 @@
 [TestEq ":= division" 12 *x [:= *x 2 6 / 3 3]]
 [TestEq ":= constant and function" 1.0 *x [:= *x [cos [2 pi]]]]
 [TestEq ":= plus minus multiply" 24 *x [:= *x 2 + 3 - 1 + 4 5]]
+[TestEq ":= nested" 46 *x [:= *x 1 + [2 + 3] [4 + 5]]]
 
 [auto_atoms]
 
@@ -449,6 +450,11 @@
 [TestEq "Eval 2" [+ [1 x] [9]] *x [::= *x 4 + x + 5]]
 [TestEq "Eval 3" [+ [20 x]] *x [::= *x 4 x 5]]
 [TestEq "Eval 4" [+ [-1 x] [9]] *x [::= *x 4 - x + 5]]
+[TestEq "Nested Eval" [+ [6]] *x [::= *x 1 + [2 + 3]]]
+[TestEq "Powered Eval 1" [+ [1 x x x]] *x [::= *x x ^ 3]]
+[TestEq "Powered Eval 2" [+ [1 x y y y z] [127]] *x [::= *x x y ^ 3 z + 127]]
+[TestEq "Nested Power 1" [+ [1 x x] [4 x] [4]] *x [::= *x [x + 2] ^ 2]]
+[TestEq "Nested Power 2" [+ [1 x x x] [6 x x] [12 x] [8]] *x [::= *x [x + 2] ^3]]
 
 [TestEq "StringToLower \"Sonda Academy\" *x" "sonda academy" *x [StringToLower "Sonda Academy" *x]]
 [TestEq "StringToLower *x \"Sonda Academy\"" "SONDA ACADEMY" *x [StringToLower *x : "Sonda Academy"]]
