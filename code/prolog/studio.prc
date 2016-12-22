@@ -513,8 +513,7 @@ program studio #machine := "prolog.studio"
 [[toSymbolicForm *number [+ [*number]]] [is_number *number] /]
 [[toSymbolicForm *atom [+ [1 *atom]]] [is_atom *atom] /]
 [[toSymbolicForm [+ : *T] [+ : *T]] /]
-[[toSymbolicForm [*number : *T] [*number : *T]] [is_number *number] /]
-[[toSymbolicForm *a *ex] [::= *a *ex]]
+[[toSymbolicForm *a *ex] [::= *ex : *a]]
 
 [[sortSymbolicForm *l1 *l2] [LENGTH *l1 *ll1] [LENGTH *l2 *ll2] [>= *ll1 *ll2]]
 
@@ -534,6 +533,7 @@ program studio #machine := "prolog.studio"
 [[multiplySymbolicForm [*A : *At] [*B : *Bt] [*AB : *SABt]] [is_number *A] [is_number *B] / [mult *A *B *AB] [APPEND *At *Bt *ABt] [<=> *ABt *SABt]]
 
 [[::= *e [*a : *b] : *t] [not eq *a +] / [::= *ab *a : *b] [::= *e *ab : *t]]
+[[::= *e - : *t] / [::= *e -1 : *t]]
 [[::= *e *x] / [toSymbolicForm *x *e]]
 [[::= *e *x ^ *n : *t] [> *n 1] / [-- *n *next] [::= *e *x ^ *next *x : *t]]
 [[::= *e *x ^ *n : *t] / [::= *e *x : *t]]

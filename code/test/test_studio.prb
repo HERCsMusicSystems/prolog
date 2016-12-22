@@ -455,6 +455,8 @@
 [TestEq "Powered Eval 2" [+ [1 x y y y z] [127]] *x [::= *x x y ^ 3 z + 127]]
 [TestEq "Nested Power 1" [+ [1 x x] [4 x] [4]] *x [::= *x [x + 2] ^ 2]]
 [TestEq "Nested Power 2" [+ [1 x x x] [6 x x] [12 x] [8]] *x [::= *x [x + 2] ^3]]
+[TestEq "Complicated 1" [+ [-7 x] [-16]] *x [::= *x -5 [3 x + 2] + 2 [4 x - 3]]]
+[TestEq "Negative front" [+ [-1 x]] *x [::= *x - x]]
 
 [TestEq "StringToLower \"Sonda Academy\" *x" "sonda academy" *x [StringToLower "Sonda Academy" *x]]
 [TestEq "StringToLower *x \"Sonda Academy\"" "SONDA ACADEMY" *x [StringToLower *x : "Sonda Academy"]]
