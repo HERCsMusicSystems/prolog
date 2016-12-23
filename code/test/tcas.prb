@@ -1,0 +1,20 @@
+
+[import "cas"]
+[import "test"]
+
+[TestEq "rm0" [+ x] *x [rm0 [+ 0 x] *x]]
+[TestFails "rm0 fails" [rm0 [+ x] *]]
+[TestEq "apply rm0" [+ x y] *x [apply [+ x 0 y] *x [rm0]]]
+[TestEq "apply nested rm0" [+ x [+ a b] y] *x [apply [+ x [+ a 0 b] y] *x [rm0]]]
+
+[TestEq "apply nested rm1" [+ x [~ 4 [^ x [~ pi]]]] *x [apply [+ x [~ 4 [^ x [~ pi 1]]]] *x [rm1]]]
+[TestFails "apply rm1 to addition" [apply [+ x y 1] * [rm1]]]
+
+[TestEq "sort multiplications" [~ 1 2 3 [^ a n] x y z] *x [exhaust [~ x 1 y 2 [^ a n] 3 z] *x [srt]]]
+
+[FailedTestSummary]
+
+;[command]
+
+[exit]
+
