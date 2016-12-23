@@ -29,7 +29,8 @@ program studio #machine := "prolog.studio"
 		is_atom is_integer is_double is_number is_var is_head is_text has_machine
 		text_list text_term e32 query_stack object_counter
 		exit halt command save_history load_history inner inner_addcl inner_call minimise maximise
-		res not eq rres ures lazy random_cl explode TRY ONE PROBE SELECT APPEND LENGTH REVERSE AT ONLIST INLIST NODUP MAP
+		res not eq rres ures lazy random_cl explode
+		TRY ONE PROBE SELECT APPEND LENGTH REVERSE AT ONLIST INLIST NODUP MAP MEMBER REPLACE
 		sort divide
 		WHILE FOR FOREVER forever REPEAT IF
 		CONSTANT VARIABLE ACCUMULATOR STACK QUEUE ARRAY INDEX var inc dec ALL ISALL isall isallr isallq
@@ -244,6 +245,12 @@ program studio #machine := "prolog.studio"
 [[NODUP [*x : *t] [*x : *result]] / [NODUP *t *result]]
 [[MAP [] [] []]]
 [[MAP [[*x *y] : *xyt] [*x : *xt] [*y : *yt]] / [MAP *xyt *xt *yt]]
+[[MEMBER *x [*x : *]]]
+[[MEMBER *x [* : *l]] [MEMBER *x *l]]
+[[REPLACE *x [*x : *l] *l]]
+[[REPLACE *x [*h : *l] [*h : *ll]] [REPLACE *x *l *ll]]
+[[REPLACE *x [*x : *l] *y [*y : *l]]]
+[[REPLACE *x [*h : *l] *y [*h : *ll]] [REPLACE *x *l *y *ll]]
 [[WHILE *condition : *call] [not not : *condition] / [PROBE : *call] / [WHILE *condition : *call]]
 [[WHILE : *]]
 [[FOREVER : *instructions] [PROBE : *instructions] / [FOREVER : *instructions]]
@@ -545,7 +552,7 @@ program studio #machine := "prolog.studio"
 protect [
 	+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^
 	eq grnd
-	not res ONE ALL TRY PROBE SELECT APPEND LENGTH REVERSE ONLIST INLIST NODUP MAP
+	not res ONE ALL TRY PROBE SELECT APPEND LENGTH REVERSE ONLIST INLIST NODUP MAP MEMBER REPLACE
 	exit command inner inner_addcl inner_call random_cl explode
 	sort divide
 	toSymbolicForm sortSymbolicForm addSymbolicForm multiplySymbolicForm := ::=

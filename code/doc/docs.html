@@ -262,6 +262,7 @@
             <a href="#predicate_LENGTH">LENGTH</a>
             <a href="#predicate_MAP">MAP</a>
             <a href="#predicate_maximise">maximise</a>
+            <a href="#predicate_MEMBER">MEMBER</a>
             <a href="#predicate_minimise">minimise</a>
             <a href="#predicate_NODUP">NODUP</a>
             <a href="#predicate_not">not</a>
@@ -269,6 +270,7 @@
             <a href="#predicate_ONLIST">ONLIST</a>
             <a href="#predicate_PROBE">PROBE</a>
             <a href="#predicate_QUEUE">QUEUE</a>
+            <a href="#predicate_REPLACE">REPLACE</a>
             <a href="#predicate_res">res</a>
             <a href="#predicate_REVERSE">REVERSE</a>
             <a href="#predicate_rres">rres</a>
@@ -2969,6 +2971,26 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_MEMBER">
+        <div class="doc_predicate_header">
+            [MEMBER element list]
+        </div>
+        <div class="doc_predicate_body">
+            Identical to <a href="#predicate_ONLIST">ONLIST</a>.<br />
+            Checks if the element is on the list.
+            If list contains variables then they become the element.
+            If element is a variable then it become the first element of the list and on sub-sequent backtracking
+            second, third and so on.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[MEMBER *x [*x : *]]]<br />
+            [[MEMBER *x [* : *l]] [MEMBER *x *l]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_minimise">
         <div class="doc_predicate_header">
             [minimise *x from to]<br />
@@ -3092,6 +3114,25 @@
             it is placed at the end of the queue.
             Every time a variable is passed, a value is popped from the beginning of the queue.<br />
             <b>Note:</b> QUEUE is not designed to correctly index variables. Avoid pushing terms containing variables.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_REPLACE">
+        <div class="doc_predicate_header">
+            [REPLACE element list result]<br />
+            [REPLACE element list new_element result]<br />
+        </div>
+        <div class="doc_predicate_body">
+            Removes an element from a list or replaces it with a new one.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[REPLACE *x [*x : *l] *l]]<br />
+            [[REPLACE *x [*h : *l] [*h : *ll]] [REPLACE *x *l *ll]]<br />
+            [[REPLACE *x [*x : *l] *y [*y : *l]]]<br />
+            [[REPLACE *x [*h : *l] *y [*h : *ll]] [REPLACE *x *l *y *ll]]<br />
         </div>
     </a>
 </div>
