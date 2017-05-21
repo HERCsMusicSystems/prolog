@@ -12,6 +12,16 @@
 
 [TestEq "sort multiplications" [~ 1 2 3 [^ a n] x y z] *x [exhaust [~ x 1 y 2 [^ a n] 3 z] *x [srt]]]
 
+[TestEq "Remove nested vectors" [+ 1 2 3 4 5] *x [exhaust [+ 1 [+ 2 [+ 3 4]] 5] *x [rdb]]]
+[TestEq "Remove nested products" [+ 1 2 x 4 5] *x [exhaust [+ 1 [+ 2 [~ x 1]] 4 5] *x [rdb srt rm1 rdb]]]
+
+[TestEq "Reduce numbers" [+ [~ 15 x]] *x [exhaust [+ [~ 3 x 5]] *x [rdn srt]]]
+[TestEq "Reduce numbers completely" [+ x] *x [exhaust [+ [~ 2 x 0.5]] *x [rdn srt rm1 rdb]]]
+
+[TestEq "Distribution 1" [+ [~ 2 v x] [~ 2 v y]] *x [exhaust [+ [~ 2 [+ x y] v]] *x [dstr rdb srt]]]
+
+[TestEq "Two distributions" [+ [~ 4 [^ x 3]] [~ 24 [^ x 2]] [~ 20 x]] *x [exhaust [+ [~ x 4 [+ x 1] [+ x 5]]] *x [rdb srt dstr rdn rm1 clt pwr]]]
+
 [FailedTestSummary]
 
 ;[command]
