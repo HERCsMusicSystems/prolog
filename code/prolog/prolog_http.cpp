@@ -30,24 +30,35 @@ class http_responder : public PrologNativeCode {
 public:
 	int fd;
 	PrologRoot * root;
+	void psend (char * area, int size) {
+		if (fd >= 0) send (fd, area, size, 0);
+		else {for (int ind = 0; ind < size; ind++) putchar (area [ind]);}
+	}
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
 		AREA area;
 		while (parameters -> isPair ()) {
 			PrologElement * el = parameters -> getLeft ();
-			if (el -> isText ()) {char * cp = el -> getText (); send (fd, cp, strlen (cp), 0);}
-			if (el -> isAtom ()) {char * cp = el -> getAtom () -> name (); send (fd, cp, strlen (cp), 0);}
-			if (el -> isInteger ()) {sprintf (area, "%c", el -> getInteger ()); send (fd, area, 1, 0);}
+			if (el -> isText ()) {char * cp = el -> getText (); psend (cp, strlen (cp));}
+			if (el -> isAtom ()) {char * cp = el -> getAtom () -> name (); psend (cp, strlen (cp));}
+			if (el -> isInteger ()) {sprintf (area, "%c", el -> getInteger ()); psend (area, 1);}
 			if (el -> isEarth () && parameters -> getRight () -> isText ()) {
 				FILE * fr = fopen (parameters -> getRight () -> getText (), "rb");
+				PrologString * root_directory = root -> search_directories;
+				while (root_directory != 0 && fr == 0) {
+					AREA command;
+					sprintf (command, "%s%s", root_directory -> text, parameters -> getRight () -> getText ());
+					fr = fopen (command, "rb");
+					root_directory = root_directory -> next;
+				}
 				if (fr != 0) {
 					int ch;
-					while ((ch = fgetc (fr)) >= 0) {area [0] = (char) ch; send (fd, area, 1, 0);}
+					while ((ch = fgetc (fr)) >= 0) {area [0] = (char) ch; psend (area, 1);}
 				}
 				fclose (fr);
 			}
 			while (el -> isPair ()) {
 				int length = root -> getValue (el -> getLeft (), area, 0);
-				send (fd, area, length, 0);
+				psend (area, length);
 				el = el -> getRight ();
 			}
 			parameters = parameters -> getRight ();
@@ -547,6 +558,7 @@ PrologNativeCode * PrologHttpServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "fork") == 0) return new fork_code (this -> root);
 	if (strcmp (name, "wait_for") == 0) return new wait_for_code ();
 	if (strcmp (name, "http_request") == 0) return new http_request_code (this);
+	if (strcmp (name, "http_responder") == 0) return new http_responder (-1, this -> root);
 	return 0;
 }
 
