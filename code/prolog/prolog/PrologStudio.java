@@ -1806,49 +1806,28 @@ class file_writer extends PrologNativeCode {
 
 class file_reader extends PrologNativeCode {
 	public PrologRoot root;
+	public boolean shebang = false;
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
 		PrologElement symbol = null;
 		PrologElement name = null;
+		int search_index = 0;
 		while (parameters . isPair ()) {
 			PrologElement el = parameters . getLeft ();
-			if (el . isAtom ()) symbol = el;
-			if (el . isVar ()) symbol = el;
-			if (el . isText ()) name = el;
+			if (el . isAtom ()) {symbol = el; search_index = root . search_directories . size ();}
+			if (el . isVar ()) {symbol = el; search_index = root . search_directories . size ();}
+			if (el . isText ()) {name = el; search_index = 0;}
 			parameters = parameters . getRight ();
 		}
 		if (symbol == null || name == null) return false;
 		if (symbol . isVar ()) symbol . setAtom (new PrologAtom ());
 		PrologAtom atom = symbol . getAtom ();
 		if (atom . getMachine () != null) return false;
-		prolog . studio . FileReader fr = new prolog . studio . FileReader (atom, root, root . ccd (name . getText ()));
-		if (fr . fi == null) return false;
-		return atom . setMachine (fr);
-	}
-	public file_reader (PrologRoot root) {this . root = root;}
-}
-
-class shebang_reader extends PrologNativeCode {
-	public PrologRoot root;
-	public boolean code (PrologElement parameters, PrologResolution resolution) {
-		PrologElement symbol = null;
-		PrologElement name = null;
-		while (parameters . isPair ()) {
-			PrologElement el = parameters . getLeft ();
-			if (el . isAtom ()) symbol = el;
-			if (el . isVar ()) symbol = el;
-			if (el . isText ()) name = el;
-			parameters = parameters . getRight ();
-		}
-		if (symbol == null || name == null) return false;
-		if (symbol . isVar ()) symbol . setAtom (new PrologAtom ());
-		PrologAtom atom = symbol . getAtom ();
-		if (atom . getMachine () != null) return false;
-		prolog . studio . FileReader fr = new prolog . studio . FileReader (atom, root, root . ccd (name . getText ()));
+		prolog . studio . FileReader fr = new prolog . studio . FileReader (atom, root, root . ccd (name . getText ()), search_index);
 		if (fr . fi == null) return false;
 		fr . sr . shebang ();
 		return atom . setMachine (fr);
 	}
-	public shebang_reader (PrologRoot root) {this . root = root;}
+	public file_reader (PrologRoot root, boolean shebang) {this . root = root; this . shebang = shebang;}
 }
 
 class module_loader extends PrologNativeCode {
@@ -3018,8 +2997,8 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("msemaphore")) return new semaphore_maker (directory);
 		if (name . equals ("mutex")) return new mutex_maker (directory);
 		if (name . equals ("file_writer")) return new file_writer (root);
-		if (name . equals ("file_reader")) return new file_reader (root);
-		if (name . equals ("shebang_reader")) return new shebang_reader (root);
+		if (name . equals ("file_reader")) return new file_reader (root, false);
+		if (name . equals ("shebang_reader")) return new file_reader (root, true);
 		if (name . equals ("import_loader")) return new import_loader (root);
 		if (name . equals ("load_loader")) return new load_loader (root);
 		if (name . equals ("consult_loader")) return new consult_loader (root);

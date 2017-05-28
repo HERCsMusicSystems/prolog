@@ -48,9 +48,14 @@ public class FileReader extends PrologNativeCode {
 		parameters . setLeft (el);
 		return true;
 	}
-	public FileReader (PrologAtom atom, PrologRoot root, String file_name) {
+	public FileReader (PrologAtom atom, PrologRoot root, String file_name, int search_index) {
 		this . atom = atom;
-		try {fi = new FileInputStream (file_name);} catch (Exception ex) {fi = null;}
+		try {
+			fi = new FileInputStream (file_name);
+			while (fi == null && search_index < root . search_directories . size ()) {
+				fi = new FileInputStream (root . search_directories . get (search_index++) + file_name);
+			}
+		} catch (Exception ex) {fi = null;}
 		sr = new SymbolReader (root, fi);
 	}
 	public FileReader (PrologAtom atom, PrologRoot root, FileInputStream fi) {
