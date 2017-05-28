@@ -2563,8 +2563,8 @@ public:
 		PrologString * root_directory = 0;
 		while (parameters -> isPair ()) {
 			PrologElement * el = parameters -> getLeft ();
-			if (el -> isAtom ()) symbol = el;
-			if (el -> isVar ()) symbol = el;
+			if (el -> isAtom ()) {symbol = el; root_directory = 0;}
+			if (el -> isVar ()) {symbol = el; root_directory = 0;}
 			if (el -> isText ()) {name = el; root_directory = root -> search_directories;}
 			parameters = parameters -> getRight ();
 		}
