@@ -2533,7 +2533,7 @@ public:
 		parameters -> setLeft (el);
 		return true;
 	}
-	file_read (PrologAtom * atom, PrologRoot * root, char * file_name) {
+	file_read (PrologAtom * atom, PrologRoot * root, char * file_name, PrologString * root_directory) {
 		this -> atom = atom;
 		if (
 			(file_name [1] == ':' && file_name [2] == '\\')
@@ -2543,6 +2543,11 @@ public:
 		else {
 			fi = fopen (file_name, "rb");
 		}
+		while (root_directory != 0 && fi == 0) {
+			AREA command; sprintf (command, "%s%s", root_directory -> text, file_name);
+			fi = fopen (command, "rb");
+			root_directory = root_directory -> next;
+		}
 		sr . init (root, fi);
 	}
 	~ file_read (void) {if (fi != NULL) fclose (fi);}
@@ -2551,54 +2556,30 @@ public:
 class file_reader : public PrologNativeCode {
 public:
 	PrologRoot * root;
+	bool shebang;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		PrologElement * symbol = 0;
 		PrologElement * name = 0;
+		PrologString * root_directory = 0;
 		while (parameters -> isPair ()) {
 			PrologElement * el = parameters -> getLeft ();
 			if (el -> isAtom ()) symbol = el;
 			if (el -> isVar ()) symbol = el;
-			if (el -> isText ()) name = el;
+			if (el -> isText ()) {name = el; root_directory = root -> search_directories;}
 			parameters = parameters -> getRight ();
 		}
 		if (symbol == 0 || name == 0) return false;
 		if (symbol -> isVar ()) symbol -> setAtom (new PrologAtom ());
 		PrologAtom * atom = symbol -> getAtom ();
 		if (atom -> getMachine () != 0) return false;
-		file_read * fr = new file_read (atom, root, name -> getText ());
+		file_read * fr = new file_read (atom, root, name -> getText (), root_directory);
 		if (fr -> fi == 0) {delete fr; return false;}
+		if (shebang) fr -> sr . shebang ();
 		if (atom -> setMachine (fr)) return true;
 		delete fr;
 		return false;
 	}
-	file_reader (PrologRoot * root) {this -> root = root;}
-};
-
-class shebang_reader : public PrologNativeCode {
-public:
-	PrologRoot * root;
-	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		PrologElement * symbol = 0;
-		PrologElement * name = 0;
-		while (parameters -> isPair ()) {
-			PrologElement * el = parameters -> getLeft ();
-			if (el -> isAtom ()) symbol = el;
-			if (el -> isVar ()) symbol = el;
-			if (el -> isText ()) name = el;
-			parameters = parameters -> getRight ();
-		}
-		if (symbol == 0 || name == 0) return false;
-		if (symbol -> isVar ()) symbol -> setAtom (new PrologAtom ());
-		PrologAtom * atom = symbol -> getAtom ();
-		if (atom -> getMachine () != 0) return false;
-		file_read * fr = new file_read (atom, root, name -> getText ());
-		if (fr -> fi == 0) {delete fr; return false;}
-		fr -> sr . shebang ();
-		if (atom -> setMachine (fr)) return true;
-		delete fr;
-		return false;
-	}
-	shebang_reader (PrologRoot * root) {this -> root = root;}
+	file_reader (PrologRoot * root, bool shebang = false) {this -> root = root; this -> shebang = shebang;}
 };
 
 class module_loader : public PrologNativeCode {
@@ -4283,7 +4264,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "mutex") == 0) return new MutexMaker (directory);
 	if (strcmp (name, "file_writer") == 0) return new file_writer (root);
 	if (strcmp (name, "file_reader") == 0) return new file_reader (root);
-	if (strcmp (name, "shebang_reader") == 0) return new shebang_reader (root);
+	if (strcmp (name, "shebang_reader") == 0) return new file_reader (root, true);
 	if (strcmp (name, "import_loader") == 0) return new import_loader (root);
 	if (strcmp (name, "load_loader") == 0) return new load_loader (root);
 	if (strcmp (name, "consult_loader") == 0) return new consult_loader (root);
