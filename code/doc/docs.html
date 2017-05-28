@@ -1299,7 +1299,8 @@
 <div class="doc_predicate">
     <a id="predicate_file_reader">
         <div class="doc_predicate_header">
-            [file_reader *reader "file_name.extension"]<br />
+            [file_reader *reader "file_name.extension"] with search path context<br />
+            [file_reader "file_name.extension" *reader] explicit<br />
             ===========================================<br />
             [*reader *term] => reads a prolog term<br />
             [*reader "word" *text] => reads word<br />
@@ -1317,6 +1318,8 @@
             <li>Texts consisting of specified characters.</li><br />
             Without any parameters the reader closes the file and releases the machine clause binding.
             If anonymous symbol is garbage collected then the file is also closed (and machine binding released as well).
+            <br/>
+            <b>Note:</b> depending on the order of parameters the search path context can be used (*reader first) or suppressed (*file_name first).
             <br/>
             <b>Note:</b> use <a href="#predicate_shebang_reader">shebang_reader</a> to filter-out the possible initial shebang sequence (#!).
         </div>
