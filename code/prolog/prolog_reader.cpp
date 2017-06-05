@@ -566,6 +566,7 @@ PrologElement * PrologReader :: readRightSide (PrologElement * LEFT, bool second
 		if (right == NULL) {if (LEFT) delete LEFT; return NULL;}
 		if (right -> isEarth ()) {
 			message ("Syntax error (earth not allowed here).");
+			delete right;
 			if (LEFT) delete LEFT;
 			return NULL;
 		}
