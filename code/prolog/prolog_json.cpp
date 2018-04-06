@@ -156,12 +156,12 @@ public:
 
 void PrologJSONServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {
 	this -> root = root;
+	PrologDirectory * studio = root -> searchDirectory ("studio");
+	if (studio != 0) equal_atom =studio -> searchAtom ("=");
 	if (directory == 0) return;
 	true_atom = directory -> searchAtom ("true");
 	false_atom = directory -> searchAtom ("false");
 	null_atom = directory -> searchAtom ("null");
-	PrologDirectory * studio = root -> searchDirectory ("studio");
-	if (studio != 0) equal_atom =studio -> searchAtom ("=");
 }
 
 PrologNativeCode * PrologJSONServiceClass :: getNativeCode (char * name) {
