@@ -23,10 +23,50 @@
 #include "prolog_json.h"
 #include "prolog_studio.h"
 
-void PrologJSONServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {this -> root = root;}
+class json_native_class : public PrologNativeCode {
+public:
+	PrologJSONServiceClass * service;
+	void drop (FILE * fw, int tab, PrologElement * el) {
+		if (el -> isAtom ()) {
+			PrologAtom * atom = el -> getAtom ();
+			if (atom == service -> true_atom) fprintf (fw, "true");
+			else if (atom == service -> false_atom) fprintf (fw, "false");
+			else if (atom == service -> null_atom) fprintf (fw, "null");
+			else fprintf (fw, "\"%s\"", atom -> name ());
+		}
+	}
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		PrologElement * path = 0;
+		PrologElement * variable = 0;
+		PrologElement * json = 0;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isText ()) path = el;
+			else if (el -> isVar ()) variable = el;
+			else json = el;
+			parameters = parameters -> getRight ();
+		}
+		if (path != 0 && json != 0) {
+			FILE * fw = fopen (path -> getText (), "wb");
+			drop (fw, 0, json);
+			fclose (fw);
+		}
+		return false;
+	}
+	json_native_class (PrologJSONServiceClass * service) {this -> service = service;}
+};
+
+void PrologJSONServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {
+	this -> root = root;
+	if (directory == 0) return;
+	true_atom = directory -> searchAtom ("true");
+	false_atom = directory -> searchAtom ("false");
+	null_atom = directory -> searchAtom ("null");
+}
 
 PrologNativeCode * PrologJSONServiceClass :: getNativeCode (char * name) {
+	if (strcmp (name, "json") == 0) return new json_native_class (this);
 	return 0;
 }
 
-PrologJSONServiceClass :: PrologJSONServiceClass (void) {root = 0;}
+PrologJSONServiceClass :: PrologJSONServiceClass (void) {root = 0; true_atom = false_atom = null_atom = 0;}

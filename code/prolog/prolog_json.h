@@ -28,6 +28,9 @@
 class PrologJSONServiceClass : public PrologServiceClass {
 public:
 	PrologRoot * root;
+	PrologAtom * true_atom;
+	PrologAtom * false_atom;
+	PrologAtom * null_atom;
 	virtual void init (PrologRoot * root, PrologDirectory * directory);
 	virtual PrologNativeCode * getNativeCode (char * name);
 	PrologJSONServiceClass (void);
