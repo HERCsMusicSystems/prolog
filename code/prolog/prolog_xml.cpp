@@ -93,3 +93,5 @@ PrologNativeCode * PrologXMLServiceClass :: getNativeCode (char * name) {
 	if (strcmp (name, "xml") == 0) return new xml_native_class (root);
 	return 0;
 }
+
+PrologXMLServiceClass :: PrologXMLServiceClass (void) {root = 0;}

@@ -111,6 +111,7 @@
     <ClCompile Include="..\code\prolog\prolog_dll_loader.cpp" />
     <ClCompile Include="..\code\prolog\prolog_element.cpp" />
     <ClCompile Include="..\code\prolog\prolog_http.cpp" />
+    <ClCompile Include="..\code\prolog\prolog_json.cpp" />
     <ClCompile Include="..\code\prolog\prolog_loader.cpp" />
     <ClCompile Include="..\code\prolog\prolog_match.cpp" />
     <ClCompile Include="..\code\prolog\prolog_midi.cpp" />
@@ -138,6 +139,7 @@
     <ClInclude Include="..\code\prolog\prolog_conductor.h" />
     <ClInclude Include="..\code\prolog\prolog_control.h" />
     <ClInclude Include="..\code\prolog\prolog_distribution.h" />
+    <ClInclude Include="..\code\prolog\prolog_json.h" />
     <ClInclude Include="..\code\prolog\prolog_midi.h" />
     <ClInclude Include="..\code\prolog\prolog_neural.h" />
     <ClInclude Include="..\code\prolog\prolog_xml.h" />

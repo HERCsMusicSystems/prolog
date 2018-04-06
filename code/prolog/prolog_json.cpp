@@ -22,3 +22,11 @@
 
 #include "prolog_json.h"
 #include "prolog_studio.h"
+
+void PrologJSONServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {this -> root = root;}
+
+PrologNativeCode * PrologJSONServiceClass :: getNativeCode (char * name) {
+	return 0;
+}
+
+PrologJSONServiceClass :: PrologJSONServiceClass (void) {root = 0;}

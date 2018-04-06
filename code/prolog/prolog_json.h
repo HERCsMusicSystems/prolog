@@ -30,7 +30,7 @@ public:
 	PrologRoot * root;
 	virtual void init (PrologRoot * root, PrologDirectory * directory);
 	virtual PrologNativeCode * getNativeCode (char * name);
-	PrologJSONServiceClass (void) {root = 0;}
+	PrologJSONServiceClass (void);
 };
 
 #endif

@@ -30,7 +30,7 @@ public:
 	PrologRoot * root;
 	virtual void init (PrologRoot * root, PrologDirectory * directory);
 	virtual PrologNativeCode * getNativeCode (char * name);
-	PrologXMLServiceClass (void) {root = 0;}
+	PrologXMLServiceClass (void);
 };
 
 #endif

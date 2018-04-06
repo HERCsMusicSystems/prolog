@@ -28,6 +28,7 @@
 #include "prolog_conductor.h"
 #include "prolog_midi.h"
 #include "prolog_xml.h"
+#include "prolog_json.h"
 #include "prolog_distribution.h"
 #include "prolog_control.h"
 #include "prolog_http.h"
@@ -116,6 +117,7 @@ public:
 		if (strcmp (name, "prolog.xml") == 0) return new PrologXMLServiceClass ();
 		if (strcmp (name, "prolog.distribution") == 0) return new PrologDistributionServiceClass ();
 		if (strcmp (name, "prolog.control") == 0) return new PrologControlServiceClass ();
+		if (strcmp (name, "prolog.json") == 0) return new PrologJSONServiceClass ();
 		return NULL;
 	}
 } service_class_loader;
