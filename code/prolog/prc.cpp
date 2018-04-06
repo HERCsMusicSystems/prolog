@@ -80,6 +80,7 @@ extern char resource_test;
 extern char resource_xml;
 extern char resource_distribution;
 extern char resource_control;
+extern char resource_json;
 class resource_loader_class : public PrologResourceLoader {
 public:
 	char * load (char * name) {
@@ -99,6 +100,7 @@ public:
 		if (strcmp (name, "xml.prc") == 0) ret = & resource_xml;
 		if (strcmp (name, "distribution.prc") == 0) ret = & resource_distribution;
 		if (strcmp (name, "control.prc") == 0) ret = & resource_control;
+		if (strcmp (name, "json.prc") == 0) ret = & resource_json;
 		return ret;
 	}
 } resource_loader;
