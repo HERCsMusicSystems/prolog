@@ -146,7 +146,7 @@ public:
 			if (path == 0) {
 				if (variable == 0) {drop (stdout, 0, json); printf ("\n");}
 				else {AREA area; area [0] = '\0'; int ind = drop (area, 0, 0, json); area_cat (area, ind, '\0'); variable -> setText (area);}
-			} if (path != 0) {FILE * fw = fopen (path -> getText (), "wb"); drop (fw, 0, json); fprintf (fw, "\n"); fclose (fw);}
+			} else {FILE * fw = fopen (path -> getText (), "wb"); drop (fw, 0, json); fprintf (fw, "\n"); fclose (fw);}
 			return true;
 		}
 		return false;
@@ -155,6 +155,7 @@ public:
 };
 
 void PrologJSONServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {
+	if (root == 0) return;
 	this -> root = root;
 	PrologDirectory * studio = root -> searchDirectory ("studio");
 	if (studio != 0) equal_atom =studio -> searchAtom ("=");
