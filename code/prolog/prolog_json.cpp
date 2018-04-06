@@ -33,6 +33,19 @@ public:
 			else if (atom == service -> false_atom) fprintf (fw, "false");
 			else if (atom == service -> null_atom) fprintf (fw, "null");
 			else fprintf (fw, "\"%s\"", atom -> name ());
+			return;
+		}
+		if (el -> isText ()) {
+			char * text = el -> getText ();
+			fprintf (fw, "\"");
+			while (* text != '\0') {
+				if (* text == '\"') fprintf (fw, "\\\"");
+				else if (* text == '\\') fprintf (fw, "\\\\");
+				else fprintf (fw, "%c", * text);
+				text++;
+			}
+			fprintf (fw, "\"");
+			return;
 		}
 	}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -41,7 +54,7 @@ public:
 		PrologElement * json = 0;
 		while (parameters -> isPair ()) {
 			PrologElement * el = parameters -> getLeft ();
-			if (el -> isText ()) path = el;
+			if (el -> isText ()) {if (path == 0) path = el; else json = el;}
 			else if (el -> isVar ()) variable = el;
 			else json = el;
 			parameters = parameters -> getRight ();
@@ -50,6 +63,7 @@ public:
 			FILE * fw = fopen (path -> getText (), "wb");
 			drop (fw, 0, json);
 			fclose (fw);
+			return true;
 		}
 		return false;
 	}
