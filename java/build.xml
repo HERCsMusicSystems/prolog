@@ -27,6 +27,7 @@
 			<fileset dir="../code/prolog" includes="test.prc"/>
 			<fileset dir="../code/prolog" includes="store.prc"/>
 			<fileset dir="../code/prolog" includes="xml.prc"/>
+			<fileset dir="../code/prolog" includes="json.prc"/>
 			<manifest><attribute name="Main-Class" value="studio"/></manifest>
 		</jar>
 	</target>
