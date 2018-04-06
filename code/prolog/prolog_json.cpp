@@ -26,6 +26,18 @@
 class json_native_class : public PrologNativeCode {
 public:
 	PrologJSONServiceClass * service;
+	void tabs (FILE * fw, int tabs) {while (tabs-- > 0) fprintf (fw, " ");}
+	void multiline (FILE * fw, int tab, PrologElement * el, char bracket) {
+		int tabss = tab + 2;
+		bool comma = false;
+		while (el -> isPair ()) {
+			if (comma) fprintf (fw, ","); comma = true;
+			fprintf (fw, "\n"); tabs (fw, tabss);
+			drop (fw, tabss, el -> getLeft ());
+			el = el -> getRight ();
+		}
+		fprintf (fw, "\n"); tabs (fw, tab); fprintf (fw, "%c", bracket);
+	}
 	void drop (FILE * fw, int tab, PrologElement * el) {
 		if (el -> isAtom ()) {
 			PrologAtom * atom = el -> getAtom ();
@@ -52,7 +64,18 @@ public:
 		if (el -> isPair ()) {
 			PrologElement * left = el -> getLeft ();
 			PrologElement * right = el -> getRight ();
-			if (! right -> isPair () && ! right -> isEarth ()) {drop (fw, tab, left); fprintf (fw, ": "); drop (fw, tab, right); return;}
+			if (left -> isAtom () && left -> getAtom () == service -> equal_atom) {
+				if (! right -> isPair ()) return;
+				left = right -> getLeft (); right = right -> getRight ();
+				if (! right -> isPair ()) return; right = right -> getLeft ();
+				drop (fw, tab + 2, left); fprintf (fw, ": "); drop (fw, tab, right);
+				return;
+			}
+			char left_bracket = '[', right_bracket = ']';
+			if (left -> isPair ()) left = left -> getLeft ();
+			if (left -> isAtom () && left -> getAtom () == service -> equal_atom) {left_bracket = '{'; right_bracket = '}';}
+			fprintf (fw, "%c", left_bracket);
+			multiline (fw, tab, el, right_bracket);
 			return;
 		}
 		if (el -> isFail ()) {fprintf (fw, "false"); return;}
@@ -70,10 +93,9 @@ public:
 			else json = el;
 			parameters = parameters -> getRight ();
 		}
-		if (path != 0 && json != 0) {
-			FILE * fw = fopen (path -> getText (), "wb");
-			drop (fw, 0, json);
-			fclose (fw);
+		if (json != 0) {
+			if (path == 0) {drop (stdout, 0, json); printf ("\n");}
+			else {FILE * fw = fopen (path -> getText (), "wb"); drop (fw, 0, json); fprintf (fw, "\n"); fclose (fw);}
 			return true;
 		}
 		return false;
@@ -87,6 +109,8 @@ void PrologJSONServiceClass :: init (PrologRoot * root, PrologDirectory * direct
 	true_atom = directory -> searchAtom ("true");
 	false_atom = directory -> searchAtom ("false");
 	null_atom = directory -> searchAtom ("null");
+	PrologDirectory * studio = root -> searchDirectory ("studio");
+	if (studio != 0) equal_atom =studio -> searchAtom ("=");
 }
 
 PrologNativeCode * PrologJSONServiceClass :: getNativeCode (char * name) {
@@ -94,4 +118,4 @@ PrologNativeCode * PrologJSONServiceClass :: getNativeCode (char * name) {
 	return 0;
 }
 
-PrologJSONServiceClass :: PrologJSONServiceClass (void) {root = 0; true_atom = false_atom = null_atom = 0;}
+PrologJSONServiceClass :: PrologJSONServiceClass (void) {root = 0; true_atom = false_atom = null_atom = equal_atom = 0;}
