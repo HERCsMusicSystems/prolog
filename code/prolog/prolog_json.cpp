@@ -47,6 +47,17 @@ public:
 			fprintf (fw, "\"");
 			return;
 		}
+		if (el -> isInteger ()) {fprintf (fw, "%i", el -> getInteger ()); return;}
+		if (el -> isDouble ()) {fprintf (fw, "%.15g", el -> getDouble ()); return;}
+		if (el -> isPair ()) {
+			PrologElement * left = el -> getLeft ();
+			PrologElement * right = el -> getRight ();
+			if (! right -> isPair () && ! right -> isEarth ()) {drop (fw, tab, left); fprintf (fw, ": "); drop (fw, tab, right); return;}
+			return;
+		}
+		if (el -> isFail ()) {fprintf (fw, "false"); return;}
+		if (el -> isSlash ()) {fprintf (fw, "true"); return;}
+		if (el -> isVar ()) {fprintf (fw, "null"); return ;}
 	}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		PrologElement * path = 0;
