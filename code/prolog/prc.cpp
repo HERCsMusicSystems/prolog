@@ -54,6 +54,7 @@ public:
 		if (strcmp (name, "xml.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (XML_PRC), RT_RCDATA);
 		if (strcmp (name, "distribution.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (DISTRIBUTION_PRC), RT_RCDATA);
 		if (strcmp (name, "control.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (CONTROL_PRC), RT_RCDATA);
+		if (strcmp (name, "json.prc") == 0) resource = FindResource (NULL, MAKEINTRESOURCE (JSON_PRC), RT_RCDATA);
 		if (! resource) return NULL;
 		HGLOBAL loader = LoadResource (NULL, resource);
 		if (! loader) return NULL;

@@ -150,7 +150,7 @@
     <ClInclude Include="..\code\tinyxml2\tinyxml2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
+    <ClInclude Include="..\code\prolog\studio_resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -216,6 +216,9 @@
       <Filter>Documents</Filter>
     </None>
     <None Include="..\code\prolog\test.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\json.prc">
       <Filter>Prolog Files</Filter>
     </None>
   </ItemGroup>

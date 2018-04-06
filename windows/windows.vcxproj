@@ -141,13 +141,13 @@
     <ClInclude Include="..\code\prolog\prolog_midi.h" />
     <ClInclude Include="..\code\prolog\prolog_neural.h" />
     <ClInclude Include="..\code\prolog\prolog_xml.h" />
+    <ClInclude Include="..\code\prolog\studio_resource.h" />
     <ClInclude Include="..\code\tinyxml2\tinyxml2.h" />
     <ClInclude Include="operating_system.h" />
     <ClInclude Include="..\code\prolog\prolog.h" />
     <ClInclude Include="..\code\prolog\prolog_midi_command.h" />
     <ClInclude Include="..\code\prolog\prolog_studio.h" />
     <ClInclude Include="..\code\prolog\prolog_windows_console.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="..\code\prolog\windows_midi.h" />
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +159,7 @@
     <None Include="..\code\prolog\help.prc" />
     <None Include="..\code\prolog\http.prc" />
     <None Include="..\code\prolog\irrklang.prc" />
+    <None Include="..\code\prolog\json.prc" />
     <None Include="..\code\prolog\keyboard.prc" />
     <None Include="..\code\prolog\lisp.prc" />
     <None Include="..\code\prolog\main_course.prc" />
