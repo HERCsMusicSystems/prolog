@@ -23,6 +23,8 @@
 #include "prolog_json.h"
 #include "prolog_studio.h"
 
+#include <string.h>
+
 class json_native_class : public PrologNativeCode {
 public:
 	PrologJSONServiceClass * service;
