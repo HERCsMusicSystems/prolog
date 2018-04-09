@@ -48,7 +48,7 @@ class json_native_class extends PrologNativeCode {
     boolean comma = false;
     String ret = "";
     while (el . isPair ()) {
-      if (comma) {ret += ","; if (tab >= 0) ret += " ";} comma = true;
+      if (comma) {ret += ","; if (tab < 0) ret += " ";} comma = true;
       if (tab >= 0) ret += "\n" + tabs (tabss);
       ret += drop (tabss, el . getLeft ());
       el = el . getRight ();

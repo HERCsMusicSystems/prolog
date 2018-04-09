@@ -23,115 +23,64 @@
 #include "prolog_json.h"
 #include "prolog_studio.h"
 
-#include <string.h>
+#include <string>
 
 class json_native_class : public PrologNativeCode {
 public:
 	PrologJSONServiceClass * service;
-	void tabs (FILE * fw, int tabs) {while (tabs-- > 0) fprintf (fw, " ");}
-	void multiline (FILE * fw, int tab, PrologElement * el, char bracket) {
+	void tabs (std :: string * area, int tab) {while (tab-- > 0) * area += ' ';}
+	void drop_text (std :: string * area, char * text) {
+		area -> append ("\"");
+		while (* text != '\0') {
+			if (* text == '\"') area -> append ("\\\"");
+			else if (* text == '\\') area -> append ("\\\\");
+			else * area += * text;
+			text++;
+		}
+		area -> append ("\"");
+	}
+	void multiline (std :: string * area, int tab, PrologElement * el, char bracket) {
 		int tabss = tab + 2;
 		bool comma = false;
 		while (el -> isPair ()) {
-			if (comma) fprintf (fw, ","); comma = true;
-			fprintf (fw, "\n"); tabs (fw, tabss);
-			drop (fw, tabss, el -> getLeft ());
+			if (comma) {area -> append (","); if (tab < 0) area -> append (" ");} comma = true;
+			if (tab >= 0) {area -> append ("\n"); tabs (area, tabss);}
+			drop (area, tabss, el -> getLeft ());
 			el = el -> getRight ();
 		}
-		fprintf (fw, "\n"); tabs (fw, tab); fprintf (fw, "%c", bracket);
+		if (tab >= 0) {area -> append ("\n"); tabs (area, tab);}
+		* area += bracket;
 	}
-	int multiline (char * area, int ind, int tab, PrologElement * el, char bracket) {
-		int tabss = tab + 2;
-		bool comma = false;
-		while (el -> isPair ()) {
-			if (comma) ind = area_cat (area, ind, ", "); comma = true;
-			ind = drop (area, ind, tabss, el -> getLeft ());
-			el = el -> getRight ();
-		}
-		return area_cat (area, ind, bracket);
-	}
-	void drop_text (FILE * fw, char * text) {
-		fprintf (fw, "\"");
-		while (* text != '\0') {
-			if (* text == '\"') fprintf (fw, "\\\"");
-			else if (* text == '\\') fprintf (fw, "\\\\");
-			else fprintf (fw, "%c", * text);
-			text++;
-		}
-		fprintf (fw, "\"");
-	}
-	int drop_text (char * area, int ind, char * text) {
-		ind = area_cat (area, ind, '\"');
-		while (* text != '\0') {
-			if (* text == '\"') ind = area_cat (area, ind, "\\\"");
-			else if (* text == '\\') ind = area_cat (area, ind, "\\\\");
-			else ind = area_cat (area, ind, * text);
-			text++;
-		}
-		return area_cat (area, ind, '\"');
-	}
-	void drop (FILE * fw, int tab, PrologElement * el) {
+	void drop (std :: string * area, int tab, PrologElement * el) {
 		if (el -> isAtom ()) {
 			PrologAtom * atom = el -> getAtom ();
-			if (atom == service -> true_atom) fprintf (fw, "true");
-			else if (atom == service -> false_atom) fprintf (fw, "false");
-			else if (atom == service -> null_atom) fprintf (fw, "null");
-			else drop_text (fw, atom -> name ());
+			if (atom == service -> true_atom) area -> append ("true");
+			else if (atom == service -> false_atom) area -> append ("false");
+			else if (atom == service -> null_atom) area -> append ("null");
+			else drop_text (area, atom -> name ());
 			return;
-		}
-		if (el -> isText ()) {drop_text (fw, el -> getText ()); return;}
-		if (el -> isInteger ()) {fprintf (fw, "%i", el -> getInteger ()); return;}
-		if (el -> isDouble ()) {fprintf (fw, "%.15g", el -> getDouble ()); return;}
+		} else if (el -> isText ()) {drop_text (area, el -> getText ()); return;}
+		else if (el -> isInteger ()) {PROLOG_STRING command; sprintf (command, "%i", el -> getInteger ()); area -> append (command); return;}
+		else if (el -> isDouble ()) {PROLOG_STRING command; sprintf (command, "%.15g", el -> getDouble ()); area -> append (command); return;}
 		if (el -> isPair ()) {
 			PrologElement * left = el -> getLeft ();
 			PrologElement * right = el -> getRight ();
 			if (left -> isAtom () && left -> getAtom () == service -> equal_atom) {
 				if (! right -> isPair ()) return; left = right -> getLeft (); right = right -> getRight ();
 				if (! right -> isPair ()) return; right = right -> getLeft ();
-				drop (fw, tab + 2, left); fprintf (fw, ": "); drop (fw, tab, right);
+				drop (area, tab + 2, left); area -> append (": "); drop (area, tab, right);
 				return;
 			}
 			char left_bracket = '[', right_bracket = ']';
 			if (left -> isPair ()) left = left -> getLeft ();
 			if (left -> isAtom () && left -> getAtom () == service -> equal_atom) {left_bracket = '{'; right_bracket = '}';}
-			fprintf (fw, "%c", left_bracket);
-			multiline (fw, tab, el, right_bracket);
+			* area += left_bracket;
+			multiline (area, tab, el, right_bracket);
 			return;
 		}
-		if (el -> isFail ()) {fprintf (fw, "false"); return;}
-		if (el -> isSlash ()) {fprintf (fw, "true"); return;}
-		if (el -> isVar ()) {fprintf (fw, "null"); return ;}
-	}
-	int drop (char * area, int ind, int tab, PrologElement * el) {
-		if (el -> isAtom ()) {
-			PrologAtom * atom = el -> getAtom ();
-			if (atom == service -> true_atom) ind = area_cat (area, ind, "true");
-			else if (atom == service -> false_atom) ind = area_cat (area, ind, "false");
-			else if (atom == service -> null_atom) ind = area_cat (area, ind, "null");
-			else ind = drop_text (area, ind, atom -> name ());
-			return ind;
-		}
-		if (el -> isText ()) return drop_text (area, ind, el -> getText ());
-		if (el -> isInteger ()) {PROLOG_STRING command; sprintf (command, "%i", el -> getInteger ()); return area_cat (area, ind, command);}
-		if (el -> isDouble ()) {PROLOG_STRING command; sprintf (command, "%.15g", el -> getDouble ()); return area_cat (area, ind, command);}
-		if (el -> isPair ()) {
-			PrologElement * left = el -> getLeft ();
-			PrologElement * right = el -> getRight ();
-			if (left -> isAtom () && left -> getAtom () == service -> equal_atom) {
-				if (! right -> isPair ()) return ind; left = right -> getLeft (); right = right -> getRight ();
-				if (! right -> isPair ()) return ind; right = right -> getLeft ();
-				ind = drop (area, ind, tab + 2, left); ind = area_cat (area, ind, ": "); return drop (area, ind, tab, right);
-			}
-			char left_bracket = '[', right_bracket = ']';
-			if (left -> isPair ()) left = left -> getLeft ();
-			if (left -> isAtom () && left -> getAtom () == service -> equal_atom) {left_bracket = '{'; right_bracket = '}';}
-			ind = area_cat (area, ind, left_bracket);
-			return multiline (area, ind, tab, el, right_bracket);
-		}
-		if (el -> isFail ()) return area_cat (area, ind, "false");
-		if (el -> isSlash ()) return area_cat (area, ind, "true");
-		if (el -> isVar ()) return area_cat (area, ind, "null");
-		return ind;
+		if (el -> isFail ()) area -> append ("false");
+		else if (el -> isSlash ()) area -> append ("true");
+		else if (el -> isVar ()) area -> append ("null");
 	}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		PrologElement * path = 0;
@@ -145,10 +94,11 @@ public:
 			parameters = parameters -> getRight ();
 		}
 		if (json != 0) {
+			std :: string area = "";
 			if (path == 0) {
-				if (variable == 0) {drop (stdout, 0, json); printf ("\n");}
-				else {AREA area; area [0] = '\0'; int ind = drop (area, 0, 0, json); area_cat (area, ind, '\0'); variable -> setText (area);}
-			} else {FILE * fw = fopen (path -> getText (), "wb"); drop (fw, 0, json); fprintf (fw, "\n"); fclose (fw);}
+				if (variable == 0) {drop (& area, 0, json); printf (area . c_str ()); printf ("\n");}
+				else {drop (& area, INT_MIN, json); variable -> setText ((char *) area . c_str ());}
+			} else {FILE * fw = fopen (path -> getText (), "wb"); drop (& area, 0, json); fprintf (fw, area . c_str ()); fprintf (fw, "\n"); fclose (fw);}
 			return true;
 		}
 		return false;
