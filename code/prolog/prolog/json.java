@@ -27,6 +27,49 @@ import java . io . StringReader;
 
 class json_native_class extends PrologNativeCode {
   json service;
+  PrologRoot root = new PrologRoot ();
+  public PrologAtom atomC (String name) {
+    PrologAtom atom = service . root . search (name);
+    if (atom == null) atom = service . root . createAtom (name);
+    return atom;
+  }
+  public void read_json_pair (PrologElement el, PrologReader reader) {
+    el . setPair (); el . getLeft () . setAtom (service . equal_atom);
+    if (reader . symbol_control != 8) {reader . get_symbol (); return;}
+    el = el . getRight (); el . setPair (); el . getLeft () . setAtom (atomC (reader . symbol));
+    el = el . getRight (); el . setPair ();
+    reader . get_symbol (); if (reader . symbol_control != 3) return;
+    reader . get_symbol ();
+    read_json (el . getLeft (), reader);
+  }
+  public void read_json (PrologElement el, PrologReader reader) {
+    switch (reader . symbol_control) {
+    case 10: el . setInteger (reader . int_symbol); reader . get_symbol (); break;
+    case 18: el . setDouble (reader . double_symbol); reader . get_symbol (); break;
+    case 11:
+      if (reader . symbol . equals ("true")) el . setAtom (service . true_atom);
+      else if (reader . symbol . equals ("false")) el . setAtom (service . false_atom);
+      else if (reader . symbol . equals ("null")) el . setAtom (service . null_atom);
+      reader . get_symbol ();
+      break;
+    case 8: el . setAtom (atomC (reader . symbol)); reader . get_symbol (); break;
+    case 1:
+      el . setPair ();
+      reader . get_symbol ();
+      read_json (el . getLeft (), reader);
+      while (reader . symbol_control == 32) {el = el . getRight (); el . setPair (); reader . get_symbol (); read_json (el . getLeft (), reader);}
+      if (reader . symbol_control == 2) reader . get_symbol ();
+      break;
+    case 51:
+      el . setPair ();
+      reader . get_symbol ();
+      read_json_pair (el . getLeft (), reader);
+      while (reader . symbol_control == 32) {el = el . getRight (); el . setPair (); reader . get_symbol (); read_json_pair (el . getLeft (), reader);}
+      if (reader . symbol_control == 52) reader . get_symbol ();
+      break;
+    default: break;
+    }
+  }
   public String drop_text (String text) {
     try {
       StringReader rd = new StringReader (text);
@@ -100,10 +143,24 @@ class json_native_class extends PrologNativeCode {
         else variable . setText (drop (Integer . MIN_VALUE, json));
       } else {try {FileWriter fw = new FileWriter (path . getText ()); fw . write (drop (0, json)); fw . close ();} catch (Exception ex) {return false;}}
       return true;
+    } else {
+      if (variable != null && path != null) {
+        prolog . studio . TermReader reader = new prolog . studio . TermReader (root, path . getText ());
+        reader . get_symbol (); read_json (variable, reader);
+        return true;
+      }
     }
     return false;
   }
-  public json_native_class (json service) {this . service = service;}
+  public json_native_class (json service) {
+    this . service = service;
+    root . separator_caption = ",";
+    root . left_caption = "[";
+    root . right_caption = "]";
+    root . secondary_left_caption = "{";
+    root . secondary_right_caption = "}";
+    root . mid_caption = ":";
+  }
 }
 
 public class json extends PrologServiceClass {
