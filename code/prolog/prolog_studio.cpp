@@ -809,6 +809,14 @@ public:
 	}
 };
 
+void term_reader :: message (char * text) {}
+int term_reader :: move_z (void) {if (* text == '\0') return -1; return * text++;}
+void term_reader :: init (PrologRoot * root, char * text) {this -> text = text; setRoot (root);}
+void symbol_reader :: message (char * text) {root -> print (text); root -> print (root -> new_line_caption);}
+void symbol_reader :: message_v (char * text, char * variable) {root -> message (text, variable);}
+int symbol_reader :: move_z (void) {return fgetc (fi);}
+void symbol_reader :: init (PrologRoot * root, FILE * fi) {this -> fi = fi; setRoot (root);}
+
 class text_term : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -2484,18 +2492,6 @@ public:
 		return false;
 	}
 	file_writer (PrologRoot * root) {this -> root = root;}
-};
-
-class symbol_reader : public PrologReader {
-public:
-	FILE * fi;
-	void message (char * text) {root -> print (text); root -> print (root -> new_line_caption);}
-	void message_v (char * text, char * variable) {root -> message (text, variable);}
-	int move_z (void) {return fgetc (fi);}
-	void init (PrologRoot * root, FILE * fi) {
-		this -> fi = fi;
-		setRoot (root);
-	}
 };
 
 class file_read : public PrologNativeCode {
