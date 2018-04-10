@@ -28,6 +28,49 @@
 class json_native_class : public PrologNativeCode {
 public:
 	PrologJSONServiceClass * service;
+	PrologRoot root;
+	PrologAtom * atomC (char * name) {
+		PrologAtom * atom = service -> root -> search (name);
+		if (atom == 0) atom = service -> root -> createAtom (name);
+		return atom;
+	}
+	void read_json_pair (PrologElement * el, PrologReader * reader) {
+		el -> setPair (); el -> getLeft () -> setAtom (service -> equal_atom);
+		if (reader -> symbol_control != 8) {reader -> get_symbol (); return;}
+		el = el -> getRight (); el -> setPair (); el -> getLeft () -> setAtom (atomC (reader -> symbol));
+		el = el -> getRight (); el -> setPair ();
+		reader -> get_symbol (); if (reader -> symbol_control != 3) return;
+		reader -> get_symbol ();
+		read_json (el -> getLeft (), reader);
+	}
+	void read_json (PrologElement * el, PrologReader * reader) {
+		switch (reader -> symbol_control) {
+		case 10: el -> setInteger (reader -> int_symbol); reader -> get_symbol (); break;
+		case 18: el -> setDouble (reader -> double_symbol); reader -> get_symbol (); break;
+		case 11:
+			if (strcmp (reader -> symbol, "true")) el -> setAtom (service -> true_atom);
+			else if (strcmp (reader -> symbol, "false")) el -> setAtom (service -> false_atom);
+			else if (strcmp (reader -> symbol, "null")) el -> setAtom (service -> null_atom);
+			reader -> get_symbol ();
+			break;
+		case 8: el -> setAtom (atomC (reader -> symbol)); reader -> get_symbol (); break;
+		case 1:
+			el -> setPair ();
+			reader -> get_symbol ();
+			read_json (el -> getLeft (), reader);
+			while (reader -> symbol_control == 23) {el = el -> getRight (); el -> setPair (); reader -> get_symbol (); read_json (el -> getLeft (), reader);}
+			if (reader -> symbol_control == 2) reader -> get_symbol ();
+			break;
+		case 51:
+			el -> setPair ();
+			reader -> get_symbol ();
+			read_json_pair (el -> getLeft (), reader);
+			while (reader -> symbol_control == 23) {el = el -> getRight (); el -> setPair (); reader -> get_symbol (); read_json_pair (el -> getLeft (), reader);}
+			if (reader -> symbol_control == 52) reader -> get_symbol ();
+			break;
+		default: break;
+		}
+	}
 	void tabs (std :: string * area, int tab) {while (tab-- > 0) * area += ' ';}
 	void drop_text (std :: string * area, char * text) {
 		area -> append ("\"");
@@ -100,10 +143,45 @@ public:
 				else {drop (& area, INT_MIN, json); variable -> setText ((char *) area . c_str ());}
 			} else {FILE * fw = fopen (path -> getText (), "wb"); drop (& area, 0, json); fprintf (fw, area . c_str ()); fprintf (fw, "\n"); fclose (fw);}
 			return true;
+		} else {
+			if (variable != 0 && path != 0) {
+				char * command = path -> getText ();
+				if (command [0] == '[' || command [0] == '{') {
+					term_reader reader;
+					reader . init (& root, path -> getText ());
+					reader . get_symbol ();
+					read_json (variable, & reader);
+				} else {
+					symbol_reader reader;
+					FILE * fr = fopen (command, "rb");
+					if (fr == 0) {
+						PrologString * dir = service -> root -> search_directories;
+						while (dir != 0 && fr == 0) {
+							AREA area; sprintf (area, "%s%s", dir -> text, command);
+							fr = fopen (area, "rb");
+							dir = dir -> next;
+						}
+					}
+					if (fr == 0) return false;
+					reader . init (& root, fr);
+					reader . get_symbol ();
+					read_json (variable, & reader);
+					fclose (fr);
+				}
+				return true;
+			}
 		}
 		return false;
 	}
-	json_native_class (PrologJSONServiceClass * service) {this -> service = service;}
+	json_native_class (PrologJSONServiceClass * service) {
+		this -> service = service;
+		strcpy (root . separator_caption, ",");
+		strcpy (root . left_caption, "[");
+		strcpy (root . right_caption, "]");
+		strcpy (root . secondary_left_caption, "{");
+		strcpy (root . secondary_right_caption, "}");
+		strcpy (root . mid_caption, ":");
+	}
 };
 
 void PrologJSONServiceClass :: init (PrologRoot * root, PrologDirectory * directory) {
