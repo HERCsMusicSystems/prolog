@@ -35,15 +35,18 @@ protected:
 class term_reader : public PrologReader {
 public:
 	char * text;
-	virtual void message (char * text) {}
-	virtual int move_z (void) {
-		if (* text == '\0') return -1;
-		return * text++;
-	}
-	void init (PrologRoot * root, char * text) {
-		this -> text = text;
-		setRoot (root);
-	}
+	virtual void message (char * text);
+	virtual int move_z (void);
+	void init (PrologRoot * root, char * text);
+};
+
+class symbol_reader : public PrologReader {
+public:
+	FILE * fi;
+	void message (char * text);
+	void message_v (char * text, char * variable);
+	int move_z (void);
+	void init (PrologRoot * root, FILE * fi);
 };
 
 class PrologNoise TRACK {

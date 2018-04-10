@@ -177,11 +177,11 @@ objects = \
 	$(pi)prolog_transport.o \
 	$(pi)prolog_variable.o \
 	$(pi)prolog_linux_console.o \
-	$(pi)prolog_xml.o $(pi)tinyxml.o \
+	$(pi)prolog_xml.o $(pi)tinyxml.o $(pi)prolog_json.o \
 	$(pi)prolog_distribution.o $(pi)prolog_control.o $(pi)joystick_linux.o
 
 prc_resources = studio_prc.o conductor_prc.o midi_prc.o http_prc.o store_prc.o f1_prc.o help_prc.o record_prc.o\
-	neural_prc.o keyboard_prc.o sql_prc.o test_prc.o xml_prc.o distribution_prc.o control_prc.o
+	neural_prc.o keyboard_prc.o sql_prc.o test_prc.o xml_prc.o json_prc.o distribution_prc.o control_prc.o
 
 hercs_gem.o: $(pc)hercs_gem.cpp
 	g++ -Wno-write-strings -I. $(INCFLAGS) $(pc)hercs_gem.cpp -c -o hercs_gem.o
@@ -233,6 +233,8 @@ prolog_xml.o: $(pc)prolog_xml.h $(pc)prolog_xml.cpp $(pc)prolog.h
 	g++ -Wno-write-strings -I. $(pc)prolog_xml.cpp -c -o prolog_xml.o
 tinyxml.o: $(pc)../tinyxml2/tinyxml2.cpp $(pc)../tinyxml2/tinyxml2.h
 	g++ -Wno-write-strings $(pc)../tinyxml2/tinyxml2.cpp -c -o tinyxml.o
+prolog_json.o: $(pc)prolog_json.h $(pc)prolog_json.cpp $(pc)prolog.h
+	g++ -Wno-write-strings -I. $(pc)prolog_json.cpp -c -o prolog_json.o
 prolog_distribution.o: $(pc)prolog_distribution.h $(pc)prolog_distribution.cpp $(pc)prolog.h
 	g++ -Wno-write-strings -std=c++11 -I. $(pc)prolog_distribution.cpp -c -o prolog_distribution.o
 prolog_control.o: $(pc)prolog_control.h $(pc)prolog_control.cpp $(pc)prolog.h
@@ -338,6 +340,11 @@ xml_prc.o: $(pc)xml.prc
 	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
 		--redefine-sym _binary____code_prolog_xml_prc_start=resource_xml\
 		$(pc)xml.prc xml_prc.o
+
+json_prc.o: $(pc)json.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_json_prc_start=resource_json\
+		$(pc)json.prc json_prc.o
 
 distribution_prc.o: $(pc)distribution.prc
 	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\

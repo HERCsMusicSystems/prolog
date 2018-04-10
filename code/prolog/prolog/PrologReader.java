@@ -133,7 +133,7 @@ public class PrologReader {
 		}
 		if (root . dot_caption . indexOf ((char) act_znak) >= 0) {symbol_control = 21; symbol = "" + root . dot_caption; act_znak = move_z (); return;}
 		if (root . at_caption . indexOf ((char) act_znak) >= 0) {symbol_control = 22; act_znak = move_z (); return;}
-		if (root . separator_caption . indexOf ((char) act_znak) >= 0) {symbol_control = 32; act_znak = move_z (); return;}
+		if (root . separator_caption . indexOf ((char) act_znak) >= 0) {symbol_control = 23; act_znak = move_z (); return;}
 		// if number
 		boolean negative = false;
 		if (act_znak == '-') {negative = true; symbol = "-"; act_znak = move_z ();}

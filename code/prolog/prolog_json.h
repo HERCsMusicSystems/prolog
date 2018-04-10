@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////////
-//                       Copyright (C) 2014 Robert P. Wolf                       //
+//                       Copyright (C) 2018 Robert P. Wolf                       //
 //                                                                               //
 // Permission is hereby granted, free of charge, to any person obtaining a copy  //
 // of this software and associated documentation files (the "Software"), to deal //
@@ -20,17 +20,21 @@
 // THE SOFTWARE.                                                                 //
 ///////////////////////////////////////////////////////////////////////////////////
 
-#ifndef _PROLOG_XML_SERVICE_CLASS_
-#define _PROLOG_XML_SERVICE_CLASS_
+#ifndef _PROLOG_JSON_SERVICE_CLASS_
+#define _PROLOG_JSON_SERVICE_CLASS_
 
 #include "prolog.h"
 
-class PrologXMLServiceClass : public PrologServiceClass {
+class PrologJSONServiceClass : public PrologServiceClass {
 public:
 	PrologRoot * root;
+	PrologAtom * true_atom;
+	PrologAtom * false_atom;
+	PrologAtom * null_atom;
+	PrologAtom * equal_atom;
 	virtual void init (PrologRoot * root, PrologDirectory * directory);
 	virtual PrologNativeCode * getNativeCode (char * name);
-	PrologXMLServiceClass (void);
+	PrologJSONServiceClass (void);
 };
 
 #endif

@@ -94,6 +94,9 @@
     <ClCompile Include="..\code\pthread\pthread.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\code\prolog\prolog_json.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\prolog\encoder.h">
@@ -150,7 +153,10 @@
     <ClInclude Include="..\code\tinyxml2\tinyxml2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resource.h">
+    <ClInclude Include="..\code\prolog\studio_resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\prolog\prolog_json.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -216,6 +222,9 @@
       <Filter>Documents</Filter>
     </None>
     <None Include="..\code\prolog\test.prc">
+      <Filter>Prolog Files</Filter>
+    </None>
+    <None Include="..\code\prolog\json.prc">
       <Filter>Prolog Files</Filter>
     </None>
   </ItemGroup>
