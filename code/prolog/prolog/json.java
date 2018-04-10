@@ -24,6 +24,7 @@ package prolog;
 
 import java . io . FileWriter;
 import java . io . StringReader;
+import java . io . FileInputStream;
 
 class json_native_class extends PrologNativeCode {
   json service;
@@ -145,7 +146,12 @@ class json_native_class extends PrologNativeCode {
       return true;
     } else {
       if (variable != null && path != null) {
-        prolog . studio . TermReader reader = new prolog . studio . TermReader (root, path . getText ());
+        prolog . PrologReader reader;
+        String command = path . getText ();
+        if ("[{" . indexOf (command . charAt (0)) >= 0) reader = new prolog . studio . TermReader (root, command);
+        else try {
+          reader = new prolog . studio . SymbolReader (root, new FileInputStream (service . root . ccd (command)));
+        } catch (Exception ex) {return false;}
         reader . get_symbol (); read_json (variable, reader);
         return true;
       }
