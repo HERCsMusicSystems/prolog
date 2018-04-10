@@ -58,14 +58,14 @@ class json_native_class extends PrologNativeCode {
       el . setPair ();
       reader . get_symbol ();
       read_json (el . getLeft (), reader);
-      while (reader . symbol_control == 32) {el = el . getRight (); el . setPair (); reader . get_symbol (); read_json (el . getLeft (), reader);}
+      while (reader . symbol_control == 23) {el = el . getRight (); el . setPair (); reader . get_symbol (); read_json (el . getLeft (), reader);}
       if (reader . symbol_control == 2) reader . get_symbol ();
       break;
     case 51:
       el . setPair ();
       reader . get_symbol ();
       read_json_pair (el . getLeft (), reader);
-      while (reader . symbol_control == 32) {el = el . getRight (); el . setPair (); reader . get_symbol (); read_json_pair (el . getLeft (), reader);}
+      while (reader . symbol_control == 23) {el = el . getRight (); el . setPair (); reader . get_symbol (); read_json_pair (el . getLeft (), reader);}
       if (reader . symbol_control == 52) reader . get_symbol ();
       break;
     default: break;
