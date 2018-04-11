@@ -360,7 +360,7 @@
         <a href="#predicate_http_request">http_request</a>
         <a href="#predicate_http_responder">http_responder</a>
         <a href="#predicate_wait_for">wait_for</a>
-        <a href="#predicate_webserver">webserver</a>
+        <a href="#predicate_daemon">webserver</a>
       </li>
     </ul>
     <li><a href="sql">sql</a></li>
@@ -4168,7 +4168,74 @@
     </a>
 </div>
 
-<div class="doc_library_section"><a id="musical_processing">Musical Processing</a></div>
+<div class="doc_library"><a id="http">LIBRARY: <b>http</b></a></div>
+
+<div class="doc_library_section"><a id="http_commands">Commands</a></div>
+
+<div class="doc_predicate">
+    <a id="predicate_daemon">
+        <div class="doc_predicate_header">
+            [daemon *server port router]<br />
+            [webserver *server port router]<br />
+            ============================<br />
+            [*server] => closes the webserver or daemon<br />
+            The router should be defined as follows:<br />
+            [[router *req *res]<br />
+            &nbsp;&nbsp;[*req HTTP_URI : *route]<br />
+            &nbsp;&nbsp;[show [route *req *res : *route]]<br />
+            &nbsp;&nbsp;[route *req *res : *route]<br />
+            ]<br />
+            [[route *req *res GET ""] [*res "HTTP/1.0 200 OK\n\n&lt;body&gt;&lt;h1&gt;Prolog Webserver&lt;/h1&gt;&lt;/body&gt;"]]
+        </div>
+        <div class="doc_predicate_body">
+            Creates a webserver (stateful) or daemon (stateless using Unix fork) on specified port (integer).
+            The *server parameter must be an atom or variable (if variable then an anonymous atom will be constructed).
+            The router must be an atom servicing the requests.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_fork">
+        <div class="doc_predicate_header">
+            [fork *pid commands]<br />
+            [fork commands]
+        </div>
+        <div class="doc_predicate_body">
+            This is the Unix fork function. It runs the commands in a separate process.
+            The optional *pid parameter is the Unix process id.
+            If it is not specified then fork will wait until the forked process finishes.
+            Use anonymous variable. Otherwise fork will wait.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_http_request">
+        <div class="doc_predicate_header">
+            [http_request *req]
+        </div>
+        <div class="doc_predicate_body">
+            Obtains the http request if the script has been called externally (i.e. by xinetd).
+            If the *req is an atom then http_request builds the definition.
+            If it is variable then it also creates an anonymous atom.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_wait_for">
+        <div class="doc_predicate_header">
+            [wait_for *pid]<br />
+            [wait]
+        </div>
+        <div class="doc_predicate_body">
+            This is the Unix waitpid (or wait) function.
+            The optional *pid parameter is the Unix process id.
+            If it is not specified then wait_for will wait for any child process.
+        </div>
+    </a>
+</div>
 
 </div></div>
 </body>
