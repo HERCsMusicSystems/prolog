@@ -23,6 +23,7 @@
 #include "prolog_json.h"
 #include "prolog_studio.h"
 
+#include <string.h>
 #include <string>
 
 class json_native_class : public PrologNativeCode {
@@ -139,9 +140,9 @@ public:
 		if (json != 0) {
 			std :: string area = "";
 			if (path == 0) {
-				if (variable == 0) {drop (& area, 0, json); printf (area . c_str ()); printf ("\n");}
-				else {drop (& area, INT_MIN, json); variable -> setText ((char *) area . c_str ());}
-			} else {FILE * fw = fopen (path -> getText (), "wb"); drop (& area, 0, json); fprintf (fw, area . c_str ()); fprintf (fw, "\n"); fclose (fw);}
+				if (variable == 0) {drop (& area, 0, json); printf ("%s", area . c_str ()); printf ("\n");}
+				else {drop (& area, -65535, json); variable -> setText ((char *) area . c_str ());}
+			} else {FILE * fw = fopen (path -> getText (), "wb"); drop (& area, 0, json); fprintf (fw, "%s", area . c_str ()); fprintf (fw, "\n"); fclose (fw);}
 			return true;
 		} else {
 			if (variable != 0 && path != 0) {
