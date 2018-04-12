@@ -362,6 +362,13 @@
         <a href="#predicate_wait_for">wait_for</a>
         <a href="#predicate_daemon">webserver</a>
       </li>
+      <li>
+        <a href="#http_macros">Macros</a><br />
+        <a href="#predicate_FORM">FORM</a>
+        <a href="#predicate_GET">GET</a>
+        <a href="#predicate_MULTIFORM">MULTIFORM</a>
+        <a href="#predicate_param">param</a>
+      </li>
     </ul>
     <li><a href="sql">sql</a></li>
 </ul>
@@ -4224,6 +4231,28 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_http_responder">
+        <div class="doc_predicate_header">
+            [http_responder ....]<br />
+            [http_responder text]<br />
+            [http_responder atom]<br />
+            [http_responder integer]<br />
+            [http_responder [......]]<br />
+            [http_responder [] : file_name]
+        </div>
+        <div class="doc_predicate_body">
+            Sends the reply from the server.
+            The explicit http_responder atom can be used when the script has been called externally (i.e. by xinetd).
+            Otherwise, it is given to the router as a parameter from webserver. It operates as follows:<br />
+            Texts and atoms are written exactly as they are.<br />
+            Integers are written as ASCII characters.<br />
+            Elements in a list are written as prolog terms.<br />
+            Empty list [] followed by file name on the right side of pair copies a file from server.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_wait_for">
         <div class="doc_predicate_header">
             [wait_for *pid]<br />
@@ -4233,6 +4262,84 @@
             This is the Unix waitpid (or wait) function.
             The optional *pid parameter is the Unix process id.
             If it is not specified then wait_for will wait for any child process.
+        </div>
+    </a>
+</div>
+
+<div class="doc_library_section"><a id="http_macros">Macros</a></div>
+
+<div class="doc_predicate">
+    <a id="predicate_FORM">
+        <div class="doc_predicate_header">
+            [FORM *res method p1 p2 p3 ....]<br />
+            [FORM *res]
+        </div>
+        <div class="doc_predicate_body">
+            Constructs an HTML &lt;a&gt; tag to /p1/p2/p3.... with specified method (GET POST PUT PATCH DELETE COPY HEAD OPTIONS LINK UNLINK PURGE).<br />
+            [FORM *res] closes the tag.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[FORM *res *method] / [*res "&lt;form action=\"/\" method=\"" *method "\" /&gt;"]]
+            [[FORM *res *method *p : *ps] / [*res "&lt;form method=\"" *method "\" action=\""] / [FORMatter *res *p : *ps]]
+            [[FORM *res] / [*res "&lt;/form&gt;"]]
+            [[FORMatter *res *p1 : *ps] [*res "/" *p1] / [FORMatter *res : *ps]]
+            [[FORMatter *res] [*res "\" /&gt;"]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_GET">
+        <div class="doc_predicate_header">
+            [GET *es p1 p2 p3 .... content]
+        </div>
+        <div class="doc_predicate_body">
+            Constructs an HTML &lt;a&gt; link to /p1/p2/p3.... with the content as inner HTML.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[GET *res *content] / [*res "&lt;a href=\"/\" /&gt;" *content "&lt;/a&gt;"]]<br />
+            [[GET *res : *command] / [*res "&lt;a href=\""] / [GETter *res : *command]]<br />
+            [[GETter *res *p1 *p2 : *tail] / [*res "/" *p1] / [GETter *res *p2 : *tail]]<br />
+            [[GETter *res *content] [*res "\" /&gt;" *content "&lt;/a&gt;"]]<br />
+            [[GETter *res]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_MULTIFORM">
+        <div class="doc_predicate_header">
+            [MULTIFORM *res method p1 p2 p3 ....]
+        </div>
+        <div class="doc_predicate_body">
+            Same as <a href="#predicate_FORM">FORM</a> but adds enctype="multipart/form-data" attribute.<br />
+            Again [FORM *res] closes the tag.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[MULTIFORM *res *method] / [*res "&lt;form enctype=\"multipart/form-data\" action=\"/\" method=\"" *method "\" /&gt;"]]
+            [[MULTIFORM *res *method *p : *ps] / [*res "&lt;form enctype=\"multipart/form-data\" method=\"" *method "\" action=\""] / [FORMatter *res *p : *ps]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_param">
+        <div class="doc_predicate_header">
+            [param *res name]<br />
+            [param *res name type]<br />
+            [param *res name type value]
+        </div>
+        <div class="doc_predicate_body">
+            Constructs an HTML &lt;input tags&gt; with name and optional type and value.<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+          [[param *res *name] [*res "&lt;input type=\"text\" name=\"" *name "\" /&gt;"]]<br />
+          [[param *res *type *name] [*res "&lt;input type=\"" *type "\" name=\"" *name "\" /&gt;"]]<br />
+          [[param *res *type *name *value] [*res "&lt;input type=\"" *type "\" name=\"" *name "\" value=\"" *value "\" /&gt;"]]
         </div>
     </a>
 </div>
