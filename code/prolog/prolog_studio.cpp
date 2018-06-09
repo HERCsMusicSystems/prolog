@@ -2914,6 +2914,61 @@ public:
 	}
 };
 
+class rooter_code : public PrologNativeCode {
+private:
+	PrologAtom * atom;
+	PrologRoot * root;
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isEarth ()) {atom -> setMachine (0); delete root; delete this; return true;}
+		PrologElement * list = 0;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isVar ()) list = el;
+			parameters = parameters -> getRight ();
+		}
+		if (list == 0) return false;
+		AREA area;
+		root -> list (area, 0);
+		list -> setText (area);
+		return true;
+	}
+	rooter_code (PrologRoot * root, PrologAtom * atom) {
+		this -> atom = atom;
+		this -> root = new PrologRoot ();
+		this -> root -> setResourceLoader (root -> resource_loader);
+		this -> root -> setServiceClassLoader (root -> service_loader);
+		PrologLoader loader (this -> root);
+		loader . load ("studio.prc");
+	}
+	~ rooter_code (void) {delete root;}
+};
+
+class root_code : public PrologNativeCode {
+private:
+	PrologRoot * root;
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (root == 0) return false;
+		PrologElement * symbol = 0;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isAtom ()) symbol = el;
+			if (el -> isVar ()) symbol = el;
+			parameters = parameters -> getRight ();
+		}
+		if (symbol == 0) return false;
+		if (symbol -> isVar ()) symbol -> setAtom (new PrologAtom ());
+		PrologAtom * atom = symbol -> getAtom ();
+		if (atom -> getMachine () != 0) return false;
+		rooter_code * rc = new rooter_code (root, atom);
+		if (atom -> setMachine (rc)) return true;
+		delete rc;
+		return false;
+	}
+	root_code (PrologRoot * root) {this -> root = root;}
+};
+
 class make_directory : public PrologNativeCode {
 private:
 	PrologRoot * root;
@@ -4278,6 +4333,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "execute") == 0) return new execute (root);
 	if (strcmp (name, "exit_code") == 0) return new exit_code (root);
 	if (strcmp (name, "halt_code") == 0) return new halt_code ();
+	if (strcmp (name, "root_code") == 0) return new root_code (root);
 	if (strcmp (name, "make_directory") == 0) return new make_directory (root);
 	if (strcmp (name, "erase") == 0) return new erase_file (root);
 	if (strcmp (name, "erase_directory") == 0) return new erase_directory (root);
