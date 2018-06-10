@@ -2917,31 +2917,37 @@ public:
 class rooter_code : public PrologNativeCode {
 private:
 	PrologAtom * atom;
-	PrologRoot * root;
+	PrologRoot root;
 public:
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isEarth ()) {atom -> setMachine (0); delete root; delete this; return true;}
-		PrologElement * list = 0;
+		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
+		PrologElement * command = 0;
+		PrologElement * result = 0;
 		while (parameters -> isPair ()) {
 			PrologElement * el = parameters -> getLeft ();
-			if (el -> isVar ()) list = el;
+			if (el -> isText ()) command = el;
+			if (el -> isVar ()) result = el;
 			parameters = parameters -> getRight ();
 		}
-		if (list == 0) return false;
-		AREA area;
-		root -> list (area, 0);
-		list -> setText (area);
+		if (command == 0 || result == 0) return false;
+		term_reader tr;
+		tr . init (& this -> root, command -> getText ());
+		PrologElement * el = tr . readElement ();
+		if (el == 0) return false;
+		if (root . resolution (el) != 1) {delete el; return false;}
+		AREA area; root . getValue (el, area, 0); result -> setText (area);
+		delete el;
 		return true;
 	}
 	rooter_code (PrologRoot * root, PrologAtom * atom) {
 		this -> atom = atom;
-		this -> root = new PrologRoot ();
-		this -> root -> setResourceLoader (root -> resource_loader);
-		this -> root -> setServiceClassLoader (root -> service_loader);
-		PrologLoader loader (this -> root);
+		this -> root . get_search_directories_from_environment ("STUDIO_HOME");
+		this -> root . setResourceLoader (root -> resource_loader);
+		this -> root . setServiceClassLoader (root -> service_loader);
+		this -> root . set_uap32_captions ();
+		PrologLoader loader (& this -> root);
 		loader . load ("studio.prc");
 	}
-	~ rooter_code (void) {delete root;}
 };
 
 class root_code : public PrologNativeCode {
