@@ -69,6 +69,7 @@ public:
 			while (reader -> symbol_control == 23) {el = el -> getRight (); el -> setPair (); reader -> get_symbol (); read_json_pair (el -> getLeft (), reader);}
 			if (reader -> symbol_control == 52) reader -> get_symbol ();
 			break;
+		case 6: case 56: el -> setEarth (); reader -> get_symbol (); break;
 		default: break;
 		}
 	}
@@ -125,6 +126,7 @@ public:
 		if (el -> isFail ()) area -> append ("false");
 		else if (el -> isSlash ()) area -> append ("true");
 		else if (el -> isVar ()) area -> append ("null");
+		else if (el -> isEarth ()) area -> append ("[]");
 	}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		PrologElement * path = 0;
