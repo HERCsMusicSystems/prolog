@@ -2926,7 +2926,7 @@ public:
 		while (parameters -> isPair ()) {
 			PrologElement * el = parameters -> getLeft ();
 			if (el -> isText ()) command = el;
-			if (el -> isVar ()) result = el;
+			if (el -> isVar ()) result = parameters;
 			parameters = parameters -> getRight ();
 		}
 		if (command == 0 || result == 0) return false;
@@ -2935,8 +2935,7 @@ public:
 		PrologElement * el = tr . readElement ();
 		if (el == 0) return false;
 		if (root . resolution (el) != 1) {delete el; return false;}
-		AREA area; root . getValue (el, area, 0); result -> setText (area);
-		delete el;
+		result -> setLeft (el);
 		return true;
 	}
 	rooter_code (PrologRoot * root, PrologAtom * atom) {
