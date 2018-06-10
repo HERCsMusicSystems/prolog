@@ -102,6 +102,7 @@ public:
 			if (atom == service -> true_atom) area -> append ("true");
 			else if (atom == service -> false_atom) area -> append ("false");
 			else if (atom == service -> null_atom) area -> append ("null");
+			else if (atom == service -> equal_atom) area -> append ("{}");
 			else drop_text (area, atom -> name ());
 			return;
 		} else if (el -> isText ()) {drop_text (area, el -> getText ()); return;}
