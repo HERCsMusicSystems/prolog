@@ -102,7 +102,7 @@ public:
 			if (atom == service -> true_atom) area -> append ("true");
 			else if (atom == service -> false_atom) area -> append ("false");
 			else if (atom == service -> null_atom) area -> append ("null");
-			else if (atom == service -> equal_atom) area -> append ("{}");
+			else if (atom == service -> not_equal_atom) area -> append ("{}");
 			else drop_text (area, atom -> name ());
 			return;
 		} else if (el -> isText ()) {drop_text (area, el -> getText ()); return;}
@@ -143,7 +143,7 @@ public:
 		if (json != 0) {
 			std :: string area = "";
 			if (path == 0) {
-				if (variable == 0) {drop (& area, 0, json); printf ("%s", area . c_str ()); printf ("\n");}
+				if (variable == 0) {drop (& area, 0, json); service -> root -> print ((char *) area . c_str ()); service -> root -> print ("\n");}
 				else {drop (& area, -65535, json); variable -> setText ((char *) area . c_str ());}
 			} else {FILE * fw = fopen (path -> getText (), "wb"); drop (& area, 0, json); fprintf (fw, "%s", area . c_str ()); fprintf (fw, "\n"); fclose (fw);}
 			return true;
@@ -192,11 +192,12 @@ void PrologJSONServiceClass :: init (PrologRoot * root, PrologDirectory * direct
 	if (root == 0) return;
 	this -> root = root;
 	PrologDirectory * studio = root -> searchDirectory ("studio");
-	if (studio != 0) equal_atom =studio -> searchAtom ("=");
-	if (directory == 0) return;
-	true_atom = directory -> searchAtom ("true");
-	false_atom = directory -> searchAtom ("false");
-	null_atom = directory -> searchAtom ("null");
+	if (studio == 0) return;
+	equal_atom = studio -> searchAtom ("=");
+	not_equal_atom = studio -> searchAtom ("<>");
+	true_atom = studio -> searchAtom ("true");
+	false_atom = studio -> searchAtom ("false");
+	null_atom = studio -> searchAtom ("null");
 }
 
 PrologNativeCode * PrologJSONServiceClass :: getNativeCode (char * name) {
@@ -204,4 +205,5 @@ PrologNativeCode * PrologJSONServiceClass :: getNativeCode (char * name) {
 	return 0;
 }
 
-PrologJSONServiceClass :: PrologJSONServiceClass (void) {root = 0; true_atom = false_atom = null_atom = equal_atom = 0;}
+PrologJSONServiceClass :: PrologJSONServiceClass (void) {root = 0; true_atom = false_atom = null_atom = equal_atom = not_equal_atom = 0;}
+

@@ -263,7 +263,7 @@ midi_command_prompt.o: $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)midi
 prc.o: $(pc)linux_midi.h $(pc)prolog.h $(pc)midi_stream.h $(pc)encoder.h $(pc)prolog_hercs_console.h \
 	$(pc)prolog_midi_command.h $(pc)prolog_windows_console.h \
 	$(pc)prolog_studio.h $(pc)prolog_conductor.h $(pc)prolog_midi.h $(pc)prolog_http.h $(pc)midi_command_prompt.h \
-	$(pc)prc.cpp $(pc)prolog_neural.h
+	$(pc)prc.cpp $(pc)prolog_neural.h $(pc)prolog_json.h
 	g++ -Wno-write-strings -I. -I$(pc) $(pc)prc.cpp -c -o prc.o -lreadline
 
 
