@@ -24,7 +24,7 @@ program studio #machine := "prolog.studio"
 		::= toSymbolicForm addSymbolicForm multiplySymbolicForm sortSymbolicForm
 		add add1 sub sub1 mult div mod and or xor sum times mac less less_eq greater greater_eq max min
 		abs cos degrad e exp log2 log10 ln log pi pow sin tan trunc DFT FFT
-		StringToLower StringToUpper StringReplaceOnce StringReplaceAll
+		StringToLower StringToUpper StringReplaceOnce StringReplaceAll StringSplit StringSplitOnce
 		timestamp
 		is_atom is_integer is_double is_number is_var is_head is_text has_machine
 		text_list text_term e32 query_stack object_counter
@@ -87,6 +87,8 @@ program studio #machine := "prolog.studio"
 #machine StringToUpper := "StringToUpper"
 #machine StringReplaceOnce := "StringReplaceOnce"
 #machine StringReplaceAll := "StringReplaceAll"
+#machine StringSplit :="StringSplit"
+#machine StringSplitOnce := "StringSplitOnce"
 
 #machine DFT := "DFT"
 #machine FFT := "FFT"

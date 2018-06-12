@@ -1820,6 +1820,79 @@ class StringReplaceAll : public PrologNativeCode {
 		return true;
 	}
 };
+class StringSplit : public PrologNativeCode {
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * el = parameters -> getLeft (); if (! el -> isText ()) return false;
+		char * source = el -> getText ();
+		parameters = parameters -> getRight (); if (! parameters -> isPair ()) return false;
+		el = parameters -> getLeft (); if (! el -> isText ()) return false;
+		char * pattern = el -> getText ();
+		parameters = parameters -> getRight ();
+		if (strlen (pattern) < 1) {
+			if (strlen (source) < 1) {parameters -> setEarth (); return true;}
+			char command [] = " ";
+			while (* source != '\0') {
+				* command = * source++;
+				parameters -> setPair (); parameters -> getLeft () -> setText (command); parameters = parameters -> getRight ();
+			}
+			return true;
+		}
+		char * command = new char [strlen (source) + 16];
+		strcpy (command, source);
+		source = command;
+		char * cp;
+		while ((cp = strstr (source, pattern)) != 0) {
+			* cp = '\0';
+			parameters -> setPair ();
+			parameters -> getLeft () -> setText (source);
+			parameters = parameters -> getRight ();
+			source = cp + strlen (pattern);
+		}
+		parameters -> setPair ();
+		parameters -> getLeft () -> setText (source);
+		delete [] command;
+		return true;
+	}
+};
+class StringSplitOnce : public PrologNativeCode {
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * el = parameters -> getLeft (); if (! el -> isText ()) return false;
+		char * source = el -> getText ();
+		parameters = parameters -> getRight (); if (! parameters -> isPair ()) return false;
+		el = parameters -> getLeft (); if (! el -> isText ()) return false;
+		char * pattern = el -> getText ();
+		parameters = parameters -> getRight ();
+		if (strlen (pattern) < 1) {
+			if (strlen (source) < 1) {parameters -> setEarth (); return true;}
+			char command [] = " ";
+			if (* source != '\0') {
+				* command = * source++;
+				parameters -> setPair (); parameters -> getLeft () -> setText (command); parameters = parameters -> getRight ();
+			}
+			parameters -> setPair (); parameters -> getLeft () -> setText (source);
+			return true;
+		}
+		char * command = new char [strlen (source) + 16];
+		strcpy (command, source);
+		source = command;
+		char * cp;
+		if ((cp = strstr (source, pattern)) != 0) {
+			* cp = '\0';
+			parameters -> setPair ();
+			parameters -> getLeft () -> setText (source);
+			parameters = parameters -> getRight ();
+			source = cp + strlen (pattern);
+		}
+		parameters -> setPair ();
+		parameters -> getLeft () -> setText (source);
+		delete [] command;
+		return true;
+	}
+};
 
 /////////////////////////////////////
 // TRIGONOMETRICAL TRANSFORMATIONS //
@@ -4259,6 +4332,8 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "StringToUpper") == 0) return new StringToUpper ();
 	if (strcmp (name, "StringReplaceOnce") == 0) return new StringReplaceOnce ();
 	if (strcmp (name, "StringReplaceAll") == 0) return new StringReplaceAll ();
+	if (strcmp (name, "StringSplit") == 0) return new StringSplit ();
+	if (strcmp (name, "StringSplitOnce") == 0) return new StringSplitOnce ();
 
 	if (strcmp (name, "DFT") == 0) return new DFT (false);
 	if (strcmp (name, "FFT") == 0) return new DFT (true);
