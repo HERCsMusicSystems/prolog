@@ -42,7 +42,12 @@ PrologAtom :: PrologAtom (char * name) TRACKING (14) {
 	Protected = false;
 	firstClause = NULL;
 	machine = NULL;
-	atomName = create_text (name);
+	if (name == 0) {
+		PROLOG_STRING command;
+		time_t time_stamp = time (0);
+		sprintf (command, "<Atom=%p#%p>", (void *) this, (void *) time_stamp);
+		atomName = create_text (command);
+	} else atomName = create_text (name);
 	next = NULL;
 	COLLECTOR_RESET (0)
 //	reference_counter = 0;
@@ -53,7 +58,12 @@ PrologAtom :: PrologAtom (char * name, PrologAtom * root) TRACKING (14) {
 	Protected = false;
 	firstClause = NULL;
 	machine = NULL;
-	atomName = create_text (name);
+	if (name == 0) {
+		PROLOG_STRING command;
+		time_t time_stamp = time (0);
+		sprintf (command, "<Atom=%p#%p>", (void *) this, (void *) time_stamp);
+		atomName = create_text (command);
+	} else atomName = create_text (name);
 	next = root;
 	COLLECTOR_RESET (1)
 //	reference_counter = 1;

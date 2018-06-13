@@ -527,7 +527,10 @@ public:
 	}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
-		PrologElement * name = parameters -> getLeft (); if (! name -> isText ()) return false; parameters = parameters -> getRight ();
+		PrologElement * name = parameters -> getLeft ();
+		parameters = parameters -> getRight ();
+		if (name -> isVar () && parameters -> isEarth () && create) {name -> setAtom (root -> createAtom (0)); return true;}
+		if (! name -> isText ()) return false;
 		if (parameters -> isVar ()) return sub_code (parameters, name -> getText ());
 		if (! parameters -> isPair ()) return false;
 		PrologElement * e = parameters -> getLeft ();
