@@ -80,11 +80,13 @@
 
 ;//========== ROUTES ===========//
 
+[[route *req *res * call : *command] [controller_call *req *res *command]]
 [[route *req *res GET capitol] [controller_index *req *res]]
 [[route *req *res GET capitol delete *country] [controller_delete *req *res *country]]
 [[route *req *res GET capitol persist] [controller_persist *req *res]]
 [[route *req *res POST capitol insert] [controller_insert *req *res]]
-[[route *req *res GET ""] [*res "HTTP/1.0 200 OK\n\n<body><h1>Prolog Webserver</h1></body>"]]
+[[route *req *res GET ""] [header *res *atom] [hrcs *res] [*res "<body><h1>Prolog Webserver</h1></body>"]]
+[[route *req *res GET *file_name] [show "getting: " *file_name] [*res [] : *file_name] [show "send....."]]
 [[route *req *res : *] [*res "HTTP/1.1 401 Not found\n\n"]]
 
 ;//========== WEBSERVER ===========//
