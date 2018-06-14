@@ -62,13 +62,9 @@ program http #machine := "prolog.http"
 <script>
 var hrcs = function (command) {
 	var xhr = new XMLHttpRequest ();
-	xhr . onreadystatechange = function () {
-		if (this . readyState == 4 && this . status == 200) console . log (this . responseText);
-	};
 	xhr . open ('GET', 'call?[' + command + ']', false);
 	xhr . send ();
-	console . log ('=>', xhr . responseText);
-	return JSON . parse (xhr . responseText);
+	return JSON . parse (xhr . responseText) [0];
 };
 </script>
 "]]
