@@ -44,7 +44,7 @@
 	[session_header *req *res *session "Content-Type: application/json"]
 	[list *req]
 	[show *command]
-	[*req param "command" *c]
+	[*req HTTP_SEARCH *c]
 	[show [*session *c]]
 	[*session *c *reply]
 	[show *reply]
@@ -86,7 +86,7 @@
 [[route *req *res GET capitol persist] [controller_persist *req *res]]
 [[route *req *res POST capitol insert] [controller_insert *req *res]]
 [[route *req *res GET ""] [header *res *atom] [hrcs *res] [*res "<body><h1>Prolog Webserver</h1></body>"]]
-[[route *req *res GET *file_name] [show "getting: " *file_name] [*res [] : *file_name] [show "send....."]]
+[[route *req *res GET *file_name] [*res [] : *file_name]]
 [[route *req *res : *] [*res "HTTP/1.1 401 Not found\n\n"]]
 
 ;//========== WEBSERVER ===========//

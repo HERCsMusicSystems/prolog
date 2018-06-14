@@ -4,7 +4,7 @@ import studio
 program http #machine := "prolog.http"
 
 	[
-		webserver daemon fork wait_for FULL_HEADER_TEXT param HTTP_URI HTTP_PROTOCOL HTTP_HEADER
+		webserver daemon fork wait_for FULL_HEADER_TEXT param HTTP_SEARCH HTTP_URI HTTP_PROTOCOL HTTP_HEADER
 		GET POST PUT PATCH DELETE COPY HEAD OPTIONS LINK UNLINK PURGE
 		GETter FORM MULTIFORM FORMatter
 		http_request http_responder
@@ -65,7 +65,7 @@ var hrcs = function (command) {
 	xhr . onreadystatechange = function () {
 		if (this . readyState == 4 && this . status == 200) console . log (this . responseText);
 	};
-	xhr . open ('GET', 'call?command=[' + command + ']', false);
+	xhr . open ('GET', 'call?[' + command + ']', false);
 	xhr . send ();
 	console . log ('=>', xhr . responseText);
 	return JSON . parse (xhr . responseText);
