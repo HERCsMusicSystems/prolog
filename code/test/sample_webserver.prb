@@ -1,5 +1,6 @@
 [import "http"]
 [import "store"]
+[import "json"]
 
 ;//======== LOAD DATABASE =========//
 
@@ -37,6 +38,18 @@
 	[store_database "capitol.txt" capitol]
 	[view_list_all *res]
 	[*res "</body>"]
+]
+
+[[controller_call *req *res *command]
+	[session_header *req *res *session "Content-Type: application/json"]
+	[list *req]
+	[show *command]
+	[*req param "command" *c]
+	[show [*session *c]]
+	[*session *c *reply]
+	[show *reply]
+	[json *reply *json]
+	[*res *json]
 ]
 
 ;//========== VIEW(s) =========//
@@ -78,6 +91,7 @@
 
 [webserver service 3008 router]
 [show "ready"]
+[command]
 
 ;//========== END-OF-SCRIPT ===========//
 [exit]
