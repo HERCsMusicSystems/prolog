@@ -9,4 +9,7 @@
   [MEMBER [= ID 32] *plant] [MEMBER [= COMMON *name] *plant]
 ]
 
+[TestEq "To JSON" "[1, 2, 3, [], {}, {\"command\": \"studio\", \"sonda\": \"sputnik\"}, false, true, false, true, null, null]" *json [json [1 2 3 [] <> [[= command studio] [= sonda sputnik]] fail true false / * null] *json]]
+[TestEq "From JSON" [1 2 [] [[= sonda []]] 3] *structure [json "[1, 2, {}, {\"sonda\": []}, 3]" *structure]]
+
 [exit]
