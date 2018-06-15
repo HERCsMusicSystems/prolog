@@ -128,6 +128,8 @@
             <br />
             <a href="#predicate_StringReplaceAll">StringReplaceAll</a>
             <a href="#predicate_StringReplaceOnce">StringReplaceOnce</a>
+            <a href="#predicate_StringSplit">StringSplit</a>
+            <a href="#predicate_StringSplitOnce">StringSplitOnce</a>
             <a href="#predicate_StringToLower">StringToLower</a>
             <a href="#predicate_StringToUpper">StringToUpper</a>
         </li>
@@ -1028,6 +1030,30 @@
         </div>
         <div class="doc_predicate_body">
             Replaces all occurences of pattern within the string with replacement.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_StringSplit">
+        <div class="doc_predicate_header">
+            [StringSplit string separator : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Splits the string by separator. If the separator is an empty string then it splits into individual characters.
+            The result is list of strings.<br />
+            It can also be used to check if string splitted by the separator produces the specified list of strings.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_StringSplitOnce">
+        <div class="doc_predicate_header">
+            [StringSplitOnce string separator : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Same as <a href=#predicate_StringSplit>StringSplit</a> but only once.
         </div>
     </a>
 </div>
@@ -2089,7 +2115,7 @@
             [search_atom "module" "name" : *atom]
         </div>
         <div class="doc_predicate_body">
-            Finds a symbol.
+            Finds a symbol. Fails if not found.
             If module name is specified then it searches only this particular module.
             Otherwise it searches in all modules.
         </div>
@@ -2102,13 +2128,15 @@
             [search_atom_c "name" *atom]<br />
             [search_atom_c "name" : *atom]<br />
             [search_atom_c "module" "name" *atom]<br />
-            [search_atom_c "module" "name" : *atom]
+            [search_atom_c "module" "name" : *atom]<br />
+            [search_atom_c *atom]
         </div>
         <div class="doc_predicate_body">
             Works similar to <a href="#predicate_search_atom">search_atom</a>.
             However, if symbol does not exist then it is created.
             If the module was specified then the new symbol is created in the same module.
-            Otherwise, it creates the new symbol in the first modules (typically in the "user!").
+            Otherwise, it creates the new symbol in the first module (typically in the "user!").
+            If no name is specified then it is automatically generated.
         </div>
     </a>
 </div>
