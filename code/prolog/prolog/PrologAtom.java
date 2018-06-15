@@ -30,8 +30,15 @@ public class PrologAtom {
 	public PrologElement firstClause = null;
 	public PrologNativeCode machine = null;
 	public PrologAtom () {atomName = "<" + this . toString () . replace ("@", "=") . replace ("Prolog.Prolog", "") + "#" + System . currentTimeMillis () + ">";}
-	public PrologAtom (String name) {atomName = "" + name;}
-	public PrologAtom (String name, PrologAtom root) {atomName = "" + name; next = root;}
+	public PrologAtom (String name) {
+		if (name == null) atomName = "<" + this . toString () . replace ("@", "=") . replace ("Prolog.Prolog", "") + "#" + System . currentTimeMillis () + ">";
+		else atomName = "" + name;
+	}
+	public PrologAtom (String name, PrologAtom root) {
+		if (name == null) atomName = "<" + this . toString () . replace ("@", "=") . replace ("Prolog.Prolog", "") + "#" + System . currentTimeMillis () + ">";
+		else atomName = "" + name;
+		next = root;
+	}
 	public String name () {return atomName;}
 	public String names () {
 		String area = "" + atomName;
