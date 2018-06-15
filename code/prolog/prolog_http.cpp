@@ -53,8 +53,8 @@ public:
 				if (fr != 0) {
 					int ch;
 					while ((ch = fgetc (fr)) >= 0) {area [0] = (char) ch; psend (area, 1);}
+					fclose (fr);
 				}
-				fclose (fr);
 			}
 			while (el -> isPair ()) {
 				int length = root -> getValue (el -> getLeft (), area, 0);
