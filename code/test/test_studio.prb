@@ -473,6 +473,8 @@
 [TestWorks "StringSplit sonda; mariner; sputnik ; " [StringSplit "sonda; mariner; sputnik" "; " "sonda" "mariner" "sputnik"]]
 [TestWorks "StringSplit sonda; ; " [StringSplit "sonda; " "; " "sonda" ""]]
 [TestWorks "StringSplit ; ;" [StringSplit ";" ";" "" ""]]
+[TestEq "StringSplit Join strings" "sonda;mariner;voyager" *x [StringSplit *x ";" "sonda" "mariner" "voyager"]]
+[TestEq "StringSplit Join atom" "sonda;command;voyager" *x [StringSplit *x ";" "sonda" command "voyager"]]
 [TestWorks "StringSplitOnce empty empty" [StringSplitOnce "" ""]]
 [TestWorks "StringSplitOnce empty ;" [StringSplitOnce "" ";" ""]]
 [TestWorks "StringSplitOnce sonda empty" [StringSplitOnce "sonda" "" "s" "onda"]]

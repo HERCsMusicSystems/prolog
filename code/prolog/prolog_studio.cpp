@@ -1827,9 +1827,23 @@ class StringSplit : public PrologNativeCode {
 public:
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
-		PrologElement * el = parameters -> getLeft (); if (! el -> isText ()) return false;
+		PrologElement * el = parameters -> getLeft ();
+		parameters = parameters -> getRight ();
+		if (el -> isVar ()) {
+			PrologElement * ret = el;
+			if (! parameters -> isPair ()) return false;
+			el = parameters -> getLeft ();
+			char * separator = 0;
+			if (el -> isText ()) separator = el -> getText ();
+			if (el -> isAtom ()) separator = el -> getAtom () -> name ();
+			if (separator == 0) return false;
+			int size = strlen (separator);
+			el = parametr
+			return false;
+		}
+		if (! el -> isText ()) return false;
 		char * source = el -> getText ();
-		parameters = parameters -> getRight (); if (! parameters -> isPair ()) return false;
+		if (! parameters -> isPair ()) return false;
 		el = parameters -> getLeft (); if (! el -> isText ()) return false;
 		char * pattern = el -> getText ();
 		parameters = parameters -> getRight ();
