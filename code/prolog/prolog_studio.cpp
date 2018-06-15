@@ -1837,9 +1837,31 @@ public:
 			if (el -> isText ()) separator = el -> getText ();
 			if (el -> isAtom ()) separator = el -> getAtom () -> name ();
 			if (separator == 0) return false;
-			int size = strlen (separator);
-			el = parametr
-			return false;
+			int separator_length = strlen (separator);
+			int size = separator_length;
+			parameters = parameters -> getRight ();
+			el = parameters;
+			while (el -> isPair ()) {
+				PrologElement * sub = el -> getLeft ();
+				if (sub -> isText ()) size += strlen (sub -> getText ());
+				else if (sub -> isAtom ()) size += strlen (sub -> getAtom () -> name ());
+				size += separator_length;
+				el = el -> getRight ();
+			}
+			char * area = new char [size];
+			char * cp = area;
+			char * cpp = cp;
+			while (parameters -> isPair ()) {
+				el = parameters -> getLeft ();
+				if (cp != area) {strcpy (cp, separator); cp += separator_length;}
+				if (el -> isText ()) {cpp = el -> getText (); strcpy (cp, cpp); cp += strlen (cpp);}
+				else if (el -> isAtom ()) {cpp = el -> getAtom () -> name (); strcpy (cp, cpp); cp += strlen (cpp);}
+				parameters = parameters -> getRight ();
+			}
+			* cp = '\0';
+			ret -> setText (area);
+			delete [] area;
+			return true;
 		}
 		if (! el -> isText ()) return false;
 		char * source = el -> getText ();
@@ -1877,9 +1899,45 @@ class StringSplitOnce : public PrologNativeCode {
 public:
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
-		PrologElement * el = parameters -> getLeft (); if (! el -> isText ()) return false;
+		PrologElement * el = parameters -> getLeft ();
+		parameters = parameters -> getRight ();
+		if (el -> isVar ()) {
+			PrologElement * ret = el;
+			if (! parameters -> isPair ()) return false;
+			el = parameters -> getLeft ();
+			char * separator = 0;
+			if (el -> isText ()) separator = el -> getText ();
+			if (el -> isAtom ()) separator = el -> getAtom () -> name ();
+			if (separator == 0) return false;
+			int separator_length = strlen (separator);
+			int size = separator_length;
+			parameters = parameters -> getRight ();
+			el = parameters;
+			while (el -> isPair ()) {
+				PrologElement * sub = el -> getLeft ();
+				if (sub -> isText ()) size += strlen (sub -> getText ());
+				else if (sub -> isAtom ()) size += strlen (sub -> getAtom () -> name ());
+				size += separator_length;
+				el = el -> getRight ();
+			}
+			char * area = new char [size];
+			char * cp = area;
+			char * cpp = cp;
+			while (parameters -> isPair ()) {
+				el = parameters -> getLeft ();
+				if (cp != area) {strcpy (cp, separator); cp += separator_length;}
+				if (el -> isText ()) {cpp = el -> getText (); strcpy (cp, cpp); cp += strlen (cpp);}
+				else if (el -> isAtom ()) {cpp = el -> getAtom () -> name (); strcpy (cp, cpp); cp += strlen (cpp);}
+				parameters = parameters -> getRight ();
+			}
+			* cp = '\0';
+			ret -> setText (area);
+			delete [] area;
+			return true;
+		}
+		if (! el -> isText ()) return false;
 		char * source = el -> getText ();
-		parameters = parameters -> getRight (); if (! parameters -> isPair ()) return false;
+		if (! parameters -> isPair ()) return false;
 		el = parameters -> getLeft (); if (! el -> isText ()) return false;
 		char * pattern = el -> getText ();
 		parameters = parameters -> getRight ();

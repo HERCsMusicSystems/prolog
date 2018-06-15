@@ -175,6 +175,7 @@
             <a href="#predicate_pt">pt</a>
             <a href="#predicate_query_stack">query_stack</a>
             <a href="#predicate_read">read</a>
+            <a href="#predicate_root">root</a>
             <a href="#predicate_load_history">load_history</a>
             <a href="#predicate_readln">readln</a>
             <a href="#predicate_relativise_path">relativise_path</a>
@@ -231,6 +232,7 @@
             <a href="#predicate_monitor">monitor</a>
             <a href="#predicate_msemaphore">msemaphore</a>
             <a href="#predicate_mutex">mutex</a>
+            <a href="#predicate_root">root</a>
             <a href="#predicate_semaphore">semaphore</a>
             <a href="#predicate_task">task</a>
             <a href="#predicate_timeout">timeout</a>
@@ -1037,12 +1039,14 @@
 <div class="doc_predicate">
     <a id="predicate_StringSplit">
         <div class="doc_predicate_header">
-            [StringSplit string separator : *x]
+            [StringSplit string separator : *x]<br />
+            [StringSplit *x separator : *text_or_atom_list]
         </div>
         <div class="doc_predicate_body">
             Splits the string by separator. If the separator is an empty string then it splits into individual characters.
             The result is list of strings.<br />
-            It can also be used to check if string splitted by the separator produces the specified list of strings.
+            It can also be used to check if string splitted by the separator produces the specified list of strings.<br />
+            It can also be used to join texts or atoms using separator.
         </div>
     </a>
 </div>
@@ -1050,7 +1054,8 @@
 <div class="doc_predicate">
     <a id="predicate_StringSplitOnce">
         <div class="doc_predicate_header">
-            [StringSplitOnce string separator : *x]
+            [StringSplitOnce string separator : *x]<br />
+            [StringSplitOnce *x separator : *text_or_atom_list]
         </div>
         <div class="doc_predicate_body">
             Same as <a href=#predicate_StringSplit>StringSplit</a> but only once.
@@ -1668,6 +1673,24 @@
         </div>
         <div class="doc_predicate_body">
             Skips whitespaces and then reads the input text from the console, until a whitespace is detected.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_root">
+        <div class="doc_predicate_header">
+            [root *atom]<br />
+            ========================<br />
+            [*atom] => closes the root<br />
+            [*atom "[[*x *y] [add 1 2 *x] [times *x 4 *y]]" *result_term] => calls the root producing [[3 12]]
+        </div>
+        <div class="doc_predicate_body">
+            Creates a completely new prolog root. If variable is passed instead of a symbol, then anonymous symbol is created.<br />
+            Usage:<br />
+            Root accepts a clause with header interface.
+            It needs to be noted that the symbols in the results will come from the new root and will be remote in relation to the calling program.<br />
+            Calling root without parameters closes the root.
         </div>
     </a>
 </div>

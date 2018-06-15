@@ -483,6 +483,8 @@
 [TestWorks "StringSplitOnce sonda; mariner; sputnik ; " [StringSplitOnce "sonda; mariner; sputnik" "; " "sonda" "mariner; sputnik"]]
 [TestWorks "StringSplitOnce sonda; ; " [StringSplitOnce "sonda; " "; " "sonda" ""]]
 [TestWorks "StringSplitOnce ; ;" [StringSplitOnce ";" ";" "" ""]]
+[TestEq "StringSplitOnce Join strings" "sonda;mariner;voyager" *x [StringSplitOnce *x ";" "sonda" "mariner" "voyager"]]
+[TestEq "StringSplitOnce Join atom" "sonda;command;voyager" *x [StringSplitOnce *x ";" "sonda" command "voyager"]]
 
 [TestWorks "less 1 2 3 4.5 4.7 5 6" [less 1 2 3 4.5 4.7 5.0 6]]
 [TestFails "less 1 2 3 4.5 4.5 6" [less 1 2 3 4.5 4.5 6]]
