@@ -2138,7 +2138,7 @@ class exit_code extends PrologNativeCode {
 		return true;
 	}
 	public exit_code (PrologRoot root) {this . root = root;}
-};
+}
 
 class halt_code extends PrologNativeCode {
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
@@ -2148,7 +2148,58 @@ class halt_code extends PrologNativeCode {
 		System . exit (parameters . getInteger ());
 		return true;
 	}
-};
+}
+
+class rooter_code extends PrologNativeCode {
+	private PrologAtom atom;
+	private PrologRoot root = new PrologRoot ();
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isEarth ()) {atom . setMachine (null); return true;}
+		PrologElement command = null;
+		PrologElement result = null;
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isText ()) command = el;
+			if (el . isVar ()) result = parameters;
+			parameters = parameters . getRight ();
+		}
+		if (command == null || result == null) return false;
+		prolog . studio . TermReader tr = new prolog . studio . TermReader (root, command . getText ());
+		PrologElement el = tr . readElement ();
+		if (el == null) return false;
+		if (root . resolution (el) != 1) return false;
+		result . setLeft (el);
+		return true;
+	}
+	public rooter_code (PrologRoot root, PrologAtom atom) {
+		this . atom = atom;
+		this . root . get_search_directories_from_environment ("JAVA_STUDIO_HOME");
+		this . root . set_uap32_captions ();
+		PrologLoader loader = new PrologLoader (this . root);
+		loader . load ("studio.prc");
+	}
+}
+
+class root_code extends PrologNativeCode {
+	private PrologRoot root = null;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (root == null) return false;
+		PrologElement symbol = null;
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isAtom ()) symbol = el;
+			if (el . isVar ()) symbol = el;
+			parameters = parameters . getRight ();
+		}
+		if (symbol == null) return false;
+		if (symbol . isVar ()) symbol . setAtom (new PrologAtom ());
+		PrologAtom atom = symbol . getAtom ();
+		if (atom . getMachine () != null) return false;
+		rooter_code rc = new rooter_code (root, atom);
+		return atom . setMachine (rc);
+	}
+	public root_code (PrologRoot root) {this . root = root;}
+}
 
 class make_directory extends PrologNativeCode {
 	public PrologRoot root;
@@ -3074,6 +3125,7 @@ class PrologStudio extends PrologServiceClass {
 	*/
 		if (name . equals ("exit_code")) return new exit_code (root);
 		if (name . equals ("halt_code")) return new halt_code ();
+		if (name . equals ("root_code")) return new root_code (root);
 		if (name . equals ("make_directory")) return new make_directory (root);
 		if (name . equals ("erase")) return new erase_file (root);
 		if (name . equals ("erase_directory")) return new erase_file (root);

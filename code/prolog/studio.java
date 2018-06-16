@@ -6,7 +6,7 @@ import prolog . *;
 public class studio {
 	public static void main (String [] args) {
 		PrologRoot root = new PrologRoot ();
-		root . get_search_directories_from_environment ("STUDIO_HOME");
+		root . get_search_directories_from_environment ("JAVA_STUDIO_HOME");
 		root . set_uap32_captions ();
 		String name = null;
 		for (int ind = 0; ind < args . length; ind++) {
