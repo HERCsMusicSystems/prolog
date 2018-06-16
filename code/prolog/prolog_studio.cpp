@@ -1836,7 +1836,7 @@ public:
 			el = parameters -> getLeft ();
 			char * separator = 0;
 			if (el -> isText ()) separator = el -> getText ();
-			if (el -> isAtom ()) separator = el -> getAtom () -> name ();
+			else if (el -> isAtom ()) separator = el -> getAtom () -> name ();
 			if (separator == 0) return false;
 			int separator_length = strlen (separator);
 			int size = separator_length;

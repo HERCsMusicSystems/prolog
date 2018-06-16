@@ -1280,6 +1280,57 @@ class StringReplaceAll extends PrologNativeCode {
 	}
 }
 
+class StringSplit extends PrologNativeCode {
+	public int limit = 0x7fffffff;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement el = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (el . isVar ()) {
+			if (! parameters . isPair ()) return false;
+			String separator = null;
+			PrologElement sub = parameters . getLeft ();
+			if (sub . isText ()) separator = sub . getText ();
+			else if (sub . isAtom ()) separator = sub . getAtom () . name ();
+			if (separator == null) return false;
+			parameters = parameters . getRight ();
+			String area = "";
+			boolean next = false;
+			while (parameters . isPair ()) {
+				sub = parameters . getLeft ();
+				if (next) area += separator; else next = true;
+				if (sub . isText ()) area += sub . getText ();
+				else if (sub . isAtom ()) area += sub . getAtom () . name ();
+				parameters = parameters . getRight ();
+			}
+			el . setText (area);
+			return true;
+		}
+		if (! el . isText ()) return false;
+		String source = el . getText ();
+		if (! parameters . isPair ()) return false;
+		el = parameters . getLeft (); if (! el . isText ()) return false;
+		String separator = el . getText ();
+		parameters = parameters . getRight ();
+		if (source . length () < 1 && separator . length () < 1) {parameters . setEarth (); return true;}
+		String [] parts = null;
+		if (limit == 1) parts = source . split (separator, 2);
+		else {
+			if (separator . length () < 1) parts = source . split (separator);
+			else parts = source . split (separator, -1);
+		}
+		for (int ind = 0; ind < parts . length; ind++) {
+			System . out . println (parts [ind]);
+			parameters . setPair ();
+			parameters . getLeft () . setText (parts [ind]);
+			parameters = parameters . getRight ();
+		}
+		return true;
+	}
+	StringSplit () {}
+	StringSplit (int limit) {this . limit = limit;}
+};
+
 /////////////////////////////////////
 // TRIGONOMETRICAL TRANSFORMATIONS //
 /////////////////////////////////////
@@ -2939,6 +2990,8 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("StringToUpper")) return new StringToUpper ();
 		if (name . equals ("StringReplaceOnce")) return new StringReplaceOnce ();
 		if (name . equals ("StringReplaceAll")) return new StringReplaceAll ();
+		if (name . equals ("StringSplit")) return new StringSplit ();
+		if (name . equals ("StringSplitOnce")) return new StringSplit (1);
 
 	/*
 	if (strcmp (name, "DFT") == 0) return new DFT (false);
