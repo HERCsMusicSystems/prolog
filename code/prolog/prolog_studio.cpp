@@ -1825,6 +1825,7 @@ class StringReplaceAll : public PrologNativeCode {
 };
 class StringSplit : public PrologNativeCode {
 public:
+	int limit;
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
 		PrologElement * el = parameters -> getLeft ();
@@ -1872,17 +1873,20 @@ public:
 		if (strlen (pattern) < 1) {
 			if (strlen (source) < 1) {parameters -> setEarth (); return true;}
 			char command [] = " ";
-			while (* source != '\0') {
+			int limit = this -> limit;
+			while (* source != '\0' && limit-- > 0) {
 				* command = * source++;
 				parameters -> setPair (); parameters -> getLeft () -> setText (command); parameters = parameters -> getRight ();
 			}
+			if (limit < 1) {parameters -> setPair (); parameters -> getLeft () -> setText (source);}
 			return true;
 		}
 		char * command = new char [strlen (source) + 16];
 		strcpy (command, source);
 		source = command;
 		char * cp;
-		while ((cp = strstr (source, pattern)) != 0) {
+		int limit = this -> limit;
+		while ((cp = strstr (source, pattern)) != 0 && limit-- > 0) {
 			* cp = '\0';
 			parameters -> setPair ();
 			parameters -> getLeft () -> setText (source);
@@ -1894,79 +1898,7 @@ public:
 		delete [] command;
 		return true;
 	}
-};
-class StringSplitOnce : public PrologNativeCode {
-public:
-	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (! parameters -> isPair ()) return false;
-		PrologElement * el = parameters -> getLeft ();
-		parameters = parameters -> getRight ();
-		if (el -> isVar ()) {
-			PrologElement * ret = el;
-			if (! parameters -> isPair ()) return false;
-			el = parameters -> getLeft ();
-			char * separator = 0;
-			if (el -> isText ()) separator = el -> getText ();
-			if (el -> isAtom ()) separator = el -> getAtom () -> name ();
-			if (separator == 0) return false;
-			int separator_length = strlen (separator);
-			int size = separator_length;
-			parameters = parameters -> getRight ();
-			el = parameters;
-			while (el -> isPair ()) {
-				PrologElement * sub = el -> getLeft ();
-				if (sub -> isText ()) size += strlen (sub -> getText ());
-				else if (sub -> isAtom ()) size += strlen (sub -> getAtom () -> name ());
-				size += separator_length;
-				el = el -> getRight ();
-			}
-			char * area = new char [size];
-			char * cp = area;
-			char * cpp = cp;
-			while (parameters -> isPair ()) {
-				el = parameters -> getLeft ();
-				if (cp != area) {strcpy (cp, separator); cp += separator_length;}
-				if (el -> isText ()) {cpp = el -> getText (); strcpy (cp, cpp); cp += strlen (cpp);}
-				else if (el -> isAtom ()) {cpp = el -> getAtom () -> name (); strcpy (cp, cpp); cp += strlen (cpp);}
-				parameters = parameters -> getRight ();
-			}
-			* cp = '\0';
-			ret -> setText (area);
-			delete [] area;
-			return true;
-		}
-		if (! el -> isText ()) return false;
-		char * source = el -> getText ();
-		if (! parameters -> isPair ()) return false;
-		el = parameters -> getLeft (); if (! el -> isText ()) return false;
-		char * pattern = el -> getText ();
-		parameters = parameters -> getRight ();
-		if (strlen (pattern) < 1) {
-			if (strlen (source) < 1) {parameters -> setEarth (); return true;}
-			char command [] = " ";
-			if (* source != '\0') {
-				* command = * source++;
-				parameters -> setPair (); parameters -> getLeft () -> setText (command); parameters = parameters -> getRight ();
-			}
-			parameters -> setPair (); parameters -> getLeft () -> setText (source);
-			return true;
-		}
-		char * command = new char [strlen (source) + 16];
-		strcpy (command, source);
-		source = command;
-		char * cp;
-		if ((cp = strstr (source, pattern)) != 0) {
-			* cp = '\0';
-			parameters -> setPair ();
-			parameters -> getLeft () -> setText (source);
-			parameters = parameters -> getRight ();
-			source = cp + strlen (pattern);
-		}
-		parameters -> setPair ();
-		parameters -> getLeft () -> setText (source);
-		delete [] command;
-		return true;
-	}
+	StringSplit (int limit = 0x7fffffff) {this -> limit = limit;}
 };
 
 /////////////////////////////////////
@@ -4408,7 +4340,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "StringReplaceOnce") == 0) return new StringReplaceOnce ();
 	if (strcmp (name, "StringReplaceAll") == 0) return new StringReplaceAll ();
 	if (strcmp (name, "StringSplit") == 0) return new StringSplit ();
-	if (strcmp (name, "StringSplitOnce") == 0) return new StringSplitOnce ();
+	if (strcmp (name, "StringSplitOnce") == 0) return new StringSplit (1);
 
 	if (strcmp (name, "DFT") == 0) return new DFT (false);
 	if (strcmp (name, "FFT") == 0) return new DFT (true);
