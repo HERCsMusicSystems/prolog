@@ -388,7 +388,10 @@ class search_atom extends PrologNativeCode {
 	}
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
 		if (! parameters . isPair ()) return false;
-		PrologElement name = parameters . getLeft (); if (! name . isText ()) return false; parameters = parameters . getRight ();
+		PrologElement name = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (name . isVar () && parameters . isEarth () && create) {name . setAtom (root . createAtom (null)); return true;}
+		if (! name . isText ()) return false;
 		if (parameters . isVar ()) return sub_code (parameters, name . getText ());
 		if (! parameters . isPair ()) return false;
 		PrologElement e = parameters . getLeft ();
@@ -1277,6 +1280,57 @@ class StringReplaceAll extends PrologNativeCode {
 	}
 }
 
+class StringSplit extends PrologNativeCode {
+	public int limit = 0x7fffffff;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (! parameters . isPair ()) return false;
+		PrologElement el = parameters . getLeft ();
+		parameters = parameters . getRight ();
+		if (el . isVar ()) {
+			if (! parameters . isPair ()) return false;
+			String separator = null;
+			PrologElement sub = parameters . getLeft ();
+			if (sub . isText ()) separator = sub . getText ();
+			else if (sub . isAtom ()) separator = sub . getAtom () . name ();
+			if (separator == null) return false;
+			parameters = parameters . getRight ();
+			String area = "";
+			boolean next = false;
+			while (parameters . isPair ()) {
+				sub = parameters . getLeft ();
+				if (next) area += separator; else next = true;
+				if (sub . isText ()) area += sub . getText ();
+				else if (sub . isAtom ()) area += sub . getAtom () . name ();
+				parameters = parameters . getRight ();
+			}
+			el . setText (area);
+			return true;
+		}
+		if (! el . isText ()) return false;
+		String source = el . getText ();
+		if (! parameters . isPair ()) return false;
+		el = parameters . getLeft (); if (! el . isText ()) return false;
+		String separator = el . getText ();
+		parameters = parameters . getRight ();
+		if (source . length () < 1 && separator . length () < 1) {parameters . setEarth (); return true;}
+		String [] parts = null;
+		if (limit == 1) parts = source . split (separator, 2);
+		else {
+			if (separator . length () < 1) parts = source . split (separator);
+			else parts = source . split (separator, -1);
+		}
+		for (int ind = 0; ind < parts . length; ind++) {
+			System . out . println (parts [ind]);
+			parameters . setPair ();
+			parameters . getLeft () . setText (parts [ind]);
+			parameters = parameters . getRight ();
+		}
+		return true;
+	}
+	StringSplit () {}
+	StringSplit (int limit) {this . limit = limit;}
+};
+
 /////////////////////////////////////
 // TRIGONOMETRICAL TRANSFORMATIONS //
 /////////////////////////////////////
@@ -2084,7 +2138,7 @@ class exit_code extends PrologNativeCode {
 		return true;
 	}
 	public exit_code (PrologRoot root) {this . root = root;}
-};
+}
 
 class halt_code extends PrologNativeCode {
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
@@ -2094,7 +2148,58 @@ class halt_code extends PrologNativeCode {
 		System . exit (parameters . getInteger ());
 		return true;
 	}
-};
+}
+
+class rooter_code extends PrologNativeCode {
+	private PrologAtom atom;
+	private PrologRoot root = new PrologRoot ();
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (parameters . isEarth ()) {atom . setMachine (null); return true;}
+		PrologElement command = null;
+		PrologElement result = null;
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isText ()) command = el;
+			if (el . isVar ()) result = parameters;
+			parameters = parameters . getRight ();
+		}
+		if (command == null || result == null) return false;
+		prolog . studio . TermReader tr = new prolog . studio . TermReader (root, command . getText ());
+		PrologElement el = tr . readElement ();
+		if (el == null) return false;
+		if (root . resolution (el) != 1) return false;
+		result . setLeft (el);
+		return true;
+	}
+	public rooter_code (PrologRoot root, PrologAtom atom) {
+		this . atom = atom;
+		this . root . get_search_directories_from_environment ("JAVA_STUDIO_HOME");
+		this . root . set_uap32_captions ();
+		PrologLoader loader = new PrologLoader (this . root);
+		loader . load ("studio.prc");
+	}
+}
+
+class root_code extends PrologNativeCode {
+	private PrologRoot root = null;
+	public boolean code (PrologElement parameters, PrologResolution resolution) {
+		if (root == null) return false;
+		PrologElement symbol = null;
+		while (parameters . isPair ()) {
+			PrologElement el = parameters . getLeft ();
+			if (el . isAtom ()) symbol = el;
+			if (el . isVar ()) symbol = el;
+			parameters = parameters . getRight ();
+		}
+		if (symbol == null) return false;
+		if (symbol . isVar ()) symbol . setAtom (new PrologAtom ());
+		PrologAtom atom = symbol . getAtom ();
+		if (atom . getMachine () != null) return false;
+		rooter_code rc = new rooter_code (root, atom);
+		return atom . setMachine (rc);
+	}
+	public root_code (PrologRoot root) {this . root = root;}
+}
 
 class make_directory extends PrologNativeCode {
 	public PrologRoot root;
@@ -2936,6 +3041,8 @@ class PrologStudio extends PrologServiceClass {
 		if (name . equals ("StringToUpper")) return new StringToUpper ();
 		if (name . equals ("StringReplaceOnce")) return new StringReplaceOnce ();
 		if (name . equals ("StringReplaceAll")) return new StringReplaceAll ();
+		if (name . equals ("StringSplit")) return new StringSplit ();
+		if (name . equals ("StringSplitOnce")) return new StringSplit (1);
 
 	/*
 	if (strcmp (name, "DFT") == 0) return new DFT (false);
@@ -3018,6 +3125,7 @@ class PrologStudio extends PrologServiceClass {
 	*/
 		if (name . equals ("exit_code")) return new exit_code (root);
 		if (name . equals ("halt_code")) return new halt_code ();
+		if (name . equals ("root_code")) return new root_code (root);
 		if (name . equals ("make_directory")) return new make_directory (root);
 		if (name . equals ("erase")) return new erase_file (root);
 		if (name . equals ("erase_directory")) return new erase_file (root);

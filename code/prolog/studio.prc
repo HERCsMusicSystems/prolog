@@ -17,14 +17,14 @@ program studio #machine := "prolog.studio"
 		remove_module create_module set_machine machine_type
 		add_search_directory search_directories
 		cd relativise_path dir ls DIR ARGS args args_tail edit execute make_directory erase erase_directory move copy
-		operating_system implementation version
+		operating_system implementation version root
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
 		create_atom create_atoms search_atom search_atom_c unique_atoms preprocessor prompt
-		+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^ :=
+		+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^ := true false null nil
 		::= toSymbolicForm addSymbolicForm multiplySymbolicForm sortSymbolicForm
 		add add1 sub sub1 mult div mod and or xor sum times mac less less_eq greater greater_eq max min
 		abs cos degrad e exp log2 log10 ln log pi pow sin tan trunc DFT FFT
-		StringToLower StringToUpper StringReplaceOnce StringReplaceAll
+		StringToLower StringToUpper StringReplaceOnce StringReplaceAll StringSplit StringSplitOnce
 		timestamp
 		is_atom is_integer is_double is_number is_var is_head is_text has_machine
 		text_list text_term e32 query_stack object_counter
@@ -87,6 +87,8 @@ program studio #machine := "prolog.studio"
 #machine StringToUpper := "StringToUpper"
 #machine StringReplaceOnce := "StringReplaceOnce"
 #machine StringReplaceAll := "StringReplaceAll"
+#machine StringSplit :="StringSplit"
+#machine StringSplitOnce := "StringSplitOnce"
 
 #machine DFT := "DFT"
 #machine FFT := "FFT"
@@ -181,6 +183,7 @@ program studio #machine := "prolog.studio"
 #machine execute := "execute"
 #machine exit := "exit_code"
 #machine halt := "halt_code"
+#machine root := "root_code"
 #machine operating_system := "operating_system"
 #machine implementation := "implementation"
 #machine save_history := "save_history"

@@ -53,8 +53,8 @@ public:
 				if (fr != 0) {
 					int ch;
 					while ((ch = fgetc (fr)) >= 0) {area [0] = (char) ch; psend (area, 1);}
+					fclose (fr);
 				}
-				fclose (fr);
 			}
 			while (el -> isPair ()) {
 				int length = root -> getValue (el -> getLeft (), area, 0);
@@ -97,7 +97,7 @@ public:
 	void copy_char (char * * to, char * * from) {
 		char c1, c2;
 		switch (* * from) {
-		case '+': * (* to)++ = ' '; (* from)++; break;
+		//case '+': * (* to)++ = ' '; (* from)++; break;
 		case '%': (* from)++; c1 = * (* from)++; c2 = * (* from)++; * (* to)++ = extract_hex (c1, c2); break;
 		default: * (* to)++ = * (* from)++; break;
 		}
@@ -193,6 +193,12 @@ public:
 		* cp = '\0';
 		if (* command == '&') command++;
 		return true;
+	}
+	void get_location (void) {
+		if (* command != '?') {* area = '\0'; return;}
+		char * from = command + 1;
+		char * to = area;
+		while (* from > 32) copy_char (& to, & from); * to = '\0';
 	}
 	bool get_get_param (void) {
 		if (* command != '?' && * command != '&') return false;
@@ -292,6 +298,10 @@ while ((partial = analyser . get_partial_request ()) != 0) {
 	cp = cp -> getRight ();
 }
 clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> route_atom), content)), root -> earth ());
+// GET LOCATION
+analyser . get_location ();
+content = root -> pair (root -> text (analyser . area), root -> earth ());
+clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> search_atom), content)), root -> earth ());
 // GET PARAMS
 while (analyser . get_get_param ()) {
 	content = root -> pair (root -> text (analyser . key), root -> pair (root -> text (analyser . area), root -> earth ()));
@@ -408,6 +418,10 @@ static PrologElement * extract_request_clause (PrologHttpServiceClass * service,
 		cp = cp -> getRight ();
 	}
 	clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> route_atom), content)), root -> earth ());
+	// GET LOCATION
+	analyser . get_location ();
+	content = root -> pair (root -> text (analyser . area), root -> earth ());
+	clausa = root -> pair (root -> pair (root -> head (clausa), root -> pair (root -> atom (service -> search_atom), content)), root -> earth ());
 	// GET PARAMS
 	while (analyser . get_get_param ()) {
 		content = root -> pair (root -> text (analyser . key), root -> pair (root -> text (analyser . area), root -> earth ()));
@@ -526,7 +540,7 @@ void PrologHttpServiceClass :: init (PrologRoot * root, PrologDirectory * direct
 #endif
 	this -> root = root;
 	http_directory = directory;
-	full_text_atom = route_atom = protocol_atom = header_atom = param_atom = 0;
+	full_text_atom = route_atom = protocol_atom = header_atom = search_atom = param_atom = 0;
 	get_atom = post_atom = put_atom = patch_atom = delete_atom = copy_atom = 0;
 	head_atom = options_atom = link_atom = unlink_atom = purge_atom = 0;
 }
@@ -537,6 +551,7 @@ void PrologHttpServiceClass :: set_atoms (void) {
 	route_atom = http_directory -> searchAtom ("HTTP_URI");
 	protocol_atom = http_directory -> searchAtom ("HTTP_PROTOCOL");
 	header_atom = http_directory -> searchAtom ("HTTP_HEADER");
+	search_atom = http_directory -> searchAtom ("HTTP_SEARCH");
 	param_atom = http_directory -> searchAtom ("param");
 	get_atom = http_directory -> searchAtom ("GET");
 	post_atom = http_directory -> searchAtom ("POST");

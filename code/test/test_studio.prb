@@ -77,6 +77,7 @@
 [TestEq "search_atom_c 2" command *x [search_atom_c "studio" "command" : *x]]
 [TestEq "search_atom_c 3" command *x [search_atom_c "command" *x]]
 [TestEq "search_atom_c 4" command *x [search_atom_c "command" : *x]]
+[TestEq "search_atom_c with anonymous atom" [*atom : *] *x [search_atom_c *atom] [list "user!" : *x]]
 
 [TestWorks "unique_atoms" [unique_atoms]]
 [TestWorks "unique_atoms command" [unique_atoms command]]
@@ -464,6 +465,26 @@
 [TestEq "StringToUpper *x \"Sonda Academy\"" "sonda academy" *x [StringToUpper *x : "Sonda Academy"]]
 [TestEq "StringReplaceOnce \"012340540\" \"0\" \"-\" *x" "-12340540" *x [StringReplaceOnce "012340540" "0" "-" *x]]
 [TestEq "StringReplaceAll \"012340540\" \"0\" \"-=\" *x" "-=1234-=54-=" *x [StringReplaceAll "012340540" "0" "-=" *x]]
+[TestWorks "StringSplit empty empty" [StringSplit "" ""]]
+[TestWorks "StringSplit empty ;" [StringSplit "" ";" ""]]
+[TestWorks "StringSplit sonda empty" [StringSplit "sonda" "" "s" "o" "n" "d" "a"]]
+[TestWorks "StringSplit sonda ;" [StringSplit "sonda" ";" "sonda"]]
+[TestWorks "StringSplit sonda;mariner ;" [StringSplit "sonda;mariner" ";" "sonda" "mariner"]]
+[TestWorks "StringSplit sonda; mariner; sputnik ; " [StringSplit "sonda; mariner; sputnik" "; " "sonda" "mariner" "sputnik"]]
+[TestWorks "StringSplit sonda; ; " [StringSplit "sonda; " "; " "sonda" ""]]
+[TestWorks "StringSplit ; ;" [StringSplit ";" ";" "" ""]]
+[TestEq "StringSplit Join strings" "sonda;mariner;voyager" *x [StringSplit *x ";" "sonda" "mariner" "voyager"]]
+[TestEq "StringSplit Join atom" "sonda;command;voyager" *x [StringSplit *x ";" "sonda" command "voyager"]]
+[TestWorks "StringSplitOnce empty empty" [StringSplitOnce "" ""]]
+[TestWorks "StringSplitOnce empty ;" [StringSplitOnce "" ";" ""]]
+[TestWorks "StringSplitOnce sonda empty" [StringSplitOnce "sonda" "" "s" "onda"]]
+[TestWorks "StringSplitOnce sonda ;" [StringSplitOnce "sonda" ";" "sonda"]]
+[TestWorks "StringSplitOnce sonda;mariner ;" [StringSplitOnce "sonda;mariner" ";" "sonda" "mariner"]]
+[TestWorks "StringSplitOnce sonda; mariner; sputnik ; " [StringSplitOnce "sonda; mariner; sputnik" "; " "sonda" "mariner; sputnik"]]
+[TestWorks "StringSplitOnce sonda; ; " [StringSplitOnce "sonda; " "; " "sonda" ""]]
+[TestWorks "StringSplitOnce ; ;" [StringSplitOnce ";" ";" "" ""]]
+[TestEq "StringSplitOnce Join strings" "sonda;mariner;voyager" *x [StringSplitOnce *x ";" "sonda" "mariner" "voyager"]]
+[TestEq "StringSplitOnce Join atom" "sonda;command;voyager" *x [StringSplitOnce *x ";" "sonda" command "voyager"]]
 
 [TestWorks "less 1 2 3 4.5 4.7 5 6" [less 1 2 3 4.5 4.7 5.0 6]]
 [TestFails "less 1 2 3 4.5 4.5 6" [less 1 2 3 4.5 4.5 6]]
@@ -576,6 +597,8 @@
 
 [TestWorks "operating_system *" [operating_system *name] [is_text *name]]
 [TestWorks "operating_system : *" [operating_system : *name] [is_text *name]]
+
+[TestEq "root" [["user!" "studio"]] *directories [root *root] [*root "[*list [list : *list]]" *directories] [*root] [not has_machine *root]]
 
 [TestEq "relativise_path" "sonda.txt" *x [relativise_path "/root/files/sonda.txt" "/root/files/" *x]]
 [TestEq "relativise_path" "lib/sonda.txt" *x [relativise_path "/root/files/lib/sonda.txt" "/root/files/" *x]]

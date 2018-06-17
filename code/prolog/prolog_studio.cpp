@@ -527,7 +527,10 @@ public:
 	}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
-		PrologElement * name = parameters -> getLeft (); if (! name -> isText ()) return false; parameters = parameters -> getRight ();
+		PrologElement * name = parameters -> getLeft ();
+		parameters = parameters -> getRight ();
+		if (name -> isVar () && parameters -> isEarth () && create) {name -> setAtom (root -> createAtom (0)); return true;}
+		if (! name -> isText ()) return false;
 		if (parameters -> isVar ()) return sub_code (parameters, name -> getText ());
 		if (! parameters -> isPair ()) return false;
 		PrologElement * e = parameters -> getLeft ();
@@ -1820,6 +1823,83 @@ class StringReplaceAll : public PrologNativeCode {
 		return true;
 	}
 };
+class StringSplit : public PrologNativeCode {
+public:
+	int limit;
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * el = parameters -> getLeft ();
+		parameters = parameters -> getRight ();
+		if (el -> isVar ()) {
+			PrologElement * ret = el;
+			if (! parameters -> isPair ()) return false;
+			el = parameters -> getLeft ();
+			char * separator = 0;
+			if (el -> isText ()) separator = el -> getText ();
+			else if (el -> isAtom ()) separator = el -> getAtom () -> name ();
+			if (separator == 0) return false;
+			int separator_length = strlen (separator);
+			int size = separator_length;
+			parameters = parameters -> getRight ();
+			el = parameters;
+			while (el -> isPair ()) {
+				PrologElement * sub = el -> getLeft ();
+				if (sub -> isText ()) size += strlen (sub -> getText ());
+				else if (sub -> isAtom ()) size += strlen (sub -> getAtom () -> name ());
+				size += separator_length;
+				el = el -> getRight ();
+			}
+			char * area = new char [size];
+			char * cp = area;
+			char * cpp = cp;
+			while (parameters -> isPair ()) {
+				el = parameters -> getLeft ();
+				if (cp != area) {strcpy (cp, separator); cp += separator_length;}
+				if (el -> isText ()) {cpp = el -> getText (); strcpy (cp, cpp); cp += strlen (cpp);}
+				else if (el -> isAtom ()) {cpp = el -> getAtom () -> name (); strcpy (cp, cpp); cp += strlen (cpp);}
+				parameters = parameters -> getRight ();
+			}
+			* cp = '\0';
+			ret -> setText (area);
+			delete [] area;
+			return true;
+		}
+		if (! el -> isText ()) return false;
+		char * source = el -> getText ();
+		if (! parameters -> isPair ()) return false;
+		el = parameters -> getLeft (); if (! el -> isText ()) return false;
+		char * pattern = el -> getText ();
+		parameters = parameters -> getRight ();
+		if (strlen (pattern) < 1) {
+			if (strlen (source) < 1) {parameters -> setEarth (); return true;}
+			char command [] = " ";
+			int limit = this -> limit;
+			while (* source != '\0' && limit-- > 0) {
+				* command = * source++;
+				parameters -> setPair (); parameters -> getLeft () -> setText (command); parameters = parameters -> getRight ();
+			}
+			if (limit < 1) {parameters -> setPair (); parameters -> getLeft () -> setText (source);}
+			return true;
+		}
+		char * command = new char [strlen (source) + 16];
+		strcpy (command, source);
+		source = command;
+		char * cp;
+		int limit = this -> limit;
+		while ((cp = strstr (source, pattern)) != 0 && limit-- > 0) {
+			* cp = '\0';
+			parameters -> setPair ();
+			parameters -> getLeft () -> setText (source);
+			parameters = parameters -> getRight ();
+			source = cp + strlen (pattern);
+		}
+		parameters -> setPair ();
+		parameters -> getLeft () -> setText (source);
+		delete [] command;
+		return true;
+	}
+	StringSplit (int limit = 0x7fffffff) {this -> limit = limit;}
+};
 
 /////////////////////////////////////
 // TRIGONOMETRICAL TRANSFORMATIONS //
@@ -2912,6 +2992,66 @@ public:
 		exit (parameters -> getInteger ());
 		return true;
 	}
+};
+
+class rooter_code : public PrologNativeCode {
+private:
+	PrologAtom * atom;
+	PrologRoot root;
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isEarth ()) {atom -> setMachine (0); delete this; return true;}
+		PrologElement * command = 0;
+		PrologElement * result = 0;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isText ()) command = el;
+			if (el -> isVar ()) result = parameters;
+			parameters = parameters -> getRight ();
+		}
+		if (command == 0 || result == 0) return false;
+		term_reader tr;
+		tr . init (& this -> root, command -> getText ());
+		PrologElement * el = tr . readElement ();
+		if (el == 0) return false;
+		if (root . resolution (el) != 1) {delete el; return false;}
+		result -> setLeft (el);
+		return true;
+	}
+	rooter_code (PrologRoot * root, PrologAtom * atom) {
+		this -> atom = atom;
+		this -> root . get_search_directories_from_environment ("STUDIO_HOME");
+		this -> root . setResourceLoader (root -> resource_loader);
+		this -> root . setServiceClassLoader (root -> service_loader);
+		this -> root . set_uap32_captions ();
+		PrologLoader loader (& this -> root);
+		loader . load ("studio.prc");
+	}
+};
+
+class root_code : public PrologNativeCode {
+private:
+	PrologRoot * root;
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (root == 0) return false;
+		PrologElement * symbol = 0;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isAtom ()) symbol = el;
+			if (el -> isVar ()) symbol = el;
+			parameters = parameters -> getRight ();
+		}
+		if (symbol == 0) return false;
+		if (symbol -> isVar ()) symbol -> setAtom (new PrologAtom ());
+		PrologAtom * atom = symbol -> getAtom ();
+		if (atom -> getMachine () != 0) return false;
+		rooter_code * rc = new rooter_code (root, atom);
+		if (atom -> setMachine (rc)) return true;
+		delete rc;
+		return false;
+	}
+	root_code (PrologRoot * root) {this -> root = root;}
 };
 
 class make_directory : public PrologNativeCode {
@@ -4199,6 +4339,8 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "StringToUpper") == 0) return new StringToUpper ();
 	if (strcmp (name, "StringReplaceOnce") == 0) return new StringReplaceOnce ();
 	if (strcmp (name, "StringReplaceAll") == 0) return new StringReplaceAll ();
+	if (strcmp (name, "StringSplit") == 0) return new StringSplit ();
+	if (strcmp (name, "StringSplitOnce") == 0) return new StringSplit (1);
 
 	if (strcmp (name, "DFT") == 0) return new DFT (false);
 	if (strcmp (name, "FFT") == 0) return new DFT (true);
@@ -4278,6 +4420,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "execute") == 0) return new execute (root);
 	if (strcmp (name, "exit_code") == 0) return new exit_code (root);
 	if (strcmp (name, "halt_code") == 0) return new halt_code ();
+	if (strcmp (name, "root_code") == 0) return new root_code (root);
 	if (strcmp (name, "make_directory") == 0) return new make_directory (root);
 	if (strcmp (name, "erase") == 0) return new erase_file (root);
 	if (strcmp (name, "erase_directory") == 0) return new erase_directory (root);

@@ -68,6 +68,7 @@ class json_native_class extends PrologNativeCode {
       while (reader . symbol_control == 23) {el = el . getRight (); el . setPair (); reader . get_symbol (); read_json_pair (el . getLeft (), reader);}
       if (reader . symbol_control == 52) reader . get_symbol ();
       break;
+    case 6: case 56: el . setEarth (); reader. get_symbol (); break;
     default: break;
     }
   }
@@ -106,6 +107,7 @@ class json_native_class extends PrologNativeCode {
       if (atom == service . true_atom) return "true";
       else if (atom == service . false_atom) return "false";
       else if (atom == service . null_atom) return "null";
+      else if (atom == service . not_equal_atom) return "{}";
       else return drop_text (atom . name ());
     }
     if (el . isText ()) return drop_text (el . getText ());
@@ -125,8 +127,9 @@ class json_native_class extends PrologNativeCode {
       return left_bracket + multiline (tab, el, right_bracket);
     }
     if (el . isFail ()) return "false";
-    if (el . isSlash ()) return "true";
-    if (el . isVar ()) return "null";
+    else if (el . isSlash ()) return "true";
+    else if (el . isVar ()) return "null";
+    else if (el . isEarth ()) return "[]";
     return "";
   }
   public boolean code (PrologElement parameters, PrologResolution resolution) {
@@ -140,7 +143,7 @@ class json_native_class extends PrologNativeCode {
     }
     if (json != null) {
       if (path == null) {
-        if (variable == null) System . out . println (drop (0, json));
+        if (variable == null) service . root . print (drop (0, json) + "\n");
         else variable . setText (drop (Integer . MIN_VALUE, json));
       } else {try {FileWriter fw = new FileWriter (path . getText ()); fw . write (drop (0, json)); fw . close ();} catch (Exception ex) {return false;}}
       return true;
@@ -171,16 +174,17 @@ class json_native_class extends PrologNativeCode {
 
 public class json extends PrologServiceClass {
   public PrologRoot root;
-  public PrologAtom true_atom, false_atom, null_atom, equal_atom;
+  public PrologAtom true_atom, false_atom, null_atom, equal_atom, not_equal_atom;
   public void init (PrologRoot root, PrologDirectory directory) {
     if (root == null) return;
     this . root = root;
     PrologDirectory studio = root . searchDirectory ("studio");
-    if (studio != null) equal_atom = studio . searchAtom ("=");
-    if (directory == null) return;
-    true_atom = directory . searchAtom ("true");
-    false_atom = directory . searchAtom ("false");
-    null_atom = directory . searchAtom ("null");
+    if (studio == null) return;
+    equal_atom = studio . searchAtom ("=");
+    not_equal_atom = studio . searchAtom ("<>");
+    true_atom = studio . searchAtom ("true");
+    false_atom = studio . searchAtom ("false");
+    null_atom = studio . searchAtom ("null");
   }
   public PrologNativeCode getNativeCode (String name) {
     if (name . equals ("json")) return new json_native_class (this);

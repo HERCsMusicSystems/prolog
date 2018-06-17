@@ -29,7 +29,7 @@ class PrologHttpServiceClass : public PrologServiceClass {
 public:
 	PrologRoot * root;
 	PrologDirectory * http_directory;
-	PrologAtom * full_text_atom, * route_atom, * protocol_atom, * header_atom, * param_atom;
+	PrologAtom * full_text_atom, * route_atom, * protocol_atom, * header_atom, * search_atom, * param_atom;
 	PrologAtom * get_atom, * post_atom, * put_atom, * patch_atom, * delete_atom, * copy_atom;
 	PrologAtom * head_atom, * options_atom, * link_atom, * unlink_atom, * purge_atom;
 	void set_atoms (void);

@@ -1,5 +1,6 @@
 [import "http"]
 [import "store"]
+[import "json"]
 
 ;//======== LOAD DATABASE =========//
 
@@ -39,6 +40,18 @@
 	[*res "</body>"]
 ]
 
+[[controller_call *req *res *command]
+	[session_header *req *res *session "Content-Type: application/json"]
+	[list *req]
+	[show *command]
+	[*req HTTP_SEARCH *c]
+	[show [*session *c]]
+	[*session *c *reply]
+	[show *reply]
+	[json *reply *json]
+	[*res *json]
+]
+
 ;//========== VIEW(s) =========//
 
 [[view_list_all *res]
@@ -67,17 +80,20 @@
 
 ;//========== ROUTES ===========//
 
+[[route *req *res * call : *command] [controller_call *req *res *command]]
 [[route *req *res GET capitol] [controller_index *req *res]]
 [[route *req *res GET capitol delete *country] [controller_delete *req *res *country]]
 [[route *req *res GET capitol persist] [controller_persist *req *res]]
 [[route *req *res POST capitol insert] [controller_insert *req *res]]
-[[route *req *res GET ""] [*res "HTTP/1.0 200 OK\n\n<body><h1>Prolog Webserver</h1></body>"]]
+[[route *req *res GET ""] [header *res *atom] [hrcs *res] [*res "<body><h1>Prolog Webserver</h1></body>"]]
+[[route *req *res GET *file_name] [*res [] : *file_name]]
 [[route *req *res : *] [*res "HTTP/1.1 401 Not found\n\n"]]
 
 ;//========== WEBSERVER ===========//
 
 [webserver service 3008 router]
 [show "ready"]
+[command]
 
 ;//========== END-OF-SCRIPT ===========//
 [exit]

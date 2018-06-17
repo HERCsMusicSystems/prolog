@@ -32,6 +32,7 @@ public:
 	PrologAtom * false_atom;
 	PrologAtom * null_atom;
 	PrologAtom * equal_atom;
+	PrologAtom * not_equal_atom;
 	virtual void init (PrologRoot * root, PrologDirectory * directory);
 	virtual PrologNativeCode * getNativeCode (char * name);
 	PrologJSONServiceClass (void);
