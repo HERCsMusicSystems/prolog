@@ -5,14 +5,22 @@
 [import "studio"]
 [import "http"]
 
-[[route *req *res GET ""] [*res "HTTP/1.0 200 OK\n\n"] [*res [] : "index.html"]]
-[[route *req *res GET *file] [*res "HTTP/1.0 200 OK\n\n"] [*res [] : *file]]; "</h1><body>"]]
-[[route *req *res GET *folder *script] [*res "HTTP/1.0 200 OK\n\n"] [add *folder "/" *script *path] [*res [] : *path]]
-[[route *req *res : *route] [*res "HTTP/1.0 200 OK\n\n<body><h1>Prolog Webserver" [*route] "</h1></body>"]]
-
-[res [http_request *req] [*req HTTP_URI : *route] [route *req http_responder : *route]]
+[[route *req *res GET : *file] [StringSplit *path "/" : *file] [show *path] [header *res] [*res [] : *path]]
+[[route *req *res : *route] [header *res] [*res "<body><h1>Prolog Webserver" [*route] "</h1></body>"]]
 
 
+;[res [http_request *req] [*req HTTP_URI : *route] [route *req http_responder : *route]]
+
+[[router *req *res]
+	[*req HTTP_URI : *route]
+	[show [route *req *res : *route]]
+	[route *req *res : *route]
+]
+
+
+[webserver service 11006 router]
+[prompt "=> "]
+[command]
 
 [exit]
 

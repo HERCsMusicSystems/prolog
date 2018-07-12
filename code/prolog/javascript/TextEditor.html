@@ -1,4 +1,51 @@
 <body>
-Voyager
+<div id=editor_div>
+	<input type=button value=OPEN onclick="javascript: open_file ();" />
+	<input type=text id=file_name size=80 />
+	<input type=button value=SAVE onclick="javascript: store_file ();" />
+	<br />
+	<textarea id=editor cols=100 rows=24>
+	</textarea>
+</div>
+
+<ul id=files_list>
+	<li onclick="javascript: alert ('soinda');" >One</li>
+	<li>Two</li>
+</ul>
+
+<script type="text/javascript">
+
+var refresh_files = function () {
+	var getFunction = function (id) {return function () {open_file (id);}};
+	var ul = document . getElementById ('files_list');
+	while (ul . firstChild) {ul . removeChild (ul . firstChild);}
+	for (var ind = 0; ind < localStorage . length; ind++) {
+		var li = document . createElement ('li');
+		li . innerHTML = localStorage . key (ind);
+		li . onclick = getFunction (localStorage . key (ind));
+		ul . appendChild (li);
+	}
+};
+
+var open_file = function (name) {
+	var file_name = name == undefined ? document . getElementById ('file_name') . value : name;
+	var file_content = localStorage . getItem (file_name);
+	if (file_content == null) {alert (`File ${file_name} does not exist.`); return;}
+	document . getElementById ('editor') . value = file_content;
+};
+
+var store_file = function () {
+	var file_name = document . getElementById ('file_name') . value;
+	var file_content = document . getElementById ('editor') . value;
+	var already_exists = localStorage . getItem (file_name);
+	if (already_exists != null) {if (! confirm (`File ${file_name} alread exists.\nOverwrite?`)) return;}
+	localStorage . setItem (file_name, file_content);
+};
+
+refresh_files ();
+
+</script>
+
+
 </body>
 
