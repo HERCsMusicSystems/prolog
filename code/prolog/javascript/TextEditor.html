@@ -1,3 +1,6 @@
+
+<style>li {cursor: pointer;}</style>
+
 <body>
 
 <ul id=files_list style="float: left; padding: 24px;">
@@ -8,9 +11,9 @@
 <div id=editor_div>
 	<input type=button value=OPEN onclick="javascript: studio . edit_file (document . getElementById ('file_name') . value, 'editor');" />
 	<input type=text id=file_name size=64 />
-	<input type=button value=SAVE onclick="javascript: studio . store_edited_file ('file_name', 'editor'); refresh_file_tree ('files_list', 'editor');" />
+	<input type=button value=SAVE onclick="javascript: studio . store_edited_file ('file_name', 'editor'); studio . refresh_file_tree ('files_list', 'editor');" />
 	<br />
-	<textarea id=editor cols=100 rows=24>
+	<textarea id=editor cols=100 rows=24 onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">
 	</textarea>
 </div>
 
