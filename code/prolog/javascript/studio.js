@@ -3,11 +3,14 @@ var studio = new function () {
 
 var local_imports = [];
 
-this . edit_file = function (file_name, area) {
+this . edit_file = function (file_name, area, location) {
 	var content = localStorage . getItem (file_name);
 	if (content == null) {alert (`File ${file_name} not found!`); return;}
-	document . getElementById (area) . value = content;
+	if (area != undefined) document . getElementById (area) . value = content;
+	if (location != undefined) document . getElementById (location) . value = file_name;
 };
+
+this . erase_file = function (file_name) {localStorage . removeItem (file_name);};
 
 this . store_edited_file = function (file_name, editor) {
 	var file_name = document . getElementById (file_name) . value;
@@ -17,8 +20,8 @@ this . store_edited_file = function (file_name, editor) {
 	localStorage . setItem (file_name, file_content);
 };
 
-this . refresh_file_tree = function (files_list, editor) {
-	var getFunction = function (id) {return function () {studio . edit_file (id, editor);}};
+this . refresh_file_tree = function (files_list, editor, location) {
+	var getFunction = function (id) {return function () {studio . edit_file (id, editor, location);}};
 	var ul = document . getElementById (files_list);
 	while (ul . firstChild) {ul . removeChild (ul . firstChild);}
 	var collection = [];
