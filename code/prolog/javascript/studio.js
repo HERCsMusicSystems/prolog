@@ -1,6 +1,8 @@
 
 var studio = new function () {
 
+var local_imports = [];
+
 this . edit_file = function (file_name, area) {
 	var content = localStorage . getItem (file_name);
 	if (content == null) {alert (`File ${file_name} not found!`); return;}
@@ -28,6 +30,21 @@ this . refresh_file_tree = function (files_list, editor) {
 		li . onclick = getFunction (collection [ind]);
 		ul . appendChild (li);
 	}
+};
+
+this . import = function (file_name) {
+	if (local_imports . includes (file_name)) return;
+	var content = localStorage . getItem (file_name);
+	if (content == null) {console . log (`FILE ${file_name} NOT FOUND!`); return;}
+	eval . call (window, content);
+	local_imports . push (file_name);
+};
+
+this . reimport = function (file_name) {
+	var content = localStorage . getItem (file_name);
+	if (content == null) {console . log (`FILE ${file_name} NOT FOUND!`); return;}
+	eval . call (window, content);
+	if (! local_imports . includes (file_name)) local_imports . push (file_name);
 };
 
 };
