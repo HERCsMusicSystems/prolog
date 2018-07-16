@@ -5,6 +5,8 @@ var pwd = [];
 var search = [];
 var local_imports = [];
 
+this . resource = {};
+
 this . pwd = function (path) {
 	if (path == undefined) return pwd . length < 1 ? '' : pwd . join ('/') + '/';
 	if (Array . isArray (path)) pwd = path;
@@ -25,6 +27,21 @@ this . search = function (path) {
 	else if (typeof (path) === 'string') search . push (path . split ('/'));
 	return this . search ();
 };
+
+this . readFile = function (path) {
+	var content = localStorage . getItem (this . pwd () + path);
+	if (content == null) {
+		var searches = this . search ();
+		for (var ind in searches) {
+			content = localStorage . getItem (searches [ind] + path);
+			if (content != null) return content;
+		}
+	}
+	if (content == null) content = this . resource [path];
+	return content;
+};
+
+this . writeFile = function (path, content) {localStorage . setItem (this . pwd () + path, content);};
 
 this . edit_file = function (file_name, area, location) {
 	var content = localStorage . getItem (file_name);
@@ -60,14 +77,14 @@ this . refresh_file_tree = function (files_list, editor, location) {
 
 this . import = function (file_name) {
 	if (local_imports . includes (file_name)) return;
-	var content = localStorage . getItem (file_name);
+	var content = this . readFile (file_name);
 	if (content == null) {console . log (`FILE ${file_name} NOT FOUND!`); return;}
 	eval . call (window, content);
 	local_imports . push (file_name);
 };
 
 this . reimport = function (file_name) {
-	var content = localStorage . getItem (file_name);
+	var content = this . readFile (file_name);
 	if (content == null) {console . log (`FILE ${file_name} NOT FOUND!`); return;}
 	eval . call (window, content);
 	if (! local_imports . includes (file_name)) local_imports . push (file_name);
