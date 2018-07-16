@@ -1,7 +1,30 @@
 
 var studio = new function () {
 
+var pwd = [];
+var search = [];
 var local_imports = [];
+
+this . pwd = function (path) {
+	if (path == undefined) return pwd . length < 1 ? '' : pwd . join ('/') + '/';
+	if (Array . isArray (path)) pwd = path;
+	else if (typeof (path) === 'string') pwd = path . split ('/');
+	return this . pwd ();
+};
+
+this . cd = function (dir) {
+	if (dir == undefined) pwd . pop ();
+	else if (Array . isArray (dir)) pwd = pwd . concat (dir);
+	else pwd . push (dir);
+	return pwd . length < 1 ? '' : pwd . join ('/') + '/';
+};
+
+this . search = function (path) {
+	if (path == undefined) return search . map (function (el) {return el . length < 1 ? '' : el . join ('/') + '/';});
+	if (Array . isArray (path)) search . push (path);
+	else if (typeof (path) === 'string') search . push (path . split ('/'));
+	return this . search ();
+};
 
 this . edit_file = function (file_name, area, location) {
 	var content = localStorage . getItem (file_name);
