@@ -47,26 +47,10 @@ this . PrologAtom . prototype . machineType = function () {return this . machine
 this . PrologAtom . prototype . getMachine = function () {return this . machine;};
 
 this . PrologNativeCode = function () {};
-var native_code_name = "PrologNativeCode";
-this . PrologNativeCode . prototype . name = function () {return native_code_name;};
+this . PrologNativeCode . prototype . codeName = function () {return "PrologNativeCode";};
+this . PrologNativeCode . prototype . isTypeOf = function (code_name) {return code_name === "PrologNativeCode";};
+this . PrologNativeCode . prototype . code = function () {return true;};
 
 };
 /*
-package prolog;
-
-public class PrologNativeCode {
-	public static String name () {return "PrologNativeCode";}
-	public String codeName () {return name ();}
-	public boolean isTypeOf (String code_name) {return name () == code_name;}
-	public boolean code (PrologElement parameters, PrologResolution resolution) {return true;}
-};
-
-static char * native_code_name = "PrologNativeCode";
-char * PrologNativeCode :: name (void) {return native_code_name;}
-char * PrologNativeCode :: codeName (void) {return name ();}
-bool PrologNativeCode :: code (PrologElement * parameter, PrologResolution * resolution) {return true;}
-bool PrologNativeCode :: isTypeOf (char * code_name) {return name () == code_name;}
-PrologNativeCode :: PrologNativeCode (void) TRACKING (16) {}
-PrologNativeCode :: ~ PrologNativeCode (void) {}
 */
-
