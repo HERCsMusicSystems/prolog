@@ -112,6 +112,19 @@ this . PrologElement . prototype . duplicate = function (el) {
 	}
 	return el;
 };
+this . PrologElement . prototype . attach = function (position) {
+	if (this . type !== 1) return false;
+	var sub = this . left; if (sub . type !== 1) return false;
+	sub = sub . left; if (sub . type !== 3) return false;
+	var atom = sub . left; if (atom . Protected) return false;
+	if (position === undefined) position = Number . MAX_VALUE;
+	if (atom . firstClause === null || position < 1) {sub . setNative (atom . firstClause); atom . firstClause = this; return true;}
+	var head = atom . firstClause . left . left;
+	while (head . left !== null && position > 1) {head = head . left . left . left; position -= 1;}
+	sub . setNative (head . left);
+	head . setNative (this);
+	return true;
+};
 
 //////// ROOT ////////
 
@@ -218,32 +231,23 @@ this . PrologRoot . prototype . Protect = function (name) {
 };
 this . PrologRoot . prototype . listAtom = function (name) {
 	var atom = this . search (name);
-	console . log (atom);
 	if (atom === null) return [];
 	var el = atom . firstClause;
 	var ret = [];
-	console . log (el);
 	while (el !== null) {
-		ret . push (this . left_caption + this . left_caption + this . getRightCaption (el . left . right) + this . right_caption + this . getRightCaption (el . right) + this . right_caption);
-		el = el . left . left;
+		ret . push (this . left_caption + this . left_caption + name + this . getRightCaption (el . left . right) + this . right_caption + this . getRightCaption (el . right) + this . right_caption);
+		el = el . left . left . left;
 	}
 	return ret;
 };
-this . PrologRoot . prototype . attachClause = function (clause, position) {
-	if (clause . type !== 1) return 1;
-	var sub = clause . left; if (sub . type !== 1) return 2;
-	sub = sub . left; if (sub . type !== 3) return 3;
-	var atom = sub . left; if (atom . Protected) return 4;
-	sub . setNative (null);
-	atom . firstClasue = clause;
-	return 0;
-};
+
 };
 /*
 */
 root = new prolog.PrologRoot();
 sonda = root.createAtom('sonda');
 mariner = root.createAtom('mariner');
+//////////
 e = new prolog.PrologElement();
 e.setPair();
 e.left.setAtom(sonda);
@@ -252,5 +256,36 @@ e.right.left.setAtom(mariner);
 cl = new prolog.PrologElement();
 cl.setPair();
 cl.left = e;
-root.attachClause(cl);
-root.listAtom('sonda');
+console . log (cl.attach());
+///////
+e = new prolog.PrologElement();
+e.setPair();
+e.left.setAtom(sonda);
+e.right.setPair();
+e.right.left.setNative(123);
+cl = new prolog.PrologElement();
+cl.setPair();
+cl.left = e;
+console . log (cl.attach());
+///////
+e = new prolog.PrologElement();
+e.setPair();
+e.left.setAtom(sonda);
+e.right.setPair();
+e.right.left.setNative(124);
+cl = new prolog.PrologElement();
+cl.setPair();
+cl.left = e;
+console . log (cl.attach());
+///////
+e = new prolog.PrologElement();
+e.setPair();
+e.left.setAtom(sonda);
+e.right.setPair();
+e.right.left.setVar(124);
+cl = new prolog.PrologElement();
+cl.setPair();
+cl.left = e;
+console . log (cl.attach(0));
+////////
+console . log (root.listAtom('sonda').join('\n'));
