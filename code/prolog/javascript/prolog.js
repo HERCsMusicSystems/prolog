@@ -241,6 +241,20 @@ this . PrologRoot . prototype . listAtom = function (name) {
 	return ret;
 };
 
+//////// ROOT ////////
+
+this . PrologReader = function (root, file) {
+	this . root = root;
+	this . file = file;
+	this . act = '';
+	this . ind = 0;
+};
+
+this . PrologReader . prototype . move = function () {
+	this . act = this . file . charAt (this . ind ++);
+	return this . act;
+};
+
 };
 /*
 */
