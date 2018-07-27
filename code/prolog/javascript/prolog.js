@@ -131,12 +131,28 @@ this . Element . prototype . attach = function (position) {
 this . Root = function () {
 	this . left_caption = '[';
 	this . right_caption = ']';
+	this . secondary_left_caption = '(';
+	this . secondary_right_caption = ')';
 	this . var_caption = '*';
 	this . separator_caption = ',';
 	this . mid_caption = ':';
 	this . slash_caption = '/';
 	this . fail_caption = 'fail';
-	this . quotation_caption = '"';
+	this . quotation_caption = '"\'';
+	this . atom_quotation_caption = '\`';
+	this . comment_caption = ';';
+	this . at_caption = '@';
+	this . dot_caption = '.';
+	this . atom_head_captions = "_qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM?<>&|+-=%~#!$^{}";
+	this . atom_tail_captions = "_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM?/<>&|+-=%~#!";
+	this . if_atom_caption = ':=';
+	this . and_atom_caption = '^';
+	this . operator_captions = '';
+	this . directive_head_caption = '\\';
+	this . escape_caption = '\\'
+	this . var_head_captions = '*';
+	this . var_tail_captions = '_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM';
+	this . var_caption = '*';
 	this . auto_atoms = false;
 	this . root = new hrcs . Directory ("user!");
 };
@@ -248,10 +264,138 @@ this . Reader = function (root, file) {
 	this . file = file;
 	this . act = '';
 	this . ind = 0;
+	this . control = 'eof';
+	this . symbol = '';
 };
 this . Reader . prototype . move = function () {
 	this . act = this . file . charAt (this . ind ++);
 	return this . act;
+};
+this . Reader . prototype . getSymbol = function () {
+	if (this . act <= '') this . move ();
+	this . symbol = '';
+	while (this . act <= ' ' || this . root . comment_caption . indexOf (this . act) >= 0) {
+		if (this . root . comment_caption . indexOf (this . act) >= 0) {
+			while (this . act !== '\n' && this . act > '') this . move ();
+		}
+		if (this . act <= '') {this . control = 'eof'; return;}
+		this . move ();
+	}
+	if (this . root . left_caption . indexOf (this . act) >= 0) {
+		this . move ();
+		while (this . act <= ' ' && this . act > '') this . move ();
+		if (this . root . right_caption . indexOf (this . act) >= 0) {this . control = '[]', this . move (); return;}
+		this . control = '[';
+		return;
+	}
+	if (this . root . secondary_left_caption . indexOf (this . act) >= 0) {
+		this . move ();
+		while (this . act <= ' ' && this . act > '') this . move ();
+		if (this . root . secondary_right_caption . indexOf (this . act) >= 0) {this . control = '()', this . move (); return;}
+		this . control = '(';
+		return;
+	}
+	if (this . root . right_caption . indexOf (this . act) >= 0) {this . control = ']'; this . move (); return;}
+	if (this . root . secondary_right_caption . indexOf (this . act) >= 0) {this . control = ')'; this . move (); return;}
+	if (this . root . slash_caption . indexOf (this . act) >= 0) {this . control = '/'; this . move (); return;}
+	if (this . root . mid_caption . indexOf (this . act) >= 0) {
+		this . symbol = ':'; this . move ();
+		while (':=<>|/!+-' . indexOf (this . act) >= 0 && this . act > '') {this . symbol += this . act; this . move ();}
+		this . control = this . symbol . length < 2 ? ':' : 'atom';
+		return;
+	}
+	if (this . root . dot_caption . indexOf (this . act) >= 0) {this . control = '.'; this . move (); return;}
+	if (this . root . at_caption . indexOf (this . act) >= 0) {this . control = '@'; this . move (); return;}
+	if (this . root . separator_caption . indexOf (this . act) >= 0) {this . control = ',', this . move (); return;}
+	var negative = false;
+	if (this . act === '-') {negative = true; this . symbol = '-'; this . move();}
+	if ('0123456789' . indexOf (this . act) >= 0) {
+		while ('0123456789abcdefABCDEFxX.-' . indexOf (this . act) >= 0 && this . act > '') {this . symbol += this . act; this . move();}
+		this . control = 'number';
+		console . log ('numbering this', this . symbol)
+		this . symbol = Number (this . symbol);
+		return;
+	}
+	if (negative) {
+		if (this . root . atom_head_captions . indexOf ('-') >= 0) {
+			this . control = 'atom';
+			while (this . root . atom_tail_captions . indexOf (this . act && this . act > '') >= 0) {
+				if (this . root . if_atom_caption === this . symbol) return;
+				if (this . root . and_atom_caption === this . symbol) return;
+				if (this . root . operator_captions . indexOf (this . symbol) >= 0) return;
+				this . symbol += this . act;
+				this . move ();
+			}
+			return;
+		}
+		this . control = 'unknown';
+		console . log ("Lexical error (negative).");
+		return;
+	}
+	if (this . root . directive_head_caption . indexOf (this . act) >= 0) {
+		this . move ();
+		while ('abcdefghijklmnopqrstuvwxyz' . indexOf (this . act) >= 0 && this . act > '') {
+			this . symbol += this . act; this . move ();
+		}
+		this . control = 'directive';
+		return;
+	}
+	if (this . root . quotation_caption . indexOf (this . act) >= 0) {
+		this . move ();
+		while (this . root . quotation_caption . indexOf (this . act) < 0 && this . act > '') {
+			if (this . root . escape_caption . indexOf (this . act) >= 0) {
+				this . move ();
+				switch (this . act) {
+					case 'n': this . symbol += '\n'; break;
+					default: this . symbol += this . act; break;
+				}
+			} else this . symbol += this . act;
+			this . move ();
+		}
+		this . move ();
+		this . control = 'text';
+		return;
+	}
+	if (this . root . atom_quotation_caption . indexOf (this . act) >= 0) {
+		this . move ();
+		while (this . root . atom_quotation_caption . indexOf (this . act) < 0 && this . act > '') {
+			if (this . root . escape_caption . indexOf (this . act) >= 0) {
+				this . move ();
+				switch (this . act) {
+					case 'n': this . symbol += '\n'; break;
+					default: this . symbol += this . act; break;
+				}
+			} else this . symbol += this . act;
+			this . move ();
+		}
+		this . move ();
+		this . control = 'atom';
+		return;
+	}
+	if (this . root . var_head_captions . indexOf (this . act) >= 0) {
+		this . symbol += this . act;
+		this . move ();
+		while (this . root . var_tail_captions . indexOf (this . act) >= 0 && this . act > '') {
+			this . symbol += this . act; this . move ();
+		}
+		this . control = 'var';
+		return;
+	}
+	if (this . root . atom_head_captions . indexOf (this . act) >= 0) {
+		this . control = 'atom';
+		do {
+			this . symbol += this . act;
+			this . move ();
+			if (this . root . if_atom_caption === this . symbol) return;
+			if (this . root . and_atom_caption === this . symbol) return;
+			if (this . root . operator_captions . indexOf (this . symbol) >= 0) return;
+		} while (this . root . atom_tail_captions . indexOf (this . act) >= 0 && this . act > '');
+		if (this . symbol === this . root . fail_caption) this . control = 'fail';
+		return;
+	}
+	this . control = 'unknown';
+	this . move ();
+	console . log ("Lexical error (unknown character sequence).");
 };
 
 };
@@ -302,3 +446,5 @@ cl.left = e;
 console . log (cl.attach(0));
 ////////
 console . log (root.listAtom('sonda').join('\n'));
+reader = new prolog.Reader(root, studio . readFile ('test_scripts/directive.prc'));
+function m () {reader . getSymbol (); console . log (reader.symbol); return [reader.control, reader.symbol];};
