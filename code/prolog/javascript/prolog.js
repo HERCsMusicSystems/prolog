@@ -266,6 +266,7 @@ this . Reader = function (root, file) {
 	this . ind = 0;
 	this . control = 'eof';
 	this . symbol = '';
+	this . search_context = null;
 };
 this . Reader . prototype . move = function () {
 	this . act = this . file . charAt (this . ind ++);
@@ -312,7 +313,6 @@ this . Reader . prototype . getSymbol = function () {
 	if ('0123456789' . indexOf (this . act) >= 0) {
 		while ('0123456789abcdefABCDEFxX.-' . indexOf (this . act) >= 0 && this . act > '') {this . symbol += this . act; this . move();}
 		this . control = 'number';
-		console . log ('numbering this', this . symbol)
 		this . symbol = Number (this . symbol);
 		return;
 	}
@@ -397,6 +397,46 @@ this . Reader . prototype . getSymbol = function () {
 	this . move ();
 	console . log ("Lexical error (unknown character sequence).");
 };
+this . Reader . prototype . atomC = function (name) {
+	var atom;
+	if (this . search_context === null) atom = this . root . search (name);
+	else {
+		var dir = this . search_context;
+		while (atom === null && dir !== null) {atom = dir . search (name); dir = dir . next;}
+	}
+	if (atom === null && this . root . auto_atoms) {
+		atom = root . createAtom (name);
+		if (this . search_context !== null) this . search_context . firstAtom = atom;
+	}
+	if (atom === null) return null;
+	var el = new hrcs . Element (); el . setAtom (atom); return el;
+};
+this . Reader . prototype . getElement = function () {
+	this . getSymbol ();
+	var el; var dir;
+	switch (this . control) {
+		case 'atom':
+			el = this . atomC (this . symbol);
+			if (el === null) console . log ("Semantic error (unknown atom: " + this . symbol + ").");
+			return el;
+		case '@':
+			this . getSymbol ();
+			if (this . control !== 'atom') {console . log ("Syntax error (directory expected)."); return null;}
+			dir = this . root . searchDirectory (this . symbol);
+			this . getSymbol ();
+			if (dir === null) {console . log ("Semantic error (directory" + this . symbol + " does not exist)"); return null;}
+			if (this . control !== '.') {console . log ("Syntax error (dot expected)."); return null;}
+			this . getSymbol ();
+			if (this . control !== 'atom') {console . log ("Syntax error (atom after dot expected)."); return null;}
+			el = dir . searchAtom (this . symbol);
+			if (el === null) {console . log ("Semantic error (qualified atom " + this . symbol + " not found in " + dir . name + ")."); return null;}
+			dir = new hrcs . Element (); dir . setAtom (el);
+			return dir;
+		default: break;
+	}
+	console . log ("Syntax error (unknown syntax).");
+	return null;
+};
 
 };
 /*
@@ -448,3 +488,4 @@ console . log (cl.attach(0));
 console . log (root.listAtom('sonda').join('\n'));
 reader = new prolog.Reader(root, studio . readFile ('test_scripts/directive.prc'));
 function m () {reader . getSymbol (); console . log (reader.symbol); return [reader.control, reader.symbol];};
+function ge () {return reader . getElement ();};
