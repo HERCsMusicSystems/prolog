@@ -267,6 +267,7 @@ this . Reader = function (root, file) {
 	this . control = 'eof';
 	this . symbol = '';
 	this . search_context = null;
+	this . vars = [];
 };
 this . Reader . prototype . move = function () {
 	this . act = this . file . charAt (this . ind ++);
@@ -411,9 +412,15 @@ this . Reader . prototype . atomC = function (name) {
 	if (atom === null) return null;
 	var el = new hrcs . Element (); el . setAtom (atom); return el;
 };
+this . Reader . prototype . varNumber = function (name) {
+	if (name === this . root . var_caption) return this . vars . push (name) - 1;
+	var ind = this . vars . indexOf (name);
+	if (ind < 0) return this . vars . push (name) - 1;
+	return ind;
+};
 this . Reader . prototype . getElement = function () {
 	this . getSymbol ();
-	var el; var dir;
+	var el, dir;
 	switch (this . control) {
 		case 'atom':
 			el = this . atomC (this . symbol);
@@ -432,10 +439,77 @@ this . Reader . prototype . getElement = function () {
 			if (el === null) {console . log ("Semantic error (qualified atom " + this . symbol + " not found in " + dir . name + ")."); return null;}
 			dir = new hrcs . Element (); dir . setAtom (el);
 			return dir;
+		case 'number': el = new hrcs . Element (); el . setNative (this . symbol); return el;
+		case '[]': case '()': return new hrcs . Element ();
+		case '/': el = new hrcs . Element (); el . type = 4; return el;
+		case 'fail': el = new hrcs . Element (); el . type = 5; return el;
+		case 'var': el = new hrcs . Element (); el . setVar (this . varNumber (this . symbol)); return el;
+		case 'text': el = new hrcs . Element (); el . setNative (this . symbol); return el;
+		case '[': return this . readRightSide (this . getElement (), ']');
+		case '(': return this . readRightSide (this . getElement (), ')');
+		case '.': return this . atomC ('.');
+		case 'eof': console . log ("Syntax error (end of file)."); return null;
 		default: break;
 	}
 	console . log ("Syntax error (unknown syntax).");
 	return null;
+};
+this . Reader . prototype . readRightSide = function (left, bracket) {
+	this . getSymbol ();
+	if (this . root . separator_caption !== '') {
+		if (this . control === ',') this . getSymbol ();
+		else {console . log ("Syntax error (separator expected)."); return null;}
+	}
+	var el, dir;
+	switch (this . control) {
+		case ']': case ')':
+			if (bracket !== this . control) {console . log ("Syntax error (bracket mismatch.)"); return null;}
+			el = new hrcs . Element (); el . setPair (); el . left = left; el . right = new hrcs . Element ();
+			return el;
+		case ':':
+			el = this . getElement (); if (el === null) return null;
+			if (el . type === 0) {console . log ("Syntax error (earth not allowed here)."); return null;}
+			this . getSymbol ();
+			if (this . control !== bracket) {console . log ("Syntax error (closing bracket expected)."); return null;}
+			dir = new hrcs . Element (); dir . setPair (); dir . left = left; dir . right = el;
+			return dir;
+		default: break;
+	}
+	switch (this . control) {
+		case 'atom':
+			el = this . atomC (this . symbol);
+			if (el === null) console . log ("Semantic error (unknown atom: " + this . symbol + ").");
+			break;
+		case '@':
+			this . getSymbol ();
+			if (this . control !== 'atom') {console . log ("Syntax error (directory expected)."); return null;}
+			el = this . root . searchDirectory (this . symbol);
+			this . getSymbol ();
+			if (el === null) {console . log ("Semantic error (directory" + this . symbol + " does not exist)"); return null;}
+			if (this . control !== '.') {console . log ("Syntax error (dot expected)."); return null;}
+			this . getSymbol ();
+			if (this . control !== 'atom') {console . log ("Syntax error (atom after dot expected)."); return null;}
+			dir = dir . searchAtom (this . symbol);
+			if (dir === null) {console . log ("Semantic error (qualified atom " + this . symbol + " not found in " + el . name + ")."); return null;}
+			el = new hrcs . Element (); dir . setAtom (dir);
+			break;
+		case 'number': el = new hrcs . Element (); el . setNative (this . symbol); break;
+		case '[]': case '()': el = new hrcs . Element (); break;
+		case '/': el = new hrcs . Element (); el . type = 4; break;
+		case 'fail': el = new hrcs . Element (); el . type = 5; break;
+		case 'var': el = new hrcs . Element (); el . setVar (this . varNumber (this . symbol)); break;
+		case 'text': el = new hrcs . Elelment (); el . setNative (this . symbol); break;
+		case '[': el = this . readRightSide (this . getElement (), ']'); break;
+		case '(': el = this . readRightSide (this . getElement (), ')'); break;
+		case '.': el = this . atomC ('.'); break;
+		default: return null;
+	}
+	if (el === null) return null;
+	el = this . readRightSide (el, bracket);
+	if (el === null) return null;
+	dir = new hrcs . Element ();
+	dir . setPair (); dir . left = left; dir . right = el;
+	return dir;
 };
 
 };
