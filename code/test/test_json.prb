@@ -2,7 +2,7 @@
 [import "json"]
 [import "test"]
 
-[TestEq "Looking for Greek Valerian (index 32)." 'Greek Valerian' *name
+[TestEq "Looking for Greek Valerian (index 32)." `Greek Valerian` *name
   [json "plant_catalog.json" *json]
   [= *json [[= CATALOG *catalog]]]
   [MEMBER *plant *catalog]
