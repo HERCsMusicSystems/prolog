@@ -78,8 +78,8 @@ void PrologRoot :: set_uap32_captions (void) {
 	prolog_string_copy (comment_caption, ";");
 	prolog_string_copy (fail_caption, "fail");
 	prolog_string_copy (slash_caption, "/");
-	prolog_string_copy (quotation_caption, "\"");
-	prolog_string_copy (atom_quotation_caption, "'");
+	prolog_string_copy (quotation_caption, "\"'");
+	prolog_string_copy (atom_quotation_caption, "`");
 	prolog_string_copy (escape_caption, "\\");
 	prolog_string_copy (head_caption, ":head:");
 	prolog_string_copy (separator_caption, "");
@@ -356,9 +356,9 @@ int PrologRoot :: getValue (PrologElement * el, char * area, int ind) {
 	case 4: return area_cat (area, ind, slash_caption);
 	case 5: return area_cat (area, ind, fail_caption);
 	case 6:
-		ind = area_cat (area, ind, quotation_caption);
+		ind = area_cat (area, ind, quotation_caption [0]);
 		ind = area_cat (area, ind, el -> getText ());
-		ind = area_cat (area, ind, quotation_caption);
+		ind = area_cat (area, ind, quotation_caption [0]);
 		return ind;
 	case 7: sprintf (command, "<%p>", el -> head); return area_cat (area, area_cat (area, ind, head_caption), command);
 	case 8: sprintf (command, "%i", el -> getInteger ()); return area_cat (area, ind, command);
@@ -391,9 +391,9 @@ int PrologRoot :: getTrueValue (PrologElement * el, char * area, int ind) {
 	case 4: return area_cat (area, ind, slash_caption);
 	case 5: return area_cat (area, ind, fail_caption);
 	case 6:
-		ind = area_cat (area, ind, quotation_caption);
+		ind = area_cat (area, ind, quotation_caption [0]);
 		ind = area_cat (area, ind, el -> getText ());
-		ind = area_cat (area, ind, quotation_caption);
+		ind = area_cat (area, ind, quotation_caption [0]);
 		return ind;
 	case 7: return area_cat (area, ind, head_caption);
 	case 8: sprintf (command, "%i", el -> getInteger ()); return area_cat (area, ind, command);

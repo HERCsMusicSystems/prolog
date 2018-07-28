@@ -338,10 +338,11 @@ void PrologReader :: get_symbol (void) {
 	}
 	// if text
 	if (indexOf (root -> quotation_caption, (char) act_znak) >= 0) {
+		int quotation = act_znak;
 		symbol [0] = '\0';
 		ind = 0;
 		act_znak = move_z ();
-		while (indexOf (root -> quotation_caption, (char) act_znak) < 0) {
+		while (act_znak != quotation) {
 			if (act_znak < 1) {
 				message ("Lexical error (unclosed text).");
 				symbol_control = 0;
@@ -363,10 +364,11 @@ void PrologReader :: get_symbol (void) {
 	}
 	// if quoted atom
 	if (indexOf (root -> atom_quotation_caption, (char) act_znak) >= 0) {
+		int quotation = act_znak;
 		symbol [0] = '\0';
 		ind = 0;
 		act_znak = move_z ();
-		while (indexOf (root -> atom_quotation_caption, (char) act_znak) < 0) {
+		while (act_znak != quotation) {
 			if (act_znak < 1) {
 				message ("Lexical error (unclosed text).");
 				symbol_control = 0;
