@@ -138,7 +138,7 @@ this . Root = function () {
 	this . mid_caption = ':';
 	this . slash_caption = '/';
 	this . fail_caption = 'fail';
-	this . quotation_caption = '"\'';
+	this . quotation_caption = '\'"';
 	this . atom_quotation_caption = '\`';
 	this . comment_caption = ';';
 	this . at_caption = '@';
@@ -168,7 +168,7 @@ this . Root . prototype . getValue = function (el) {
 		case 3: return el . left . name;
 		case 4: return this . slash_caption;
 		case 5: return this . fail_caption;
-		case 6: return typeof (el . left) === 'number' ? el . left : this . quotation_caption + el . left + this . quotation_caption;
+		case 6: return typeof (el . left) === 'number' ? el . left : this . quotation_caption . charAt (0) + el . left + this . quotation_caption . charAt (0);
 	}
 	return "Unknown element type.";
 };
@@ -342,8 +342,9 @@ this . Reader . prototype . getSymbol = function () {
 		return;
 	}
 	if (this . root . quotation_caption . indexOf (this . act) >= 0) {
+		var quotation = this . act;
 		this . move ();
-		while (this . root . quotation_caption . indexOf (this . act) < 0 && this . act > '') {
+		while (this . act !== quotation && this . act > '') {
 			if (this . root . escape_caption . indexOf (this . act) >= 0) {
 				this . move ();
 				switch (this . act) {
@@ -358,8 +359,9 @@ this . Reader . prototype . getSymbol = function () {
 		return;
 	}
 	if (this . root . atom_quotation_caption . indexOf (this . act) >= 0) {
+		var quotation = this . act;
 		this . move ();
-		while (this . root . atom_quotation_caption . indexOf (this . act) < 0 && this . act > '') {
+		while (this . act !== quotation && this . act > '') {
 			if (this . root . escape_caption . indexOf (this . act) >= 0) {
 				this . move ();
 				switch (this . act) {
