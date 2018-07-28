@@ -208,9 +208,10 @@ public class PrologReader {
 		}
 		// if text
 		if (root . quotation_caption . indexOf ((char) act_znak) >= 0) {
+			int quotation = act_znak;
 			symbol = "";
 			act_znak = move_z ();
-			while (root . quotation_caption . indexOf ((char) act_znak) < 0) {
+			while (act_znak != quotation) {
 				if (act_znak < 1) {root . message ("Lexical error (unclosed text)."); symbol_control = 0; act_znak = move_z (); return;}
 				if (root . escape_caption . indexOf ((char) act_znak) >= 0) {
 					act_znak = move_z ();
@@ -227,9 +228,10 @@ public class PrologReader {
 		}
 		// if quoted atom
 		if (root . atom_quotation_caption . indexOf ((char) act_znak) >= 0) {
+			int quotation = act_znak;
 			symbol = "";
 			act_znak = move_z ();
-			while (root . atom_quotation_caption . indexOf ((char) act_znak) < 0) {
+			while (act_znak != quotation) {
 				if (act_znak < 1) {root . message ("Lexical error (unclosed text)."); symbol_control = 0; act_znak = move_z (); return;}
 				if (root . escape_caption . indexOf ((char) act_znak) >= 0) {
 					act_znak = move_z ();

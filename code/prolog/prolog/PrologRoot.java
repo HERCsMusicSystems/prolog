@@ -97,8 +97,8 @@ public class PrologRoot {
 		comment_caption = ";";
 		fail_caption = "fail";
 		slash_caption = "/";
-		quotation_caption = "\"";
-		atom_quotation_caption = "'";
+		quotation_caption = "\"'";
+		atom_quotation_caption = "`";
 		escape_caption = "\\";
 		head_caption = ":head:";
 		separator_caption = "";
@@ -396,7 +396,7 @@ public class PrologRoot {
 		case 3: return el . getAtom () . name ();
 		case 4: return slash_caption;
 		case 5: return fail_caption;
-		case 6: return quotation_caption + el . getText () + quotation_caption;
+		case 6: return quotation_caption . charAt (0) + el . getText () + quotation_caption . charAt (0);
 		case 7: return head_caption + "<" + el . head + ">";
 		case 8: return "" + el . getInteger ();
 		case 9: return "" + el . getDouble ();
@@ -417,7 +417,7 @@ public class PrologRoot {
 		case 3: return el . getAtom () . name ();
 		case 4: return slash_caption;
 		case 5: return fail_caption;
-		case 6: return quotation_caption + el . getText () + quotation_caption;
+		case 6: return quotation_caption . charAt (0) + el . getText () + quotation_caption . charAt (0);
 		case 7: return head_caption + "<" + el . head + ">";
 		case 8: return "" + el . getInteger ();
 		case 9: return "" + el . getDouble ();
