@@ -456,10 +456,6 @@ this . Reader . prototype . getElement = function () {
 };
 this . Reader . prototype . readRightSide = function (left, bracket) {
 	this . getSymbol ();
-	if (this . root . separator_caption !== '') {
-		if (this . control === ',') this . getSymbol ();
-		else {console . log ("Syntax error (separator expected)."); return null;}
-	}
 	var el, dir;
 	switch (this . control) {
 		case ']': case ')':
@@ -474,6 +470,10 @@ this . Reader . prototype . readRightSide = function (left, bracket) {
 			dir = new hrcs . Element (); dir . setPair (); dir . left = left; dir . right = el;
 			return dir;
 		default: break;
+	}
+	if (this . root . separator_caption !== '') {
+		if (this . control === ',') this . getSymbol ();
+		else {console . log ("Syntax error (separator expected)."); return null;}
 	}
 	switch (this . control) {
 		case 'atom':
