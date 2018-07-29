@@ -75,11 +75,6 @@ this . Directory . prototype . list = function () {
 	while (atom !== null) {area . push (atom . name); atom = atom . next;}
 	return area;
 };
-this . Directory . prototype . close = function () {
-	if (this . next === null) return this;
-	var sub = this . next; this . next = this . next . next; sub . next = this;
-	return sub;
-};
 this . Directory . prototype . duplicate = function (root) {
 	var dir = new hrcs . Directory (this . name, root, this . service_class);
 	dir . fistAtom = this . firstAtom;
@@ -134,7 +129,7 @@ this . Root = function () {
 	this . secondary_left_caption = '(';
 	this . secondary_right_caption = ')';
 	this . var_caption = '*';
-	this . separator_caption = ',';
+	this . separator_caption = '';
 	this . mid_caption = ':';
 	this . slash_caption = '/';
 	this . fail_caption = 'fail';
@@ -210,7 +205,14 @@ this . Root . prototype . list = function (name) {
 	if (sub === null) return [];
 	return sub . list ();
 };
-this . Root . prototype . close = function () {if (this . root === null) return; this . root . close ();};
+this . Root . prototype . close = function () {
+	if (this . root === null) return;
+	var sub = this . root . next;
+	if (sub === null) return;
+	this . root . next = sub . next;
+	sub . next = this . root;
+	this . root = sub;
+};
 this . Root . prototype . drop = function (name) {
 	if (this . root === null) return;
 	if (name === undefined) {this . root = this . root . next; return;}
@@ -255,6 +257,13 @@ this . Root . prototype . listAtom = function (name) {
 		el = el . left . left . left;
 	}
 	return ret;
+};
+this . Root . prototype . load = function (name) {
+	var content = studio . readFile (name);
+	if (content === null) content = studio . readFile (name + ".prc");
+	if (content === null) return false;
+	var reader = new hrcs . Reader (this, content);
+	return reader . readProgram ();
 };
 
 //////// READER ////////
@@ -500,7 +509,7 @@ this . Reader . prototype . readRightSide = function (left, bracket) {
 		case '/': el = new hrcs . Element (); el . type = 4; break;
 		case 'fail': el = new hrcs . Element (); el . type = 5; break;
 		case 'var': el = new hrcs . Element (); el . setVar (this . varNumber (this . symbol)); break;
-		case 'text': el = new hrcs . Elelment (); el . setNative (this . symbol); break;
+		case 'text': el = new hrcs . Element (); el . setNative (this . symbol); break;
 		case '[': el = this . readRightSide (this . getElement (), ']'); break;
 		case '(': el = this . readRightSide (this . getElement (), ')'); break;
 		case '.': el = this . atomC ('.'); break;
@@ -513,11 +522,44 @@ this . Reader . prototype . readRightSide = function (left, bracket) {
 	dir . setPair (); dir . left = left; dir . right = el;
 	return dir;
 };
+this . Reader . prototype . readProgram = function () {
+	this . getSymbol ();
+	if (this . control !== 'atom' || this . symbol !== 'program') return null;
+	this . getSymbol ();
+	if (this . control !== 'atom') return null;
+	this . root . createDirectory (this . symbol);
+	this . getSymbol ();
+	switch (this . control) {
+	case '[]': break;
+	case '[':
+		this . getSymbol ();
+		while (this . control === 'atom') {this . root . createAtom (this . symbol); this . getSymbol ();}
+		if (this . control !== ']') return null;
+		break;
+	default: return null;
+	};
+	this . getSymbol ();
+	while (this . control === '[') {
+		var el = this . readRightSide (this . getElement (), ']');
+		el . attach ();
+		this . getSymbol ();
+	}
+	if (this . control !== 'atom' && this . control !== 'end') return null;
+	this . getSymbol ();
+	if (this . control === '.') {this . root . close (); return new hrcs . Element ();}
+	if (this . control !== 'atom' || this . symbol !== ':=') return null;
+	var command = this . getElement ();
+	this . root . close ();
+	return command;
+};
 
 };
-/*
-*/
+studio . search ('test_scripts');
 root = new prolog.Root();
+console . log ('load', root . load ('sonda'));
+console . log (root . list ());
+console . log (root . list ('sonda'));
+/*
 sonda = root.createAtom('sonda');
 mariner = root.createAtom('mariner');
 //////////
@@ -565,3 +607,4 @@ console . log (root.listAtom('sonda').join('\n'));
 reader = new prolog.Reader(root, studio . readFile ('test_scripts/directive.prc'));
 function m () {reader . getSymbol (); console . log (reader.symbol); return [reader.control, reader.symbol];};
 function ge () {return reader . getElement ();};
+*/
