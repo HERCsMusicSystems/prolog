@@ -413,6 +413,7 @@ this . Reader . prototype . atomC = function (name) {
 	var atom;
 	if (this . search_context === null) atom = this . root . search (name);
 	else {
+		console . log ("searching", name);
 		var dir = this . search_context;
 		while (atom === null && dir !== null) {atom = dir . search (name); dir = dir . next;}
 	}
@@ -420,6 +421,7 @@ this . Reader . prototype . atomC = function (name) {
 		atom = root . createAtom (name);
 		if (this . search_context !== null) this . search_context . firstAtom = atom;
 	}
+	console . log ('....', atom);
 	if (atom === null) return null;
 	var el = new hrcs . Element (); el . setAtom (atom); return el;
 };
@@ -466,6 +468,7 @@ this . Reader . prototype . getElement = function () {
 	return null;
 };
 this . Reader . prototype . readRightSide = function (left, bracket) {
+	if (left === null) return null;
 	this . getSymbol ();
 	var el, dir;
 	switch (this . control) {
@@ -524,9 +527,22 @@ this . Reader . prototype . readRightSide = function (left, bracket) {
 };
 this . Reader . prototype . readProgram = function () {
 	this . getSymbol ();
-	if (this . control !== 'atom' || this . symbol !== 'program') return null;
+	while (this . control === 'atom' && this . symbol === 'import') {
+		this . getSymbol ();
+		if (this . control !== 'atom') {console . log ("Syntax error (import name expected)."); return null;}
+		var dir = this . root . searchDirectory (this . symbol);
+		if (dir === null) {
+			console . log ("IMPORTING " + this . symbol);
+			this . root . load (this . symbol);
+			dir = this . root . searchDirectory (this . symbol);
+		}
+		if (dir === null) {console . log ("Semantic error (program " + this . symbol + " could not be imported)."); return null;}
+		this . search_context = dir . duplicate (this . search_context);
+		this . getSymbol ();
+	}
+	if (this . control !== 'atom' || this . symbol !== 'program') {console . log ("Syntax error (program keyword expected)."); return null;}
 	this . getSymbol ();
-	if (this . control !== 'atom') return null;
+	if (this . control !== 'atom') {console . log ("Syntax error (program name expected)."); return null;}
 	this . root . createDirectory (this . symbol);
 	this . getSymbol ();
 	switch (this . control) {
@@ -534,21 +550,26 @@ this . Reader . prototype . readProgram = function () {
 	case '[':
 		this . getSymbol ();
 		while (this . control === 'atom') {this . root . createAtom (this . symbol); this . getSymbol ();}
-		if (this . control !== ']') return null;
+		if (this . control !== ']') {this . root . drop (); return null;}
 		break;
-	default: return null;
+	default: this . root . drop (); return null;
 	};
 	this . getSymbol ();
 	while (this . control === '[') {
 		var el = this . readRightSide (this . getElement (), ']');
+		if (el === null) {this . root . drop (); return null;}
 		el . attach ();
 		this . getSymbol ();
 	}
-	if (this . control !== 'atom' && this . control !== 'end') return null;
+	if (this . control !== 'atom' && this . control !== 'end') {this . root . drop (); return null;}
 	this . getSymbol ();
+	console . log ("JOKER", this . search_context);
 	if (this . control === '.') {this . root . close (); return new hrcs . Element ();}
-	if (this . control !== 'atom' || this . symbol !== ':=') return null;
+	if (this . control !== 'atom' || this . symbol !== ':=') {this . root . drop (); return null;}
 	var command = this . getElement ();
+	if (command === null) {this . root . drop (); return null;}
+	this . getSymbol ();
+	if (this . control !== '.') {console . log ("Syntax error (dot at the end expected)."); this . root . drop (); return null;}
 	this . root . close ();
 	return command;
 };
@@ -556,9 +577,9 @@ this . Reader . prototype . readProgram = function () {
 };
 studio . search ('test_scripts');
 root = new prolog.Root();
-console . log ('load', root . load ('sonda'));
-console . log (root . list ());
-console . log (root . list ('sonda'));
+console . log ('load', root . load ('main_course'));
+//console . log (root . list ());
+//console . log (root . list ('sonda'));
 /*
 sonda = root.createAtom('sonda');
 mariner = root.createAtom('mariner');
