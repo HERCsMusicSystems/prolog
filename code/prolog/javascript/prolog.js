@@ -77,7 +77,7 @@ this . Directory . prototype . list = function () {
 };
 this . Directory . prototype . duplicate = function (root) {
 	var dir = new hrcs . Directory (this . name, root, this . service_class);
-	dir . fistAtom = this . firstAtom;
+	dir . firstAtom = this . firstAtom;
 	return dir;
 };
 
@@ -413,15 +413,14 @@ this . Reader . prototype . atomC = function (name) {
 	var atom;
 	if (this . search_context === null) atom = this . root . search (name);
 	else {
-		console . log ("searching", name);
+		atom = null;
 		var dir = this . search_context;
-		while (atom === null && dir !== null) {atom = dir . search (name); dir = dir . next;}
+		while (atom === null && dir !== null) {atom = dir . searchAtom (name); dir = dir . next;}
 	}
 	if (atom === null && this . root . auto_atoms) {
 		atom = root . createAtom (name);
 		if (this . search_context !== null) this . search_context . firstAtom = atom;
 	}
-	console . log ('....', atom);
 	if (atom === null) return null;
 	var el = new hrcs . Element (); el . setAtom (atom); return el;
 };
@@ -532,7 +531,6 @@ this . Reader . prototype . readProgram = function () {
 		if (this . control !== 'atom') {console . log ("Syntax error (import name expected)."); return null;}
 		var dir = this . root . searchDirectory (this . symbol);
 		if (dir === null) {
-			console . log ("IMPORTING " + this . symbol);
 			this . root . load (this . symbol);
 			dir = this . root . searchDirectory (this . symbol);
 		}
@@ -554,6 +552,7 @@ this . Reader . prototype . readProgram = function () {
 		break;
 	default: this . root . drop (); return null;
 	};
+	this . search_context = this . root . root . duplicate (this . search_context);
 	this . getSymbol ();
 	while (this . control === '[') {
 		var el = this . readRightSide (this . getElement (), ']');
@@ -563,7 +562,6 @@ this . Reader . prototype . readProgram = function () {
 	}
 	if (this . control !== 'atom' && this . control !== 'end') {this . root . drop (); return null;}
 	this . getSymbol ();
-	console . log ("JOKER", this . search_context);
 	if (this . control === '.') {this . root . close (); return new hrcs . Element ();}
 	if (this . control !== 'atom' || this . symbol !== ':=') {this . root . drop (); return null;}
 	var command = this . getElement ();
