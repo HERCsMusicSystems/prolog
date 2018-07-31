@@ -573,18 +573,28 @@ this . Reader . prototype . readProgram = function () {
 		this . root . root . service_class = new service_class (this . root, this . root . root);
 	}
 	this . getSymbol ();
-	while (this . control === '[') {
-		var el = this . readRightSide (this . getElement (), ']');
-		if (el === null) {this . root . drop (); return null;}
-		el . attach ();
-		this . getSymbol ();
+	while (this . control === '[' || (this . control === 'atom' && this . symbol === '#machine')) {
+		if (this . control === 'atom') {
+			this . getSymbol ();
+			if (this . control !== 'atom') {console . log ("Syntax error (atom expected in machine assignment)."); this . root . drop (); return null;}
+			this . getSymbol ();
+			if (this . control !== 'atom' || this . symbol !== ':=') {console . log ("Syntax error (operator := expected in machine assignment)."); this . root . drop (); return null;}
+			this . getSymbol ();
+			if (this . control !== 'text') {console . log ("Syntax error (location of native code in machine assignment expected)."); this . root . drop (); return null;}
+			this . getSymbol ();
+		} else {
+			var el = this . readRightSide (this . getElement (), ']');
+			if (el === null) {this . root . drop (); return null;}
+			el . attach ();
+			this . getSymbol ();
+		}
 	}
-	if (this . control !== 'atom' && this . control !== 'end') {this . root . drop (); return null;}
+	if (this . control !== 'atom' || this . symbol !== 'end') {console . log ("Syntax error (end keyword expected)."); this . root . drop (); return null;}
 	this . getSymbol ();
 	if (this . control === '.') {this . root . close (); return new hrcs . Element ();}
-	if (this . control !== 'atom' || this . symbol !== ':=') {this . root . drop (); return null;}
+	if (this . control !== 'atom' || this . symbol !== ':=') {console . log ("Syntax error (assignment in loading instructions expected)."); this . root . drop (); return null;}
 	var command = this . getElement ();
-	if (command === null) {this . root . drop (); return null;}
+	if (command === null) {console . log ("Syntax error (loading instructions not readable)."); this . root . drop (); return null;}
 	this . getSymbol ();
 	if (this . control !== '.') {console . log ("Syntax error (dot at the end expected)."); this . root . drop (); return null;}
 	this . root . close ();
