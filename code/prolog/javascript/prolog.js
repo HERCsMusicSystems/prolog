@@ -541,8 +541,17 @@ this . Reader . prototype . readProgram = function () {
 	if (this . control !== 'atom' || this . symbol !== 'program') {console . log ("Syntax error (program keyword expected)."); return null;}
 	this . getSymbol ();
 	if (this . control !== 'atom') {console . log ("Syntax error (program name expected)."); return null;}
+	var service_class_name = null;
 	this . root . createDirectory (this . symbol);
 	this . getSymbol ();
+	if (this . control === 'atom' && this . symbol === '#machine') {
+		this . getSymbol ();
+		if (this . control !== 'atom' && this . symbol !== ':=') {console . log ("Syntax error (service class machine assignment expected)."); this . root . drop (); return null;}
+		this . getSymbol ();
+		if (this . control !== 'text') {console . log ("Syntax error (service class location expected)."); this . root . drop (); return null;}
+		service_class_name = this . symbol;
+		this . getSymbol ();
+	}
 	switch (this . control) {
 	case '[]': break;
 	case '[':
@@ -550,9 +559,19 @@ this . Reader . prototype . readProgram = function () {
 		while (this . control === 'atom') {this . root . createAtom (this . symbol); this . getSymbol ();}
 		if (this . control !== ']') {this . root . drop (); return null;}
 		break;
-	default: this . root . drop (); return null;
+	default: this . root . drop (); console . log ("Syntax error (atome list expected)."); return null;
 	};
 	this . search_context = this . root . root . duplicate (this . search_context);
+	if (service_class_name !== null) {
+		var service_class = studio . readResource (service_class_name);
+		if (service_class === null) {console . log ("Semantic error (service class " + service_class_name + " not found)."); this . root . drop (); return null;}
+		if (typeof (service_class) === 'string') {
+			eval . call (window, service_class);
+			service_class = studio . readResource (service_class_name);
+			if (service_class === null || typeof (service_class) === 'string') {console . log ("Semantic error (service class " + service_class_name + " could not be imported)."); this . root . drop (); return null;}
+		}
+		this . root . root . service_class = new service_class (this . root, this . root . root);
+	}
 	this . getSymbol ();
 	while (this . control === '[') {
 		var el = this . readRightSide (this . getElement (), ']');
@@ -573,9 +592,7 @@ this . Reader . prototype . readProgram = function () {
 };
 
 };
-studio . search ('test_scripts');
-root = new prolog.Root();
-console . log ('load', root . load ('main_course'));
+
 //console . log (root . list ());
 //console . log (root . list ('sonda'));
 /*

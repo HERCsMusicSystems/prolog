@@ -28,8 +28,9 @@ this . search = function (path) {
 	return this . search ();
 };
 
-this . readResource = function (path) {
-	if (! Array . isArray (path)) path = String (path) . split ('.') . map (function (a) {return a . trim ();});
+var st = this;
+
+var resourceRead = function (path) {
 	var content = resources;
 	for (var ind in path) {
 		content = content [path [ind]];
@@ -38,16 +39,29 @@ this . readResource = function (path) {
 	return content;
 };
 
-this . readFile = function (path) {
-	var content = localStorage . getItem (this . pwd () + path);
+var fileRead = function (path) {
+	var content = localStorage . getItem (st . pwd () + path);
 	if (content === null) {
-		var searches = this . search ();
+		var searches = st . search ();
 		for (var ind in searches) {
 			content = localStorage . getItem (searches [ind] + path);
 			if (content !== null) return content;
 		}
 	}
-	if (content === null) content = this . readResource (path . split ('/') . map (function (a) {return a . trim ();}));
+	return content;
+};
+
+this . readFile = function (path) {
+	var content = fileRead (path);
+	if (content === null) content = resourceRead (path . split ('/') . map (function (a) {return a . trim ();}));
+	if (content === null) content = resourceRead (path . split ('.') . map (function (a) {return a . trim ();}));
+	return content;
+};
+
+this . readResource = function (path) {
+	if (! Array . isArray (path)) path = String (path) . split ('.') . map (function (a) {return a . trim ();});
+	var content = resourceRead (path);
+	if (content === null) content = fileRead (path . join ('/'));
 	return content;
 };
 

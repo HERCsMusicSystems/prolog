@@ -20,6 +20,19 @@
 <script type="text/javascript">
 	studio . setResource (['sonda', 123, 'mariner'], "Joker was here!");
 	studio . setResource (['sonda', 123, 'mariner.prc'], "JOKER");
+	studio . setResource (['prolog', 'studio'],
+		function (root, dir) {
+			console . log (root, dir);
+			this . x = 123;
+			this . y = 456;
+		}
+);
+</script>
+
+<script type="text/javascript">
+	studio . search ('test_scripts');
+	root = new prolog.Root();
+	console . log ('load', root . load ('main_course'));
 </script>
 
 <script type="text/javascript">
