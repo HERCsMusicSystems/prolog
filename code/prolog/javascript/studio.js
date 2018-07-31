@@ -5,7 +5,7 @@ var pwd = [];
 var search = [];
 var local_imports = [];
 
-this . resource = {};
+var resources = {};
 
 this . pwd = function (path) {
 	if (path === undefined) return pwd . length < 1 ? '' : pwd . join ('/') + '/';
@@ -28,6 +28,16 @@ this . search = function (path) {
 	return this . search ();
 };
 
+this . readResource = function (path) {
+	if (! Array . isArray (path)) path = String (path) . split ('.') . map (function (a) {return a . trim ();});
+	var content = resources;
+	for (var ind in path) {
+		content = content [path [ind]];
+		if (content === undefined) return null;
+	}
+	return content;
+};
+
 this . readFile = function (path) {
 	var content = localStorage . getItem (this . pwd () + path);
 	if (content === null) {
@@ -37,9 +47,21 @@ this . readFile = function (path) {
 			if (content !== null) return content;
 		}
 	}
-	if (content === null) content = this . resource [path];
-	if (content == null) return null;
+	if (content === null) content = this . readResource (path . split ('/') . map (function (a) {return a . trim ();}));
 	return content;
+};
+
+this . setResource = function (path, resource) {
+	var location = resources;
+	var target = null, key = null;
+	for (var ind in path) {
+		key = path [ind];
+		if (location [key] === undefined) location [key] = {}
+		target = location;
+		location = location [key];
+	}
+	if (target === null) return;
+	target [key] = resource;
 };
 
 this . writeFile = function (path, content) {localStorage . setItem (this . pwd () + path, content);};
