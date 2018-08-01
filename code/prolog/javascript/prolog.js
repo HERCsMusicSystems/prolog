@@ -621,6 +621,20 @@ this . Reader . prototype . readProgram = function () {
 					if (this . control !== ']') return this . dropError ("Syntax error (closing bracket after private atome list expected).");
 					this . getSymbol ();
 					break;
+				case this . root . protect_caption:
+					this . getSymbol ();
+					if (this . control === '[]') {this . getSymbol (); break;}
+					if (this . control !== '[') return this . dropError ("Syntax error (list of protect atoms expected).");
+					this . getSymbol ();
+					while (this . control === 'atom') {
+						var atom = this . root . root . searchAtom (this . symbol);
+						if (atom === null) return this . dropError ("Semantic error (atom " + this . symbol + " not found in protect clause).");
+						atom . Protected = true;
+						this . getSymbol ();
+					}
+					if (this . control !== ']') return this . dropError ("Syntax error (closing bracket after protect atome list expected).");
+					this . getSymbol ();
+					break;
 				default: return this . dropError ("Syntax error (unknown keyword " + this . symbol + ").");
 			}
 		} else {
