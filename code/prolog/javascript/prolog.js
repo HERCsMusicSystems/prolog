@@ -440,15 +440,15 @@ this . Reader . prototype . getElement = function () {
 			return el;
 		case '@':
 			this . getSymbol ();
-			if (this . control !== 'atom') {console . log ("Syntax error (directory expected)."); return null;}
+			if (this . control !== 'atom') return this . error ("Syntax error (directory expected).");
 			dir = this . root . searchDirectory (this . symbol);
 			this . getSymbol ();
-			if (dir === null) {console . log ("Semantic error (directory" + this . symbol + " does not exist)"); return null;}
-			if (this . control !== '.') {console . log ("Syntax error (dot expected)."); return null;}
+			if (dir === null) return this . error ("Semantic error (directory" + this . symbol + " does not exist)");
+			if (this . control !== '.') return this . error ("Syntax error (dot expected).");
 			this . getSymbol ();
-			if (this . control !== 'atom') {console . log ("Syntax error (atom after dot expected)."); return null;}
+			if (this . control !== 'atom') return this . error ("Syntax error (atom after dot expected).");
 			el = dir . searchAtom (this . symbol);
-			if (el === null) {console . log ("Semantic error (qualified atom " + this . symbol + " not found in " + dir . name + ")."); return null;}
+			if (el === null) return this . error ("Semantic error (qualified atom " + this . symbol + " not found in " + dir . name + ").");
 			dir = new hrcs . Element (); dir . setAtom (el);
 			return dir;
 		case 'number': el = new hrcs . Element (); el . setNative (this . symbol); return el;
@@ -460,11 +460,10 @@ this . Reader . prototype . getElement = function () {
 		case '[': return this . readRightSide (this . getElement (), ']');
 		case '(': return this . readRightSide (this . getElement (), ')');
 		case '.': return this . atomC ('.');
-		case 'eof': console . log ("Syntax error (end of file)."); return null;
+		case 'eof': return this . error ("Syntax error (end of file).");
 		default: break;
 	}
-	console . log ("Syntax error (unknown syntax).");
-	return null;
+	return this . error ("Syntax error (unknown syntax).");
 };
 this . Reader . prototype . readRightSide = function (left, bracket) {
 	if (left === null) return null;
@@ -472,38 +471,38 @@ this . Reader . prototype . readRightSide = function (left, bracket) {
 	var el, dir;
 	switch (this . control) {
 		case ']': case ')':
-			if (bracket !== this . control) {console . log ("Syntax error (bracket mismatch.)"); return null;}
+			if (bracket !== this . control) return this . error ("Syntax error (bracket mismatch.)");
 			el = new hrcs . Element (); el . setPair (); el . left = left; el . right = new hrcs . Element ();
 			return el;
 		case ':':
 			el = this . getElement (); if (el === null) return null;
-			if (el . type === 0) {console . log ("Syntax error (earth not allowed here)."); return null;}
+			if (el . type === 0) return this . error ("Syntax error (earth not allowed here).");
 			this . getSymbol ();
-			if (this . control !== bracket) {console . log ("Syntax error (closing bracket expected)."); return null;}
+			if (this . control !== bracket) return this . error ("Syntax error (closing bracket expected).");
 			dir = new hrcs . Element (); dir . setPair (); dir . left = left; dir . right = el;
 			return dir;
 		default: break;
 	}
 	if (this . root . separator_caption !== '') {
 		if (this . control === ',') this . getSymbol ();
-		else {console . log ("Syntax error (separator expected)."); return null;}
+		else return this . error ("Syntax error (separator expected).");
 	}
 	switch (this . control) {
 		case 'atom':
 			el = this . atomC (this . symbol);
-			if (el === null) console . log ("Semantic error (unknown atom: " + this . symbol + ").");
+			if (el === null) return this . error ("Semantic error (unknown atom: " + this . symbol + ").");
 			break;
 		case '@':
 			this . getSymbol ();
-			if (this . control !== 'atom') {console . log ("Syntax error (directory expected)."); return null;}
+			if (this . control !== 'atom') return this . error ("Syntax error (directory expected).");
 			el = this . root . searchDirectory (this . symbol);
 			this . getSymbol ();
-			if (el === null) {console . log ("Semantic error (directory" + this . symbol + " does not exist)"); return null;}
-			if (this . control !== '.') {console . log ("Syntax error (dot expected)."); return null;}
+			if (el === null) return this . error ("Semantic error (directory" + this . symbol + " does not exist)");
+			if (this . control !== '.') return this . error ("Syntax error (dot expected).");
 			this . getSymbol ();
-			if (this . control !== 'atom') {console . log ("Syntax error (atom after dot expected)."); return null;}
+			if (this . control !== 'atom') return this . error ("Syntax error (atom after dot expected).");
 			dir = dir . searchAtom (this . symbol);
-			if (dir === null) {console . log ("Semantic error (qualified atom " + this . symbol + " not found in " + el . name + ")."); return null;}
+			if (dir === null) return this . error ("Semantic error (qualified atom " + this . symbol + " not found in " + el . name + ").");
 			el = new hrcs . Element (); dir . setAtom (dir);
 			break;
 		case 'number': el = new hrcs . Element (); el . setNative (this . symbol); break;
@@ -528,27 +527,27 @@ this . Reader . prototype . readProgram = function () {
 	this . getSymbol ();
 	while (this . control === 'atom' && this . symbol === 'import') {
 		this . getSymbol ();
-		if (this . control !== 'atom') {console . log ("Syntax error (import name expected)."); return null;}
+		if (this . control !== 'atom') return this . error ("Syntax error (import name expected).");
 		var dir = this . root . searchDirectory (this . symbol);
 		if (dir === null) {
 			this . root . load (this . symbol);
 			dir = this . root . searchDirectory (this . symbol);
 		}
-		if (dir === null) {console . log ("Semantic error (program " + this . symbol + " could not be imported)."); return null;}
+		if (dir === null) return this . error ("Semantic error (program " + this . symbol + " could not be imported).");
 		this . search_context = dir . duplicate (this . search_context);
 		this . getSymbol ();
 	}
-	if (this . control !== 'atom' || this . symbol !== 'program') {console . log ("Syntax error (program keyword expected)."); return null;}
+	if (this . control !== 'atom' || this . symbol !== 'program') return this . error ("Syntax error (program keyword expected).");
 	this . getSymbol ();
-	if (this . control !== 'atom') {console . log ("Syntax error (program name expected)."); return null;}
+	if (this . control !== 'atom') return this . error ("Syntax error (program name expected).");
 	var service_class_name = null;
 	this . root . createDirectory (this . symbol);
 	this . getSymbol ();
 	if (this . control === 'atom' && this . symbol === '#machine') {
 		this . getSymbol ();
-		if (this . control !== 'atom' && this . symbol !== ':=') {console . log ("Syntax error (service class machine assignment expected)."); this . root . drop (); return null;}
+		if (this . control !== 'atom' && this . symbol !== ':=') return this . dropError ("Syntax error (service class machine assignment expected).");
 		this . getSymbol ();
-		if (this . control !== 'text') {console . log ("Syntax error (service class location expected)."); this . root . drop (); return null;}
+		if (this . control !== 'text') return this . dropError ("Syntax error (service class location expected).");
 		service_class_name = this . symbol;
 		this . getSymbol ();
 	}
@@ -557,18 +556,18 @@ this . Reader . prototype . readProgram = function () {
 	case '[':
 		this . getSymbol ();
 		while (this . control === 'atom') {this . root . createAtom (this . symbol); this . getSymbol ();}
-		if (this . control !== ']') {this . root . drop (); return null;}
+		if (this . control !== ']') return this . dropError ("Syntax error (closing bracket after atome list expected).");
 		break;
-	default: this . root . drop (); console . log ("Syntax error (atome list expected)."); return null;
+	default: return this . dropError ("Syntax error (atome list expected).");
 	};
 	this . search_context = this . root . root . duplicate (this . search_context);
 	if (service_class_name !== null) {
 		var service_class = studio . readResource (service_class_name);
-		if (service_class === null) {console . log ("Semantic error (service class " + service_class_name + " not found)."); this . root . drop (); return null;}
+		if (service_class === null) return this . dropError ("Semantic error (service class " + service_class_name + " not found).");
 		if (typeof (service_class) === 'string') {
 			eval . call (window, service_class);
 			service_class = studio . readResource (service_class_name);
-			if (service_class === null || typeof (service_class) === 'string') {console . log ("Semantic error (service class " + service_class_name + " could not be imported)."); this . root . drop (); return null;}
+			if (service_class === null || typeof (service_class) === 'string') return this . dropError ("Semantic error (service class " + service_class_name + " could not be imported).");
 		}
 		this . root . root . service_class = new service_class (this . root, this . root . root);
 	}
@@ -576,11 +575,16 @@ this . Reader . prototype . readProgram = function () {
 	while (this . control === '[' || (this . control === 'atom' && this . symbol === '#machine')) {
 		if (this . control === 'atom') {
 			this . getSymbol ();
-			if (this . control !== 'atom') {console . log ("Syntax error (atom expected in machine assignment)."); this . root . drop (); return null;}
+			if (this . control !== 'atom') return this . dropError ("Syntax error (atom expected in machine assignment).");
+			var atom = this . root . root . searchAtom (this . symbol);
+			if (atom === null) return this . dropError ("Semantic error (atom " + this . symbol + " for machine assignment not found).");
 			this . getSymbol ();
-			if (this . control !== 'atom' || this . symbol !== ':=') {console . log ("Syntax error (operator := expected in machine assignment)."); this . root . drop (); return null;}
+			if (this . control !== 'atom' || this . symbol !== ':=') return this . dropError ("Syntax error (operator := expected in machine assignment).");
 			this . getSymbol ();
-			if (this . control !== 'text') {console . log ("Syntax error (location of native code in machine assignment expected)."); this . root . drop (); return null;}
+			if (this . control !== 'text') return this . dropError ("Syntax error (location of native code in machine assignment expected).");
+			if (this . root . root . service_class === null) return this . dropError ("Syntax error (no service class for machine assignment).");
+			var machine = this . root . root . service_class . getNativeCode (this . symbol);
+			if (machine === null) return this . dropError ("Semantic error (native code " + this . symbol + " not found).");
 			this . getSymbol ();
 		} else {
 			var el = this . readRightSide (this . getElement (), ']');
@@ -589,17 +593,19 @@ this . Reader . prototype . readProgram = function () {
 			this . getSymbol ();
 		}
 	}
-	if (this . control !== 'atom' || this . symbol !== 'end') {console . log ("Syntax error (end keyword expected)."); this . root . drop (); return null;}
+	if (this . control !== 'atom' || this . symbol !== 'end') return this . dropError ("Syntax error (end keyword expected).");
 	this . getSymbol ();
 	if (this . control === '.') {this . root . close (); return new hrcs . Element ();}
-	if (this . control !== 'atom' || this . symbol !== ':=') {console . log ("Syntax error (assignment in loading instructions expected)."); this . root . drop (); return null;}
+	if (this . control !== 'atom' || this . symbol !== ':=') return this . dropError ("Syntax error (assignment in loading instructions expected).");
 	var command = this . getElement ();
-	if (command === null) {console . log ("Syntax error (loading instructions not readable)."); this . root . drop (); return null;}
+	if (command === null) return this . dropError ("Syntax error (loading instructions not readable).");
 	this . getSymbol ();
-	if (this . control !== '.') {console . log ("Syntax error (dot at the end expected)."); this . root . drop (); return null;}
+	if (this . control !== '.') return this . dropError ("Syntax error (dot at the end expected).");
 	this . root . close ();
 	return command;
 };
+this . Reader . prototype . error = function (error) {console . log (error); return null;};
+this . Reader . prototype . dropError = function (error) {this . root . drop (); return this . error (error);};
 
 };
 
