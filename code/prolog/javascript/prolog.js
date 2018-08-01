@@ -572,20 +572,36 @@ this . Reader . prototype . readProgram = function () {
 		this . root . root . service_class = new service_class (this . root, this . root . root);
 	}
 	this . getSymbol ();
-	while (this . control === '[' || (this . control === 'atom' && this . symbol === '#machine')) {
+	while (this . control === '[' || this . control === 'atom') {
 		if (this . control === 'atom') {
-			this . getSymbol ();
-			if (this . control !== 'atom') return this . dropError ("Syntax error (atom expected in machine assignment).");
-			var atom = this . root . root . searchAtom (this . symbol);
-			if (atom === null) return this . dropError ("Semantic error (atom " + this . symbol + " for machine assignment not found).");
-			this . getSymbol ();
-			if (this . control !== 'atom' || this . symbol !== ':=') return this . dropError ("Syntax error (operator := expected in machine assignment).");
-			this . getSymbol ();
-			if (this . control !== 'text') return this . dropError ("Syntax error (location of native code in machine assignment expected).");
-			if (this . root . root . service_class === null) return this . dropError ("Syntax error (no service class for machine assignment).");
-			var machine = this . root . root . service_class . getNativeCode (this . symbol);
-			if (machine === null) return this . dropError ("Semantic error (native code " + this . symbol + " not found).");
-			this . getSymbol ();
+			switch (this . symbol) {
+				case '#machine':
+					this . getSymbol ();
+					if (this . control !== 'atom') return this . dropError ("Syntax error (atom expected in machine assignment).");
+					var atom = this . root . root . searchAtom (this . symbol);
+					if (atom === null) return this . dropError ("Semantic error (atom " + this . symbol + " for machine assignment not found).");
+					this . getSymbol ();
+					if (this . control !== 'atom' || this . symbol !== ':=') return this . dropError ("Syntax error (operator := expected in machine assignment).");
+					this . getSymbol ();
+					if (this . control !== 'text') return this . dropError ("Syntax error (location of native code in machine assignment expected).");
+					if (this . root . root . service_class === null) return this . dropError ("Syntax error (no service class for machine assignment).");
+					var machine = this . root . root . service_class . getNativeCode (this . symbol);
+					if (machine === null) return this . dropError ("Semantic error (native code " + this . symbol + " not found).");
+					if (! atom . setMachine (machine)) return this . dropError ("Semantic error (machine assignment of " + atom . name  + " failed).");
+					this . getSymbol ();
+					break;
+				case 'end':
+					this . getSymbol ();
+					if (this . control === '.') {this . root . close (); return new hrcs . Element ();}
+					if (this . control !== 'atom' || this . symbol !== ':=') return this . dropError ("Syntax error (assignment in loading instructions expected).");
+					var command = this . getElement ();
+					if (command === null) return this . dropError ("Syntax error (loading instructions not readable).");
+					this . getSymbol ();
+					if (this . control !== '.') return this . dropError ("Syntax error (dot at the end expected).");
+					this . root . close ();
+					return command;
+				default: return this . dropError ("Syntax error (unknown keyword " + this . symbol + ").");
+			}
 		} else {
 			var el = this . readRightSide (this . getElement (), ']');
 			if (el === null) {this . root . drop (); return null;}
@@ -593,16 +609,7 @@ this . Reader . prototype . readProgram = function () {
 			this . getSymbol ();
 		}
 	}
-	if (this . control !== 'atom' || this . symbol !== 'end') return this . dropError ("Syntax error (end keyword expected).");
-	this . getSymbol ();
-	if (this . control === '.') {this . root . close (); return new hrcs . Element ();}
-	if (this . control !== 'atom' || this . symbol !== ':=') return this . dropError ("Syntax error (assignment in loading instructions expected).");
-	var command = this . getElement ();
-	if (command === null) return this . dropError ("Syntax error (loading instructions not readable).");
-	this . getSymbol ();
-	if (this . control !== '.') return this . dropError ("Syntax error (dot at the end expected).");
-	this . root . close ();
-	return command;
+	return this . dropError ("Syntax error (at least end keyword expected but got this instead [" + this . control + ' ' + this . symbol + "]).");
 };
 this . Reader . prototype . error = function (error) {console . log (error); return null;};
 this . Reader . prototype . dropError = function (error) {this . root . drop (); return this . error (error);};
