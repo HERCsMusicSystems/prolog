@@ -148,6 +148,13 @@ this . Root = function () {
 	this . var_head_captions = '*';
 	this . var_tail_captions = '_qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM';
 	this . var_caption = '*';
+	this . program_caption = 'program';
+	this . end_caption = 'end';
+	this . assignment_caption = ':=';
+	this . machine_caption = '#machine';
+	this . auto_caption = '#auto';
+	this . private_caption = 'private';
+	this . protect_caption = 'protect';
 	this . auto_atoms = false;
 	this . root = new hrcs . Directory ("user!");
 };
@@ -537,15 +544,15 @@ this . Reader . prototype . readProgram = function () {
 		this . search_context = dir . duplicate (this . search_context);
 		this . getSymbol ();
 	}
-	if (this . control !== 'atom' || this . symbol !== 'program') return this . error ("Syntax error (program keyword expected).");
+	if (this . control !== 'atom' || this . symbol !== this . root . program_caption) return this . error ("Syntax error (program keyword expected).");
 	this . getSymbol ();
 	if (this . control !== 'atom') return this . error ("Syntax error (program name expected).");
 	var service_class_name = null;
 	this . root . createDirectory (this . symbol);
 	this . getSymbol ();
-	if (this . control === 'atom' && this . symbol === '#machine') {
+	if (this . control === 'atom' && this . symbol === this . root . machine_caption) {
 		this . getSymbol ();
-		if (this . control !== 'atom' && this . symbol !== ':=') return this . dropError ("Syntax error (service class machine assignment expected).");
+		if (this . control !== 'atom' && this . symbol !== this . root . assignment_caption) return this . dropError ("Syntax error (service class machine assignment expected).");
 		this . getSymbol ();
 		if (this . control !== 'text') return this . dropError ("Syntax error (service class location expected).");
 		service_class_name = this . symbol;
@@ -575,13 +582,13 @@ this . Reader . prototype . readProgram = function () {
 	while (this . control === '[' || this . control === 'atom') {
 		if (this . control === 'atom') {
 			switch (this . symbol) {
-				case '#machine':
+				case this . root . machine_caption:
 					this . getSymbol ();
 					if (this . control !== 'atom') return this . dropError ("Syntax error (atom expected in machine assignment).");
 					var atom = this . root . root . searchAtom (this . symbol);
 					if (atom === null) return this . dropError ("Semantic error (atom " + this . symbol + " for machine assignment not found).");
 					this . getSymbol ();
-					if (this . control !== 'atom' || this . symbol !== ':=') return this . dropError ("Syntax error (operator := expected in machine assignment).");
+					if (this . control !== 'atom' || this . symbol !== this . root . assignment_caption) return this . dropError ("Syntax error (operator := expected in machine assignment).");
 					this . getSymbol ();
 					if (this . control !== 'text') return this . dropError ("Syntax error (location of native code in machine assignment expected).");
 					if (this . root . root . service_class === null) return this . dropError ("Syntax error (no service class for machine assignment).");
@@ -590,16 +597,30 @@ this . Reader . prototype . readProgram = function () {
 					if (! atom . setMachine (machine)) return this . dropError ("Semantic error (machine assignment of " + atom . name  + " failed).");
 					this . getSymbol ();
 					break;
-				case 'end':
+				case this . root . end_caption:
 					this . getSymbol ();
 					if (this . control === '.') {this . root . close (); return new hrcs . Element ();}
-					if (this . control !== 'atom' || this . symbol !== ':=') return this . dropError ("Syntax error (assignment in loading instructions expected).");
+					if (this . control !== 'atom' || this . symbol !== this . root . assignment_caption) return this . dropError ("Syntax error (assignment in loading instructions expected).");
 					var command = this . getElement ();
 					if (command === null) return this . dropError ("Syntax error (loading instructions not readable).");
 					this . getSymbol ();
 					if (this . control !== '.') return this . dropError ("Syntax error (dot at the end expected).");
 					this . root . close ();
 					return command;
+				case this . root . private_caption:
+					this . getSymbol ();
+					if (this . control === '[]') {this . getSymbol (); break;}
+					if (this . control !== '[') return this . dropError ("Syntax error (list of private atoms expected).");
+					this . getSymbol ();
+					while (this . control === 'atom') {
+						var atom = this . root . root . searchAtom (this . symbol);
+						if (atom === null) return this . dropError ("Semantic error (atom " + this . symbol + " not found in private clause).");
+						atom . Privated = true;
+						this . getSymbol ();
+					}
+					if (this . control !== ']') return this . dropError ("Syntax error (closing bracket after private atome list expected).");
+					this . getSymbol ();
+					break;
 				default: return this . dropError ("Syntax error (unknown keyword " + this . symbol + ").");
 			}
 		} else {
