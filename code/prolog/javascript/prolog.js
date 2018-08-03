@@ -638,6 +638,7 @@ this . Reader . prototype . readProgram = function () {
 				default: return this . dropError ("Syntax error (unknown keyword " + this . symbol + ").");
 			}
 		} else {
+			this . vars = [];
 			var el = this . readRightSide (this . getElement (), ']');
 			if (el === null) {this . root . drop (); return null;}
 			el . attach ();
@@ -741,8 +742,7 @@ Resolution . prototype . match = function (actual, ac, formal, fc) {
 			case 3: case 6: return actual . left === formal . left;
 			case 1:
 				if (! this . match (actual . left, ac, formal . left, fc)) return false;
-				//actual = actual . right; formal = formal . right;
-				return this . match (actual . right, ac, formal . right, fc);
+				actual = actual . right; formal = formal . right; break;
 			default: return false;
 		}
 	} while (actual . type === 1);
@@ -819,6 +819,7 @@ Resolution . prototype . res_forward = function () {
 		return 1;
 	}
 	var clausa = term . left . left . firstClause;
+	console . log (this . root . getValue (clausa));
 	if (clausa === null) {console . log ("Free atom [" + term . left . atom . name + "]."); return 0;}
 	var relation_atom = new hrcs . Element ();
 	relation_atom . type = 3; relation_atom . atom = term . left . left;
@@ -829,11 +830,13 @@ Resolution . prototype . sub_res_forward = function (relation_atom, term, clausa
 	while (clausa !== null) {
 		this . reset ();
 		next_clausa = clausa . left . left . left;
+		console . log (this . root . getValue (term . right), this . root . getValue (clausa . left . right));
 		if (this . match (term . right, true, clausa . left . right, false)) {
 			next_tail = this . match_product (clausa . right, false);
 			console . log (this . root . getValue (next_tail));
 			return 0;
 		}
+		clausa = null;
 	}
 };
 Resolution . prototype . resolution = function (query) {
