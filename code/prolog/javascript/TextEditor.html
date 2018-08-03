@@ -37,6 +37,9 @@
 	query = reader . getElement ();
 	res = root . resolution ();
 	console . log (res . resolution (query));
+	actual = new prolog . Reader (root, '[**]') . getElement ();
+	res . reset ();
+	console . log (res . match (actual, true, actual, false));
 </script>
 
 <script type="text/javascript">

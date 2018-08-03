@@ -665,87 +665,83 @@ var Resolution = function (root) {this . root = root;};
 Resolution . prototype . reset = function () {this . actuals = []; this . formals = []; this . vars = []; this . var_counter = 0;};
 Resolution . prototype . match = function (actual, ac, formal, fc) {
 	var v1, v2, vr, vr1, vr2;
-	do {
-		if (actual . type === 2) {
-			if (formal . type === 2) {
-				v1 = ac ? this . actuals [actual . left] : this . formals [actual . left];
-				v2 = fc ? this . actuals [formal . left] : this . formals [formal . left];
-				if (v1 === undefined) {
-					if (v2 === undefined) {
-						v2 = this . vars . length;
-						if (fc) this . actuals [formal . left] = v2;
-						else this . formals [formal . left] = v2;
-						this . vars . push (vr = {term: null});
-					}
-					if (ac) this . actuals [actual . left] = v2;
-					else this . formals [actual . left] = v2;
-					return true;
-				}
-				if (v2 === undefined) {
-					if (fc) this . actuals [formal . left] = v1;
-					else this . formals [formal . left] = v1;
-					return true;
-				}
-				vr1 = this . vars [v1];
-				if (vr1 . term === null) {
-					for (var ind in this . actuals) {if (this . actuals [ind] === v1) this . actuals [ind] = v2;}
-					for (var ind in this . formals) {if (this . formals [ind] === v1) this . formals [ind] = v2;}
-					return true;
-				}
-				vr2 = this . vars [v2];
-				if (vr2 . term === null) {
-					for (var ind in this . actuals) {if (this . actuals [ind] === v2) this . actuals [ind] = v1;}
-					for (var ind in this . formals) {if (this . formals [ind] === v2) this . formals [ind] = v1;}
-					return true;
-				}
-				return this . match (vr1 . term, vr1 . location, vr2 . term, vr2 . location);
-			} else {
-				if (ac) {
-					if ((vr = this . actuals [actual . left]) === undefined) {
-						this . actuals [actual . left] = this . vars . length;
-						this . vars . push ({term: formal, location: fc});
-						return true;
-					}
-				} else {
-					if ((vr = this . formals [actual . left]) === undefined) {
-						this . formals [actual . left] = this . vars . length;
-						this . vars . push ({term: formal, location: fc});
-						return true;
-					}
-				}
-				vr = this . vars [vr];
-				if (vr . term === null) {vr . term = formal, vr . location = fc; return true;}
-				return this . match (vr . term, vr . location, formal, fc);
-			}
-		}
+	if (actual . type === 2) {
 		if (formal . type === 2) {
-			if (fc) {
-				if ((vr = this . actuals [formal . left]) === undefined) {
-					this . actuals [formal . left] = this . vars . length;
-					this . vars . push ({term: actual, location: ac});
+			v1 = ac ? this . actuals [actual . left] : this . formals [actual . left];
+			v2 = fc ? this . actuals [formal . left] : this . formals [formal . left];
+			if (v1 === undefined) {
+				if (v2 === undefined) {
+					v2 = this . vars . length;
+					if (fc) this . actuals [formal . left] = v2;
+					else this . formals [formal . left] = v2;
+					this . vars . push (vr = {term: null});
+				}
+				if (ac) this . actuals [actual . left] = v2;
+				else this . formals [actual . left] = v2;
+				return true;
+			}
+			if (v2 === undefined) {
+				if (fc) this . actuals [formal . left] = v1;
+				else this . formals [formal . left] = v1;
+				return true;
+			}
+			vr1 = this . vars [v1];
+			if (vr1 . term === null) {
+				for (var ind in this . actuals) {if (this . actuals [ind] === v1) this . actuals [ind] = v2;}
+				for (var ind in this . formals) {if (this . formals [ind] === v1) this . formals [ind] = v2;}
+				return true;
+			}
+			vr2 = this . vars [v2];
+			if (vr2 . term === null) {
+				for (var ind in this . actuals) {if (this . actuals [ind] === v2) this . actuals [ind] = v1;}
+				for (var ind in this . formals) {if (this . formals [ind] === v2) this . formals [ind] = v1;}
+				return true;
+			}
+			return this . match (vr1 . term, vr1 . location, vr2 . term, vr2 . location);
+		} else {
+			if (ac) {
+				if ((vr = this . actuals [actual . left]) === undefined) {
+					this . actuals [actual . left] = this . vars . length;
+					this . vars . push ({term: formal, location: fc});
 					return true;
 				}
 			} else {
-				if ((vr = this . formals [formal . left]) === undefined) {
-					this . formals [formal . left] = this . vars . length;
-					this . vars . push ({term: actual, location: ac});
+				if ((vr = this . formals [actual . left]) === undefined) {
+					this . formals [actual . left] = this . vars . length;
+					this . vars . push ({term: formal, location: fc});
 					return true;
 				}
 			}
 			vr = this . vars [vr];
-			if (vr . term === null) {vr . term = actual, vr . location = ac; return true;}
-			return this . match (actual, ac, vr . term, vr . location);
+			if (vr . term === null) {vr . term = formal, vr . location = fc; return true;}
+			return this . match (vr . term, vr . location, formal, fc);
 		}
-		if (actual . type !== formal . type) return false;
-		switch (actual . type) {
-			case 0: case 4: case 5: return true;
-			case 3: case 6: return actual . left === formal . left;
-			case 1:
-				if (! this . match (actual . left, ac, formal . left, fc)) return false;
-				actual = actual . right; formal = formal . right; break;
-			default: return false;
+	}
+	if (formal . type === 2) {
+		if (fc) {
+			if ((vr = this . actuals [formal . left]) === undefined) {
+				this . actuals [formal . left] = this . vars . length;
+				this . vars . push ({term: actual, location: ac});
+				return true;
+			}
+		} else {
+			if ((vr = this . formals [formal . left]) === undefined) {
+				this . formals [formal . left] = this . vars . length;
+				this . vars . push ({term: actual, location: ac});
+				return true;
+			}
 		}
-	} while (actual . type === 1);
+		vr = this . vars [vr];
+		if (vr . term === null) {vr . term = actual, vr . location = ac; return true;}
+		return this . match (actual, ac, vr . term, vr . location);
+	}
+	if (actual . type !== formal . type) return false;
+	switch (actual . type) {
+		case 0: case 4: case 5: return true;
+		case 3: case 6: return actual . left === formal . left;
+		case 1:	return this . match (actual . left, ac, formal . left, fc) && this . match (actual . right, ac, formal . right, fc);
+		default: return false;
+	}
 	return false;
 };
 Resolution . prototype . match_product = function (actual, ac) {
@@ -819,7 +815,6 @@ Resolution . prototype . res_forward = function () {
 		return 1;
 	}
 	var clausa = term . left . left . firstClause;
-	console . log (this . root . getValue (clausa));
 	if (clausa === null) {console . log ("Free atom [" + term . left . atom . name + "]."); return 0;}
 	var relation_atom = new hrcs . Element ();
 	relation_atom . type = 3; relation_atom . atom = term . left . left;
@@ -830,7 +825,6 @@ Resolution . prototype . sub_res_forward = function (relation_atom, term, clausa
 	while (clausa !== null) {
 		this . reset ();
 		next_clausa = clausa . left . left . left;
-		console . log (this . root . getValue (term . right), this . root . getValue (clausa . left . right));
 		if (this . match (term . right, true, clausa . left . right, false)) {
 			next_tail = this . match_product (clausa . right, false);
 			console . log (this . root . getValue (next_tail));
