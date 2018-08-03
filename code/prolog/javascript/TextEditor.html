@@ -33,6 +33,10 @@
 	studio . search ('test_scripts');
 	root = new prolog.Root();
 	console . log ('load', root . load ('main_course'));
+	reader = new prolog . Reader (root, '[[*x *y] [main_course *x *y]]');
+	query = reader . getElement ();
+	res = root . resolution ();
+	console . log (res . resolution (query));
 </script>
 
 <script type="text/javascript">

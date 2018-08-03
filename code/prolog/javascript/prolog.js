@@ -649,56 +649,210 @@ this . Reader . prototype . readProgram = function () {
 this . Reader . prototype . error = function (error) {console . log (error); return null;};
 this . Reader . prototype . dropError = function (error) {this . root . drop (); return this . error (error);};
 
+//////// RESOLUTION ////////
+
+var Query = function (query, stack, context, fail_target, original) {
+	this . query = query;
+	this . stack = stack === undefined ? null : stack;
+	this . context = context === undefined ? null : context;
+	this . fail_target = fail_target === undefined ? null : fail_target;
+	this . original = original === undefined ? true : original;
+};
+// drop_stack_to_fail_target = this . stack = this . fail_target
+
+var Resolution = function (root) {this . root = root;};
+Resolution . prototype . reset = function () {this . actuals = []; this . formals = []; this . vars = []; this . var_counter = 0;};
+Resolution . prototype . match = function (actual, ac, formal, fc) {
+	var v1, v2, vr, vr1, vr2;
+	do {
+		if (actual . type === 2) {
+			if (formal . type === 2) {
+				v1 = ac ? this . actuals [actual . left] : this . formals [actual . left];
+				v2 = fc ? this . actuals [formal . left] : this . formals [formal . left];
+				if (v1 === undefined) {
+					if (v2 === undefined) {
+						v2 = this . vars . length;
+						if (fc) this . actuals [formal . left] = v2;
+						else this . formals [formal . left] = v2;
+						this . vars . push (vr = {term: null});
+					}
+					if (ac) this . actuals [actual . left] = v2;
+					else this . formals [actual . left] = v2;
+					return true;
+				}
+				if (v2 === undefined) {
+					if (fc) this . actuals [formal . left] = v1;
+					else this . formals [formal . left] = v1;
+					return true;
+				}
+				vr1 = this . vars [v1];
+				if (vr1 . term === null) {
+					for (var ind in this . actuals) {if (this . actuals [ind] === v1) this . actuals [ind] = v2;}
+					for (var ind in this . formals) {if (this . formals [ind] === v1) this . formals [ind] = v2;}
+					return true;
+				}
+				vr2 = this . vars [v2];
+				if (vr2 . term === null) {
+					for (var ind in this . actuals) {if (this . actuals [ind] === v2) this . actuals [ind] = v1;}
+					for (var ind in this . formals) {if (this . formals [ind] === v2) this . formals [ind] = v1;}
+					return true;
+				}
+				return this . match (vr1 . term, vr1 . location, vr2 . term, vr2 . location);
+			} else {
+				if (ac) {
+					if ((vr = this . actuals [actual . left]) === undefined) {
+						this . actuals [actual . left] = this . vars . length;
+						this . vars . push ({term: formal, location: fc});
+						return true;
+					}
+				} else {
+					if ((vr = this . formals [actual . left]) === undefined) {
+						this . formals [actual . left] = this . vars . length;
+						this . vars . push ({term: formal, location: fc});
+						return true;
+					}
+				}
+				vr = this . vars [vr];
+				if (vr . term === null) {vr . term = formal, vr . location = fc; return true;}
+				return this . match (vr . term, vr . location, formal, fc);
+			}
+		}
+		if (formal . type === 2) {
+			if (fc) {
+				if ((vr = this . actuals [formal . left]) === undefined) {
+					this . actuals [formal . left] = this . vars . length;
+					this . vars . push ({term: actual, location: ac});
+					return true;
+				}
+			} else {
+				if ((vr = this . formals [formal . left]) === undefined) {
+					this . formals [formal . left] = this . vars . length;
+					this . vars . push ({term: actual, location: ac});
+					return true;
+				}
+			}
+			vr = this . vars [vr];
+			if (vr . term === null) {vr . term = actual, vr . location = ac; return true;}
+			return this . match (actual, ac, vr . term, vr . location);
+		}
+		if (actual . type !== formal . type) return false;
+		switch (actual . type) {
+			case 0: case 4: case 5: return true;
+			case 3: case 6: return actual . left === formal . left;
+			case 1:
+				if (! this . match (actual . left, ac, formal . left, fc)) return false;
+				//actual = actual . right; formal = formal . right;
+				return this . match (actual . right, ac, formal . right, fc);
+			default: return false;
+		}
+	} while (actual . type === 1);
+	return false;
+};
+Resolution . prototype . match_product = function (actual, ac) {
+	var ret, vr;
+	switch (actual . type) {
+		case 0: return new hrcs . Element ();
+		case 3: case 6:
+			ret = new hrcs . Element ();
+			ret . type = actual . type;
+			ret . left = actual . left;
+			return ret;
+		case 1:
+			ret = new hrcs . Element ();
+			ret . type = 1;
+			ret . left = this . match_product (actual . left, ac);
+			ret . right = this . match_product (actual . right, ac);
+			return ret;
+		case 2:
+			if (ac) {
+				if ((vr = this . actuals [actual . left]) === undefined) {
+					ret = new hrcs . Element (); ret . type = 2;
+					this . actuals [actual . left] = this . vars . length;
+					ret . left = this . var_counter;
+					this . vars . push ({term: null, var_id: this . var_counter});
+					this . var_counter += 1;
+					return ret;
+				}
+			} else {
+				if ((vr = this . formals [actual . left]) === undefined) {
+					ret = new hrcs . Element (); ret . type = 2;
+					this . formals [actual . left] = this . vars . length;
+					ret . left = this . var_counter;
+					this . vars . push ({term: null, var_id: this . var_counter});
+					this . var_counter += 1;
+					return ret;
+				}
+			}
+			vr = this . vars [vr];
+			if (vr . term === null) {
+				ret = new hrcs . Element (); ret . type = 2;
+				if (vr . var_id === undefined) {
+					vr . var_id = this . var_counter; this . var_counter += 1;
+				}
+				ret . left = vr . var_id;
+				return ret;
+			}
+			return this . match_product (vr . term, vr . location);
+		default:
+			ret = new hrcs . Element ();
+			ret . type = actual . type;
+			return ret;
+	}
+};
+Resolution . prototype . res_forward = function () {
+	var term = this . q_root . query;
+	if (term . type !== 1) {console . log ("Wrong query (querries expected)."); return 0;}
+	term = term . right;
+	if (term . type !== 1) {console . log ("Wrong query (query expected)."); return 0;}
+	term = term . left;
+	if (term . type === 5) return 0; // genuine fail
+	if (term . type === 4) {
+		// slash maker
+		return 1;
+	}
+	if (term . type !== 1) {console . log ("Wrong query (query is not a pair)."); return 0;}
+	if (term . left === null) {console . log ("Wrong query (query head does not exist)."); return 0;}
+	if (term . left . type !== 3) {console . log ("Wrong query (query head is not an atom)."); return 0;}
+	var native = term . left . left . machine;
+	if (native !== null) {
+		// machine goes here
+		return 1;
+	}
+	var clausa = term . left . left . firstClause;
+	if (clausa === null) {console . log ("Free atom [" + term . left . atom . name + "]."); return 0;}
+	var relation_atom = new hrcs . Element ();
+	relation_atom . type = 3; relation_atom . atom = term . left . left;
+	return this . sub_res_forward (relation_atom, term, clausa);
+};
+Resolution . prototype . sub_res_forward = function (relation_atom, term, clausa) {
+	var next_clausa, next_tail;
+	while (clausa !== null) {
+		this . reset ();
+		next_clausa = clausa . left . left . left;
+		if (this . match (term . right, true, clausa . left . right, false)) {
+			next_tail = this . match_product (clausa . right, false);
+			console . log (this . root . getValue (next_tail));
+			return 0;
+		}
+	}
+};
+Resolution . prototype . resolution = function (query) {
+	// returns: 0 = fail, 1 = success, 2 = no space left, 3 = wrong query
+	if (query === null) return 3;
+	if (query . type !== 1) return 3;
+	this . q_root = new Query (query . duplicate ());
+	var ctrl;
+	//do {
+		ctrl = this . res_forward ();
+	//}
+	return 0;
 };
 
-//console . log (root . list ());
-//console . log (root . list ('sonda'));
+this . Root . prototype . resolution = function (query) {return new Resolution (this);};
 /*
-sonda = root.createAtom('sonda');
-mariner = root.createAtom('mariner');
-//////////
-e = new prolog.Element();
-e.setPair();
-e.left.setAtom(sonda);
-e.right.setPair();
-e.right.left.setAtom(mariner);
-cl = new prolog.Element();
-cl.setPair();
-cl.left = e;
-console . log (cl.attach());
-///////
-e = new prolog.Element();
-e.setPair();
-e.left.setAtom(sonda);
-e.right.setPair();
-e.right.left.setNative(123);
-cl = new prolog.Element();
-cl.setPair();
-cl.left = e;
-console . log (cl.attach());
-///////
-e = new prolog.Element();
-e.setPair();
-e.left.setAtom(sonda);
-e.right.setPair();
-e.right.left.setNative(124);
-cl = new prolog.Element();
-cl.setPair();
-cl.left = e;
-console . log (cl.attach());
-///////
-e = new prolog.Element();
-e.setPair();
-e.left.setAtom(sonda);
-e.right.setPair();
-e.right.left.setVar(124);
-cl = new prolog.Element();
-cl.setPair();
-cl.left = e;
-console . log (cl.attach(0));
-////////
-console . log (root.listAtom('sonda').join('\n'));
-reader = new prolog.Reader(root, studio . readFile ('test_scripts/directive.prc'));
-function m () {reader . getSymbol (); console . log (reader.symbol); return [reader.control, reader.symbol];};
-function ge () {return reader . getElement ();};
+this . Root . prototype . resolution = function (query) {
+	var actuals, formals, vars, var_counter;
+	var reset = function () {actuals = null, formals = null, vars = null, var_counter = 0;};
+};
 */
+};
