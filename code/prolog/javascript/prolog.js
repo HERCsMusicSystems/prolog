@@ -821,18 +821,63 @@ Resolution . prototype . res_forward = function () {
 	return this . sub_res_forward (relation_atom, term, clausa);
 };
 Resolution . prototype . sub_res_forward = function (relation_atom, term, clausa) {
-	var next_clausa, next_tail;
+	var next_clausa, next_tail, el;
 	while (clausa !== null) {
 		this . reset ();
 		next_clausa = clausa . left . left . left;
 		if (this . match (term . right, true, clausa . left . right, false)) {
 			next_tail = this . match_product (clausa . right, false);
-			console . log (this . root . getValue (next_tail));
-			return 0;
+			if (next_tail . type === 0) {
+				next_tail = this . match_product (this . q_root . query . right . right, true);
+				el = new hrcs . PrologElement ();
+				el . type = 1;
+				el . left = this . match_product (this . q_root . query . left, true);
+				el . right = new_tail;
+				if (next_clausa === null) this . q_root . query = ell
+				else {
+					term . left . left = next_clausa;
+					this . q_root = new Query (el, this . q_root, this . q_root . context, this . q_root . fail_target, this . q_root . original);
+				}
+				if (next_tail . type === 0) return 2;
+				return 1;
+			} else {
+				if (next_clausa === null && this . q_root . query . right . right . type === 0) {
+					el = new hrcs . Element (); el . type = 1; el . left = this . match_product (this . q_root . query . left, true); el . right = next_tail;
+					this . q_root . query = el;
+					this . q_root . fail_target = this . q_root . stack;
+					this . q_root . original = false;
+					return 1;
+				}
+			}
+			term . left . left = next_clausa;
+			el = new hrcs . Element (); el . type = 1; el . left = relation_atom; el . right = this . match_product (clausa . left . right, false);
+			var ell = new hrcs . Element (); ell . type = 1; ell . left = el; ell . right = next_tail;
+			this . q_root = new Query (ell, this . q_root, this . q_root, this . q_root, true);
+			return 1;
 		}
-		clausa = null;
+		clausa = next_clausa;
 	}
+	return 0;
 };
+Resolution . prototype . res_fail_back = function () {
+	if ((this . q_root = this . q_root . stack) === null) return 5;
+	var term = this . q_root . query . right . left;
+	var relation_atom = new hrcs . Element (); relation_atom . type = 3; relation_atom . left = term . left . left;
+	var clausa = term . left . left;
+	return sub_res_forward (relation_atom, term, clausa);
+};
+/*
+	public int res_fail_back () {
+		q_root = q_root . stack;
+		if (q_root == null) return 5;
+		PrologElement term = q_root . query . right . left;
+		PrologElement relation_atom = new PrologElement ();
+		relation_atom . type = 3;
+		relation_atom . atom = term . left . atom;
+		PrologElement clausa = (PrologElement) term . left . head;
+		return sub_res_forward (relation_atom, term, clausa);
+	}
+*/
 Resolution . prototype . resolution = function (query) {
 	// returns: 0 = fail, 1 = success, 2 = no space left, 3 = wrong query
 	if (query === null) return 3;
