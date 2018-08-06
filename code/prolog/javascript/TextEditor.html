@@ -27,7 +27,9 @@
 	studio . search ('test_scripts');
 	root = new prolog.Root();
 	console . log ('load', root . load ('main_course'));
-	reader = new prolog . Reader (root, '[[*x *y] [main_course *x *y]]');
+	//reader = new prolog . Reader (root, '[[*x *y] [main_course *x *y] [pp *x " " *y]]');
+	//reader = new prolog . Reader (root, '[*x [sum 234 *x : 1000]]');
+	reader = new prolog . Reader (root, '[*x [light_meal : *x] [pp [sum : *x]]]');
 	query = reader . getElement ();
 	res = root . resolution ();
 	console . log (root . getValue (res . resolution (query)));

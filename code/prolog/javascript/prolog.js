@@ -818,7 +818,18 @@ Resolution . prototype . res_forward = function () {
 	var native = term . left . left . machine;
 	if (native !== null) {
 		// machine goes here
-		return 1;
+		this . reset ();
+		var parameters = this . match_product (term . right, true);
+		if (! native . code (parameters, this)) return 0;
+		this . reset ();
+		if (this . match (term . right, true, parameters, false)) {
+			var new_head = this . match_product (this . q_root . query . left, true);
+			var new_tail = this . match_product (this . q_root . query . right . right, true);
+			var el = new Element (); el . type = 1; el . left = new_head; el . right = new_tail;
+			this . q_root . query = el;
+			return new_tail . type === 0 ? 2 : 1;
+		}
+		return 0;
 	}
 	var clausa = term . left . left . firstClause;
 	if (clausa === null) {console . log ("Free atom [" + term . left . atom . name + "]."); return 0;}
@@ -847,9 +858,9 @@ Resolution . prototype . sub_res_forward = function (relation_atom, term, clausa
 				return new_tail . type === 0 ? 2 : 1;
 			} else {
 				// tail recursion optimisation
-				if (next_clausa === null && q_root . query . right . right . type == 0) {
+				if (next_clausa === null && this . q_root . query . right . right . type == 0) {
 					el = new Element (); el . type = 1;
-					el . left = this . root . match_product (this . q_root . query . left, true);
+					el . left = this . match_product (this . q_root . query . left, true);
 					el . right = new_tail;
 					this . q_root . query = el;
 					this . q_root . fail_target = this . q_root . stack;
@@ -901,7 +912,7 @@ Resolution . prototype . resolution = function (query) {
 	if (query . type !== 1) return 3;
 	this . q_root = new Query (query . duplicate ());
 	var ctrl;
-	var limit = 6
+	var limit = 16
 	do {
 		this . sa ();
 		ctrl = this . res_forward ();
