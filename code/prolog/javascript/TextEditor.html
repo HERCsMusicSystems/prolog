@@ -36,10 +36,7 @@
 	reader = new prolog . Reader (root, '[[*x *y] [main_course *x *y]]');
 	query = reader . getElement ();
 	res = root . resolution ();
-	console . log (res . resolution (query));
-	actual = new prolog . Reader (root, '[**]') . getElement ();
-	res . reset ();
-	console . log (res . match (actual, true, actual, false));
+	console . log (root . getValue (res . resolution (query)));
 </script>
 
 <script type="text/javascript">

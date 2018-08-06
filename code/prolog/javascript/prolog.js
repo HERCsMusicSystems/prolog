@@ -1,11 +1,9 @@
 
 var prolog = new function () {
 
-var hrcs = this;
-
 //////// ATOM ////////
 
-this . Atom = function (name, root) {
+Atom = function (name, root) {
 	if (name === undefined) this . name = "<" + Math . random () . toString (16) . substring (2) + "#" + new Date () . getTime () . toString (16) + ">";
 	else this . name = name + "";
 	this . next = root === undefined ? null : root;
@@ -14,51 +12,52 @@ this . Atom = function (name, root) {
 	this . firstClause = null;
 	this . machine = null;
 };
-this . Atom . prototype . setMachine = function (obj) {
+Atom . prototype . setMachine = function (obj) {
 	if (this . firstClause !== null || (this . Protected && obj !== null)) return false;
 	this . Protected = (obj !== null);
 	this . machine = obj;
 	return true;
 };
-this . Atom . prototype . getMachine = function () {return this . machine;};
+Atom . prototype . getMachine = function () {return this . machine;};
+this . Atom = Atom;
 
 //////// DIRECTORY /////////
 
-this . Directory = function (name, root, service) {
+Directory = function (name, root, service) {
 	this . name = name + "";
 	this . next = root == null ? null : root;
 	this . firstAtom = null;
 	this . service_class = service == null ? null : service;
 };
-this . Directory . prototype . getServiceClass = function (name) {
+Directory . prototype . getServiceClass = function (name) {
 	if (name === undefined) return this . service_class;
 	if (name === this . name) return this . service_class;
 	if (this . next === null) return null;
 	return this . next . getServiceClass (name);
 };
-this . Directory . prototype . names = function () {
+Directory . prototype . names = function () {
 	var area = [this . name];
 	var next = this . next;
 	while (next !== null) {area . push (next . name); next = next . next;}
 	return area;
 };
-this . Directory . prototype . searchAtom = function (search) {
+Directory . prototype . searchAtom = function (search) {
 	if (this . firstAtom === null) return null;
 	var atom = this . firstAtom;
 	while (atom !== null) {if (atom . name === search && ! atom . Privated) return atom; atom = atom . next;}
 	return null;
 };
-this . Directory . prototype . searchPrivateAtom = function (search) {
+Directory . prototype . searchPrivateAtom = function (search) {
 	if (this . firstAtom === null) return null;
 	var atom = this . firstAtom;
 	while (atom !== null) {if (atom . name === search) return atom; atom = atom . next;}
 	return null;
 };
-this . Directory . prototype . createAtom = function (name) {
-	this . firstAtom = new hrcs . Atom (name, this . firstAtom);
+Directory . prototype . createAtom = function (name) {
+	this . firstAtom = new Atom (name, this . firstAtom);
 	return this . firstAtom;
 };
-this . Directory . prototype . removeAtom = function (atom) {
+Directory . prototype . removeAtom = function (atom) {
 	if (this . firstAtom === null) {if (this . next !== null) return this . next . removeAtom (atom); return false;}
 	if (this . firstAtom === atom) {this . firstAtom = this . firstAtom . next; return true;}
 	var ap = this . firstAtom;
@@ -69,33 +68,34 @@ this . Directory . prototype . removeAtom = function (atom) {
 	if (this . next === null) return false;
 	return this . next . removeAtom (atom);
 };
-this . Directory . prototype . list = function () {
+Directory . prototype . list = function () {
 	var area = [];
 	var atom = this . firstAtom;
 	while (atom !== null) {area . push (atom . name); atom = atom . next;}
 	return area;
 };
-this . Directory . prototype . duplicate = function (root) {
-	var dir = new hrcs . Directory (this . name, root, this . service_class);
+Directory . prototype . duplicate = function (root) {
+	var dir = new Directory (this . name, root, this . service_class);
 	dir . firstAtom = this . firstAtom;
 	return dir;
 };
+this . Directory = Directory;
 
 //////// ELEMENET ////////
 // 0: EARTH, 1: PAIR, 2: VAR, 3: ATOM, 4: SLASH, 5: FAIL, 6: NATIVE
 
-this . Element = function () {this . type = 0; return;};
+Element = function () {this . type = 0; return;};
 
-this . Element . prototype . setPair = function () {
+Element . prototype . setPair = function () {
 	this . type = 1;
-	this . left = new hrcs . Element ();
-	this . right = new hrcs . Element ();
+	this . left = new Element ();
+	this . right = new Element ();
 };
-this . Element . prototype . setVar = function (ind) {this . type = 2; this . left = ind;};
-this . Element . prototype . setAtom = function (atom) {this . type = 3; this . left = atom;};
-this . Element . prototype . setNative = function (el) {this . type = 6; this . left = el;};
-this . Element . prototype . duplicate = function (el) {
-	if (el === undefined) el = new hrcs . Element ();
+Element . prototype . setVar = function (ind) {this . type = 2; this . left = ind;};
+Element . prototype . setAtom = function (atom) {this . type = 3; this . left = atom;};
+Element . prototype . setNative = function (el) {this . type = 6; this . left = el;};
+Element . prototype . duplicate = function (el) {
+	if (el === undefined) el = new Element ();
 	el . type = this . type;
 	switch (this . type) {
 		case 0: case 4: case 5: return el;
@@ -107,7 +107,7 @@ this . Element . prototype . duplicate = function (el) {
 	}
 	return el;
 };
-this . Element . prototype . attach = function (position) {
+Element . prototype . attach = function (position) {
 	if (this . type !== 1) return false;
 	var sub = this . left; if (sub . type !== 1) return false;
 	sub = sub . left; if (sub . type !== 3) return false;
@@ -115,15 +115,17 @@ this . Element . prototype . attach = function (position) {
 	if (position === undefined) position = Number . MAX_VALUE;
 	if (atom . firstClause === null || position < 1) {sub . setNative (atom . firstClause); atom . firstClause = this; return true;}
 	var head = atom . firstClause . left . left;
-	while (head . left !== null && position > 1) {head = head . left . left . left; position -= 1;}
+	while (head . left !== null && position > 1) {head = head . left . left . left; position --;}
 	sub . setNative (head . left);
 	head . setNative (this);
 	return true;
 };
 
+this . Element = Element;
+
 //////// ROOT ////////
 
-this . Root = function () {
+Root = function () {
 	this . left_caption = '[';
 	this . right_caption = ']';
 	this . secondary_left_caption = '(';
@@ -156,9 +158,9 @@ this . Root = function () {
 	this . private_caption = 'private';
 	this . protect_caption = 'protect';
 	this . auto_atoms = false;
-	this . root = new hrcs . Directory ("user!");
+	this . root = new Directory ("user!");
 };
-this . Root . prototype . getValue = function (el) {
+Root . prototype . getValue = function (el) {
 	if (el == null) return "<null element>";
 	switch (el . type) {
 		case 0: return this . left_caption + this . right_caption;
@@ -167,14 +169,14 @@ this . Root . prototype . getValue = function (el) {
 			if (el . right == null) return "Wrong right element.";
 			return this . left_caption + this . getValue (el . left) + this . getRightCaption (el . right) + this . right_caption;
 		case 2: return this . var_caption + el . left;
-		case 3: return el . left . name;
+		case 3: return el . head !== undefined ? '!' + el . left . name : el . left . name;
 		case 4: return this . slash_caption;
 		case 5: return this . fail_caption;
 		case 6: return typeof (el . left) === 'number' ? el . left : this . quotation_caption . charAt (0) + el . left + this . quotation_caption . charAt (0);
 	}
 	return "Unknown element type.";
 };
-this . Root . prototype . getRightCaption = function (el) {
+Root . prototype . getRightCaption = function (el) {
 	if (el == null) return "<null element>";
 	switch (el . type) {
 		case 0: return '';
@@ -184,17 +186,17 @@ this . Root . prototype . getRightCaption = function (el) {
 	}
 	return ' ' + this . mid_caption + ' ' + this . getValue (el);
 };
-this . Root . prototype . getServiceClass = function (name) {
+Root . prototype . getServiceClass = function (name) {
 	if (this . root === null) return null;
 	return this . root . getServiceClass (name);
 };
-this . Root . prototype . createDirectory = function (name, service) {this . root = new hrcs . Directory (name, this . root, service);};
-this . Root . prototype . searchDirectory = function (name) {
+Root . prototype . createDirectory = function (name, service) {this . root = new Directory (name, this . root, service);};
+Root . prototype . searchDirectory = function (name) {
 	var ret = this . root;
 	while (ret !== null) {if (ret . name === name) return ret; ret = ret . next;}
 	return null;
 };
-this . Root . prototype . search = function (name) {
+Root . prototype . search = function (name) {
 	var sub = this . root;
 	while (sub !== null) {
 		var ret = sub . searchAtom (name);
@@ -203,7 +205,7 @@ this . Root . prototype . search = function (name) {
 	}
 	return null;
 };
-this . Root . prototype . list = function (name) {
+Root . prototype . list = function (name) {
 	if (name === undefined) {
 		if (this . root === null) return [];
 		return this . root . names ();
@@ -212,7 +214,7 @@ this . Root . prototype . list = function (name) {
 	if (sub === null) return [];
 	return sub . list ();
 };
-this . Root . prototype . close = function () {
+Root . prototype . close = function () {
 	if (this . root === null) return;
 	var sub = this . root . next;
 	if (sub === null) return;
@@ -220,7 +222,7 @@ this . Root . prototype . close = function () {
 	sub . next = this . root;
 	this . root = sub;
 };
-this . Root . prototype . drop = function (name) {
+Root . prototype . drop = function (name) {
 	if (this . root === null) return;
 	if (name === undefined) {this . root = this . root . next; return;}
 	if (this . root . name === name) this . root = this . root . next;
@@ -229,32 +231,32 @@ this . Root . prototype . drop = function (name) {
 		if (sub . next . name === name) {sub . next = sub . next . next; return;}
 	}
 };
-this . Root . prototype . createAtom = function (name) {
+Root . prototype . createAtom = function (name) {
 	if (this . root === null) return null;
 	return this . root . createAtom (name);
 };
-this . Root . prototype . removeAtom = function (name) {
+Root . prototype . removeAtom = function (name) {
 	if (this . root === null) return false;
 	return this . root . removeAtom (name);
 };
-this . Root . prototype . searchC = function (name) {
+Root . prototype . searchC = function (name) {
 	var atom = this . search (name);
 	if (atom === null) return this . createAtom (name);
 	return atom;
 };
-this . Root . prototype . Private = function (name) {
+Root . prototype . Private = function (name) {
 	if (this . root === null) return false;
 	var atom = this . root . searchPrivateAtom (name);
 	if (atom === null) return false;
 	atom . Privated = true;
 };
-this . Root . prototype . Protect = function (name) {
+Root . prototype . Protect = function (name) {
 	if (this . root === null) return false;
 	var atom = this . root . searchPrivateAtom (name);
 	if (atom === null) return false;
 	atom . Protected = true;
 };
-this . Root . prototype . listAtom = function (name) {
+Root . prototype . listAtom = function (name) {
 	var atom = this . search (name);
 	if (atom === null) return [];
 	var el = atom . firstClause;
@@ -265,17 +267,19 @@ this . Root . prototype . listAtom = function (name) {
 	}
 	return ret;
 };
-this . Root . prototype . load = function (name) {
+Root . prototype . load = function (name) {
 	var content = studio . readFile (name);
 	if (content === null) content = studio . readFile (name + ".prc");
 	if (content === null) return false;
-	var reader = new hrcs . Reader (this, content);
+	var reader = new Reader (this, content);
 	return reader . readProgram ();
 };
 
+this . Root = Root;
+
 //////// READER ////////
 
-this . Reader = function (root, file) {
+Reader = function (root, file) {
 	this . root = root;
 	this . file = file;
 	this . act = '';
@@ -285,11 +289,11 @@ this . Reader = function (root, file) {
 	this . search_context = null;
 	this . vars = [];
 };
-this . Reader . prototype . move = function () {
+Reader . prototype . move = function () {
 	this . act = this . file . charAt (this . ind ++);
 	return this . act;
 };
-this . Reader . prototype . getSymbol = function () {
+Reader . prototype . getSymbol = function () {
 	if (this . act <= '') this . move ();
 	this . symbol = '';
 	while (this . act <= ' ' || this . root . comment_caption . indexOf (this . act) >= 0) {
@@ -416,7 +420,7 @@ this . Reader . prototype . getSymbol = function () {
 	this . move ();
 	console . log ("Lexical error (unknown character sequence).");
 };
-this . Reader . prototype . atomC = function (name) {
+Reader . prototype . atomC = function (name) {
 	var atom;
 	if (this . search_context === null) atom = this . root . search (name);
 	else {
@@ -429,15 +433,15 @@ this . Reader . prototype . atomC = function (name) {
 		if (this . search_context !== null) this . search_context . firstAtom = atom;
 	}
 	if (atom === null) return null;
-	var el = new hrcs . Element (); el . setAtom (atom); return el;
+	var el = new Element (); el . setAtom (atom); return el;
 };
-this . Reader . prototype . varNumber = function (name) {
+Reader . prototype . varNumber = function (name) {
 	if (name === this . root . var_caption) return this . vars . push (name) - 1;
 	var ind = this . vars . indexOf (name);
 	if (ind < 0) return this . vars . push (name) - 1;
 	return ind;
 };
-this . Reader . prototype . getElement = function () {
+Reader . prototype . getElement = function () {
 	this . getSymbol ();
 	var el, dir;
 	switch (this . control) {
@@ -456,14 +460,14 @@ this . Reader . prototype . getElement = function () {
 			if (this . control !== 'atom') return this . error ("Syntax error (atom after dot expected).");
 			el = dir . searchAtom (this . symbol);
 			if (el === null) return this . error ("Semantic error (qualified atom " + this . symbol + " not found in " + dir . name + ").");
-			dir = new hrcs . Element (); dir . setAtom (el);
+			dir = new Element (); dir . setAtom (el);
 			return dir;
-		case 'number': el = new hrcs . Element (); el . setNative (this . symbol); return el;
-		case '[]': case '()': return new hrcs . Element ();
-		case '/': el = new hrcs . Element (); el . type = 4; return el;
-		case 'fail': el = new hrcs . Element (); el . type = 5; return el;
-		case 'var': el = new hrcs . Element (); el . setVar (this . varNumber (this . symbol)); return el;
-		case 'text': el = new hrcs . Element (); el . setNative (this . symbol); return el;
+		case 'number': el = new Element (); el . setNative (this . symbol); return el;
+		case '[]': case '()': return new Element ();
+		case '/': el = new Element (); el . type = 4; return el;
+		case 'fail': el = new Element (); el . type = 5; return el;
+		case 'var': el = new Element (); el . setVar (this . varNumber (this . symbol)); return el;
+		case 'text': el = new Element (); el . setNative (this . symbol); return el;
 		case '[': return this . readRightSide (this . getElement (), ']');
 		case '(': return this . readRightSide (this . getElement (), ')');
 		case '.': return this . atomC ('.');
@@ -472,21 +476,21 @@ this . Reader . prototype . getElement = function () {
 	}
 	return this . error ("Syntax error (unknown syntax).");
 };
-this . Reader . prototype . readRightSide = function (left, bracket) {
+Reader . prototype . readRightSide = function (left, bracket) {
 	if (left === null) return null;
 	this . getSymbol ();
 	var el, dir;
 	switch (this . control) {
 		case ']': case ')':
 			if (bracket !== this . control) return this . error ("Syntax error (bracket mismatch.)");
-			el = new hrcs . Element (); el . setPair (); el . left = left; el . right = new hrcs . Element ();
+			el = new Element (); el . setPair (); el . left = left; el . right = new Element ();
 			return el;
 		case ':':
 			el = this . getElement (); if (el === null) return null;
 			if (el . type === 0) return this . error ("Syntax error (earth not allowed here).");
 			this . getSymbol ();
 			if (this . control !== bracket) return this . error ("Syntax error (closing bracket expected).");
-			dir = new hrcs . Element (); dir . setPair (); dir . left = left; dir . right = el;
+			dir = new Element (); dir . setPair (); dir . left = left; dir . right = el;
 			return dir;
 		default: break;
 	}
@@ -510,14 +514,14 @@ this . Reader . prototype . readRightSide = function (left, bracket) {
 			if (this . control !== 'atom') return this . error ("Syntax error (atom after dot expected).");
 			dir = dir . searchAtom (this . symbol);
 			if (dir === null) return this . error ("Semantic error (qualified atom " + this . symbol + " not found in " + el . name + ").");
-			el = new hrcs . Element (); dir . setAtom (dir);
+			el = new Element (); dir . setAtom (dir);
 			break;
-		case 'number': el = new hrcs . Element (); el . setNative (this . symbol); break;
-		case '[]': case '()': el = new hrcs . Element (); break;
-		case '/': el = new hrcs . Element (); el . type = 4; break;
-		case 'fail': el = new hrcs . Element (); el . type = 5; break;
-		case 'var': el = new hrcs . Element (); el . setVar (this . varNumber (this . symbol)); break;
-		case 'text': el = new hrcs . Element (); el . setNative (this . symbol); break;
+		case 'number': el = new Element (); el . setNative (this . symbol); break;
+		case '[]': case '()': el = new Element (); break;
+		case '/': el = new Element (); el . type = 4; break;
+		case 'fail': el = new Element (); el . type = 5; break;
+		case 'var': el = new Element (); el . setVar (this . varNumber (this . symbol)); break;
+		case 'text': el = new Element (); el . setNative (this . symbol); break;
 		case '[': el = this . readRightSide (this . getElement (), ']'); break;
 		case '(': el = this . readRightSide (this . getElement (), ')'); break;
 		case '.': el = this . atomC ('.'); break;
@@ -526,11 +530,11 @@ this . Reader . prototype . readRightSide = function (left, bracket) {
 	if (el === null) return null;
 	el = this . readRightSide (el, bracket);
 	if (el === null) return null;
-	dir = new hrcs . Element ();
+	dir = new Element ();
 	dir . setPair (); dir . left = left; dir . right = el;
 	return dir;
 };
-this . Reader . prototype . readProgram = function () {
+Reader . prototype . readProgram = function () {
 	this . getSymbol ();
 	while (this . control === 'atom' && this . symbol === 'import') {
 		this . getSymbol ();
@@ -599,7 +603,7 @@ this . Reader . prototype . readProgram = function () {
 					break;
 				case this . root . end_caption:
 					this . getSymbol ();
-					if (this . control === '.') {this . root . close (); return new hrcs . Element ();}
+					if (this . control === '.') {this . root . close (); return new Element ();}
 					if (this . control !== 'atom' || this . symbol !== this . root . assignment_caption) return this . dropError ("Syntax error (assignment in loading instructions expected).");
 					var command = this . getElement ();
 					if (command === null) return this . dropError ("Syntax error (loading instructions not readable).");
@@ -647,8 +651,10 @@ this . Reader . prototype . readProgram = function () {
 	}
 	return this . dropError ("Syntax error (at least end keyword expected but got this instead [" + this . control + ' ' + this . symbol + "]).");
 };
-this . Reader . prototype . error = function (error) {console . log (error); return null;};
-this . Reader . prototype . dropError = function (error) {this . root . drop (); return this . error (error);};
+Reader . prototype . error = function (error) {console . log (error); return null;};
+Reader . prototype . dropError = function (error) {this . root . drop (); return this . error (error);};
+
+this . Reader = Reader;
 
 //////// RESOLUTION ////////
 
@@ -747,14 +753,14 @@ Resolution . prototype . match = function (actual, ac, formal, fc) {
 Resolution . prototype . match_product = function (actual, ac) {
 	var ret, vr;
 	switch (actual . type) {
-		case 0: return new hrcs . Element ();
+		case 0: return new Element ();
 		case 3: case 6:
-			ret = new hrcs . Element ();
+			ret = new Element ();
 			ret . type = actual . type;
 			ret . left = actual . left;
 			return ret;
 		case 1:
-			ret = new hrcs . Element ();
+			ret = new Element ();
 			ret . type = 1;
 			ret . left = this . match_product (actual . left, ac);
 			ret . right = this . match_product (actual . right, ac);
@@ -762,35 +768,35 @@ Resolution . prototype . match_product = function (actual, ac) {
 		case 2:
 			if (ac) {
 				if ((vr = this . actuals [actual . left]) === undefined) {
-					ret = new hrcs . Element (); ret . type = 2;
+					ret = new Element (); ret . type = 2;
 					this . actuals [actual . left] = this . vars . length;
 					ret . left = this . var_counter;
 					this . vars . push ({term: null, var_id: this . var_counter});
-					this . var_counter += 1;
+					this . var_counter ++;
 					return ret;
 				}
 			} else {
 				if ((vr = this . formals [actual . left]) === undefined) {
-					ret = new hrcs . Element (); ret . type = 2;
+					ret = new Element (); ret . type = 2;
 					this . formals [actual . left] = this . vars . length;
 					ret . left = this . var_counter;
 					this . vars . push ({term: null, var_id: this . var_counter});
-					this . var_counter += 1;
+					this . var_counter ++;
 					return ret;
 				}
 			}
 			vr = this . vars [vr];
 			if (vr . term === null) {
-				ret = new hrcs . Element (); ret . type = 2;
+				ret = new Element (); ret . type = 2;
 				if (vr . var_id === undefined) {
-					vr . var_id = this . var_counter; this . var_counter += 1;
+					vr . var_id = this . var_counter; this . var_counter ++;
 				}
 				ret . left = vr . var_id;
 				return ret;
 			}
 			return this . match_product (vr . term, vr . location);
 		default:
-			ret = new hrcs . Element ();
+			ret = new Element ();
 			ret . type = actual . type;
 			return ret;
 	}
@@ -816,81 +822,121 @@ Resolution . prototype . res_forward = function () {
 	}
 	var clausa = term . left . left . firstClause;
 	if (clausa === null) {console . log ("Free atom [" + term . left . atom . name + "]."); return 0;}
-	var relation_atom = new hrcs . Element ();
-	relation_atom . type = 3; relation_atom . atom = term . left . left;
+	var relation_atom = new Element ();
+	relation_atom . type = 3; relation_atom . left = term . left . left;
 	return this . sub_res_forward (relation_atom, term, clausa);
 };
 Resolution . prototype . sub_res_forward = function (relation_atom, term, clausa) {
-	var next_clausa, next_tail, el;
+	var next_clausa, new_tail, el;
 	while (clausa !== null) {
-		this . reset ();
 		next_clausa = clausa . left . left . left;
+		this . reset ();
 		if (this . match (term . right, true, clausa . left . right, false)) {
-			next_tail = this . match_product (clausa . right, false);
-			if (next_tail . type === 0) {
-				next_tail = this . match_product (this . q_root . query . right . right, true);
-				el = new hrcs . PrologElement ();
-				el . type = 1;
-				el . left = this . match_product (this . q_root . query . left, true);
-				el . right = new_tail;
-				if (next_clausa === null) this . q_root . query = ell
+			new_tail = this . match_product (clausa . right, false);
+			if (new_tail . type === 0) {
+				new_tail = this . match_product (this . q_root . query . right . right, true);
+				el = new Element ();
+					el . type = 1;
+					el . left = this . match_product (this . q_root . query . left, true);
+					el . right = new_tail;
+				if (next_clausa === null) this . q_root . query = el;
 				else {
-					term . left . left = next_clausa;
+					term . left . head = next_clausa;
 					this . q_root = new Query (el, this . q_root, this . q_root . context, this . q_root . fail_target, this . q_root . original);
 				}
-				if (next_tail . type === 0) return 2;
-				return 1;
+				return new_tail . type === 0 ? 2 : 1;
 			} else {
-				if (next_clausa === null && this . q_root . query . right . right . type === 0) {
-					el = new hrcs . Element (); el . type = 1; el . left = this . match_product (this . q_root . query . left, true); el . right = next_tail;
+				// tail recursion optimisation
+				if (next_clausa === null && q_root . query . right . right . type == 0) {
+					el = new Element (); el . type = 1;
+					el . left = this . root . match_product (this . q_root . query . left, true);
+					el . right = new_tail;
 					this . q_root . query = el;
 					this . q_root . fail_target = this . q_root . stack;
 					this . q_root . original = false;
 					return 1;
 				}
 			}
-			term . left . left = next_clausa;
-			el = new hrcs . Element (); el . type = 1; el . left = relation_atom; el . right = this . match_product (clausa . left . right, false);
-			var ell = new hrcs . Element (); ell . type = 1; ell . left = el; ell . right = next_tail;
-			this . q_root = new Query (ell, this . q_root, this . q_root, this . q_root, true);
+			term . left . head = next_clausa;
+			var ell = new Element ();
+				ell . type = 1;
+				ell . left = relation_atom;
+				ell . right = this . match_product (clausa . left . right, false);
+			el = new Element ();
+				el . type = 1;
+				el . left = ell;
+				el . right = new_tail;
+			this . q_root = new Query (el, this . q_root, this . q_root, this . q_root, true);
 			return 1;
 		}
 		clausa = next_clausa;
 	}
 	return 0;
 };
+Resolution . prototype . res_back_back = function () {
+	var context = this . q_root . context;
+	if (context === null) return 2;
+	this . reset ();
+	this . match (context . query . right . left . right, true, this . q_root . query . left . right, false);
+	var new_head = this . match_product (context . query . left, true);
+	var new_tail = this . match_product (context . query . right . right, true);
+	var el = new Element (); el . type = 1; el . left = new_head; el . right = new_tail;
+	this . q_root . fail_target = context . fail_target;
+	this . q_root . original = context . original;
+	this . q_root . context = context . context;
+	this . q_root . query = el;
+	console . log ('>>>>');
+	this . sa ();
+	return new_tail . type === 0 ? 1 : 0;
+};
 Resolution . prototype . res_fail_back = function () {
 	if ((this . q_root = this . q_root . stack) === null) return 5;
 	var term = this . q_root . query . right . left;
-	var relation_atom = new hrcs . Element (); relation_atom . type = 3; relation_atom . left = term . left . left;
-	var clausa = term . left . left;
-	return sub_res_forward (relation_atom, term, clausa);
+	var ra = new Element (); ra . type = 1; ra . left = term . left . left;
+	return sub_res_forward (ra, term, term . left . head);
 };
-/*
-	public int res_fail_back () {
-		q_root = q_root . stack;
-		if (q_root == null) return 5;
-		PrologElement term = q_root . query . right . left;
-		PrologElement relation_atom = new PrologElement ();
-		relation_atom . type = 3;
-		relation_atom . atom = term . left . atom;
-		PrologElement clausa = (PrologElement) term . left . head;
-		return sub_res_forward (relation_atom, term, clausa);
-	}
-*/
 Resolution . prototype . resolution = function (query) {
 	// returns: 0 = fail, 1 = success, 2 = no space left, 3 = wrong query
 	if (query === null) return 3;
 	if (query . type !== 1) return 3;
 	this . q_root = new Query (query . duplicate ());
 	var ctrl;
-	//do {
+	var limit = 6
+	do {
+		this . sa ();
 		ctrl = this . res_forward ();
-	//}
-	return 0;
+		console . log ('    ======= ', ctrl);
+		this . sa ();
+		console . log ('================')
+		if (ctrl === 2) {
+			while (ctrl !== 0 && limit > 0) {
+				ctrl = this . res_back_back ();
+				if (ctrl === 2) {
+					this . reset ();
+					query = new Element (); query . type = 1;
+					query . left = this . match_product (this . q_root . query . left, true);
+					query . right = this . match_product (this . q_root . query . right, true);
+					return query;
+				}
+				limit --;
+			}
+		}
+		limit --;
+	} while (ctrl !== 5 && limit > 0);
+	return null;
 };
+Resolution . prototype . stackArray = function () {
+	var tip = this . q_root;
+	var ret = [];
+	while (tip !== null) {
+		ret . push (this . root . getValue (tip . query));
+		tip = tip . stack;
+	}
+	return ret;
+};
+Resolution . prototype . sa = function () {console . log (this . stackArray () . join ('\n'));};
 
-this . Root . prototype . resolution = function (query) {return new Resolution (this);};
+Root . prototype . resolution = function (query) {return new Resolution (this);};
 /*
 this . Root . prototype . resolution = function (query) {
 	var actuals, formals, vars, var_counter;
