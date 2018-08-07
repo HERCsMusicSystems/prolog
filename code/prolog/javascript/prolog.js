@@ -810,7 +810,22 @@ Resolution . prototype . res_forward = function () {
 	if (term . type === 5) return 0; // genuine fail
 	if (term . type === 4) {
 		// slash maker
-		return 1;
+		this . q_root . query . right = this . q_root . query . right . right;
+		this . q_root . stack = this . q_root . fail_target;
+		if (this . q_root . original && this . q_root . stack === this . q_root . context && this . q_root . stack !== null) {
+			if (this . q_root . stack . query . right . right . type == 0) {
+				this . reset ();
+				this . match (this . q_root . stack . query . right . left . right, true, this . q_root . query . left . right, false);
+				term = new Element (); term . type = 1;
+				term . left = this . match_product (this . q_root . stack . query . left, true);
+				term . right = this . match_product (this . q_root . query . right, false);
+				this . q_root . stack . query = term;
+				this . q_root = this . q_root . stack;
+				this . q_root . fail_target = this . q_root . stack;
+				this . q_root . original = false;
+			} else this . q_root . stack . query . right . left . left . head = null;
+		}
+		return this . q_root . query . right . type === 0 ? 2 : 1;
 	}
 	if (term . type !== 1) {console . log ("Wrong query (query is not a pair)."); return 0;}
 	if (term . left === null) {console . log ("Wrong query (query head does not exist)."); return 0;}
@@ -896,15 +911,15 @@ Resolution . prototype . res_back_back = function () {
 	this . q_root . original = context . original;
 	this . q_root . context = context . context;
 	this . q_root . query = el;
-	console . log ('>>>>');
-	this . sa ();
+	//console . log ('>>>>');
+	//this . sa ();
 	return new_tail . type === 0 ? 1 : 0;
 };
 Resolution . prototype . res_fail_back = function () {
 	if ((this . q_root = this . q_root . stack) === null) return 5;
 	var term = this . q_root . query . right . left;
-	var ra = new Element (); ra . type = 1; ra . left = term . left . left;
-	return sub_res_forward (ra, term, term . left . head);
+	var ra = new Element (); ra . type = 3; ra . left = term . left . left;
+	return this . sub_res_forward (ra, term, term . left . head);
 };
 Resolution . prototype . resolution = function (query) {
 	// returns: 0 = fail, 1 = success, 2 = no space left, 3 = wrong query
@@ -912,13 +927,14 @@ Resolution . prototype . resolution = function (query) {
 	if (query . type !== 1) return 3;
 	this . q_root = new Query (query . duplicate ());
 	var ctrl;
-	var limit = 16
+	var limit = 512
 	do {
-		this . sa ();
+		//this . sa ();
 		ctrl = this . res_forward ();
-		console . log ('    ======= ', ctrl);
-		this . sa ();
-		console . log ('================')
+		//console . log ('    ======= ', ctrl);
+		//this . sa ();
+		//console . log ('================')
+		while (ctrl === 0) ctrl = this . res_fail_back ();
 		if (ctrl === 2) {
 			while (ctrl !== 0 && limit > 0) {
 				ctrl = this . res_back_back ();

@@ -41,11 +41,13 @@ function (root, directory) {
 studio . setResource (['studio.prc'],`
 program studio #machine := ' prolog . studio '
 	[
-		sum pp
+		sum pp not
 	]
 
 #machine pp := 'pp'
 #machine sum := 'sum'
+[[not : *x] *x / fail]
+[[not : *]]
 
 end .
 `);
