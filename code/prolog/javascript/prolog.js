@@ -963,7 +963,31 @@ Resolution . prototype . stackArray = function () {
 };
 Resolution . prototype . sa = function () {console . log (this . stackArray () . join ('\n'));};
 
-Root . prototype . resolution = function (query) {return new Resolution (this);};
+var toJS = function (el) {
+	switch (el . type) {
+		case 0: return [];
+		case 1:
+			var area = [];
+			while (el . type === 1) {area . push (toJS (el . left)); el = el . right;}
+			return area;
+		case 2: return '*' + el . left;
+		case 3: return el . left . name;
+		case 4: return '/';
+		case 5: return 'fail';
+		case 6: return el . left;
+		default: return null;
+	}
+};
+
+Root . prototype . resolution = function (query) {
+	var res = new Resolution (this) . resolution (query);
+	if (res === null) return null;
+	return toJS (res . left);
+};
+
+Root . prototype . textResolution = function (command) {
+	return this . resolution (new Reader (this, command) . getElement ());
+};
 /*
 this . Root . prototype . resolution = function (query) {
 	var actuals, formals, vars, var_counter;
