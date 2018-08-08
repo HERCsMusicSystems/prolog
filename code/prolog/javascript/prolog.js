@@ -274,6 +274,7 @@ Root . prototype . load = function (name) {
 	var reader = new Reader (this, content);
 	return reader . readProgram ();
 };
+Root . prototype . log = function () {console . log . apply (this, arguments);};
 
 this . Root = Root;
 
@@ -350,7 +351,7 @@ Reader . prototype . getSymbol = function () {
 			return;
 		}
 		this . control = 'unknown';
-		console . log ("Lexical error (negative).");
+		this . root . log ("Lexical error (negative).");
 		return;
 	}
 	if (this . root . directive_head_caption . indexOf (this . act) >= 0) {
@@ -418,7 +419,7 @@ Reader . prototype . getSymbol = function () {
 	}
 	this . control = 'unknown';
 	this . move ();
-	console . log ("Lexical error (unknown character sequence).");
+	this . root . log ("Lexical error (unknown character sequence).");
 };
 Reader . prototype . atomC = function (name) {
 	var atom;
@@ -447,7 +448,7 @@ Reader . prototype . getElement = function () {
 	switch (this . control) {
 		case 'atom':
 			el = this . atomC (this . symbol);
-			if (el === null) console . log ("Semantic error (unknown atom: " + this . symbol + ").");
+			if (el === null) this . root . log ("Semantic error (unknown atom: " + this . symbol + ").");
 			return el;
 		case '@':
 			this . getSymbol ();
@@ -651,7 +652,7 @@ Reader . prototype . readProgram = function () {
 	}
 	return this . dropError ("Syntax error (at least end keyword expected but got this instead [" + this . control + ' ' + this . symbol + "]).");
 };
-Reader . prototype . error = function (error) {console . log (error); return null;};
+Reader . prototype . error = function (error) {this . root . log (error); return null;};
 Reader . prototype . dropError = function (error) {this . root . drop (); return this . error (error);};
 
 this . Reader = Reader;
@@ -803,9 +804,9 @@ Resolution . prototype . match_product = function (actual, ac) {
 };
 Resolution . prototype . res_forward = function () {
 	var term = this . q_root . query;
-	if (term . type !== 1) {console . log ("Wrong query (querries expected)."); return 0;}
+	if (term . type !== 1) {this . root . log ("Wrong query (querries expected)."); return 0;}
 	term = term . right;
-	if (term . type !== 1) {console . log ("Wrong query (query expected)."); return 0;}
+	if (term . type !== 1) {this . root . log ("Wrong query (query expected)."); return 0;}
 	term = term . left;
 	if (term . type === 5) return 0; // genuine fail
 	if (term . type === 4) {
@@ -827,9 +828,9 @@ Resolution . prototype . res_forward = function () {
 		}
 		return this . q_root . query . right . type === 0 ? 2 : 1;
 	}
-	if (term . type !== 1) {console . log ("Wrong query (query is not a pair)."); return 0;}
-	if (term . left === null) {console . log ("Wrong query (query head does not exist)."); return 0;}
-	if (term . left . type !== 3) {console . log ("Wrong query (query head is not an atom)."); return 0;}
+	if (term . type !== 1) {this . root . log ("Wrong query (query is not a pair)."); return 0;}
+	if (term . left === null) {this . root . log ("Wrong query (query head does not exist)."); return 0;}
+	if (term . left . type !== 3) {this . root . log ("Wrong query (query head is not an atom)."); return 0;}
 	var native = term . left . left . machine;
 	if (native !== null) {
 		// machine goes here
@@ -847,7 +848,7 @@ Resolution . prototype . res_forward = function () {
 		return 0;
 	}
 	var clausa = term . left . left . firstClause;
-	if (clausa === null) {console . log ("Free atom [" + term . left . atom . name + "]."); return 0;}
+	if (clausa === null) {this . root . log ("Free atom [" + term . left . atom . name + "]."); return 0;}
 	var relation_atom = new Element ();
 	relation_atom . type = 3; relation_atom . left = term . left . left;
 	return this . sub_res_forward (relation_atom, term, clausa);
@@ -911,7 +912,7 @@ Resolution . prototype . res_back_back = function () {
 	this . q_root . original = context . original;
 	this . q_root . context = context . context;
 	this . q_root . query = el;
-	//console . log ('>>>>');
+	//this . root . log ('>>>>');
 	//this . sa ();
 	return new_tail . type === 0 ? 1 : 0;
 };
@@ -931,9 +932,9 @@ Resolution . prototype . resolution = function (query) {
 	do {
 		//this . sa ();
 		ctrl = this . res_forward ();
-		//console . log ('    ======= ', ctrl);
+		//this . root . log ('    ======= ', ctrl);
 		//this . sa ();
-		//console . log ('================')
+		//this . root . log ('================')
 		while (ctrl === 0) ctrl = this . res_fail_back ();
 		if (ctrl === 2) {
 			while (ctrl !== 0 && limit > 0) {
@@ -961,7 +962,7 @@ Resolution . prototype . stackArray = function () {
 	}
 	return ret;
 };
-Resolution . prototype . sa = function () {console . log (this . stackArray () . join ('\n'));};
+Resolution . prototype . sa = function () {this . root . log (this . stackArray () . join ('\n'));};
 
 var toJS = function (el) {
 	switch (el . type) {
