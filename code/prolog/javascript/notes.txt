@@ -1,0 +1,9 @@
+Query . drop_stack_to_fail_target
+Query . drop_stack
+Query . drop_one_right
+Variable . getId
+Replace recursion with loop in match_product
+Timeout in resolutionCommand
+Add partial results for add in C++/Java
+Add logical shifts in C++/Java
+Add logical negation in C++/Java
