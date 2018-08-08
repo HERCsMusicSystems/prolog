@@ -55,8 +55,7 @@ function (root, directory) {
         el = el . right;
       }
       if (result === null) return true;
-      result . setNative (sum === null ? 0 : sum);
-      return true;
+      result . setNative (sum === null ? 0 : sum); return true;
     };
   };
   var mult = new function () {
@@ -73,16 +72,47 @@ function (root, directory) {
         el = el . right;
       }
       if (result === null) return true;
-      result . setNative (ret);
-      return true;
+      result . setNative (ret); return true;
     };
   };
+  var abs = new function () {
+    this . code = function (el) {
+      if (el . type !== 1) return false;
+      var left = el . left, ret = NaN;
+      switch (left . type) {
+        case 6: ret = left . left; break;
+        case 3: ret = left . left . name; break;
+        default: break;
+      }
+      el = el . right; if (el . type === 1) el = el . left;
+      el . setNative (ret < 0 ? - ret : ret); return true;
+    };
+  };
+  var addd = function (delta) {
+    this . code = function (el) {
+      if (el . type !== 1) return false;
+      var left = el . left, ret = NaN;
+      switch (left . type) {
+        case 6: ret = left . left + delta; break;
+        case 3: ret = left . left . name + delta; break;
+        default: break;
+      }
+      el = el . right; if (el . type === 1) el = el . left;
+      el . setNative (ret); return true;
+    };
+  };
+  var add1 = new addd (1), sub1 = new addd (-1);
   this . getNativeCode = function (name) {
-    if (name === 'pp') return pp;
-    if (name === 'sum') return sum;
-    if (name === 'add') return add;
-    if (name === '+') return add;
-    if (name === 'mult') return mult;
+    switch (name) {
+      case 'pp': return pp;
+      case 'sum': return sum;
+      case 'add': return add;
+      case 'mult': return mult;
+      case 'abs': return abs;
+      case 'add1': return add1;
+      case 'sub1': return sub1
+      default: break;
+    }
     return null;
   };
 }
@@ -92,12 +122,19 @@ studio . setResource (['studio.prc'],`
 program studio #machine := ' prolog . studio '
 	[
     pp not
+    abs add1 ++ sub1 --
     sum times add + mult
 	]
 
 #machine pp := 'pp'
+
+#machine abs := 'abs'
+#machine add1 := 'add1'
+#machine ++ := 'add1'
+#machine sub1 := 'sub1'
+#machine -- := 'sub1'
 #machine sum := 'sum'
-#machine + := '+'
+#machine + := 'add'
 #machine add := 'add'
 #machine mult := 'mult'
 
