@@ -981,8 +981,7 @@ var toJS = function (el) {
 
 Root . prototype . resolution = function (query) {
 	var res = new Resolution (this) . resolution (query);
-	if (res === null) return null;
-	return toJS (res . left);
+	return res === null ? null : toJS (res . left);
 };
 
 Root . prototype . textResolution = function (command) {

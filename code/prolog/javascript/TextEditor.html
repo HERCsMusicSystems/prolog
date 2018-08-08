@@ -35,12 +35,9 @@
 	query = reader . getElement ();
 	res = root . resolution (query);
 	console . log (res);
-	function textResolution (command) {
-		console . log (root . textResolution (command));
-	};
 	function resolutionCommand (command, e) {
 		if (e !== undefined && e . key !== 'Enter') return;
-		console . log (textResolution (command));
+		console . log (root . textResolution (command));
 	};
 </script>
 
