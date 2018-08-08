@@ -341,7 +341,7 @@ Reader . prototype . getSymbol = function () {
 	if (negative) {
 		if (this . root . atom_head_captions . indexOf ('-') >= 0) {
 			this . control = 'atom';
-			while (this . root . atom_tail_captions . indexOf (this . act && this . act > '') >= 0) {
+			while (this . root . atom_tail_captions . indexOf (this . act) >= 0 && this . act > '') {
 				if (this . root . if_atom_caption === this . symbol) return;
 				if (this . root . and_atom_caption === this . symbol) return;
 				if (this . root . operator_captions . indexOf (this . symbol) >= 0) return;
