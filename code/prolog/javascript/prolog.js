@@ -130,7 +130,6 @@ Root = function () {
 	this . right_caption = ']';
 	this . secondary_left_caption = '(';
 	this . secondary_right_caption = ')';
-	this . var_caption = '*';
 	this . separator_caption = '';
 	this . mid_caption = ':';
 	this . slash_caption = '/';
