@@ -1,7 +1,7 @@
 
 studio . setResource (['prolog', 'studio'],
 function (root, directory) {
-  var pp = function () {
+  var pp = new function () {
     this . code = function (el) {
       var out = '';
       while (el . type === 1) {out += root . getValue (el . left); el = el . right;}
@@ -9,7 +9,7 @@ function (root, directory) {
       return true;
     };
   };
-  var sum = function () {
+  var sum = new function () {
     this . code = function (el) {
       if (! el . type === 1) return false;
       var e1 = el . left; el = el . right; if (! el . type === 1) return false;
@@ -30,9 +30,59 @@ function (root, directory) {
       return false;
     };
   };
+  var add = new function () {
+    this . code = function (el) {
+      if (! el . type === 1) return false;
+      var result = null, sum = 0;
+      if (el . left . type === 2) {result = el . left; el = el . right;}
+      switch (el . left . type) {
+        case 6: sum = el . left . left; el = el . right; break;
+        case 3: sum = el . left . left . name; el = el . right; break;
+        default: break;
+      }
+      while (el . type === 1) {
+        switch (el . left . type) {
+          case 6: sum += el . left . left; break;
+          case 1:
+            var sub = 1, ell = el . left;
+            while (ell . type === 1) {sub *= Number (ell . left . left); ell = ell . right;}
+            sum += sub;
+            break;
+          case 3: sum += el . left . left . name; break;
+          case 2: el . left . setNative (sum); break;
+          default: break;
+        }
+        el = el . right;
+      }
+      if (result === null) return true;
+      result . setNative (sum === null ? 0 : sum);
+      return true;
+    };
+  };
+  var mult = new function () {
+    this . code = function (el) {
+      if (! el . type === 1) return false;
+      var result = null, ret = 1;
+      if (el . left . type === 2) {result = el . left; el = el . right;}
+      while (el . type === 1) {
+        switch (el . left . type) {
+          case 6: ret *= el . left . left; break;
+          case 2: el . left . setNative (ret); break;
+          default: break;
+        }
+        el = el . right;
+      }
+      if (result === null) return true;
+      result . setNative (ret);
+      return true;
+    };
+  };
   this . getNativeCode = function (name) {
-    if (name === 'pp') return new pp ();
-    if (name === 'sum') return new sum ();
+    if (name === 'pp') return pp;
+    if (name === 'sum') return sum;
+    if (name === 'add') return add;
+    if (name === '+') return add;
+    if (name === 'mult') return mult;
     return null;
   };
 }
@@ -41,11 +91,16 @@ function (root, directory) {
 studio . setResource (['studio.prc'],`
 program studio #machine := ' prolog . studio '
 	[
-		sum pp not
+    pp not
+    sum times add + mult
 	]
 
 #machine pp := 'pp'
 #machine sum := 'sum'
+#machine + := '+'
+#machine add := 'add'
+#machine mult := 'mult'
+
 [[not : *x] *x / fail]
 [[not : *]]
 
