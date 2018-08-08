@@ -923,8 +923,8 @@ Resolution . prototype . res_fail_back = function () {
 };
 Resolution . prototype . resolution = function (query) {
 	// returns: 0 = fail, 1 = success, 2 = no space left, 3 = wrong query
-	if (query === null) return 3;
-	if (query . type !== 1) return 3;
+	if (query === null) return null;
+	if (query . type !== 1) return null;
 	this . q_root = new Query (query . duplicate ());
 	var ctrl;
 	var limit = 512
