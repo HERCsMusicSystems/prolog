@@ -847,7 +847,7 @@ Resolution . prototype . res_forward = function () {
 		return 0;
 	}
 	var clausa = term . left . left . firstClause;
-	if (clausa === null) {this . root . log ("Free atom [" + term . left . atom . name + "]."); return 0;}
+	if (clausa === null) {this . root . log ("Free atom [" + term . left . left . name + "]."); return 0;}
 	var relation_atom = new Element ();
 	relation_atom . type = 3; relation_atom . left = term . left . left;
 	return this . sub_res_forward (relation_atom, term, clausa);
