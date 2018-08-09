@@ -258,6 +258,7 @@ Root . prototype . Protect = function (name) {
 Root . prototype . listAtom = function (name) {
 	var atom = this . search (name);
 	if (atom === null) return [];
+	if (atom . machine !== null) return [atom . name + ' ' + this . assignment_caption + ' ' + this . machine_caption];
 	var el = atom . firstClause;
 	var ret = [];
 	while (el !== null) {
