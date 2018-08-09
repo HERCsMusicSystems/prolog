@@ -1,0 +1,51 @@
+
+<style>li {cursor: pointer;}</style>
+
+<body>
+
+<ul id=files_list style="float: left; padding: 24px;">
+</ul>
+
+<div id=editor_div>
+	<input type=button value=SAVE onclick="javascript: studio . store_edited_file ('file_name', 'editor'); studio . refresh_file_tree ('files_list', 'editor', 'file_name');" />
+	<input type=text id=file_name size=64 onkeydown="javascript: resolutionCommand (this . value, event);"/>
+	<input type=button value=ERASE onclick="javascript: studio . erase_file (document . getElementById ('file_name') . value); studio . refresh_file_tree ('files_list', 'editor', 'file_name');" />
+	<input type=button value=COMMAND onclick="javascript: resolutionCommand (document . getElementById ('file_name') . value);" />
+	<br />
+	<textarea id=editor cols=100 rows=24 onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">
+	</textarea>
+</div>
+
+<script src="studio.js" type="text/javascript"></script>
+<script src="prolog.js" type="text/javascript"></script>
+<script src="studio.prc.js" type="text/javascript"></script>
+<script type="text/javascript">
+	studio . setResource (['sonda', 123, 'mariner'], "Joker was here!");
+	studio . setResource (['sonda', 123, 'mariner.prc'], "JOKER");
+</script>
+
+<script type="text/javascript">
+	studio . search ('test_scripts');
+	root = new prolog.Root(); root . auto_atoms = true;
+	console . log ('load', root . load ('main_course'));
+	//reader = new prolog . Reader (root, '[[*x *y] [main_course *x *y] [pp *x " " *y]]');
+	//reader = new prolog . Reader (root, '[*x [sum 234 *x : 1000]]');
+	reader = new prolog . Reader (root, '[*x [light_meal : *x] [not pp [sum : *x]]]');
+	reader = new prolog . Reader (root, '[*x [light_meal : *x] [pp [sum : *x]]]');
+	query = reader . getElement ();
+	res = root . resolution (query);
+	console . log (res);
+	function resolutionCommand (command, e) {
+		if (e !== undefined && e . key !== 'Enter') return;
+		console . log (root . textResolution (command));
+	};
+</script>
+
+<script type="text/javascript">
+
+studio . refresh_file_tree ('files_list', 'editor', 'file_name');
+
+</script>
+
+
+</body>
