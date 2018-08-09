@@ -112,8 +112,20 @@ function (root, directory) {
       if (a . type === 6) {el . setNative (f (a . left)); return true;}
       if (el . type === 6) {a . setNative (rev (el . left)); return true;}
       return false;
-    }
-  }
+    };
+  };
+  var logical_one_param = function (f) {
+    this . code = function (el) {
+      if (el . type !== 1) return false;
+      var a = el . left; el = el . right; if (el . type === 1) el = el . left;
+      switch (a . type) {
+        case 6: el . setNative (f (a . left)); return true;
+        case 3: el . setNative (f (a . left . name)); return true;
+        default: break;
+      }
+      return false;
+    };
+  };
   var logical_two_params = function (f) {
     this . code = function (el) {
       if (el . type !== 1) return false;
@@ -130,7 +142,7 @@ function (root, directory) {
   var shiftl = new logical_two_params (function (a, b) {return a << b;});
   var shiftr = new logical_two_params (function (a, b) {return a >> b;});
   var shiftrr = new logical_two_params (function (a, b) {return a >>> b;});
-  var neg = new one_param (function (a) {return ~ a;}, function (a) {return ~ a;});
+  var neg = new logical_one_param (function (a) {return ~ a;}, function (a) {return ~ a;});
   this . getNativeCode = function (name) {
     switch (name) {
       case 'pp': return pp;

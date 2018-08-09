@@ -7,3 +7,4 @@ Timeout in resolutionCommand
 Add partial results for add in C++/Java
 Add logical shifts in C++/Java
 Add logical negation in C++/Java
+Add round alongside trunc
