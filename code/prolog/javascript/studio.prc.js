@@ -102,23 +102,53 @@ function (root, directory) {
     };
   };
   var add1 = new addd (1), sub1 = new addd (-1);
-  var e = new function () {
-    this . code = function (el) {if (el . type === 1) el = el . left; el . setNative (Math . E); return true;};
+  var zero_param = function (value) {
+    this . code = function (el) {if (el . type === 1) el = el . left; el . setNative (value);};
   };
-  var pi = new function () {
-    this . code = function (el) {if (el . type === 1) el = el . left; el . setNative (Math . PI); return true;};
+  var one_param = function (f, rev) {
+    this . code = function (el) {
+      if (el . type !== 1) return false;
+      var a = el . left; el = el . right; if (el . type === 1) el = el . left;
+      if (a . type === 6) {el . setNative (f (a . left)); return true;}
+      if (el . type === 6) {a . setNative (rev (el . left)); return true;}
+      return false;
+    }
+  }
+  var logical_two_params = function (f) {
+    this . code = function (el) {
+      if (el . type !== 1) return false;
+      var a = el . left; if (a . type !== 6) return false;
+      el = el . right; if (el . type !== 1) return false;
+      var b = el . left; if (b . type !== 6) return false;
+      el = el . right; if (el . type === 1) el = el . left;
+      el . setNative (f (a . left, b . left)); return true;
+    };
   };
+  var and = new logical_two_params (function (a, b) {return a & b;});
+  var or =  new logical_two_params (function (a, b) {return a | b;});
+  var xor = new logical_two_params (function (a, b) {return a ^ b;});
+  var shiftl = new logical_two_params (function (a, b) {return a << b;});
+  var shiftr = new logical_two_params (function (a, b) {return a >> b;});
+  var shiftrr = new logical_two_params (function (a, b) {return a >>> b;});
+  var neg = new one_param (function (a) {return ~ a;}, function (a) {return ~ a;});
   this . getNativeCode = function (name) {
     switch (name) {
       case 'pp': return pp;
       case 'sum': return sum;
       case 'add': return add;
       case 'mult': return mult;
-      case 'e': return e;
-      case 'pi': return pi;
+      case 'e': return new zero_param (Math . E);
+      case 'pi': return new zero_param (Math . PI);
       case 'abs': return abs;
       case 'add1': return add1;
-      case 'sub1': return sub1
+      case 'sub1': return sub1;
+      case 'and': return and;
+      case 'or': return or;
+      case 'xor': return xor;
+      case '<<': return shiftl;
+      case '>>': return shiftr;
+      case '>>>': return shiftrr;
+      case 'neg': return neg;
       default: break;
     }
     return null;
@@ -137,6 +167,7 @@ program studio #machine := ' prolog . studio '
 	]
 
 #machine pp := 'pp'
+
 #machine e := 'e'
 #machine pi := 'pi'
 #machine abs := 'abs'
@@ -144,6 +175,17 @@ program studio #machine := ' prolog . studio '
 #machine ++ := 'add1'
 #machine sub1 := 'sub1'
 #machine -- := 'sub1'
+#machine and := 'and'
+#machine & := 'and'
+#machine or := 'or'
+#machine | := 'or'
+#machine xor := 'xor'
+#machine ^ := 'xor'
+#machine << := '<<'
+#machine >> := '>>'
+#machine >>> := '>>>'
+#machine neg := 'neg'
+#machine ~ := 'neg'
 
 #machine sum := 'sum'
 #machine + := 'add'
