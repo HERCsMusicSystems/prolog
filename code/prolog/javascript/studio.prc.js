@@ -102,12 +102,20 @@ function (root, directory) {
     };
   };
   var add1 = new addd (1), sub1 = new addd (-1);
+  var e = new function () {
+    this . code = function (el) {if (el . type === 1) el = el . left; el . setNative (Math . E); return true;};
+  };
+  var pi = new function () {
+    this . code = function (el) {if (el . type === 1) el = el . left; el . setNative (Math . PI); return true;};
+  };
   this . getNativeCode = function (name) {
     switch (name) {
       case 'pp': return pp;
       case 'sum': return sum;
       case 'add': return add;
       case 'mult': return mult;
+      case 'e': return e;
+      case 'pi': return pi;
       case 'abs': return abs;
       case 'add1': return add1;
       case 'sub1': return sub1
@@ -122,12 +130,15 @@ studio . setResource (['studio.prc'],`
 program studio #machine := ' prolog . studio '
 	[
     pp not
+    e pi
     abs add1 ++ sub1 --
+    and & or | xor ^ neg ~ << >> >>>
     sum times add + mult
 	]
 
 #machine pp := 'pp'
-
+#machine e := 'e'
+#machine pi := 'pi'
 #machine abs := 'abs'
 #machine add1 := 'add1'
 #machine ++ := 'add1'
