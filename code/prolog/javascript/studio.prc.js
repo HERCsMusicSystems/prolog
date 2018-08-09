@@ -75,19 +75,6 @@ function (root, directory) {
       result . setNative (ret); return true;
     };
   };
-  var abs = new function () {
-    this . code = function (el) {
-      if (el . type !== 1) return false;
-      var left = el . left, ret = NaN;
-      switch (left . type) {
-        case 6: ret = left . left; break;
-        case 3: ret = left . left . name; break;
-        default: break;
-      }
-      el = el . right; if (el . type === 1) el = el . left;
-      el . setNative (ret < 0 ? - ret : ret); return true;
-    };
-  };
   var addd = function (delta) {
     this . code = function (el) {
       if (el . type !== 1) return false;
@@ -142,7 +129,7 @@ function (root, directory) {
   var shiftl = new logical_two_params (function (a, b) {return a << b;});
   var shiftr = new logical_two_params (function (a, b) {return a >> b;});
   var shiftrr = new logical_two_params (function (a, b) {return a >>> b;});
-  var neg = new logical_one_param (function (a) {return ~ a;}, function (a) {return ~ a;});
+  var neg = new logical_one_param (function (a) {return ~ a;});
   this . getNativeCode = function (name) {
     switch (name) {
       case 'pp': return pp;
@@ -151,7 +138,11 @@ function (root, directory) {
       case 'mult': return mult;
       case 'e': return new zero_param (Math . E);
       case 'pi': return new zero_param (Math . PI);
-      case 'abs': return abs;
+      case 'abs': return new logical_one_param (function (a) {return a < 0 ? - a : a;});
+      case 'trunc': return new logical_one_param (function (a) {return Math . trunc (a);});
+      case 'floor': return new logical_one_param (function (a) {return Math . floor (a);});
+      case 'ceil': return new logical_one_param (function (a) {return Math . ceil (a);});
+      case 'round': return new logical_one_param (function (a) {return Math . round (a);});
       case 'add1': return add1;
       case 'sub1': return sub1;
       case 'and': return and;
@@ -173,7 +164,8 @@ program studio #machine := ' prolog . studio '
 	[
     pp not
     e pi
-    abs add1 ++ sub1 --
+    abs trunc floor ceil round
+    add1 ++ sub1 --
     and & or | xor ^ neg ~ << >> >>>
     sum times add + mult
 	]
@@ -183,6 +175,10 @@ program studio #machine := ' prolog . studio '
 #machine e := 'e'
 #machine pi := 'pi'
 #machine abs := 'abs'
+#machine trunc := 'trunc'
+#machine floor := 'floor'
+#machine ceil := 'ceil'
+#machine round := 'round'
 #machine add1 := 'add1'
 #machine ++ := 'add1'
 #machine sub1 := 'sub1'
