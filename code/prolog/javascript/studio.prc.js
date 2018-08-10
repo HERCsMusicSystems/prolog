@@ -230,6 +230,37 @@ function (root, directory) {
       };
     };
   };
+  var comparator_runner = function (f) {
+    this . code = function (el) {
+      if (el . type !== 1) return false;
+      var ret = el . left; el = el . right; if (el . type !== 1) return false;
+      var comp = el . left; el = el . right;
+      while (el . type === 1) {
+        var e = el . left;
+        switch (e . type) {
+          case 6:
+            switch (comp . type) {
+              case 6: if (f (comp . left, e . left)) comp = e; break;
+              case 3: if (f (comp . left . name, e . left)) comp = e; break;
+              default: return false;
+            }
+            break;
+          case 3:
+            switch (comp . type) {
+              case 6: if (f (comp . left, e . left . name)) comp = e; break;
+              case 3: if (f (comp . left . name, e . left . name)) comp = e; break;
+              default: return false;
+            }
+            break;
+          default: return false;
+        }
+        el = el . right;
+      }
+      ret . type = comp . type;
+      ret . left = comp . left;
+      return true;
+    };
+  };
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
@@ -277,6 +308,8 @@ function (root, directory) {
       case 'greater_eq': return greater_eq;
       case 'less': return less;
       case 'less_eq': return less_eq;
+      case 'min': return new comparator_runner (function (a, b) {return a > b;});
+      case 'max': return new comparator_runner (function (a, b) {return a < b;});
       default: break;
     }
     return null;
@@ -297,7 +330,7 @@ program studio #machine := ' prolog . studio '
     sum times add + sub - mult div mod %
     degrad sin cos tan cotan asin acos atan acotan atan2
     pow exp log log2 log10 ln
-    greater greater_eq less less_eq > >= => < <= =<
+    greater greater_eq less less_eq > >= => < <= =< min max
 	]
 
 #machine list := 'list'
@@ -365,6 +398,8 @@ program studio #machine := ' prolog . studio '
 #machine less_eq := 'less_eq'
 #machine <= := 'less_eq'
 #machine =< := 'less_eq'
+#machine min := 'min'
+#machine max := 'max'
 
 [[not : *x] *x / fail]
 [[not : *]]
