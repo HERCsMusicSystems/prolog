@@ -5,6 +5,7 @@ function (root, directory) {
     this . code = function (el) {
       if (el . type === 0) {root . log (root . list () . join (' ')); return true;}
       if (el . type === 2) {
+        el . type = 0;
         var l = root . list ();
         for (var ind in l) el = el . setNativePair (l [ind]);
         return true;
@@ -16,6 +17,7 @@ function (root, directory) {
         if (first . type === 3) {
           if (el . type === 0) {root . log (root . listAtom (first . left) . join ('\n')); return true;}
           if (el . type === 2) {
+            el . type = 0;
             var l = root . listAtom (first . left);
             for (var ind in l) el = el . setNativePair (l [ind]);
             return true;
@@ -27,6 +29,7 @@ function (root, directory) {
           if (typeof (first) !== 'string') return false;
           if (el . type === 0) {root . log (root . list (first) . join (' ')); return true;}
           if (el . type === 2) {
+            el . type = 0;
             var l = root . list (first);
             for (var ind in l) el = el . setNativePair (l [ind]);
             return true;
@@ -283,6 +286,33 @@ function (root, directory) {
       return false;
     };
   };
+  var stack = function (method) {
+    var stacker = function (atom) {
+      var q = [];
+      this . code = function (el) {
+        if (el . type === 2) {
+          el . type = 0;
+          for (var ind in q) {el . setPair (); q [ind] . duplicate (el . left); el = el . right;}
+          return true;
+        }
+        if (el . type === 0) {atom . setMachine (null); return true;}
+        while (el . type === 1) {
+          var left = el . left;
+          if (left . type === 2) {var ell = q [method] (); if (ell === undefined) return false; ell . duplicate (left);}
+          else q . push (left);
+          el = el . right;
+        }
+        return true;
+      };
+    };
+    this . code = function (el) {
+      if (el . type === 1) el = el . left;
+      if (el . type === 2) el . setAtom (new Atom ());
+      if (el . type !== 3) return false;
+      if (el . left . machine !== null) return false;
+      return el . left . setMachine (new stacker (el . left));
+    };
+  };
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
@@ -333,6 +363,8 @@ function (root, directory) {
       case 'min': return new comparator_runner (function (a, b) {return a > b;});
       case 'max': return new comparator_runner (function (a, b) {return a < b;});
       case 'rnd': return rnd;
+      case 'STACK': return new stack ('pop');
+      case 'QUEUE': return new stack ('shift');
       default: break;
     }
     return null;
@@ -355,6 +387,7 @@ program studio #machine := ' prolog . studio '
     pow exp log log2 log10 ln
     rnd grnd
     greater greater_eq less less_eq > >= => < <= =< min max
+    STACK QUEUE
 	]
 
 #machine list := 'list'
@@ -426,6 +459,9 @@ program studio #machine := ' prolog . studio '
 #machine =< := 'less_eq'
 #machine min := 'min'
 #machine max := 'max'
+
+#machine STACK := 'STACK'
+#machine QUEUE := 'QUEUE'
 
 [[not : *x] *x / fail]
 [[not : *]]
