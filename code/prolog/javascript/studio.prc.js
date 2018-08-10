@@ -126,7 +126,7 @@ function (root, directory) {
   };
   var add1 = new addd (1), sub1 = new addd (-1);
   var zero_param = function (value) {
-    this . code = function (el) {if (el . type === 1) el = el . left; el . setNative (value);};
+    this . code = function (el) {if (el . type === 1) el = el . left; el . setNative (value); return true;};
   };
   var one_param = function (f, rev) {
     this . code = function (el) {
@@ -189,6 +189,16 @@ function (root, directory) {
       case '>>': return shiftr;
       case '>>>': return shiftrr;
       case 'neg': return neg;
+      case 'degrad': return new one_param (function (a) {return a * Math . PI / 180;}, function (a) {return a * 180 / Math . PI;});
+      case 'sin': return new one_param (function (a) {return Math . sin (a);}, function (a) {return Math . asin (a);});
+      case 'cos': return new one_param (function (a) {return Math . cos (a);}, function (a) {return Math . acos (a);});
+      case 'tan': return new one_param (function (a) {return Math . tan (a);}, function (a) {return Math . atan (a);});
+      case 'cotan': return new one_param (function (a) {return 1 / Math . tan (a);}, function (a) {return Math . PI / 2 - Math . atan (a);});
+      case 'asin': return new one_param (function (a) {return Math . asin (a);}, function (a) {return Math . sin (a);});
+      case 'acos': return new one_param (function (a) {return Math . acos (a);}, function (a) {return Math . cos (a);});
+      case 'atan': return new one_param (function (a) {return Math . atan (a);}, function (a) {return Math . tan (a);});
+      case 'acotan': return new one_param (function (a) {return Math . PI / 2 - Math . atan (a);}, function (a) {return 1 / Math . tan (a);});
+      case 'atan2': return new logical_two_params (function (a, b) {return Math . atan2 (a, b);});
       default: break;
     }
     return null;
@@ -207,6 +217,7 @@ program studio #machine := ' prolog . studio '
     add1 ++ sub1 --
     and & or | xor ^ neg ~ << >> >>>
     sum times add + mult
+    degrad sin cos tan cotan asin acos atan acotan atan2
 	]
 
 #machine list := 'list'
@@ -239,6 +250,17 @@ program studio #machine := ' prolog . studio '
 #machine + := 'add'
 #machine add := 'add'
 #machine mult := 'mult'
+
+#machine degrad := 'degrad'
+#machine sin := 'sin'
+#machine cos := 'cos'
+#machine tan := 'tan'
+#machine cotan := 'cotan'
+#machine asin := 'asin'
+#machine acos := 'acos'
+#machine atan := 'atan'
+#machine acotan := 'acotan'
+#machine atan2 := 'atan2'
 
 [[not : *x] *x / fail]
 [[not : *]]
