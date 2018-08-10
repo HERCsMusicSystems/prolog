@@ -211,8 +211,7 @@ Root . prototype . list = function (name) {
 		return this . root . names ();
 	}
 	var sub = this . searchDirectory (name);
-	if (sub === null) return [];
-	return sub . list ();
+	return sub === null ? [] : sub . list ();
 };
 Root . prototype . close = function () {
 	if (this . root === null) return;
@@ -256,14 +255,14 @@ Root . prototype . Protect = function (name) {
 	if (atom === null) return false;
 	atom . Protected = true;
 };
-Root . prototype . listAtom = function (name) {
-	var atom = this . search (name);
+Root . prototype . listAtom = function (atom) {
+	if (typeof (atom) === 'string') atom = this . search (atom);
 	if (atom === null) return [];
 	if (atom . machine !== null) return [atom . name + ' ' + this . assignment_caption + ' ' + this . machine_caption];
 	var el = atom . firstClause;
 	var ret = [];
 	while (el !== null) {
-		ret . push (this . left_caption + this . left_caption + name + this . getRightCaption (el . left . right) + this . right_caption + this . getRightCaption (el . right) + this . right_caption);
+		ret . push (this . left_caption + this . left_caption + atom . name + this . getRightCaption (el . left . right) + this . right_caption + this . getRightCaption (el . right) + this . right_caption);
 		el = el . left . left . left;
 	}
 	return ret;
