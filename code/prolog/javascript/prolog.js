@@ -94,6 +94,7 @@ Element . prototype . setPair = function () {
 Element . prototype . setVar = function (ind) {this . type = 2; this . left = ind;};
 Element . prototype . setAtom = function (atom) {this . type = 3; this . left = atom;};
 Element . prototype . setNative = function (el) {this . type = 6; this . left = el;};
+Element . prototype . setNativePair = function (native) {this . type = 1; this . left = new Element (); this . left . setNative (native); return this . right = new Element ();}
 Element . prototype . duplicate = function (el) {
 	if (el === undefined) el = new Element ();
 	el . type = this . type;
@@ -210,8 +211,7 @@ Root . prototype . list = function (name) {
 		return this . root . names ();
 	}
 	var sub = this . searchDirectory (name);
-	if (sub === null) return [];
-	return sub . list ();
+	return sub === null ? [] : sub . list ();
 };
 Root . prototype . close = function () {
 	if (this . root === null) return;
@@ -255,13 +255,14 @@ Root . prototype . Protect = function (name) {
 	if (atom === null) return false;
 	atom . Protected = true;
 };
-Root . prototype . listAtom = function (name) {
-	var atom = this . search (name);
+Root . prototype . listAtom = function (atom) {
+	if (typeof (atom) === 'string') atom = this . search (atom);
 	if (atom === null) return [];
+	if (atom . machine !== null) return [atom . name + ' ' + this . assignment_caption + ' ' + this . machine_caption];
 	var el = atom . firstClause;
 	var ret = [];
 	while (el !== null) {
-		ret . push (this . left_caption + this . left_caption + name + this . getRightCaption (el . left . right) + this . right_caption + this . getRightCaption (el . right) + this . right_caption);
+		ret . push (this . left_caption + this . left_caption + atom . name + this . getRightCaption (el . left . right) + this . right_caption + this . getRightCaption (el . right) + this . right_caption);
 		el = el . left . left . left;
 	}
 	return ret;
@@ -847,7 +848,7 @@ Resolution . prototype . res_forward = function () {
 		return 0;
 	}
 	var clausa = term . left . left . firstClause;
-	if (clausa === null) {this . root . log ("Free atom [" + term . left . atom . name + "]."); return 0;}
+	if (clausa === null) {this . root . log ("Free atom [" + term . left . left . name + "]."); return 0;}
 	var relation_atom = new Element ();
 	relation_atom . type = 3; relation_atom . left = term . left . left;
 	return this . sub_res_forward (relation_atom, term, clausa);
