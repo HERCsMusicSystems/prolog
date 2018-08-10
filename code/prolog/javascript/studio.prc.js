@@ -149,6 +149,18 @@ function (root, directory) {
       return false;
     };
   };
+  var two_params = function (f, rev, esc) {
+    this . code = function (el) {
+      if (el . type !== 1) return false;
+      var a = el . left; el = el . right; if (el . type !== 1) return false;
+      var n = el . left; el = el . right; if (el . type === 1) el = el . left;
+      if (a . type === 6) {
+        if (n . type === 6) {el . setNative (f (a . left, n . left)); return true;}
+        if (el . type === 6) {n . setNative (rev (a . left, el . left)); return true;}
+      }
+      if (n . type === 6) {a . setNative (esc (n . left, el . left)); return true;}
+    };
+  };
   var logical_two_params = function (f) {
     this . code = function (el) {
       if (el . type !== 1) return false;
@@ -227,6 +239,12 @@ function (root, directory) {
       case 'atan': return new one_param (function (a) {return Math . atan (a);}, function (a) {return Math . tan (a);});
       case 'acotan': return new one_param (function (a) {return Math . PI / 2 - Math . atan (a);}, function (a) {return 1 / Math . tan (a);});
       case 'atan2': return new logical_two_params (function (a, b) {return Math . atan2 (a, b);});
+      case 'pow': return new two_params (function (a, n) {return Math . pow (a, n);}, function (a, x) {return Math . log (x) / Math . log (a);}, function (n, x) {return Math . pow (x, 1 / n);});
+      case 'exp': return new one_param (function (n) {return Math . exp (n);}, function (x) {return Math . log (x);});
+      case 'log': return new two_params (function (a, x) {return Math . log (x) / Math . log (a);}, function (a, n) {return Math . pow (a, n);}, function (x, n) {return Math . pow (x, 1 / n);});
+      case 'log2': return new one_param (function (x) {return Math . log2 (x);}, function (n) {return Math . pow (2, n);});
+      case 'log10': return new one_param (function (x) {return Math . log10 (x);}, function (n) {return Math . pow (10, n);});
+      case 'ln': return new one_param (function (x) {return Math . log (x);}, function (n) {return Math . exp (n);});
       case 'greater': return greater;
       case 'greater_eq': return greater_eq;
       case 'less': return less;
@@ -250,6 +268,7 @@ program studio #machine := ' prolog . studio '
     and & or | xor ^ neg ~ << >> >>>
     sum times add + mult
     degrad sin cos tan cotan asin acos atan acotan atan2
+    pow exp log log2 log10 ln
     greater greater_eq less less_eq > >= => < <= =<
 	]
 
@@ -294,6 +313,14 @@ program studio #machine := ' prolog . studio '
 #machine atan := 'atan'
 #machine acotan := 'acotan'
 #machine atan2 := 'atan2'
+
+#machine pow := 'pow'
+#machine exp := 'exp'
+#machine log := 'log'
+#machine log2 := 'log2'
+#machine log10 := 'log10'
+#machine ln := 'ln'
+
 #machine greater := 'greater'
 #machine > := 'greater'
 #machine greater_eq := 'greater_eq'
