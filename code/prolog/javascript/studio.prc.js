@@ -6,26 +6,32 @@ function (root, directory) {
       if (el . type === 0) {root . log (root . list () . join (' ')); return true;}
       if (el . type === 2) {
         var l = root . list ();
-        for (var ind in l) {
-          el . type = 1; el . left = new Element (); el . left . setNative (l [ind]); el . right = new Element ();
-          el = el . right;
-        } return true;
+        for (var ind in l) el = el . setNativePair (l [ind]);
+        return true;
       }
       if (el . type === 1) {
         var first = el . left;
         if (first . type === 2) {first . setNative (root . list () . join (' ')); return true;}
+        el = el . right;
         if (first . type === 3) {
-          el = el . right;
           if (el . type === 0) {root . log (root . listAtom (first . left . name) . join ('\n')); return true;}
           if (el . type === 2) {
             var l = root . listAtom (first . left . name);
-            for (var ind in l) {
-              el . type = 1; el . left = new Element (); el . left . setNative (l [ind]); el . right = new Element ();
-              el = el . right;
-            }
+            for (var ind in l) el = el . setNativePair (l [ind]);
             return true;
           }
           if (el . type === 1) {el . left . setNative (root . listAtom (first . left . name) . join ('\n')); return true;}
+        }
+        if (first . type === 6) {
+          first = first . left;
+          if (typeof (first) !== 'string') return false;
+          if (el . type === 0) {root . log (root . list (first) . join (' ')); return true;}
+          if (el . type === 2) {
+            var l = root . list (first);
+            for (var ind in l) el = el . setNativePair (l [ind]);
+            return true;
+          }
+          if (el . type === 1) {el . left . setNative (root . list (first) . join (' ')); return true;}
         }
       }
       return false;
