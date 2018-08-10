@@ -206,13 +206,41 @@ function (root, directory) {
   var greater_eq = new comparator (function (a, b) {return a >= b;});
   var less = new comparator (function (a, b) {return a < b;});
   var less_eq = new comparator (function (a, b) {return a <= b;});
+  var sub = new function () {
+    this . code = function (el) {
+      this . code = function (el) {
+        if (el . type !== 1) return false;
+        var a = el . left; el = el . right;
+        if (el . type !== 1) {
+          if (a . type === 6) {el . setNative (- a . left); return true;}
+          if (el . type === 6) {a . setNative (- el . left); return true;}
+          return false;
+        }
+        var b = el . left; el = el . right;
+        if (el . type === 0) {
+          if (a . type === 6) {b . setNative (- a . left); return true;}
+          if (b . type === 6) {a . setNative (- b . left); return true;}
+        }
+        if (el . type === 1) el = el . left;
+        if (a . type === 6) {
+          if (b . type === 6) {el . setNative (a . left - b . left); return true;}
+          if (el . type === 6) {n . setNative (a . left - el . left); return true;}
+        }
+        if (b . type === 6) {a . setNative (b . left + el . left); return true;}
+      };
+    };
+  };
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
       case 'pp': return pp;
       case 'sum': return sum;
       case 'add': return add;
+      case 'sub': return sub;
       case 'mult': return mult;
+      case 'times': return new two_params (function (a, b) {return a * b;}, function (a, c) {return c / a;}, function (b, c) {return c / b;});
+      case 'div': return new two_params (function (a, b) {return a / b;}, function (a, c) {return a / c;}, function (b, c) {return b * c;});
+      case 'mod': return new logical_two_params (function (a, b) {return a % b;});
       case 'e': return new zero_param (Math . E);
       case 'pi': return new zero_param (Math . PI);
       case 'abs': return new logical_one_param (function (a) {return a < 0 ? - a : a;});
@@ -266,7 +294,7 @@ program studio #machine := ' prolog . studio '
     abs trunc floor ceil round
     add1 ++ sub1 --
     and & or | xor ^ neg ~ << >> >>>
-    sum times add + mult
+    sum times add + sub - mult div mod %
     degrad sin cos tan cotan asin acos atan acotan atan2
     pow exp log log2 log10 ln
     greater greater_eq less less_eq > >= => < <= =<
@@ -286,6 +314,17 @@ program studio #machine := ' prolog . studio '
 #machine ++ := 'add1'
 #machine sub1 := 'sub1'
 #machine -- := 'sub1'
+#machine sum := 'sum'
+#machine add := 'add'
+#machine + := 'add'
+#machine sub := 'sub'
+#machine - := 'sub'
+#machine mult := 'mult'
+#machine times := 'times'
+#machine div := 'div'
+#machine mod := 'mod'
+#machine % := 'mod'
+
 #machine and := 'and'
 #machine & := 'and'
 #machine or := 'or'
@@ -297,11 +336,6 @@ program studio #machine := ' prolog . studio '
 #machine >>> := '>>>'
 #machine neg := 'neg'
 #machine ~ := 'neg'
-
-#machine sum := 'sum'
-#machine + := 'add'
-#machine add := 'add'
-#machine mult := 'mult'
 
 #machine degrad := 'degrad'
 #machine sin := 'sin'
