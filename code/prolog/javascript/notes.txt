@@ -9,3 +9,4 @@ Add logical shifts in C++/Java
 Add logical negation in C++/Java
 Add round, ceil and floor alongside trunc
 Add all other trigonometric functions to C++/Java
+Consider <= and >= as comparators in C++/Java

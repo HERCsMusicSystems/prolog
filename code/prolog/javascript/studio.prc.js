@@ -159,6 +159,30 @@ function (root, directory) {
       el . setNative (f (a . left, b . left)); return true;
     };
   };
+  var comparator = function (f) {
+    this . code = function (el) {
+      if (el . type !== 1) return false;
+      var first = el . left;
+      switch (first . type) {
+        case 6: first = first . left; break;
+        case 3: first = first . left . name; break;
+        default: return false;
+      }
+      el = el . right;
+      while (el . type === 1) {
+        var next = el . left;
+        switch (next . type) {
+          case 6: next = next . left; break;
+          case 3: next = next . left . name; break;
+          default: return false;
+        }
+        if (! f (first, next)) return false;
+        first = next;
+        el = el . right;
+      }
+      return true;
+    };
+  };
   var and = new logical_two_params (function (a, b) {return a & b;});
   var or =  new logical_two_params (function (a, b) {return a | b;});
   var xor = new logical_two_params (function (a, b) {return a ^ b;});
@@ -166,6 +190,10 @@ function (root, directory) {
   var shiftr = new logical_two_params (function (a, b) {return a >> b;});
   var shiftrr = new logical_two_params (function (a, b) {return a >>> b;});
   var neg = new logical_one_param (function (a) {return ~ a;});
+  var greater = new comparator (function (a, b) {return a > b;});
+  var greater_eq = new comparator (function (a, b) {return a >= b;});
+  var less = new comparator (function (a, b) {return a < b;});
+  var less_eq = new comparator (function (a, b) {return a <= b;});
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
@@ -199,6 +227,10 @@ function (root, directory) {
       case 'atan': return new one_param (function (a) {return Math . atan (a);}, function (a) {return Math . tan (a);});
       case 'acotan': return new one_param (function (a) {return Math . PI / 2 - Math . atan (a);}, function (a) {return 1 / Math . tan (a);});
       case 'atan2': return new logical_two_params (function (a, b) {return Math . atan2 (a, b);});
+      case 'greater': return greater;
+      case 'greater_eq': return greater_eq;
+      case 'less': return less;
+      case 'less_eq': return less_eq;
       default: break;
     }
     return null;
@@ -218,6 +250,7 @@ program studio #machine := ' prolog . studio '
     and & or | xor ^ neg ~ << >> >>>
     sum times add + mult
     degrad sin cos tan cotan asin acos atan acotan atan2
+    greater greater_eq less less_eq > >= => < <= =<
 	]
 
 #machine list := 'list'
@@ -261,6 +294,16 @@ program studio #machine := ' prolog . studio '
 #machine atan := 'atan'
 #machine acotan := 'acotan'
 #machine atan2 := 'atan2'
+#machine greater := 'greater'
+#machine > := 'greater'
+#machine greater_eq := 'greater_eq'
+#machine >= := 'greater_eq'
+#machine => := 'greater_eq'
+#machine less := 'less'
+#machine < := 'less'
+#machine less_eq := 'less_eq'
+#machine <= := 'less_eq'
+#machine =< := 'less_eq'
 
 [[not : *x] *x / fail]
 [[not : *]]
