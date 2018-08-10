@@ -261,6 +261,28 @@ function (root, directory) {
       return true;
     };
   };
+  var rnd = new function () {
+    this . code = function (el) {
+      var params = [];
+      var ret = null;
+      while (el . type === 1) {
+        switch (el . left . type) {
+          case 2: ret = el . left; break;
+          case 6: params . push (el . left . left);
+          default: break;
+        }
+        el = el . right;
+      }
+      if (ret === null) return false;
+      switch (params . length) {
+        case 0: ret . setNative (Math . random ()); return true;
+        case 1: ret . setNative (Math . random () + params [0]); return true;
+        case 2: ret . setNative (Math . random () * (params [1] - params [0]) + params [0]); return true;
+        default: break;
+      }
+      return false;
+    };
+  };
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
@@ -310,6 +332,7 @@ function (root, directory) {
       case 'less_eq': return less_eq;
       case 'min': return new comparator_runner (function (a, b) {return a > b;});
       case 'max': return new comparator_runner (function (a, b) {return a < b;});
+      case 'rnd': return rnd;
       default: break;
     }
     return null;
@@ -330,6 +353,7 @@ program studio #machine := ' prolog . studio '
     sum times add + sub - mult div mod %
     degrad sin cos tan cotan asin acos atan acotan atan2
     pow exp log log2 log10 ln
+    rnd grnd
     greater greater_eq less less_eq > >= => < <= =< min max
 	]
 
@@ -388,6 +412,8 @@ program studio #machine := ' prolog . studio '
 #machine log10 := 'log10'
 #machine ln := 'ln'
 
+#machine rnd := 'rnd'
+
 #machine greater := 'greater'
 #machine > := 'greater'
 #machine greater_eq := 'greater_eq'
@@ -403,6 +429,9 @@ program studio #machine := ' prolog . studio '
 
 [[not : *x] *x / fail]
 [[not : *]]
+
+[[grnd : *command] [rnd : *command]]
+[[grnd : *command] / [grnd : *command]]
 
 end .
 `);
