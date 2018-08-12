@@ -422,6 +422,12 @@ function (root, directory) {
       case 'min': return new comparator_runner (function (a, b) {return a > b;});
       case 'max': return new comparator_runner (function (a, b) {return a < b;});
       case 'rnd': return rnd;
+      case 'atom?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 3;}};
+      case 'integer?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && Number . isInteger (el . left);}};
+      case 'double?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && typeof (el . left) === 'number' && ! Number . isInteger (el . left);}};
+      case 'number?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && typeof (el . left) === 'number';}};
+      case 'text?': return {code: function (e) {if (el . type === 1) el = el . left; return el . type === 6 && typeof (el . left) === 'string';}};
+      case 'var?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 2;}};
       case 'CONSTANT': return constant;
       case 'VARIABLE': return variable;
       case 'ACCUMULATOR': return accumulator;
@@ -439,7 +445,6 @@ program studio #machine := ' prolog . studio '
 	[
     list
     pp
-    not res
     e pi
     abs trunc floor ceil round
     add1 ++ sub1 --
@@ -449,7 +454,13 @@ program studio #machine := ' prolog . studio '
     pow exp log log2 log10 ln
     rnd grnd
     greater greater_eq less less_eq > >= => < <= =< min max
-    CONSTANT VARIABLE ACCUMULATOR STACK QUEUE
+    ; TERM
+    atom? integer? double? number? text? var?
+    ; META
+    CONSTANT VARIABLE var ACCUMULATOR STACK QUEUE
+    REVERSE
+    ISALL isall isallq isallr
+    not res
 	]
 
 #machine list := 'list'
@@ -522,6 +533,13 @@ program studio #machine := ' prolog . studio '
 #machine min := 'min'
 #machine max := 'max'
 
+#machine atom? := 'atom?'
+#machine integer? := 'integer?'
+#machine double? := 'double?'
+#machine number? := 'number?'
+#machine text? := 'text?'
+#machine var? := 'var?'
+
 #machine CONSTANT := 'CONSTANT'
 #machine VARIABLE := 'VARIABLE'
 #machine ACCUMULATOR := 'ACCUMULATOR'
@@ -532,6 +550,40 @@ program studio #machine := ' prolog . studio '
 [[not : *]]
 
 [[res : *command] : *command]
+
+[[ISALL *atom *template : *call]
+	[res : *call]
+	[*atom *template] fail
+]
+[[ISALL : *]]
+
+[[isall *list *template : *call]
+	[ACCUMULATOR *atom]
+	[ISALL *atom *template : *call]
+	[*atom : *list] /
+]
+
+[[isallq *list *template : *call]
+	[QUEUE *atom]
+	[ISALL *atom *template : *call]
+	[*atom : *list] /
+]
+
+[[isallr *list *template : *call]
+	[ACCUMULATOR *atom]
+	[ISALL *atom *template : *call]
+	[*atom : *reversed_list]
+	[REVERSE *reversed_list *list] /
+]
+
+[[REVERSE *l1 *l2] [REVERSE *l1 [] *l2]]
+[[REVERSE [] *x *x]]
+[[REVERSE [*head : *tail] *l0 *list] [REVERSE *tail [*head : *l0] *list]]
+
+[[var]]
+[[var *var : *vars] [var? *var] / [VARIABLE *var] / [var : *vars]]
+[[var [*var *value] : *vars] / [VARIABLE *var *value] / [var : *vars]]
+[[var *var : *vars] [VARIABLE *var] / [var : *vars]]
 
 [[grnd : *command] [rnd : *command]]
 [[grnd : *command] / [grnd : *command]]
