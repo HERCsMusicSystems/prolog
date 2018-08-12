@@ -290,17 +290,16 @@ function (root, directory) {
     var stacker = function (atom) {
       var q = [];
       this . code = function (el) {
-        if (el . type === 2) {
-          el . type = 0;
-          for (var ind in q) {el . setPair (); q [ind] . duplicate (el . left); el = el . right;}
-          return true;
-        }
-        if (el . type === 0) {atom . setMachine (null); return true;}
+        if (el . type === 0) return atom . setMachine (null);
         while (el . type === 1) {
           var left = el . left;
           if (left . type === 2) {var ell = q [method] (); if (ell === undefined) return false; ell . duplicate (left);}
           else q . push (left);
           el = el . right;
+        }
+        if (el . type === 2) {
+          el . type = 0;
+          for (var ind in q) {el . setPair (); q [ind] . duplicate (el . left); el = el . right;}
         }
         return true;
       };
@@ -313,6 +312,66 @@ function (root, directory) {
       return el . left . setMachine (new stacker (el . left));
     };
   };
+	var accumulator = new function () {
+		var accu = function (atom) {
+			var accu = new Element ();
+			this . code = function (el, resolution) {
+				if (el . type === 0) return atom . setMachine (null);
+				while (el . type === 1) {
+					resolution . reset ();
+					var e = new Element ();
+					e . type = 1;
+					e . left = resolution . match_product (el . left, true);
+					e . right = resolution . match_product (accu, false);
+					accu = e;
+					el = el . right;
+				}
+				if (el . type === 2) accu . duplicate (el);
+				return true;
+			};
+		};
+		this . code = function (el) {
+			if (el . type === 1) el = el . left;
+			if (el . type === 2) el . setAtom (new Atom ());
+			if (el . type !== 3) return false;
+			if (el . left . machine !== null) return false;
+			return el . left . setMachine (new accu (el . left));
+		};
+	};
+	var constant = new function () {
+		var constantor = function (atom, value) {
+			this . code = function (el) {
+				if (el . type === 0) return atom . setMachine (null);
+				if (el . type === 1) el = el . left;
+				value . duplicate (el);
+				return true;
+			};
+		};
+		this . code = function (el) {
+			if (el . type !== 1) return false;
+			var atom = el . left; if (atom . type === 2) atom . setAtom (new Atom ()); if (atom . type !== 3 || atom . left . machine !== null) return false;
+			el = el . right; if (el . type === 1) el = el . left;
+			return atom . left . setMachine (new constantor (atom, el));
+		};
+	};
+	var variable = new function () {
+		var variabler = function (atom, value) {
+			this . code = function (el) {
+				if (el . type === 1) {el . left . duplicate (value); return true;}
+				if (el . type === 2) {value . duplicate (el); return true;}
+				if (el . type === 0) return atom . setMachine (null);
+				return false;
+			};
+		};
+		this . code = function (el) {
+			var atom = null;
+			if (el . type === 1) {atom = el . left; el = el . right; if (el . type === 1) el = el . left;} else atom = el;
+			if (atom . type === 2) atom . setAtom (new Atom);
+			if (atom . left . machine !== null) return false;
+			return atom . left . setMachine (new variabler (atom, atom === el ? new Element () : el));
+		};
+		// [VARIABLE : atom] [VARIABLE atom] [VARIABLE atom : value] [VARIABLE atom value]
+	};
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
@@ -363,6 +422,9 @@ function (root, directory) {
       case 'min': return new comparator_runner (function (a, b) {return a > b;});
       case 'max': return new comparator_runner (function (a, b) {return a < b;});
       case 'rnd': return rnd;
+      case 'CONSTANT': return constant;
+      case 'VARIABLE': return variable;
+      case 'ACCUMULATOR': return accumulator;
       case 'STACK': return new stack ('pop');
       case 'QUEUE': return new stack ('shift');
       default: break;
@@ -377,7 +439,7 @@ program studio #machine := ' prolog . studio '
 	[
     list
     pp
-    not
+    not res
     e pi
     abs trunc floor ceil round
     add1 ++ sub1 --
@@ -387,7 +449,7 @@ program studio #machine := ' prolog . studio '
     pow exp log log2 log10 ln
     rnd grnd
     greater greater_eq less less_eq > >= => < <= =< min max
-    STACK QUEUE
+    CONSTANT VARIABLE ACCUMULATOR STACK QUEUE
 	]
 
 #machine list := 'list'
@@ -460,11 +522,16 @@ program studio #machine := ' prolog . studio '
 #machine min := 'min'
 #machine max := 'max'
 
+#machine CONSTANT := 'CONSTANT'
+#machine VARIABLE := 'VARIABLE'
+#machine ACCUMULATOR := 'ACCUMULATOR'
 #machine STACK := 'STACK'
 #machine QUEUE := 'QUEUE'
 
 [[not : *x] *x / fail]
 [[not : *]]
+
+[[res : *command] : *command]
 
 [[grnd : *command] [rnd : *command]]
 [[grnd : *command] / [grnd : *command]]
