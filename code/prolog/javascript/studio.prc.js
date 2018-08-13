@@ -372,6 +372,51 @@ function (root, directory) {
 		};
 		// [VARIABLE : atom] [VARIABLE atom] [VARIABLE atom : value] [VARIABLE atom value]
 	};
+	var text_list = {
+		code: function (el) {
+			if (el . type !== 1) return false;
+			var text = el . left; el = el . right;
+			if (text . type === 2) {
+				if (el . type === 1 && el . left . type === 1) el = el . left;
+				var ret = [];
+				while (el . type === 1) {if (el . left . type === 6) ret . push (Number (el . left . left)); el = el . right;}
+				text . setNative (String . fromCharCode . apply (this, ret));
+				return true;
+			}
+			if (text . type === 3) text = text . left . name;
+			else if (text . type === 6) text = String (text . left);
+			else return false;
+			if (el . type === 1) el = el . left;
+			el . type = 0;
+			for (var ind in text) el = el . setNativePair (text . charCodeAt (ind));
+			return true;
+		}
+	};
+	var text_term = function (root) {
+		this . code = function (el) {
+			if (el . type !== 1) return false;
+			var text = el . left;
+			el = el . right;
+			if (text . type === 6 && typeof (text . left) === 'string') {
+				var reader = new Reader (root, text . left);
+				el . type = 0;
+				var e = reader . getElement ();
+				while (e !== null) {
+					el . type = 1;
+					el . left = e;
+					el . right = new Element ();
+					el = el . right;
+					reader . vars = [];
+					e = reader . getElement ();
+				}
+				return true;
+			}
+			var area = [];
+			while (el . type === 1) {area . push (root . getValue (el . left)); el = el . right;}
+			text . setNative (area . join (' '));
+			return true;
+		};
+	};
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
@@ -428,6 +473,10 @@ function (root, directory) {
       case 'number?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && typeof (el . left) === 'number';}};
       case 'text?': return {code: function (e) {if (el . type === 1) el = el . left; return el . type === 6 && typeof (el . left) === 'string';}};
       case 'var?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 2;}};
+      case 'head?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6;}};
+      case 'machine?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 3 && el . left . machine !== null;}};
+      case 'text_list': return text_list;
+      case 'text_term': return new text_term (root);
       case 'CONSTANT': return constant;
       case 'VARIABLE': return variable;
       case 'ACCUMULATOR': return accumulator;
@@ -455,7 +504,7 @@ program studio #machine := ' prolog . studio '
     rnd grnd
     greater greater_eq less less_eq > >= => < <= =< min max
     ; TERM
-    atom? integer? double? number? text? var?
+    atom? integer? double? number? text? var? head? machine? text_list text_term
     ; META
     CONSTANT VARIABLE var ACCUMULATOR STACK QUEUE
     REVERSE
@@ -539,6 +588,10 @@ program studio #machine := ' prolog . studio '
 #machine number? := 'number?'
 #machine text? := 'text?'
 #machine var? := 'var?'
+#machine head? := 'head?'
+#machine machine? := 'machine?'
+#machine text_list := 'text_list'
+#machine text_term := 'text_term'
 
 #machine CONSTANT := 'CONSTANT'
 #machine VARIABLE := 'VARIABLE'

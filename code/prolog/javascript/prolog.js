@@ -472,7 +472,7 @@ Reader . prototype . getElement = function () {
 		case '[': return this . readRightSide (this . getElement (), ']');
 		case '(': return this . readRightSide (this . getElement (), ')');
 		case '.': return this . atomC ('.');
-		case 'eof': return this . error ("Syntax error (end of file).");
+		case 'eof': return null;
 		default: break;
 	}
 	return this . error ("Syntax error (unknown syntax).");
