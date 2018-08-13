@@ -306,7 +306,7 @@ function (root, directory) {
     };
     this . code = function (el) {
       if (el . type === 1) el = el . left;
-      if (el . type === 2) el . setAtom (new Atom ());
+      if (el . type === 2) el . setAtom (new prolog . Atom ());
       if (el . type !== 3) return false;
       if (el . left . machine !== null) return false;
       return el . left . setMachine (new stacker (el . left));
@@ -314,12 +314,12 @@ function (root, directory) {
   };
 	var accumulator = new function () {
 		var accu = function (atom) {
-			var accu = new Element ();
+			var accu = new prolog . Element ();
 			this . code = function (el, resolution) {
 				if (el . type === 0) return atom . setMachine (null);
 				while (el . type === 1) {
 					resolution . reset ();
-					var e = new Element ();
+					var e = new prolog . Element ();
 					e . type = 1;
 					e . left = resolution . match_product (el . left, true);
 					e . right = resolution . match_product (accu, false);
@@ -332,7 +332,7 @@ function (root, directory) {
 		};
 		this . code = function (el) {
 			if (el . type === 1) el = el . left;
-			if (el . type === 2) el . setAtom (new Atom ());
+			if (el . type === 2) el . setAtom (new prolog . Atom ());
 			if (el . type !== 3) return false;
 			if (el . left . machine !== null) return false;
 			return el . left . setMachine (new accu (el . left));
@@ -349,7 +349,9 @@ function (root, directory) {
 		};
 		this . code = function (el) {
 			if (el . type !== 1) return false;
-			var atom = el . left; if (atom . type === 2) atom . setAtom (new Atom ()); if (atom . type !== 3 || atom . left . machine !== null) return false;
+			var atom = el . left;
+			if (atom . type === 2) atom . setAtom (new prolog . Atom ());
+			if (atom . type !== 3 || atom . left . machine !== null) return false;
 			el = el . right; if (el . type === 1) el = el . left;
 			return atom . left . setMachine (new constantor (atom, el));
 		};
@@ -366,9 +368,9 @@ function (root, directory) {
 		this . code = function (el) {
 			var atom = null;
 			if (el . type === 1) {atom = el . left; el = el . right; if (el . type === 1) el = el . left;} else atom = el;
-			if (atom . type === 2) atom . setAtom (new Atom);
+			if (atom . type === 2) atom . setAtom (new prolog . Atom);
 			if (atom . left . machine !== null) return false;
-			return atom . left . setMachine (new variabler (atom, atom === el ? new Element () : el));
+			return atom . left . setMachine (new variabler (atom, atom === el ? new prolog . Element () : el));
 		};
 		// [VARIABLE : atom] [VARIABLE atom] [VARIABLE atom : value] [VARIABLE atom value]
 	};
@@ -398,13 +400,13 @@ function (root, directory) {
 			var text = el . left;
 			el = el . right;
 			if (text . type === 6 && typeof (text . left) === 'string') {
-				var reader = new Reader (root, text . left);
+				var reader = new prolog . Reader (root, text . left);
 				el . type = 0;
 				var e = reader . getElement ();
 				while (e !== null) {
 					el . type = 1;
 					el . left = e;
-					el . right = new Element ();
+					el . right = new prolog . Element ();
 					el = el . right;
 					reader . vars = [];
 					e = reader . getElement ();

@@ -3,7 +3,7 @@ var prolog = new function () {
 
 //////// ATOM ////////
 
-Atom = function (name, root) {
+var Atom = function (name, root) {
 	if (name === undefined) this . name = "<" + Math . random () . toString (16) . substring (2) + "#" + new Date () . getTime () . toString (16) + ">";
 	else this . name = name + "";
 	this . next = root === undefined ? null : root;
@@ -23,7 +23,7 @@ this . Atom = Atom;
 
 //////// DIRECTORY /////////
 
-Directory = function (name, root, service) {
+var Directory = function (name, root, service) {
 	this . name = name + "";
 	this . next = root == null ? null : root;
 	this . firstAtom = null;
@@ -84,7 +84,7 @@ this . Directory = Directory;
 //////// ELEMENET ////////
 // 0: EARTH, 1: PAIR, 2: VAR, 3: ATOM, 4: SLASH, 5: FAIL, 6: NATIVE
 
-Element = function () {this . type = 0; return;};
+var Element = function () {this . type = 0; return;};
 
 Element . prototype . setPair = function () {
 	this . type = 1;
@@ -126,7 +126,7 @@ this . Element = Element;
 
 //////// ROOT ////////
 
-Root = function () {
+var Root = function () {
 	this . left_caption = '[';
 	this . right_caption = ']';
 	this . secondary_left_caption = '(';
@@ -280,7 +280,7 @@ this . Root = Root;
 
 //////// READER ////////
 
-Reader = function (root, file) {
+var Reader = function (root, file) {
 	this . root = root;
 	this . file = file;
 	this . act = '';
@@ -988,10 +988,6 @@ Root . prototype . resolution = function (query) {
 Root . prototype . textResolution = function (command) {
 	return this . resolution (new Reader (this, command) . getElement ());
 };
-/*
-this . Root . prototype . resolution = function (query) {
-	var actuals, formals, vars, var_counter;
-	var reset = function () {actuals = null, formals = null, vars = null, var_counter = 0;};
+
 };
-*/
-};
+
