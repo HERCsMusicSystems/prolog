@@ -419,6 +419,36 @@ function (root, directory) {
 			return true;
 		};
 	};
+	var e32 = {
+		code: function (el) {
+			if (el . type !== 1) return false;
+			var e = el . left;
+			if (e . type === 6) {
+				e = Number (e . left);
+				if (e === Infinity || e === -Infinity || Number . isNaN (e)) return false;
+				el = el . right;
+				while (e !== 0) {
+					el = el . setNativePair (e & 0xff);
+					e = e >>> 8;
+				}
+				return true;
+			}
+			el = el . right;
+			var accu = 0;
+			var shift = 0;
+			while (el . type === 1) {
+				var sub = el . left;
+				if (sub . type === 6) {
+					sub = sub . left;
+					if (sub === Infinity || sub === -Infinity || Number . isNaN (sub)) return false;
+					accu += sub << shift; shift += 8;
+				}
+				el = el . right;
+			}
+			e . setNative (accu);
+			return true;
+		}
+	};
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
@@ -469,6 +499,7 @@ function (root, directory) {
       case 'min': return new comparator_runner (function (a, b) {return a > b;});
       case 'max': return new comparator_runner (function (a, b) {return a < b;});
       case 'rnd': return rnd;
+      case 'e32': return e32;
       case 'atom?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 3;}};
       case 'integer?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && Number . isInteger (el . left);}};
       case 'double?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && typeof (el . left) === 'number' && ! Number . isInteger (el . left);}};
@@ -506,7 +537,7 @@ program studio #machine := ' prolog . studio '
     rnd grnd
     greater greater_eq less less_eq > >= => < <= =< min max
     ; TERM
-    atom? integer? double? number? text? var? head? machine? text_list text_term
+    e32 atom? integer? double? number? text? var? head? machine? text_list text_term
     ; META
     CONSTANT VARIABLE var ACCUMULATOR STACK QUEUE
     REVERSE
@@ -584,6 +615,7 @@ program studio #machine := ' prolog . studio '
 #machine min := 'min'
 #machine max := 'max'
 
+#machine e32 := 'e32'
 #machine atom? := 'atom?'
 #machine integer? := 'integer?'
 #machine double? := 'double?'
