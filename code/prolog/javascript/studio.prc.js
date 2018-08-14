@@ -374,6 +374,49 @@ function (root, directory) {
 		};
 		// [VARIABLE : atom] [VARIABLE atom] [VARIABLE atom : value] [VARIABLE atom value]
 	};
+	var array = new function () {
+		var arrayer = function (atom) {
+			var content = {};
+			this . code = function (el) {
+				if (el . type === 0) return atom . setMachine (null);
+				var keys = [];
+				var ret = null;
+				var key;
+				while (el . type === 1) {
+					key = el . left;
+					switch (key . type) {
+						case 6: keys . push (key . left); break;
+						case 3: keys . push (key . left . name); break;
+						case 2: if (ret !== null) return false; ret = key; break;
+						default: return false;
+					}
+					el = el . right;
+				}
+				switch (el . type) {
+					case 0: break;
+					case 6: keys . push (el . left); break;
+					case 3: keys . push (el . left . name); break;
+					case 2: if (ret !== null) return false; ret = el; break;
+					default: return false;
+				}
+				if (ret !== null) key = keys . pop (); else {ret = key; keys . pop (); key = keys . pop ();}
+				var selector = content;
+				for (var ind in keys) {
+					if (selector [keys [ind]] === undefined) selector = (selector [keys [ind]] = {});
+					else selector = selector [keys [ind]];
+				}
+				if (ret . type === 2) selector [key] . duplicate (ret);
+				else selector [key] = ret;
+				return true;
+			};
+		};
+		this . code = function (el) {
+			if (el . type === 1) el = el . left;
+			if (el . type === 2) el . setAtom (new prolog . Atom ());
+			if (el . type !== 3 || el . left . machine !== null) return false;
+			return el . left . setMachine (new arrayer (el . left));
+		};
+	};
 	var text_list = {
 		code: function (el) {
 			if (el . type !== 1) return false;
@@ -534,6 +577,7 @@ function (root, directory) {
       case 'ACCUMULATOR': return accumulator;
       case 'STACK': return new stack ('pop');
       case 'QUEUE': return new stack ('shift');
+      case 'ARRAY': return array;
       default: break;
     }
     return null;
@@ -558,8 +602,11 @@ program studio #machine := ' prolog . studio '
     ; TERM
     e32 atom? integer? double? number? text? var? head? machine? text_list text_term
     ; META
-    CONSTANT VARIABLE var ACCUMULATOR STACK QUEUE
-    REVERSE
+    CONSTANT VARIABLE var ACCUMULATOR STACK QUEUE ARRAY
+    eq = <> !
+    ONE TRY PROBE SELECT LENGTH AT ONLIST INLIST NODUP
+    ALL APPEND REVERSE MAP MEMBER REPLACE
+    WHILE FOREVER forever REPEAT FOR IF inc dec
     ISALL isall isallq isallr
     not res
 	]
@@ -652,11 +699,79 @@ program studio #machine := ' prolog . studio '
 #machine ACCUMULATOR := 'ACCUMULATOR'
 #machine STACK := 'STACK'
 #machine QUEUE := 'QUEUE'
+#machine ARRAY := 'ARRAY'
 
+[[eq *x *x]]
+[[= *x *x]]
+[[<> *x *x] / fail]
+[[<> * *]]
+[[! : *x] *x / fail]
+[[! : *]]
 [[not : *x] *x / fail]
 [[not : *]]
-
 [[res : *command] : *command]
+[[ONE :*o][res :*o]/]
+[[ALL :*o][res : *o] fail]
+[[ALL :*]]
+[[TRY :*o]:*o]
+[[TRY :*o]]
+[[PROBE :*o][ONE :*o] fail]
+[[PROBE :*o]]
+[[SELECT] / fail]
+[[SELECT *branch : *] : *branch]
+[[SELECT * : *branches] / [SELECT : *branches]]
+[[APPEND [] *l *l]]
+[[APPEND [*head : *tail] *l [*head : *new]]/
+	[APPEND *tail *l *new]]
+[[LENGTH [] 0]]
+[[LENGTH [*head : *tail] *length] [LENGTH *tail *l] [sum *l 1 *length]]
+[[AT *from *from *e [*e : *]]]
+[[AT *from *to *e [* : *list]] [++ *from *next] / [AT *next *to *e *list]]
+[[AT *index *element *list] / [AT 0 *index *element *list]]
+[[ONLIST *x [*x : *]]]
+[[ONLIST *x [* : *l]] [ONLIST *x *l]]
+[[INLIST *l *x [*x : *l]]]
+[[INLIST [*h : *l] *x [*h : *ll]] [INLIST *l *x *ll]]
+[[NODUP [] []]/]
+[[NODUP [*x : *t] *result] [ONLIST *x *t] / [NODUP *t *result]]
+[[NODUP [*x : *t] [*x : *result]] / [NODUP *t *result]]
+[[MAP [] [] []]]
+[[MAP [[*x *y] : *xyt] [*x : *xt] [*y : *yt]] / [MAP *xyt *xt *yt]]
+[[MEMBER *x [*x : *]]]
+[[MEMBER *x [* : *l]] [MEMBER *x *l]]
+[[REPLACE *x [*x : *l] *l]]
+[[REPLACE *x [*h : *l] [*h : *ll]] [REPLACE *x *l *ll]]
+[[REPLACE *x [*x : *l] *y [*y : *l]]]
+[[REPLACE *x [*h : *l] *y [*h : *ll]] [REPLACE *x *l *y *ll]]
+[[WHILE *condition : *call] [not not : *condition] / [PROBE : *call] / [WHILE *condition : *call]]
+[[WHILE : *]]
+[[FOREVER : *instructions] [PROBE : *instructions] / [FOREVER : *instructions]]
+[[forever : *instructions] [res : *instructions] / [forever : *instructions]]
+[[REPEAT *ind : *instructions] [less 0 *ind] [PROBE : *instructions] [sub1 *ind *next] / [REPEAT *next : *instructions]]
+[[REPEAT : *]]
+[[FOR * [] : *] /]
+[[FOR *head [*head : *] : *call] [ONE : *call] fail]
+[[FOR *head [* : *tail] : *call] / [FOR *head *tail : *call]]
+[[FOR *index *index *index *step : *call] [TRY : *call]/]
+[[FOR *index *index *to *step : *call] [ONE : *call] fail]
+[[FOR *index *from *to *step : *call]
+	[add *from *step *next] /
+	[FOR *index *next *to *step : *call]]
+[[IF *condition *then] *condition / [TRY *then] /]
+[[IF *condition *then] /]
+[[IF *condition *then *else] *condition / [TRY *then] /]
+[[IF *condition *then *else] [TRY *else] /]
+[[REVERSE *l1 *l2] [REVERSE *l1 [] *l2]]
+[[REVERSE [] *x *x]]
+[[REVERSE [*head : *tail] *l0 *list] [REVERSE *tail [*head : *l0] *list]]
+[[var]]
+[[var *var : *vars] [var? *var] / [VARIABLE *var] / [var : *vars]]
+[[var [*var *value] : *vars] / [VARIABLE *var *value] / [var : *vars]]
+[[var *var : *vars] [VARIABLE *var] / [var : *vars]]
+[[inc *var] [*var : *value] [add *value 1 *new] [*var *new]]
+[[inc *var *inc] [*var : *value] [add *value *inc *new] [*var *new]]
+[[dec *var] [*var : *value] [sub *value 1 *new] [*var *new]]
+[[dec *var *dec] [*var : *value] [sub *value *dec *new] [*var *new]]
 
 [[ISALL *atom *template : *call]
 	[res : *call]
@@ -683,14 +798,6 @@ program studio #machine := ' prolog . studio '
 	[REVERSE *reversed_list *list] /
 ]
 
-[[REVERSE *l1 *l2] [REVERSE *l1 [] *l2]]
-[[REVERSE [] *x *x]]
-[[REVERSE [*head : *tail] *l0 *list] [REVERSE *tail [*head : *l0] *list]]
-
-[[var]]
-[[var *var : *vars] [var? *var] / [VARIABLE *var] / [var : *vars]]
-[[var [*var *value] : *vars] / [VARIABLE *var *value] / [var : *vars]]
-[[var *var : *vars] [VARIABLE *var] / [var : *vars]]
 
 [[grnd : *command] [rnd : *command]]
 [[grnd : *command] / [grnd : *command]]
