@@ -16,15 +16,15 @@
 	</textarea>
 </div>
 
-<script src="studio.js" type="text/javascript"></script>
-<script src="prolog.js" type="text/javascript"></script>
-<script src="studio.prc.js" type="text/javascript"></script>
-<script type="text/javascript">
+<script src="studio.js" type="text/javascript" charset="UTF-8"></script>
+<script src="prolog.js" type="text/javascript" charset="UTF-8"></script>
+<script src="studio.prc.js" type="text/javascript" charset="UTF-8"></script>
+<script type="text/javascript" charset="UTF-8">
 	studio . setResource (['sonda', 123, 'mariner'], "Joker was here!");
 	studio . setResource (['sonda', 123, 'mariner.prc'], "JOKER");
 </script>
 
-<script type="text/javascript">
+<script type="text/javascript" charset="UTF-8">
 	studio . search ('test_scripts');
 	root = new prolog.Root();
 	console . log ('main_course', root . load ('main_course'));
@@ -36,7 +36,7 @@
 	root . auto_atoms = true;
 </script>
 
-<script type="text/javascript">
+<script type="text/javascript" charset="UTF-8">
 
 studio . refresh_file_tree ('files_list', 'editor', 'file_name');
 

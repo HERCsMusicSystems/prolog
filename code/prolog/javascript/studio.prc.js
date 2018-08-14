@@ -394,8 +394,8 @@ function (root, directory) {
 			return true;
 		}
 	};
-	var text_term = function (root) {
-		this . code = function (el) {
+	var text_term = {
+		code: function (el) {
 			if (el . type !== 1) return false;
 			var text = el . left;
 			el = el . right;
@@ -417,7 +417,7 @@ function (root, directory) {
 			while (el . type === 1) {area . push (root . getValue (el . left)); el = el . right;}
 			text . setNative (area . join (' '));
 			return true;
-		};
+		}
 	};
 	var e32 = {
 		code: function (el) {
@@ -449,10 +449,29 @@ function (root, directory) {
 			return true;
 		}
 	};
+	var write = {
+		code: function (el) {
+			var params = [];
+			var accu = []
+			while (el . type === 1) {
+				var e = el . left;
+				if (e . type === 6) accu . push (typeof (e . left) === 'number' ? String . fromCharCode (e . left) : e . left);
+				if (e . type === 3) accu . push (e . left . name);
+				if (e . type === 2) accu . push ('%c');
+				if (e . type === 4) {params . push (accu . join ('')); accu = [];}
+				while (e . type === 1) {accu . push (root . getValue (e . left)); e = e . right;}
+				el = el . right;
+			}
+			params . push (accu . join (''));
+			root . log . apply (this, params);
+			return true;
+		}
+	};
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
       case 'pp': return pp;
+      case 'write': return write;
       case 'sum': return sum;
       case 'add': return add;
       case 'sub': return sub;
@@ -509,7 +528,7 @@ function (root, directory) {
       case 'head?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6;}};
       case 'machine?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 3 && el . left . machine !== null;}};
       case 'text_list': return text_list;
-      case 'text_term': return new text_term (root);
+      case 'text_term': return text_term;
       case 'CONSTANT': return constant;
       case 'VARIABLE': return variable;
       case 'ACCUMULATOR': return accumulator;
@@ -526,7 +545,7 @@ studio . setResource (['studio.prc'],`
 program studio #machine := ' prolog . studio '
 	[
     list
-    pp
+    pp write
     e pi
     abs trunc floor ceil round
     add1 ++ sub1 --
@@ -547,6 +566,7 @@ program studio #machine := ' prolog . studio '
 
 #machine list := 'list'
 #machine pp := 'pp'
+#machine write := 'write'
 
 #machine e := 'e'
 #machine pi := 'pi'
