@@ -510,6 +510,60 @@ function (root, directory) {
 			return true;
 		}
 	};
+	var timestamp = {
+		code: function (el) {
+			if (el . type !== 1) el . setPair ();
+			var stamp = el . left; el = el . right;
+			if (el . type !== 1) el . setPair ();
+			var year = el . left; el = el . right;
+			if (el . type !== 1) el . setPair ();
+			var month = el . left; el = el . right;
+			if (el . type !== 1) el . setPair ();
+			var day = el . left; el = el . right;
+			if (el . type !== 1) el . setPair ();
+			var week_day = el . left; el = el . right;
+			if (el . type !== 1) el . setPair ();
+			var hour = el . left; el = el . right;
+			if (el . type !== 1) el . setPair ();
+			var minute = el . left; el = el . right;
+			if (el . type !== 1) el . setPair ();
+			var second = el . left; el = el . right;
+			if (el . type !== 1) el . setPair ();
+			var millisecond = el . left;
+			if (year . type === 2 || year . type === 0) {
+				var date = new Date ();
+				if (stamp . type === 6) date . setTime (Number (stamp . left));
+				else stamp . setNative (date . getTime ());
+				year . setNative (date . getFullYear ());
+				month . setNative (date . getMonth () + 1);
+				day . setNative (date . getDate ());
+				week_day . setNative (date . getDay ());
+				hour . setNative (date . getHours ());
+				minute . setNative (date . getMinutes ());
+				second . setNative (date . getSeconds ());
+				millisecond . setNative (date . getMilliseconds ());
+				return true;
+			}
+			var date = new Date ();
+			if (year . type === 6) date . setFullYear (Number (year . left));
+			if (month . type === 6) date . setMonth (Number (month . left) - 1);
+			if (day . type === 6) date . setDate (Number (day . left));
+			if (hour . type === 6) date . setHours (Number (hour . left));
+			if (minute . type === 6) date . setMinutes (Number (minute . left));
+			if (second . type === 6) date . setSeconds (Number (second . left));
+			if (millisecond . type === 6) date . setMilliseconds (Number (millisecond . left));
+			if (stamp . type !== 6) stamp . setNative (date . getTime ());
+			if (year . type !== 6) year . setNative (date . getFullYear ());
+			if (month . type !== 6) month . setNative (date . getMonth () + 1);
+			if (day . type !== 6) day . setNative (date . getDate ());
+			if (week_day . type !== 6) week_day . setNative (date . getDay ());
+			if (hour . type !== 6) hour . setNative (date . getHours ());
+			if (minute . type !== 6) minute . setNative (date . getMinutes ());
+			if (second . type !== 6) second . setNative (date . getSeconds ());
+			if (millisecond . type !== 6) millisecond . setNative (date . getMilliseconds ());
+			return true;
+		}
+	};
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
@@ -561,6 +615,7 @@ function (root, directory) {
       case 'min': return new comparator_runner (function (a, b) {return a > b;});
       case 'max': return new comparator_runner (function (a, b) {return a < b;});
       case 'rnd': return rnd;
+      case 'timestamp': return timestamp;
       case 'e32': return e32;
       case 'atom?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 3;}};
       case 'integer?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && Number . isInteger (el . left);}};
@@ -585,11 +640,11 @@ function (root, directory) {
 }
 );
 
-studio . setResource (['studio.prc'],`
+studio . setResource (['studio.prc'], `
 program studio #machine := ' prolog . studio '
 	[
-    list
-    pp write
+    exit list
+    pp write show
     e pi
     abs trunc floor ceil round
     add1 ++ sub1 --
@@ -599,6 +654,8 @@ program studio #machine := ' prolog . studio '
     pow exp log log2 log10 ln
     rnd grnd
     greater greater_eq less less_eq > >= => < <= =< min max
+    ; I/O
+    timestamp
     ; TERM
     e32 atom? integer? double? number? text? var? head? machine? text_list text_term
     ; META
@@ -681,6 +738,8 @@ program studio #machine := ' prolog . studio '
 #machine =< := 'less_eq'
 #machine min := 'min'
 #machine max := 'max'
+
+#machine timestamp := 'timestamp'
 
 #machine e32 := 'e32'
 #machine atom? := 'atom?'
