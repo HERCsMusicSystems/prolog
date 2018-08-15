@@ -11,7 +11,7 @@ program test [TestWorks TestFails TestEq TestNotEq TestSummary FailedTestSummary
 	[ACCUMULATOR Successes] [ACCUMULATOR Failures] [VARIABLE Timing] [timestamp *time : *] [Timing *time]
 ]
 
-;auto := [[ResetCounters]]
+auto := [[ResetCounters]]
 
 [[TestEq *name *x *y : *action]
 	[ONE : *action]
@@ -56,8 +56,8 @@ program test [TestWorks TestFails TestEq TestNotEq TestSummary FailedTestSummary
 	[ResetCounters]
 ]
 
-protect [TestWorks TestFails TestEq TestNotEq TestSummary FailedTestSummary Failures Successes ResetCounters]
 private [Successes Failures]
+protect [TestWorks TestFails TestEq TestNotEq TestSummary FailedTestSummary Failures Successes ResetCounters]
 
 end .
 `);

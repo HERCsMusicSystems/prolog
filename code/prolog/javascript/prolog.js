@@ -154,7 +154,7 @@ var Root = function () {
 	this . end_caption = 'end';
 	this . assignment_caption = ':=';
 	this . machine_caption = '#machine';
-	this . auto_caption = '#auto';
+	this . auto_caption = 'auto';
 	this . private_caption = 'private';
 	this . protect_caption = 'protect';
 	this . auto_atoms = false;
@@ -190,7 +190,7 @@ Root . prototype . getServiceClass = function (name) {
 	if (this . root === null) return null;
 	return this . root . getServiceClass (name);
 };
-Root . prototype . createDirectory = function (name, service) {this . root = new Directory (name, this . root, service);};
+Root . prototype . createDirectory = function (name, service) {return this . root = new Directory (name, this . root, service);};
 Root . prototype . searchDirectory = function (name) {
 	var ret = this . root;
 	while (ret !== null) {if (ret . name === name) return ret; ret = ret . next;}
@@ -553,7 +553,7 @@ Reader . prototype . readProgram = function () {
 	this . getSymbol ();
 	if (this . control !== 'atom') return this . error ("Syntax error (program name expected).");
 	var service_class_name = null;
-	this . root . createDirectory (this . symbol);
+	var directory = this . root . createDirectory (this . symbol);
 	this . getSymbol ();
 	if (this . control === 'atom' && this . symbol === this . root . machine_caption) {
 		this . getSymbol ();
@@ -612,6 +612,15 @@ Reader . prototype . readProgram = function () {
 					if (this . control !== '.') return this . dropError ("Syntax error (dot at the end expected).");
 					this . root . close ();
 					return command;
+				case this . root . auto_caption:
+					this . getSymbol ();
+					if (this . control !== 'atom' || this . symbol !== this . root . assignment_caption) return this . dropError ("Syntax error (assignment expected in auto clause).");
+					var auto_clause = new Element ();
+					auto_clause . setPair ();
+					auto_clause . right = this . getElement ();
+					this . getSymbol ();
+					this . root . resolution (auto_clause);
+					break;
 				case this . root . private_caption:
 					this . getSymbol ();
 					if (this . control === '[]') {this . getSymbol (); break;}
@@ -632,7 +641,7 @@ Reader . prototype . readProgram = function () {
 					if (this . control !== '[') return this . dropError ("Syntax error (list of protect atoms expected).");
 					this . getSymbol ();
 					while (this . control === 'atom') {
-						var atom = this . root . root . searchAtom (this . symbol);
+						var atom = directory . searchPrivateAtom (this . symbol);
 						if (atom === null) return this . dropError ("Semantic error (atom " + this . symbol + " not found in protect clause).");
 						atom . Protected = true;
 						this . getSymbol ();
