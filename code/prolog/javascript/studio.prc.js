@@ -567,12 +567,12 @@ function (root, directory) {
 			return atom . left . setMachine (new reader (atom . left, content));
 		};
 	};
-	var importer = function (overwrite) {
+	var importer = function (no_overwrite) {
 		this . code = function (el) {
 			var command = new prolog . Element ();
 			while (el . type === 1) {
 				var e = el . left;
-				if (e . type === 6) command = overwrite ? root . load (String (e . left)) : root . import (String (e . left));
+				if (e . type === 6) command = root . load (String (e . left), no_overwrite);
 				if (command === null) return false;
 				el = el . right;
 			}
@@ -641,8 +641,8 @@ function (root, directory) {
       case 'write': return write;
       case 'file_writer': return file_writer;
       case 'file_reader': return file_reader;
-      case 'import': return new importer (false);
-      case 'load': return new importer (true);
+      case 'import': return new importer (true);
+      case 'load': return new importer (false);
       case 'sum': return sum;
       case 'add': return add;
       case 'sub': return sub;

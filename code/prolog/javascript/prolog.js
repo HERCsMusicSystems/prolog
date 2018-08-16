@@ -268,21 +268,18 @@ Root . prototype . listAtom = function (atom) {
 	}
 	return ret;
 };
-Root . prototype . loader = function (name) {
+Root . prototype . load = function (name, no_overwrite) {
+	if (no_overwrite === undefined) no_overwrite = false;
+	var existing = this . searchDirectory (name);
+	if (existing !== null) {
+		if (no_overwrite) return new Element ();
+		this . drop ();
+	}
 	var content = studio . readFile (name);
 	if (content === null) content = studio . readFile (name + ".prc");
 	if (content === null) return false;
 	var reader = new Reader (this, content);
 	return reader . readProgram ();
-};
-Root . prototype . import = function (name) {
-	if (this . searchDirectory (name) !== null) return new Element ();
-	return this . loader (name);
-};
-Root . prototype . load = function (name) {
-	var existing = this . searchDirectory (name);
-	if (existing !== null) this . drop (name);
-	return this . loader (name);
 };
 Root . prototype . log = function () {console . log . apply (this, arguments);};
 
