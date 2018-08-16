@@ -719,7 +719,7 @@ program studio #machine := ' prolog . studio '
 	[
     exit list
     pp write
-    file_writer file_reader import load
+    file_writer file_reader import load batch
     e pi
     abs trunc floor ceil round
     add1 ++ sub1 --
@@ -939,6 +939,13 @@ program studio #machine := ' prolog . studio '
 
 [[grnd : *command] [rnd : *command]]
 [[grnd : *command] / [grnd : *command]]
+
+[[batch *text] [file_reader *text *batch] [batch [batch] *batch]]
+[[batch [exit] *batch] [*batch] /]
+[[batch * *batch] [*batch *command] *command / [batch *command *batch]]
+[[batch * *batch] [*batch] / fail]
+
+[[exit]]
 
 end .
 `);
