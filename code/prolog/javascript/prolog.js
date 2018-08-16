@@ -228,6 +228,7 @@ Root . prototype . drop = function (name) {
 	var sub = this . root;
 	while (sub . next !== null) {
 		if (sub . next . name === name) {sub . next = sub . next . next; return;}
+		sub = sub . next;
 	}
 };
 Root . prototype . createAtom = function (name) {
@@ -267,12 +268,21 @@ Root . prototype . listAtom = function (atom) {
 	}
 	return ret;
 };
-Root . prototype . load = function (name) {
+Root . prototype . loader = function (name) {
 	var content = studio . readFile (name);
 	if (content === null) content = studio . readFile (name + ".prc");
 	if (content === null) return false;
 	var reader = new Reader (this, content);
 	return reader . readProgram ();
+};
+Root . prototype . import = function (name) {
+	if (this . searchDirectory (name) !== null) return new Element ();
+	return this . loader (name);
+};
+Root . prototype . load = function (name) {
+	var existing = this . searchDirectory (name);
+	if (existing !== null) this . drop (name);
+	return this . loader (name);
 };
 Root . prototype . log = function () {console . log . apply (this, arguments);};
 

@@ -2,7 +2,7 @@
 studio . setResource (['test.prc'], `
 import studio
 
-program test [TestWorks TestFails TestEq TestNotEq TestSummary FailedTestSummary Failures Successes Timing ResetCounters foreground nl]
+program test [TestWorks TestFails TestEq TestNotEq TestSummary FailedTestSummary Failures Successes Timing ResetCounters foreground nl show]
 
 [[ResetCounters]
 	[TRY [machine? Successes] [Successes]]

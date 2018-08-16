@@ -510,6 +510,76 @@ function (root, directory) {
 			return true;
 		}
 	};
+	var file_writer = new function () {
+		var writer = function (atom, file_name) {
+			var text = [];
+			this . code = function (el) {
+				if (el . type === 0) {studio . writeFile (file_name, text . join ('')); return atom . setMachine (null);}
+				while (el . type === 1) {
+					var e = el . left;
+					if (e . type === 6) text . push (typeof (e . left) === 'number' ? String . fromCharCode (e . left) : e . left);
+					if (e . type === 3) text . push (e . left . name);
+					while (e . type === 1) {text . push (root . getValue (e . left)); e = e . right;}
+					el = el . right;
+				}
+				return true;
+			};
+		};
+		this . code = function (el) {
+			var atom = null, file_name = null;
+			while (el . type === 1) {
+				var left = el . left;
+				if (left . type === 3) atom = left;
+				if (left . type === 2) {atom = left; atom . setAtom (new prolog . Atom ());}
+				if (left . type === 6) file_name = String (left . left);
+				el = el . right;
+			}
+			if (atom === null || file_name === null || atom . left . machine !== null) return false;
+			return atom . left . setMachine (new writer (atom . left, file_name));
+		};
+	};
+	var file_reader = new function () {
+		var reader = function (atom, content) {
+			var fr = new prolog . Reader (root, content);
+			this . code = function (el) {
+				if (el . type === 0) return atom . setMachine (null);
+				while (el . type === 1) {
+					var e = fr . getElement ();
+					if (e === null) {atom . setMachine (null); return false;}
+					e . duplicate (el . left);
+					el = el . right;
+				}
+				return true;
+			};
+		};
+		this . code = function (el) {
+			var atom = null, file_name = null;
+			while (el . type === 1) {
+				var left = el . left;
+				if (left . type === 3) atom = left;
+				if (left . type === 2) {atom = left; atom . setAtom (new prolog . Atom ());}
+				if (left . type === 6) file_name = String (left . left);
+				el = el . right;
+			}
+			if (atom === null || file_name === null || atom . left . machine !== null) return false;
+			var content = studio . readFile (file_name);
+			if (content === null) return false;
+			return atom . left . setMachine (new reader (atom . left, content));
+		};
+	};
+	var importer = function (overwrite) {
+		this . code = function (el) {
+			var command = new prolog . Element ();
+			while (el . type === 1) {
+				var e = el . left;
+				if (e . type === 6) command = overwrite ? root . load (String (e . left)) : root . import (String (e . left));
+				if (command === null) return false;
+				el = el . right;
+			}
+			if (el . type === 2) command . duplicate (el);
+			return true;
+		};
+	};
 	var timestamp = {
 		code: function (el) {
 			if (el . type !== 1) el . setPair ();
@@ -569,6 +639,10 @@ function (root, directory) {
       case 'list': return list;
       case 'pp': return pp;
       case 'write': return write;
+      case 'file_writer': return file_writer;
+      case 'file_reader': return file_reader;
+      case 'import': return new importer (false);
+      case 'load': return new importer (true);
       case 'sum': return sum;
       case 'add': return add;
       case 'sub': return sub;
@@ -644,7 +718,8 @@ studio . setResource (['studio.prc'], `
 program studio #machine := ' prolog . studio '
 	[
     exit list
-    pp write show
+    pp write
+    file_writer file_reader import load
     e pi
     abs trunc floor ceil round
     add1 ++ sub1 --
@@ -671,6 +746,10 @@ program studio #machine := ' prolog . studio '
 #machine list := 'list'
 #machine pp := 'pp'
 #machine write := 'write'
+#machine file_writer := 'file_writer'
+#machine file_reader := 'file_reader'
+#machine import := 'import'
+#machine load := 'load'
 
 #machine e := 'e'
 #machine pi := 'pi'

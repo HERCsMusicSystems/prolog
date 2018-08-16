@@ -27,10 +27,9 @@
 
 <script type="text/javascript" charset="UTF-8">
 	studio . search ('test_scripts');
+	studio . cd (['test']);
 	root = new prolog.Root();
 	console . log ('test', root . load ('test'));
-	console . log ('main_course', root . load ('main_course'));
-	console . log ('capitol', root . load ('capitol'));
 	function resolutionCommand (command, e) {
 		if (e !== undefined && e . key !== 'Enter') return;
 		console . log (root . textResolution (command));
