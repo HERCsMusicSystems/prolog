@@ -19,6 +19,18 @@ Atom . prototype . setMachine = function (obj) {
 	return true;
 };
 Atom . prototype . getMachine = function () {return this . machine;};
+Atom . prototype . clauseCount = function () {
+	var count = 0, cl = this . firstClause;
+	while (cl !== null) {count ++; cl = cl . left . left . left;}
+	return count;
+};
+Atom . prototype . raw_clause_pointer = function (position) {
+	if (position === undefined) position = 0;
+	var cl = this . firstClause;
+	while (cl !== null && position > 0) {cl = cl . left . left . left; position --;}
+	if (cl === null) return null;
+	return cl;
+};
 this . Atom = Atom;
 
 //////// DIRECTORY /////////

@@ -671,6 +671,40 @@ function (root, directory) {
 			return true;
 		}
 	};
+	var delallcl = {
+		code: function (el) {
+			if (el . type === 1) el = el . left;
+			if (el . type !== 3) return false;
+			el = el . left; if (el . Protected || el . machine !== null) return false;
+			el . firstClause = null; return true;
+		}
+	};
+	var CL = {
+		code: function (el) {
+			var atom = null, index = null, clause = null;
+			while (el . type === 1) {
+				var e = el . left;
+				if (e . type === 3) atom = e . left;
+				if (e . type === 6) index = e;
+				if (e . type === 2) {if (index === null) index = e; else clause = e;}
+				el = el . right;
+			}
+			if (el . type === 2) {if (index === null) index = el; else if (clause === null) clause = el;}
+			if (atom === null) return false;
+			if (index . type === 2) {index . setNative (atom . clauseCount ()); return true;}
+			if (index . type === 6) {
+				index = index . left;
+				if (typeof (index) !== 'number' || index < 0 || clause === null) return false;
+				var cl = atom . raw_clause_pointer (index);
+				if (cl === null) return false;
+				cl . duplicate (clause);
+				clause . left . left . setAtom (atom);
+				console . log (root . getValue (clause));
+				return true;
+			}
+			return false;
+		}
+	};
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
@@ -730,6 +764,8 @@ function (root, directory) {
       case 'max': return new comparator_runner (function (a, b) {return a < b;});
       case 'rnd': return rnd;
       case 'timestamp': return timestamp;
+      case 'delallcl': return delallcl;
+      case 'CL': return CL;
       case 'e32': return e32;
       case 'atom?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 3;}};
       case 'integer?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && Number . isInteger (el . left);}};
@@ -771,6 +807,8 @@ program studio #machine := ' prolog . studio '
     greater greater_eq less less_eq > >= => < <= =< min max
     ; I/O
     timestamp
+    ; CLAUSE
+    delallcl CL
     ; TERM
     e32 atom? integer? double? number? text? var? head? machine? text_list text_term
     ; META
@@ -862,6 +900,9 @@ program studio #machine := ' prolog . studio '
 #machine max := 'max'
 
 #machine timestamp := 'timestamp'
+
+#machine delallcl := 'delallcl'
+#machine CL := 'CL'
 
 #machine e32 := 'e32'
 #machine atom? := 'atom?'
