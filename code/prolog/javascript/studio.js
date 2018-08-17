@@ -78,7 +78,9 @@ this . setResource = function (path, resource) {
 	target [key] = resource;
 };
 
-this . writeFile = function (path, content) {localStorage . setItem (this . pwd () + path, content);};
+this . callback = function () {};
+
+this . writeFile = function (path, content) {localStorage . setItem (this . pwd () + path, content); if (this . callback !== undefined) this . callback ();};
 
 this . edit_file = function (file_name, area, location) {
 	var content = localStorage . getItem (file_name);
@@ -87,7 +89,10 @@ this . edit_file = function (file_name, area, location) {
 	if (location !== undefined) document . getElementById (location) . value = file_name;
 };
 
-this . erase_file = function (file_name) {localStorage . removeItem (file_name);};
+this . erase_file = function (file_name) {
+	localStorage . removeItem (file_name . startsWith ('/') ? file_name . substring (1) : this . pwd () + file_name);
+	if (this . callback !== undefined) this . callback ();
+};
 
 this . store_edited_file = function (file_name, editor) {
 	var file_name = document . getElementById (file_name) . value;
@@ -95,21 +100,7 @@ this . store_edited_file = function (file_name, editor) {
 	var already_exists = localStorage . getItem (file_name);
 	if (already_exists !== null) {if (! confirm (`File ${file_name} alread exists.\nOverwrite?`)) return;}
 	localStorage . setItem (file_name, file_content);
-};
-
-this . refresh_file_tree = function (files_list, editor, location) {
-	var getFunction = function (id) {return function () {studio . edit_file (id, editor, location);}};
-	var ul = document . getElementById (files_list);
-	while (ul . firstChild) {ul . removeChild (ul . firstChild);}
-	var collection = [];
-	for (var ind = 0; ind < localStorage . length; ind++) collection . push (localStorage . key (ind));
-	collection . sort ();
-	for (var ind in collection) {
-		var li = document . createElement ('li');
-		li . innerHTML = collection [ind];
-		li . onclick = getFunction (collection [ind]);
-		ul . appendChild (li);
-	}
+	if (this . callback !== undefined) this . callback ();
 };
 
 this . import = function (file_name) {

@@ -567,6 +567,43 @@ function (root, directory) {
 			return atom . left . setMachine (new reader (atom . left, content));
 		};
 	};
+	var create_file = {
+		code: function (el) {
+			if (el . type !== 1) return false;
+			var file_name = el . left; if (file_name . type !== 6) return false; file_name = String (file_name . left);
+			el = el . right;
+			var text = [];
+			while (el . type === 1) {
+				var e = el . left;
+				if (e . type === 6) text . push (typeof (e . left) === 'number' ? String . fromCharCode (e . left) : e . left);
+				if (e . type === 3) text . push (e . left . name);
+				while (e . type === 1) {text . push (root . getValue (e . left)); e = e . right;}
+				el = el . right;
+			}
+			studio . writeFile (file_name, text . join (''));
+			return true;
+		}
+	};
+	var open_file = {
+		code: function (el) {
+			if (el . type !== 1) return false;
+			var file_name = el . left; if (file_name . type !== 6) return false; file_name = String (file_name . left);
+			el = el . right;
+			if (el . type === 1) el = el . left;
+			var content = studio . readFile (file_name);
+			if (content === null) return false;
+			el . setNative (content);
+			return true;
+		}
+	};
+	var erase_file = {
+		code: function (el) {
+			if (el . type === 1) el = el . left;
+			if (el . type !== 6) return false;
+			studio . erase_file (String (el . left));
+			return true;
+		}
+	};
 	var importer = function (no_overwrite) {
 		this . code = function (el) {
 			var command = new prolog . Element ();
@@ -641,6 +678,9 @@ function (root, directory) {
       case 'write': return write;
       case 'file_writer': return file_writer;
       case 'file_reader': return file_reader;
+      case 'create_file': return create_file;
+      case 'open_file': return open_file;
+      case 'erase_file': return erase_file;
       case 'import': return new importer (true);
       case 'load': return new importer (false);
       case 'sum': return sum;
@@ -719,7 +759,7 @@ program studio #machine := ' prolog . studio '
 	[
     exit list
     pp write
-    file_writer file_reader import load batch
+    file_writer file_reader create_file open_file erase_file import load batch
     e pi
     abs trunc floor ceil round
     add1 ++ sub1 --
@@ -748,6 +788,9 @@ program studio #machine := ' prolog . studio '
 #machine write := 'write'
 #machine file_writer := 'file_writer'
 #machine file_reader := 'file_reader'
+#machine create_file := 'create_file'
+#machine open_file := 'open_file'
+#machine erase_file := 'erase_file'
 #machine import := 'import'
 #machine load := 'load'
 

@@ -7,9 +7,9 @@
 </ul>
 
 <div id=editor_div>
-	<input type=button value=SAVE onclick="javascript: studio . store_edited_file ('file_name', 'editor'); studio . refresh_file_tree ('files_list', 'editor', 'file_name');" />
+	<input type=button value=SAVE onclick="javascript: studio . store_edited_file ('file_name', 'editor');" />
 	<input type=text id=file_name size=64 onkeydown="javascript: resolutionCommand (this . value, event);"/>
-	<input type=button value=ERASE onclick="javascript: studio . erase_file (document . getElementById ('file_name') . value); studio . refresh_file_tree ('files_list', 'editor', 'file_name');" />
+	<input type=button value=ERASE onclick="javascript: studio . erase_file (document . getElementById ('file_name') . value);" />
 	<input type=button value=COMMAND onclick="javascript: resolutionCommand (document . getElementById ('file_name') . value);" />
 	<br />
 	<textarea id=editor cols=100 rows=24 onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">
@@ -39,7 +39,23 @@
 
 <script type="text/javascript" charset="UTF-8">
 
-studio . refresh_file_tree ('files_list', 'editor', 'file_name');
+refresh_file_tree = function (files_list, editor, location) {
+	var getFunction = function (id) {return function () {studio . edit_file (id, editor, location);}};
+	var ul = document . getElementById (files_list);
+	while (ul . firstChild) {ul . removeChild (ul . firstChild);}
+	var collection = [];
+	for (var ind = 0; ind < localStorage . length; ind++) collection . push (localStorage . key (ind));
+	collection . sort ();
+	for (var ind in collection) {
+		var li = document . createElement ('li');
+		li . innerHTML = collection [ind];
+		li . onclick = getFunction (collection [ind]);
+		ul . appendChild (li);
+	}
+};
+
+(studio . callback = function () {refresh_file_tree ('files_list', 'editor', 'file_name');}) ();
+
 
 </script>
 
