@@ -715,6 +715,19 @@ function (root, directory) {
 	var addcl0 = {
 		code: function (el) {el = el . duplicate (); if (el . attach (0)) return true; if (el . type !== 1) return false; return el . left . attach (0);}
 	};
+	var DELCL = {
+		code: function (el) {
+			var atom = null, index = null;
+			while (el . type === 1) {
+				var e = el . left;
+				if (e . type === 6) index = e . left;
+				if (e . type === 3) atom = e . left;
+				el = el . right;
+			}
+			if (atom === null || index === null) return false;
+			return atom . delcl (index);
+		}
+	};
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
@@ -778,6 +791,7 @@ function (root, directory) {
       case 'CL': return CL;
       case 'addcl': return addcl;
       case 'addcl0': return addcl0;
+      case 'DELCL': return DELCL;
       case 'e32': return e32;
       case 'atom?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 3;}};
       case 'integer?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && Number . isInteger (el . left);}};
@@ -820,7 +834,7 @@ program studio #machine := ' prolog . studio '
     ; I/O
     timestamp
     ; CLAUSE
-    delallcl CL cl addcl addcl0
+    delallcl CL cl addcl addcl0 DELCL delcl
     ; TERM
     e32 atom? integer? double? number? text? var? head? machine? text_list text_term
     ; META
@@ -917,6 +931,7 @@ program studio #machine := ' prolog . studio '
 #machine CL := 'CL'
 #machine addcl := 'addcl'
 #machine addcl0 := 'addcl0'
+#machine DELCL := 'DELCL'
 
 #machine e32 := 'e32'
 #machine atom? := 'atom?'
@@ -1047,7 +1062,7 @@ program studio #machine := ' prolog . studio '
 [[cl *x *y] / [cl 0 *x *y]]
 [[cl *x *x [[*a:*b]:*c]] [CL *x *a [[*a:*b]:*c]]]
 [[cl *x *y [[*a:*b]:*c]] [add *x 1 *x2] / [CL *x2 *a *X] [cl *x2 *y [[*a:*b]:*c]]]
-
+[[delcl [[*a:*b]:*c]] [cl *x [[*a:*b]:*c]] [DELCL *x *a]]
 
 [[exit]]
 
