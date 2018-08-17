@@ -687,6 +687,7 @@ function (root, directory) {
 				if (e . type === 3) atom = e . left;
 				if (e . type === 6) index = e;
 				if (e . type === 2) {if (index === null) index = e; else clause = e;}
+				if (e . type === 1) clause = e;
 				el = el . right;
 			}
 			if (el . type === 2) {if (index === null) index = el; else if (clause === null) clause = el;}
@@ -699,11 +700,20 @@ function (root, directory) {
 				if (cl === null) return false;
 				cl . duplicate (clause);
 				clause . left . left . setAtom (atom);
-				console . log (root . getValue (clause));
 				return true;
 			}
 			return false;
 		}
+	};
+	var addcl = {
+		code: function (el) {
+			var index = Number . MAX_VALUE;
+			if (el . type === 1 && el . left . type === 6) {index = el . left . left; el = el . right;}
+			el = el . duplicate (); if (el . attach (index)) return true; if (el . type !== 1) return false; return el . left . attach (0);
+		}
+	};
+	var addcl0 = {
+		code: function (el) {el = el . duplicate (); if (el . attach (0)) return true; if (el . type !== 1) return false; return el . left . attach (0);}
 	};
   this . getNativeCode = function (name) {
     switch (name) {
@@ -766,6 +776,8 @@ function (root, directory) {
       case 'timestamp': return timestamp;
       case 'delallcl': return delallcl;
       case 'CL': return CL;
+      case 'addcl': return addcl;
+      case 'addcl0': return addcl0;
       case 'e32': return e32;
       case 'atom?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 3;}};
       case 'integer?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && Number . isInteger (el . left);}};
@@ -808,7 +820,7 @@ program studio #machine := ' prolog . studio '
     ; I/O
     timestamp
     ; CLAUSE
-    delallcl CL
+    delallcl CL cl addcl addcl0
     ; TERM
     e32 atom? integer? double? number? text? var? head? machine? text_list text_term
     ; META
@@ -903,6 +915,8 @@ program studio #machine := ' prolog . studio '
 
 #machine delallcl := 'delallcl'
 #machine CL := 'CL'
+#machine addcl := 'addcl'
+#machine addcl0 := 'addcl0'
 
 #machine e32 := 'e32'
 #machine atom? := 'atom?'
@@ -1028,6 +1042,12 @@ program studio #machine := ' prolog . studio '
 [[batch [exit] *batch] [*batch] /]
 [[batch * *batch] [*batch *command] *command / [batch *command *batch]]
 [[batch * *batch] [*batch] / fail]
+
+[[cl *x] / [cl 0 *y *x]]
+[[cl *x *y] / [cl 0 *x *y]]
+[[cl *x *x [[*a:*b]:*c]] [CL *x *a [[*a:*b]:*c]]]
+[[cl *x *y [[*a:*b]:*c]] [add *x 1 *x2] / [CL *x2 *a *X] [cl *x2 *y [[*a:*b]:*c]]]
+
 
 [[exit]]
 
