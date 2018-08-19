@@ -3,7 +3,7 @@ var prolog = new function () {
 
 //////// ATOM ////////
 
-Atom = function (name, root) {
+var Atom = function (name, root) {
 	if (name === undefined) this . name = "<" + Math . random () . toString (16) . substring (2) + "#" + new Date () . getTime () . toString (16) + ">";
 	else this . name = name + "";
 	this . next = root === undefined ? null : root;
@@ -19,11 +19,32 @@ Atom . prototype . setMachine = function (obj) {
 	return true;
 };
 Atom . prototype . getMachine = function () {return this . machine;};
+Atom . prototype . clauseCount = function () {
+	var count = 0, cl = this . firstClause;
+	while (cl !== null) {count ++; cl = cl . left . left . left;}
+	return count;
+};
+Atom . prototype . raw_clause_pointer = function (position) {
+	if (position === undefined) position = 0;
+	var cl = this . firstClause;
+	while (cl !== null && position > 0) {cl = cl . left . left . left; position --;}
+	if (cl === null) return null;
+	return cl;
+};
+Atom . prototype . delcl = function (position) {
+	if (this . firstClause === null || this . Protected) return false;
+	if (position === 0) {this . firstClause = this . firstClause . left . left . left; return true;}
+	var clause = this . firstClause, next = clause . left . left . left;
+	while (next !== null && position > 1) {clause = next; next = clause . left . left . left; position --;}
+	if (next === null) return false;
+	clause . left . left . left = next . left . left . left;
+	return true;
+};
 this . Atom = Atom;
 
 //////// DIRECTORY /////////
 
-Directory = function (name, root, service) {
+var Directory = function (name, root, service) {
 	this . name = name + "";
 	this . next = root == null ? null : root;
 	this . firstAtom = null;
@@ -84,7 +105,7 @@ this . Directory = Directory;
 //////// ELEMENET ////////
 // 0: EARTH, 1: PAIR, 2: VAR, 3: ATOM, 4: SLASH, 5: FAIL, 6: NATIVE
 
-Element = function () {this . type = 0; return;};
+var Element = function () {this . type = 0; return;};
 
 Element . prototype . setPair = function () {
 	this . type = 1;
@@ -126,7 +147,7 @@ this . Element = Element;
 
 //////// ROOT ////////
 
-Root = function () {
+var Root = function () {
 	this . left_caption = '[';
 	this . right_caption = ']';
 	this . secondary_left_caption = '(';
@@ -154,7 +175,7 @@ Root = function () {
 	this . end_caption = 'end';
 	this . assignment_caption = ':=';
 	this . machine_caption = '#machine';
-	this . auto_caption = '#auto';
+	this . auto_caption = 'auto';
 	this . private_caption = 'private';
 	this . protect_caption = 'protect';
 	this . auto_atoms = false;
@@ -190,7 +211,7 @@ Root . prototype . getServiceClass = function (name) {
 	if (this . root === null) return null;
 	return this . root . getServiceClass (name);
 };
-Root . prototype . createDirectory = function (name, service) {this . root = new Directory (name, this . root, service);};
+Root . prototype . createDirectory = function (name, service) {return this . root = new Directory (name, this . root, service);};
 Root . prototype . searchDirectory = function (name) {
 	var ret = this . root;
 	while (ret !== null) {if (ret . name === name) return ret; ret = ret . next;}
@@ -228,6 +249,7 @@ Root . prototype . drop = function (name) {
 	var sub = this . root;
 	while (sub . next !== null) {
 		if (sub . next . name === name) {sub . next = sub . next . next; return;}
+		sub = sub . next;
 	}
 };
 Root . prototype . createAtom = function (name) {
@@ -267,7 +289,13 @@ Root . prototype . listAtom = function (atom) {
 	}
 	return ret;
 };
-Root . prototype . load = function (name) {
+Root . prototype . load = function (name, no_overwrite) {
+	if (no_overwrite === undefined) no_overwrite = false;
+	var existing = this . searchDirectory (name);
+	if (existing !== null) {
+		if (no_overwrite) return new Element ();
+		this . drop ();
+	}
 	var content = studio . readFile (name);
 	if (content === null) content = studio . readFile (name + ".prc");
 	if (content === null) return false;
@@ -280,7 +308,7 @@ this . Root = Root;
 
 //////// READER ////////
 
-Reader = function (root, file) {
+var Reader = function (root, file) {
 	this . root = root;
 	this . file = file;
 	this . act = '';
@@ -472,7 +500,7 @@ Reader . prototype . getElement = function () {
 		case '[': return this . readRightSide (this . getElement (), ']');
 		case '(': return this . readRightSide (this . getElement (), ')');
 		case '.': return this . atomC ('.');
-		case 'eof': return this . error ("Syntax error (end of file).");
+		case 'eof': return null;
 		default: break;
 	}
 	return this . error ("Syntax error (unknown syntax).");
@@ -553,7 +581,7 @@ Reader . prototype . readProgram = function () {
 	this . getSymbol ();
 	if (this . control !== 'atom') return this . error ("Syntax error (program name expected).");
 	var service_class_name = null;
-	this . root . createDirectory (this . symbol);
+	var directory = this . root . createDirectory (this . symbol);
 	this . getSymbol ();
 	if (this . control === 'atom' && this . symbol === this . root . machine_caption) {
 		this . getSymbol ();
@@ -612,6 +640,15 @@ Reader . prototype . readProgram = function () {
 					if (this . control !== '.') return this . dropError ("Syntax error (dot at the end expected).");
 					this . root . close ();
 					return command;
+				case this . root . auto_caption:
+					this . getSymbol ();
+					if (this . control !== 'atom' || this . symbol !== this . root . assignment_caption) return this . dropError ("Syntax error (assignment expected in auto clause).");
+					var auto_clause = new Element ();
+					auto_clause . setPair ();
+					auto_clause . right = this . getElement ();
+					this . getSymbol ();
+					this . root . resolution (auto_clause);
+					break;
 				case this . root . private_caption:
 					this . getSymbol ();
 					if (this . control === '[]') {this . getSymbol (); break;}
@@ -632,7 +669,7 @@ Reader . prototype . readProgram = function () {
 					if (this . control !== '[') return this . dropError ("Syntax error (list of protect atoms expected).");
 					this . getSymbol ();
 					while (this . control === 'atom') {
-						var atom = this . root . root . searchAtom (this . symbol);
+						var atom = directory . searchPrivateAtom (this . symbol);
 						if (atom === null) return this . dropError ("Semantic error (atom " + this . symbol + " not found in protect clause).");
 						atom . Protected = true;
 						this . getSymbol ();
@@ -988,10 +1025,6 @@ Root . prototype . resolution = function (query) {
 Root . prototype . textResolution = function (command) {
 	return this . resolution (new Reader (this, command) . getElement ());
 };
-/*
-this . Root . prototype . resolution = function (query) {
-	var actuals, formals, vars, var_counter;
-	var reset = function () {actuals = null, formals = null, vars = null, var_counter = 0;};
+
 };
-*/
-};
+
