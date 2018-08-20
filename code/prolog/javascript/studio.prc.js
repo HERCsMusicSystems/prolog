@@ -728,6 +728,8 @@ function (root, directory) {
 			return atom . delcl (index);
 		}
 	};
+  var auto_atoms = {code: function (el) {root . auto_atoms = true; return true;}};
+  var scripted_atoms = {code: function (el) {root . auto_atoms = false; return true;}};
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
@@ -792,6 +794,8 @@ function (root, directory) {
       case 'addcl': return addcl;
       case 'addcl0': return addcl0;
       case 'DELCL': return DELCL;
+      case 'auto_atoms': return auto_atoms;
+      case 'scripted_atoms': return scripted_atoms;
       case 'e32': return e32;
       case 'atom?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 3;}};
       case 'integer?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && Number . isInteger (el . left);}};
@@ -835,6 +839,7 @@ program studio #machine := ' prolog . studio '
     timestamp
     ; CLAUSE
     delallcl CL cl addcl addcl0 DELCL delcl
+    auto_atoms scripted_atoms
     ; TERM
     e32 atom? integer? double? number? text? var? head? machine? text_list text_term
     ; META
@@ -932,6 +937,8 @@ program studio #machine := ' prolog . studio '
 #machine addcl := 'addcl'
 #machine addcl0 := 'addcl0'
 #machine DELCL := 'DELCL'
+#machine auto_atoms := 'auto_atoms'
+#machine scripted_atoms := 'scripted_atoms'
 
 #machine e32 := 'e32'
 #machine atom? := 'atom?'
