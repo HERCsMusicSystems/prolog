@@ -1084,5 +1084,7 @@ program studio #machine := ' prolog . studio '
 
 [[exit : *]]
 
+protect [not]
+
 end .
 `);

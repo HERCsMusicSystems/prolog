@@ -32,7 +32,9 @@ Atom . prototype . raw_clause_pointer = function (position) {
 	return cl;
 };
 Atom . prototype . delcl = function (position) {
+	if (this . Protected) return false;
 	if (this . firstClause === null || this . Protected) return false;
+	if (position < 0) return false;
 	if (position === 0) {this . firstClause = this . firstClause . left . left . left; return true;}
 	var clause = this . firstClause, next = clause . left . left . left;
 	while (next !== null && position > 1) {clause = next; next = clause . left . left . left; position --;}
