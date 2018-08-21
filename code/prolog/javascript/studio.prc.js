@@ -699,12 +699,14 @@ function (root, directory) {
 				if (e . type === 1) clause = e;
 				el = el . right;
 			}
+      if (el . type === 3) atom = el . left;
+      if (el . type === 6) index = el;
 			if (el . type === 2) {if (index === null) index = el; else if (clause === null) clause = el;}
-			if (atom === null) return false;
-			if (index . type === 2) {index . setNative (atom . clauseCount ()); return true;}
+			if (atom === null || index === null) return false;
+      if (clause === null) {index . setNative (atom . clauseCount ()); return true;}
 			if (index . type === 6) {
 				index = index . left;
-				if (typeof (index) !== 'number' || index < 0 || clause === null) return false;
+				if (typeof (index) !== 'number' || index < 0) return false;
 				var cl = atom . raw_clause_pointer (index);
 				if (cl === null) return false;
 				cl . duplicate (clause);

@@ -21,12 +21,12 @@ auto := [[ResetCounters]]
 	]
 ]
 
-[[TestEq *name : *] [Failures *name] [exit 1] [foreground 0xff0000] [write "EQ FAILED: "] [foreground 0xffff00] [write *name] [nl]]
+[[TestEq *name : *] [Failures *name] [exit 1] [write "%cEQ FAILED: %c" *name / 'color: #ff0000;' / 'color: #ffff00;']]
 
 [[TestWorks *name : *action]
 	[SELECT
-		[[res : *action] [Successes *name] [foreground 0xff00] [write "OK: "] [foreground 0xffff00] [write *name] [foreground 0xff00] [write " worked."] [nl]]
-		[[Failures *name] [exit 1] [foreground 0xff0000] [write "FAILED: "] [foreground 0xffff00] [write *name] [foreground 0xff0000] [write " failed."] [nl]]
+		[[res : *action] [Successes *name] [write "%cOK: %c" *name " %cworked." / 'color: #00ff00;' / 'color: #ffff00;' / 'color: #00ff00;']]
+		[[Failures *name] [exit 1] [write "%cFAILED: %c" *name " %cfailed." / 'color: #ff0000;' / 'color: #ffff00;' / 'color: #ff0000;']]
 	]
 ]
 

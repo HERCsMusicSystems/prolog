@@ -11,11 +11,6 @@ studio . setResource (['test_studio.prb'], `
 [TestEq "list not *" "[[not : *0] *0 / fail]\n[[not : *0]]\n" *x [list not *x]]
 [TestEq "list not : *" [[[not : *i] *i / fail] [[not : *i]]] *x [list not : *x]]
 
-[exit]
-
-`);
-/*
-
 [scripted_atoms]
 [TestFails "scripted_atoms" [text_term "sonda" *x]]
 [auto_atoms]
@@ -32,6 +27,11 @@ studio . setResource (['test_studio.prb'], `
 [TestFails "CL atom index" [CL capitol 4]]
 [TestWorks "CL atom:index" [CL capitol : 5]]
 [TestFails "CL atom:index" [CL capitol : 4]]
+
+[exit]
+
+`);
+/*
 
 [TestEq "DELCL" [[[capitol "Australia" "Canberra"]] [[capitol "Poland" "Warsaw"]] [[capitol "USA" "Cupertino"]]] *x [DELCL capitol 2] [DELCL 1 capitol] [list capitol : *x]]
 
