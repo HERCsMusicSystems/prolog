@@ -379,7 +379,7 @@ function (root, directory) {
 			if (el . type === 1) {atom = el . left; el = el . right; if (el . type === 1) el = el . left;} else atom = el;
 			if (atom . type === 2) atom . setAtom (new prolog . Atom);
 			if (atom . left . machine !== null) return false;
-			return atom . left . setMachine (new variabler (atom, atom === el ? new prolog . Element () : el));
+			return atom . left . setMachine (new variabler (atom . left, atom === el ? new prolog . Element () : el));
 		};
 		// [VARIABLE : atom] [VARIABLE atom] [VARIABLE atom : value] [VARIABLE atom value]
 	};
