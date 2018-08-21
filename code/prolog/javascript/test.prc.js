@@ -42,7 +42,7 @@ auto := [[ResetCounters]]
 	[Successes : *s] [LENGTH *s *length_s] [Failures : *f] [LENGTH *f *length_f]
 	[write '%c' [*length_s] " passed." / 'color: lime;'] [write '%c' [*s] / 'color: lime;']
 	[write '%c' [*length_f] " failed." / 'color: red;'] [write '%c' [*f] / 'color: red;']
-	[Timing : *from] [timestamp *to : *] [sum *from *time *to] [div *time 1000.0 *timed] [write "TIME = " [*timed] " seconds."]
+	[Timing : *from] [timestamp *to : *] [sum *from *time *to] [div *time 1000.0 *timed] [write "%cTIME = " [*timed] " seconds." / 'color: yellow;']
 	[ResetCounters]
 ]
 
