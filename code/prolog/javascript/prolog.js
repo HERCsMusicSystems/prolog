@@ -232,7 +232,7 @@ Root . prototype . list = function (name) {
 		return this . root . names ();
 	}
 	var sub = this . searchDirectory (name);
-	return sub === null ? [] : sub . list ();
+	return sub === null ? null : sub . list ();
 };
 Root . prototype . close = function () {
 	if (this . root === null) return;

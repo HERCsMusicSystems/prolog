@@ -1,4 +1,4 @@
-
+studio . setResource (['test_studio.prb'], `
 [import "test"]
 [import "capitol"]
 
@@ -10,6 +10,11 @@
 [TestEq 'list "capitol" : *' [capitol] *x [list "capitol" : *x]]
 [TestEq "list not *" "[[not : *0] *0 / fail]\n[[not : *0]]\n" *x [list not *x]]
 [TestEq "list not : *" [[[not : *i] *i / fail] [[not : *i]]] *x [list not : *x]]
+
+[exit]
+
+`);
+/*
 
 [scripted_atoms]
 [TestFails "scripted_atoms" [text_term "sonda" *x]]
@@ -975,3 +980,5 @@
 
 [exit]
 
+`);
+*/

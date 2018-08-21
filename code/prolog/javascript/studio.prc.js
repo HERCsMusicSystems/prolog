@@ -18,23 +18,32 @@ function (root, directory) {
           if (el . type === 0) {root . log (root . listAtom (first . left) . join ('\n')); return true;}
           if (el . type === 2) {
             el . type = 0;
-            var l = root . listAtom (first . left);
-            for (var ind in l) el = el . setNativePair (l [ind]);
+            var clause = first . left . firstClause;
+            while (clause !== null) {
+              el . setPair ();
+              clause . duplicate (el . left); el . left . left . left . setAtom (first . left);
+              el = el . right;
+              clause = clause . left . left . left;
+            }
             return true;
           }
-          if (el . type === 1) {el . left . setNative (root . listAtom (first . left) . join ('\n')); return true;}
+          if (el . type === 1) {el . left . setNative (root . listAtom (first . left) . join ('\n') + '\n'); return true;}
         }
         if (first . type === 6) {
           first = first . left;
           if (typeof (first) !== 'string') return false;
-          if (el . type === 0) {root . log (root . list (first) . join (' ')); return true;}
           if (el . type === 2) {
             el . type = 0;
-            var l = root . list (first);
-            for (var ind in l) el = el . setNativePair (l [ind]);
+            var directory = root . searchDirectory (first);
+            if (directory === null) return false;
+            var atom = directory . firstAtom;
+            while (atom !== null) {el . setPair (); el . left . setAtom (atom); el = el . right; atom = atom . next;}
             return true;
           }
-          if (el . type === 1) {el . left . setNative (root . list (first) . join (' ')); return true;}
+          var listing = root . list (first);
+          if (listing === null) return false;
+          if (el . type === 0) {root . log (listing . join (' ')); return true;}
+          if (el . type === 1) {el . left . setNative (listing . join (' ')); return true;}
         }
       }
       return false;
@@ -1071,7 +1080,7 @@ program studio #machine := ' prolog . studio '
 [[cl *x *y [[*a:*b]:*c]] [add *x 1 *x2] / [CL *x2 *a *X] [cl *x2 *y [[*a:*b]:*c]]]
 [[delcl [[*a:*b]:*c]] [cl *x [[*a:*b]:*c]] [DELCL *x *a]]
 
-[[exit]]
+[[exit : *]]
 
 end .
 `);

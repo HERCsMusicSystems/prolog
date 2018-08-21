@@ -16,8 +16,8 @@ auto := [[ResetCounters]]
 [[TestEq *name *x *y : *action]
 	[ONE : *action]
 	[SELECT
-		[[eq *x *y] [Successes *name] [foreground 0xff00] [write "OK: "] [foreground 0xffff00] [write *name " = " ] [foreground 0xff00] [pp *y] [nl]]
-		[[Failures *name] [exit 1] [foreground 0xff0000] [write "FAILED: "] [foreground 0xffff00] [write *name " expected "] [foreground 0xff00] [pp *x] [foreground 0xffff00] [write " but was "] [foreground 0xff0000] [pp *y] [nl]]
+		[[eq *x *y] [Successes *name] [write "%cOK: %c" *name " = %c" [*y] / 'color: #00ff00;' / 'color: #ffff00;' / 'color: #00ff00;']]
+		[[Failures *name] [exit 1] [write "%cFAILED: %c" *name " expected %c" [*x] " %cbut was %c" [*y] / 'color: #ff0000;' / 'color: #ffff00;' / 'color: #00ff00;' / 'color: #ffff00;' / 'color: #ff0000;']]
 	]
 ]
 
@@ -32,8 +32,8 @@ auto := [[ResetCounters]]
 
 [[TestFails *name : *action]
 	[SELECT
-		[[res : *action] [Failures *name] [exit 1] [foreground 0xff0000] [write "FAILED: "] [foreground 0xffff00] [write *name] [foreground 0xff0000] [write " worked."] [nl]]
-		[[Successes *name] [foreground 0xff00] [write "OK: "] [foreground 0xffff00] [write *name] [foreground 0xff00] [write " failed."] [nl]]
+		[[res : *action] [Failures *name] [exit 1] [write "%cFAILED: %c" *name " %cworked." / 'color: #ff0000;' / 'color: #ffff00;' / 'color: #ff0000;']]
+		[[Successes *name] [write "%cOK: %c" *name " %cfailed." / 'color: #00ff00;' / 'color: #ffff00;' / 'color: #00ff00;']]
 	]
 ]
 
