@@ -796,6 +796,91 @@ function (root, directory) {
 			var sub = root [search] (name . left, module . left); if (sub === null) return false; atom . setAtom (sub); return true;
 		};
 	};
+	var unique_atoms = new function () {
+		var process = function (directory, atom) {
+			var area = [];
+			var dir = root . root;
+			while (dir !== null) {
+				var sub = dir . firstAtom;
+				if (directory !== dir) {
+					while (sub !== null) {if (sub !== atom && sub . name === atom . name) area . push ({atom: sub, directory: dir}); sub = sub . next;}
+				}
+				dir = dir . next;
+			}
+			return area;
+		};
+		var setArea = function (list, area) {
+			for (var ind in area) {
+				list . setPair ();
+				list . left . setPair ();
+				list . left . left . setAtom (area [ind] . atom);
+				list . left . right . setPair ();
+				list . left . right . left . setNative (area [ind] . directory . name);
+				list = list . right;
+			}
+		};
+		var writeArea = function (area) {for (var ind in area) {root . log ('@', area [ind] . directory . name, area [ind] . atom . name);}};
+		this . code = function (el) {
+			var list = null, atoms = [], directories = [];
+			while (el . type === 1) {
+				var e = el . left;
+				switch (e . type) {
+					case 2: list = e; break; case 3: atoms . push (e . left); break; case 6: directories . push (e . left); break; default: break;}
+				el = el . right;
+			}
+			switch (el . type) {case 2: list = el; break; case 3: atoms . push (el . left); break; case 6: directories . push (el . left); break; default: break;}
+			if (list !== null) list . type = 0;
+			if (atoms . length < 1 && directories . length < 1) {
+				var dir = root . root;
+				var area = [];
+				while (dir !== null) {
+					var atom = dir . firstAtom;
+					while (atom !== null) {
+						area = area . concat (process (dir, atom));
+						atom = atom . next;
+					}
+					dir = dir . next;
+				}
+				if (list !== null) {setArea (list, area); return true;}
+				writeArea (area);
+				return area . length < 1;
+			}
+			if (atoms . length > 0 && directories . length > 0) {
+				var area = [];
+				for (var ind in directories) {
+					var dir = root . searchDirectory (directories [ind]);
+					if (dir === null) return false;
+					for (var sub in atoms) area = area . concat (process (dir, atoms [sub]));
+				}
+				if (list !== null) {setArea (list, area); return true;}
+				writeArea (area);
+				return area . length < 1;
+			}
+			if (atoms . length > 0) {
+				var area = [];
+				for (var ind in atoms) area = area . concat (process (null, atoms [ind]));
+				if (list !== null) {setArea (list, area); return true;}
+				writeArea (area);
+				return area . length < 1;
+			}
+			if (directories . length > 0) {
+				area = [];
+				for (var ind in directories) {
+					var dir = root . searchDirectory (directories [ind]);
+					if (dir === null) return false;
+					var atom = dir . firstAtom;
+					while (atom !== null) {
+						area = area . concat (process (dir, atom));
+						atom = atom . next;
+					}
+				}
+				if (list != null) {setArea (list, area); return true;}
+				writeArea (area);
+				return area . length < 1;
+			}
+			return false;
+		};
+	};
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
@@ -866,6 +951,7 @@ function (root, directory) {
       case 'create_atoms': return create_atoms;
       case 'search_atom': return new search_atom ('search');
       case 'search_atom_c': return new search_atom ('searchC');
+      case 'unique_atoms': return unique_atoms;
       case 'e32': return e32;
       case 'atom?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 3;}};
       case 'integer?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && Number . isInteger (el . left);}};
@@ -925,7 +1011,7 @@ program studio #machine := ' prolog . studio '
     file_writer file_reader create_file open_file erase_file import load batch
     ; CLAUSE
     delallcl CL cl addcl addcl0 DELCL delcl OVERWRITE overwrite
-    auto_atoms scripted_atoms create_atom create_atoms search_atom search_atom_c
+    auto_atoms scripted_atoms unique_atoms create_atom create_atoms search_atom search_atom_c
     ; TERM
     e32 atom? integer? double? number? text? var? head? machine? text_list text_term
     ; META
@@ -1029,6 +1115,7 @@ program studio #machine := ' prolog . studio '
 #machine create_atoms := 'create_atoms'
 #machine search_atom := 'search_atom'
 #machine search_atom_c := 'search_atom_c'
+#machine unique_atoms := 'unique_atoms'
 
 #machine e32 := 'e32'
 #machine atom? := 'atom?'

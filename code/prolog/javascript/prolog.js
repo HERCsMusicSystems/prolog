@@ -545,9 +545,9 @@ Reader . prototype . readRightSide = function (left, bracket) {
 			if (this . control !== '.') return this . error ("Syntax error (dot expected).");
 			this . getSymbol ();
 			if (this . control !== 'atom') return this . error ("Syntax error (atom after dot expected).");
-			dir = dir . searchAtom (this . symbol);
+			dir = el . searchAtom (this . symbol);
 			if (dir === null) return this . error ("Semantic error (qualified atom " + this . symbol + " not found in " + el . name + ").");
-			el = new Element (); dir . setAtom (dir);
+			el = new Element (); el . setAtom (dir);
 			break;
 		case 'number': el = new Element (); el . setNative (this . symbol); break;
 		case '[]': case '()': el = new Element (); break;

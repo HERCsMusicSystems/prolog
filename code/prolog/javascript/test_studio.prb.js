@@ -86,26 +86,26 @@ studio . setResource (['test_studio.prb'], `
 [TestEq "search_atom_c 4" command *x [search_atom_c "command" : *x]]
 [TestEq "search_atom_c with anonymous atom" [*atom : *] *x [search_atom_c *atom] [list "user!" : *x]]
 
-[exit]
-
-`);
-/*
-
 [TestWorks "unique_atoms" [unique_atoms]]
 [TestWorks "unique_atoms command" [unique_atoms command]]
 [TestEq "unique_atoms *x" [] *x [unique_atoms *x]]
 [create_atom "command"] [create_atom "inner"]
 [TestFails "unique_atoms" [unique_atoms]]
-[TestFails "unique_atoms \"studio\"" [unique_atoms "studio"]]
+[TestFails "unique_atoms 'studio'" [unique_atoms "studio"]]
 [TestEq "unique_atoms *x" [[@ studio . command "studio"] [@ user! . command "user!"]] *x [unique_atoms *x]]
-[TestEq "unique_atoms *x command *y \"studio\" *z"
-	[[[@ studio . command "studio"]] [[@ user! . command "user!"]] []] [*x *y *z]
-	[unique_atoms *x command *y "studio" *z]
-]
-[TestEq "unique_atoms *x command @ studio . command \"studio\" \"user!\""
-	[[@ studio . command "studio"] [@ user! . command "user!"] [@ user! . command "user!"] [@ studio . command "studio"]] *x
+[TestEq "unique_atoms *x command @ studio . command 'studio' 'user!'"
+	[[@ user! . command "user!"] [@ studio . command "studio"]] *x
 	[unique_atoms *x command @ studio . command "studio" "user!"]
 ]
+[TestEq "unique_atoms *x command @ studio . command 'studio' 'user!'"
+	[[@ user! . command "user!"] [@ studio . command "studio"]] *x
+	[unique_atoms *x "studio" "user!"]
+]
+
+[exit]
+
+`);
+/*
 
 [TestEq "preprocessor *x" [] *x [preprocessor *x]]
 [TestEq "preprocessor:*x" [] *x [preprocessor : *x]]
