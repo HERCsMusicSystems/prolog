@@ -881,6 +881,18 @@ function (root, directory) {
 			return false;
 		};
 	};
+	var has_machine = {
+		code: function (el) {
+			if (el . type === 1) el = el . left;
+			if (el . type === 3) return el . left . machine !== null;
+			if (el . type === 6) {
+				var dir = root . searchDirectory (el . left);
+				if (dir === null) return false;
+				return dir . service_class !== null;
+			}
+			return false;
+		}
+	};
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
@@ -957,10 +969,10 @@ function (root, directory) {
       case 'integer?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && Number . isInteger (el . left);}};
       case 'double?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && typeof (el . left) === 'number' && ! Number . isInteger (el . left);}};
       case 'number?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && typeof (el . left) === 'number';}};
-      case 'text?': return {code: function (e) {if (el . type === 1) el = el . left; return el . type === 6 && typeof (el . left) === 'string';}};
+      case 'text?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && typeof (el . left) === 'string';}};
       case 'var?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 2;}};
       case 'head?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6;}};
-      case 'machine?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 3 && el . left . machine !== null;}};
+      case 'machine?': return has_machine;
       case 'text_list': return text_list;
       case 'text_term': return text_term;
       case 'CONSTANT': return constant;

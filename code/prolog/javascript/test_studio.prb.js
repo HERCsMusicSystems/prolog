@@ -102,52 +102,36 @@ studio . setResource (['test_studio.prb'], `
 	[unique_atoms *x "studio" "user!"]
 ]
 
-[exit]
-
-`);
-/*
-
-[TestEq "preprocessor *x" [] *x [preprocessor *x]]
-[TestEq "preprocessor:*x" [] *x [preprocessor : *x]]
-[TestEq "preprocessor eq" eq *x [preprocessor eq] [preprocessor : *x]]
-[TestEq "preprocessor []" [] *x [preprocessor []] [preprocessor *x]]
-[TestEq "preprocessor:eq" eq *x [preprocessor eq] [preprocessor : *x]]
-[TestEq "[preprpocessor]" [] *x [preprocessor] [preprocessor : *x]]
-
-[TestWorks "prompt set" [prompt "=> "]]
-[TestEq "prompt *x" "=> " *x [prompt *x]]
-[TestEq "prompt:*x" "=> " *x [prompt : *x]]
-
 [TestWorks "atom? atom" [atom? command]]
 [TestFails "atom? 127" [atom? 127]]
 
-[TestWorks "is_integer 127" [is_integer 127]]
-[TestFails "is_integer 127.0" [is_integer command]]
+[TestWorks "integer? 127" [integer? 127]]
+[TestFails "integer? 127.0" [integer? command]]
 
-[TestWorks "is_double 127.0" [is_double 127.0]]
-[TestFails "is_double 127" [is_double 127]]
+[TestWorks "double? 127.0" [double? 127.5]]
+[TestFails "double? 127" [double? 127]]
 
-[TestWorks "is_number 127.0" [is_number 127.0]]
-[TestWorks "is_number 127" [is_number 127]]
-[TestFails "is_number atom" [is_number command]]
+[TestWorks "number? 127.0" [number? 127.5]]
+[TestWorks "number? 127" [number? 127]]
+[TestFails "number? atom" [number? command]]
 
-[TestWorks "is_var *" [is_var *]]
-[TestFails "is_var atom" [is_var command]]
+[TestWorks "var? *" [var? *]]
+[TestFails "var? atom" [var? command]]
 
-[TestFails "is_head atom" [is_head command]]
+[TestFails "head? atom" [head? command]]
 
-[TestWorks "is_text text" [is_text "sonda"]]
-[TestFails "is_text atom" [is_text command]]
+[TestWorks "text? text" [text? "sonda"]]
+[TestFails "text? atom" [text? command]]
 
-[TestWorks "has_machine sum" [has_machine sum]]
-[TestFails "has_machine command" [has_machine command]]
-[TestWorks "has_machine studio" [has_machine "studio"]]
-[TestFails "has_machine capitol" [has_machine "capitol"]]
+[TestWorks "machine? sum" [machine? sum]]
+[TestFails "machine? command" [machine? command]]
+[TestWorks "machine? studio" [machine? "studio"]]
+[TestFails "machine? capitol" [machine? "capitol"]]
 
 [TestEq "text_list sonda" [115 111 110 100 97] *x [text_list "sonda" *x]]
 [TestEq "text_list 115 111 110 100 97" "sonda" *x [text_list *x [115 111 110 100 97]]]
-[TestWorks "text_list 115 111 110 100 97 \"sonda\"" [text_list "sonda" [115 111 110 100 97]]]
-[TestFails "text_list 115 111 110 100 97 \"sonda\"" [text_list "sonda" [115 111 110 100 98]]]
+[TestWorks "text_list 115 111 110 100 97 'sonda'" [text_list "sonda" [115 111 110 100 97]]]
+[TestFails "text_list 115 111 110 100 97 'sonda'" [text_list "sonda" [115 111 110 100 98]]]
 
 [TestEq "e32 *" 0 *x [e32 *x]]
 [TestEq "e32 * be" 190 *x [e32 *x 0xbe]]
@@ -187,33 +171,33 @@ studio . setResource (['test_studio.prb'], `
 [TestEq "sum [* 2.0 3.0]" 1.0 *x [sum *x 2.0 3.0]]
 [TestWorks "sum [1 2 3]" [sum 1 2 3]]
 [TestFails "sum [1 2 4]" [sum 1 2 4]]
-[TestEq "sum [command pp \"commandpp\"]" "commandpp" *x [sum command pp *x]]
-[TestEq "sum [\"command\" \"pp\" \"commandpp\"]" "commandpp" *x [sum "command" "pp" *x]]
-[TestEq "sum [command pp \"commandpp\"]" "pp" *x [sum command *x "commandpp"]]
-[TestEq "sum [\"command\" \"pp\" \"commandpp\"]" "pp" *x [sum "command" *x "commandpp"]]
-[TestEq "sum [command pp \"commandpp\"]" "command" *x [sum *x pp "commandpp"]]
-[TestEq "sum [\"command\" \"pp\" \"commandpp\"]" "command" *x [sum *x "pp" "commandpp"]]
-[TestWorks "sum [command pp \"commandpp\"]" [sum command pp "commandpp"]]
-[TestFails "sum [command pp sum]" [sum command pp sum]]
+[TestEq "sum [command pp 'commandpp']" "commandpp" *x [sum command pp *x]]
+[TestEq "sum ['command' 'pp' 'commandpp']" "commandpp" *x [sum "command" "pp" *x]]
 
 [TestEq "times [2 8 : *]" 16 *x [times 2 8 : *x]]
 [TestEq "times [2 8.5 *]" 17.0 *x [times 2 8.5 *x]]
-[TestFails "times [0 * 16]" [times 0 * 16]]
-[TestEq "times [2 * 17]" 8 *x [times 2 *x 17]]
+[TestWorks "times [0 * 16]" [times 0 * 16]]
+[TestEq "times [2 * 17]" 8.5 *x [times 2 *x 17]]
 [TestEq "times [2 * : 17.0]" 8.5 *x [times 2 *x : 17.0]]
 [TestEq "times [2.0 8  *]" 16.0 *x [times 2.0 8 *x]]
 [TestEq "times [2.0 8.5 : *]" 17.0 *x [times 2.0 8.5 : *x]]
-[TestFails "times [0.0 * : 16]" [times 0.0 * : 16]]
+[TestWorks "times [0.0 * : 16]" [times 0.0 * : 16]]
 [TestEq "times [2.0 * : 17]" 8.5 *x [times 2.0 *x : 17]]
 [TestEq "times [2.0 * 17.0]" 8.5 *x [times 2.0 *x 17.0]]
-[TestFails "times [* 0 : 17]" [times * 0 : 17]]
-[TestEq "times [* 8 17]" 2 *x [times *x 8 17]]
+[TestWorks "times [* 0 : 17]" [times * 0 : 17]]
+[TestEq "times [* 8 17]" 2.125 *x [times *x 8 17]]
 [TestEq "times [* 8 : 17.0]" 2.125 *x [times *x 8 : 17.0]]
-[TestFails "times [* 0.0 17]" [times * 0.0 17]]
+[TestWorks "times [* 0.0 17]" [times * 0.0 17]]
 [TestEq "times [* 8.5 17]" 2.0 *x [times *x 8.5 17]]
 [TestEq "times [* 8.5 : 17.0]" 2.0 *x [times *x 8.5 : 17.0]]
 [TestWorks "times [2 3 6]" [times 2 3 6]]
 [TestFails "times [2 3 4]" [times 2 3 4]]
+
+[exit]
+
+`);
+/*
+
 
 [TestEq "mac [2 4 3 : *]" 11 *x [mac 2 4 3 : *x]]
 [TestEq "mac [2.0 4 3 *]" 11.0 *x [mac 2.0 4 3 *x]]
