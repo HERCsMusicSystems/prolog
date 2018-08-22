@@ -718,9 +718,20 @@ function (root, directory) {
 	};
 	var addcl = {
 		code: function (el) {
-			var index = Number . MAX_VALUE;
-			if (el . type === 1 && el . left . type === 6) {index = el . left . left; el = el . right;}
-			el = el . duplicate (); if (el . attach (index)) return true; if (el . type !== 1) return false; return el . left . attach (0);
+			if (el . type !== 1) return false;
+			var ind = el . left;
+			if (ind . type === 1) {
+				if (ind . left . type === 3) return el . duplicate () . attach ();
+				el = el . right;
+				if (el . type === 6) return ind . duplicate () . attach (el . left);
+				if (el . type === 1) el = el . left;
+				if (el . type === 6) return ind . duplicate (). attach (el . left);
+			}
+			if (ind . type !== 6) return false;
+			el = el . right . duplicate ();
+			if (el . attach (ind . left)) return true;
+			if (el . type !== 1) return false;
+			return el . left . attach (ind . left);
 		}
 	};
 	var addcl0 = {

@@ -967,7 +967,7 @@ Resolution . prototype . resolution = function (query) {
 	if (query . type !== 1) return null;
 	this . q_root = new Query (query . duplicate ());
 	var ctrl;
-	var limit = 512
+	var limit = 16384;
 	do {
 		//this . sa ();
 		ctrl = this . res_forward ();

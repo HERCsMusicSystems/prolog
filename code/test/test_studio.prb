@@ -45,10 +45,13 @@
 
 [TestFails "addcl0 protected" [addcl0 [[not]]]]
 [TestEq "addcl0" [[capitol 1] 2 3 fail] *x [addcl0 [[capitol 1] 2 3 fail]] [CL 0 capitol *x]]
+[TestEq "addcl0 :" [[capitol 2] 3 4 / fail] *x [addcl0 [capitol 2] 3 4 / fail] [CL 0 capitol *x]]
 [TestFails "addcl protected" [addcl [[not]]]]
-[TestEq "addcl" [[capitol 2] 33 4 fail] *x [addcl [[capitol 2] 33 4 fail] 4] [CL capitol 4 *x]]
-[TestEq "addcl -1" [[capitol 123]] *x [addcl [[capitol 123]] -1] [CL 0 capitol *x]]
+[TestEq "addcl : index" [[capitol 2] 33 4 fail] *x [addcl [[capitol 2] 33 4 fail] : 4] [CL capitol 4 *x]]
+[TestEq "addcl index :" [[capitol 2] 33 4 / fail] *x [addcl 4 [capitol 2] 33 4 / fail] [CL capitol 4 *x]]
+[TestEq "addcl -1" [[capitol 123]] *x [addcl -1 [[capitol 123]]] [CL 0 capitol *x]]
 [TestEq "addcl 3" [[capitol fail]] *x [addcl [[capitol fail]] 3] [CL 3 capitol *x]]
+[TestEq "addcl : last" [[capitol fail] fail] *x [addcl [capitol fail] fail] [CL 9 capitol *x]]
 
 [TestFails "create_atom 127 (confirms not atom)" [create_atom 127]]
 [TestWorks "create_atom atom (confirms atom)" [create_atom sonda]]

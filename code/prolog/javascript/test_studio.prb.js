@@ -28,32 +28,39 @@ studio . setResource (['test_studio.prb'], `
 [TestWorks "CL atom:index" [CL capitol : 5]]
 [TestFails "CL atom:index" [CL capitol : 4]]
 
-[exit]
-
-`);
-/*
-
 [TestEq "DELCL" [[[capitol "Australia" "Canberra"]] [[capitol "Poland" "Warsaw"]] [[capitol "USA" "Cupertino"]]] *x [DELCL capitol 2] [DELCL 1 capitol] [list capitol : *x]]
 
 [TestFails "DELCL Fails 1" [DELCL capitol 3]]
 [TestFails "DELCL Fails 2" [DELCL 3 capitol]]
+
 [TestFails "DELCL Fails 3" [DELCL capitol -1]]
+
 [TestFails "DELCL Fails 4" [DELCL -1 capitol]]
 
 [TestFails "DELCL Protected" [DELCL 0 not]]
+
+[TestFails "addcl0 protected" [addcl0 [[not]]]]
+[TestEq "addcl0" [[capitol 1] 2 3 fail] *x [addcl0 [[capitol 1] 2 3 fail]] [CL 0 capitol *x]]
+[TestEq "addcl0 :" [[capitol 2] 3 4 / fail] *x [addcl0 [capitol 2] 3 4 / fail] [CL 0 capitol *x]]
+[TestFails "addcl protected" [addcl [[not]]]]
+[TestEq "addcl : index" [[capitol 2] 33 4 fail] *x [addcl [[capitol 2] 33 4 fail] : 4] [CL capitol 4 *x]]
+[TestEq "addcl index :" [[capitol 2] 33 4 / fail] *x [addcl 4 [capitol 2] 33 4 / fail] [CL capitol 4 *x]]
+[TestEq "addcl -1" [[capitol 123]] *x [addcl -1 [[capitol 123]]] [CL 0 capitol *x]]
+[TestEq "addcl 3" [[capitol fail]] *x [addcl [[capitol fail]] 3] [CL 3 capitol *x]]
+[TestEq "addcl : last" [[capitol fail] fail] *x [addcl [capitol fail] fail] [CL 9 capitol *x]]
+
+
+
+[exit]
+
+`);
+/*
 
 [TestEq "OVERWRITE" [[[capitol "Australia" "Canberra"]] [[capitol "Poland" "Warsaw"]] [[capitol] [show capitol]]] *x [OVERWRITE 2 [[capitol] [show capitol]]]]
 [TestFails "OVERWRITE Fails 1" [OVERWRITE 3 [[capitol] [show capitol]]]]
 [TestFails "OVERWRITE Fails 2" [OVERWRITE 0 [[enter]]]]
 
 [TestFails "OVERWRITE Protected" [OVERWRITE 0 [[not]]]]
-
-[TestFails "addcl0 protected" [addcl0 [[not]]]]
-[TestEq "addcl0" [[capitol 1] 2 3 fail] *x [addcl0 [[capitol 1] 2 3 fail]] [CL 0 capitol *x]]
-[TestFails "addcl protected" [addcl [[not]]]]
-[TestEq "addcl" [[capitol 2] 33 4 fail] *x [addcl [[capitol 2] 33 4 fail] 4] [CL capitol 4 *x]]
-[TestEq "addcl -1" [[capitol 123]] *x [addcl [[capitol 123]] -1] [CL 0 capitol *x]]
-[TestEq "addcl 3" [[capitol fail]] *x [addcl [[capitol fail]] 3] [CL 3 capitol *x]]
 
 [TestFails "create_atom 127 (confirms not atom)" [create_atom 127]]
 [TestWorks "create_atom atom (confirms atom)" [create_atom sonda]]
