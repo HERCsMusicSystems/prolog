@@ -57,24 +57,16 @@ studio . setResource (['test_studio.prb'], `
 
 [TestEq "overwrite" "Krakow" *city [overwrite [[capitol "Poland" : *] : *] [[capitol "Poland" "Krakow"]]] [capitol "Poland" *city]]
 
-[exit]
-
-`);
-/*
-
-
-[TestFails "OVERWRITE Protected" [OVERWRITE 0 [[not]]]]
-
 [TestFails "create_atom 127 (confirms not atom)" [create_atom 127]]
 [TestWorks "create_atom atom (confirms atom)" [create_atom sonda]]
-[TestEq "create_atom *var (anonymous)" [sonda] *x [create_atom *atom] [list "user!" : *x] [is_atom *atom]]
+[TestEq "create_atom *var (anonymous)" [sonda] *x [create_atom *atom] [list "user!" : *x] [atom? *atom]]
 [TestEq "create_atom name" "mariner sonda" *x [create_atom "mariner"] [list "user!" *x]]
 [TestEq "create_atom name *var" ["mariner sonda" "voyager"] [*x *y] [create_atom "voyager" *atom] [add "" *atom *y] [list "user!" *x]]
 [TestEq "create_atom name:*var" ["mariner sonda" "voyager"] [*x *y] [create_atom "voyager" : *atom] [add "" *atom *y] [list "user!" *x]]
 
 [TestWorks "create_atoms []" [create_atoms]]
-[TestWorks "create_atoms 1 2 command 3" [create_atoms *1 *2 command *3] [is_atom *1] [is_atom *2] [is_atom *3]]
-[TestFails "create_atoms \"sonda\"" [create_atoms "sonda"]]
+[TestWorks "create_atoms 1 2 command 3" [create_atoms *1 *2 command *3] [atom? *1] [atom? *2] [atom? *3]]
+[TestFails "create_atoms 'sonda'" [create_atoms "sonda"]]
 [TestFails "create_atoms 127" [create_atoms 127]]
 
 [TestFails "search_atom directory/atom 1" [search_atom "stdio" "command" *x]]
@@ -93,6 +85,11 @@ studio . setResource (['test_studio.prb'], `
 [TestEq "search_atom_c 3" command *x [search_atom_c "command" *x]]
 [TestEq "search_atom_c 4" command *x [search_atom_c "command" : *x]]
 [TestEq "search_atom_c with anonymous atom" [*atom : *] *x [search_atom_c *atom] [list "user!" : *x]]
+
+[exit]
+
+`);
+/*
 
 [TestWorks "unique_atoms" [unique_atoms]]
 [TestWorks "unique_atoms command" [unique_atoms command]]
@@ -121,8 +118,8 @@ studio . setResource (['test_studio.prb'], `
 [TestEq "prompt *x" "=> " *x [prompt *x]]
 [TestEq "prompt:*x" "=> " *x [prompt : *x]]
 
-[TestWorks "is_atom atom" [is_atom command]]
-[TestFails "is_atom 127" [is_atom 127]]
+[TestWorks "atom? atom" [atom? command]]
+[TestFails "atom? 127" [atom? 127]]
 
 [TestWorks "is_integer 127" [is_integer 127]]
 [TestFails "is_integer 127.0" [is_integer command]]
@@ -865,7 +862,7 @@ studio . setResource (['test_studio.prb'], `
 [TestWorks "TRY eq 127 128" [TRY [eq 127 128]]]
 [TestWorks "PROBE"
 	[var [*v var]]
-	[*v : *v1] [is_atom *v1]
+	[*v : *v1] [atom? *v1]
 	[PROBE [eq *x 127] [*v *x]]
 	[is_var *x]
 	[*v : *v2] [is_integer *v2]

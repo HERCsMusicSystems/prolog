@@ -219,7 +219,8 @@ Root . prototype . searchDirectory = function (name) {
 	while (ret !== null) {if (ret . name === name) return ret; ret = ret . next;}
 	return null;
 };
-Root . prototype . search = function (name) {
+Root . prototype . search = function (name, module) {
+	if (module !== undefined) {module = this . searchDirectory (module); if (module === null) return null; return module . searchAtom (name);}
 	var sub = this . root;
 	while (sub !== null) {
 		var ret = sub . searchAtom (name);
@@ -254,17 +255,18 @@ Root . prototype . drop = function (name) {
 		sub = sub . next;
 	}
 };
-Root . prototype . createAtom = function (name) {
+Root . prototype . createAtom = function (name, module) {
 	if (this . root === null) return null;
+	if (module !== undefined) {module = this . searchDirectory (module); if (module === null) return null; return module . createAtom (name);}
 	return this . root . createAtom (name);
 };
 Root . prototype . removeAtom = function (name) {
 	if (this . root === null) return false;
 	return this . root . removeAtom (name);
 };
-Root . prototype . searchC = function (name) {
-	var atom = this . search (name);
-	if (atom === null) return this . createAtom (name);
+Root . prototype . searchC = function (name, module) {
+	var atom = this . search (name, module);
+	if (atom === null) return this . createAtom (name, module);
 	return atom;
 };
 Root . prototype . Private = function (name) {

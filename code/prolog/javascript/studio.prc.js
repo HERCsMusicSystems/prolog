@@ -750,8 +750,52 @@ function (root, directory) {
 			return atom . delcl (index);
 		}
 	};
-  var auto_atoms = {code: function (el) {root . auto_atoms = true; return true;}};
-  var scripted_atoms = {code: function (el) {root . auto_atoms = false; return true;}};
+	var auto_atoms = {code: function (el) {root . auto_atoms = true; return true;}};
+	var scripted_atoms = {code: function (el) {root . auto_atoms = false; return true;}};
+	var create_atom = {
+		code: function (el) {
+			if (el . type === 3) return true;
+			if (el . type === 2) {el . setAtom (new prolog . Atom ()); return true;}
+			if (el . type !== 1) return false;
+			var sub = el . left; el = el . right; if (el . type === 1) el = el . left;
+			if (sub . type === 3) return true;
+			if (sub . type === 2) {
+				if (el . type === 6) {sub . setAtom (new prolog . Atom (el . left)); return true;}
+				if (el . type === 0) {sub . setAtom (new prolog . Atom ()); return true;}
+			}
+			if (sub . type === 6) {
+				if (el . type === 2) {el . setAtom (new prolog . Atom (sub . left)); return true;}
+				if (el . type === 0) {if (typeof (sub . left) !== 'string') return false; root . createAtom (sub . left); return true;}
+			}
+			return false;
+		}
+	};
+	var create_atoms = {
+		code: function (el) {
+			while (el . type === 1) {
+				var e = el . left;
+				if (e . type === 2) e . setAtom (new prolog . Atom ());
+				else if (e . type !== 3) return false;
+				el = el . right;
+			}
+			return true;
+		}
+	};
+	var search_atom = function (search) {
+		this . code = function (el) {
+			var module = null, name = null, atom = null;
+			while (el . type === 1) {
+				var sub = el . left;
+				if (sub . type === 6) {if (module === null) module = sub; else name = sub;} else if (sub . type === 2) atom = sub;
+				el = el . right;
+			}
+			if (el . type === 6) {if (module === null) module = el; else name = el;} else if (el . type === 2) atom = el;
+			if (atom === null) return false;
+			if (module === null) {atom . setAtom (root . createAtom ()); return true;}
+			if (name === null) {var sub = root [search] (module . left); if (sub === null) return false; atom . setAtom (sub); return true;}
+			var sub = root [search] (name . left, module . left); if (sub === null) return false; atom . setAtom (sub); return true;
+		};
+	};
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
@@ -818,6 +862,10 @@ function (root, directory) {
       case 'DELCL': return DELCL;
       case 'auto_atoms': return auto_atoms;
       case 'scripted_atoms': return scripted_atoms;
+      case 'create_atom': return create_atom;
+      case 'create_atoms': return create_atoms;
+      case 'search_atom': return new search_atom ('search');
+      case 'search_atom_c': return new search_atom ('searchC');
       case 'e32': return e32;
       case 'atom?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 3;}};
       case 'integer?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && Number . isInteger (el . left);}};
@@ -860,9 +908,6 @@ function (root, directory) {
 studio . setResource (['studio.prc'], `
 program studio #machine := ' prolog . studio '
 	[
-    exit list
-    pp write
-    file_writer file_reader create_file open_file erase_file import load batch
     e pi
     abs trunc floor ceil round
     add1 ++ sub1 --
@@ -875,9 +920,12 @@ program studio #machine := ' prolog . studio '
     ; I/O
     timestamp
     operating_system implementation version navigator
+    command exit
+    list pp write
+    file_writer file_reader create_file open_file erase_file import load batch
     ; CLAUSE
     delallcl CL cl addcl addcl0 DELCL delcl OVERWRITE overwrite
-    auto_atoms scripted_atoms
+    auto_atoms scripted_atoms create_atom create_atoms search_atom search_atom_c
     ; TERM
     e32 atom? integer? double? number? text? var? head? machine? text_list text_term
     ; META
@@ -977,6 +1025,10 @@ program studio #machine := ' prolog . studio '
 #machine DELCL := 'DELCL'
 #machine auto_atoms := 'auto_atoms'
 #machine scripted_atoms := 'scripted_atoms'
+#machine create_atom := 'create_atom'
+#machine create_atoms := 'create_atoms'
+#machine search_atom := 'search_atom'
+#machine search_atom_c := 'search_atom_c'
 
 #machine e32 := 'e32'
 #machine atom? := 'atom?'
