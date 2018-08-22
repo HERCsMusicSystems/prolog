@@ -860,7 +860,7 @@ program studio #machine := ' prolog . studio '
     ; I/O
     timestamp
     ; CLAUSE
-    delallcl CL cl addcl addcl0 DELCL delcl
+    delallcl CL cl addcl addcl0 DELCL delcl OVERWRITE overwrite
     auto_atoms scripted_atoms
     ; TERM
     e32 atom? integer? double? number? text? var? head? machine? text_list text_term
@@ -1092,6 +1092,9 @@ program studio #machine := ' prolog . studio '
 [[cl *x *x [[*a:*b]:*c]] [CL *x *a [[*a:*b]:*c]]]
 [[cl *x *y [[*a:*b]:*c]] [add *x 1 *x2] / [CL *x2 *a *X] [cl *x2 *y [[*a:*b]:*c]]]
 [[delcl [[*a:*b]:*c]] [cl *x [[*a:*b]:*c]] [DELCL *x *a]]
+
+[[OVERWRITE *index [[*atom : *parameters] : *body]] [DELCL *atom *index] [addcl *index [*atom : *parameters] : *body]]
+[[overwrite [[*a:*b]:*c] [[*a:*h]:*i]] [cl *x [[*a:*b]:*c]] [OVERWRITE *x [[*a:*h]:*i]]]
 
 [[exit : *]]
 

@@ -37,12 +37,11 @@
 
 [TestFails "DELCL Protected" [DELCL 0 not]]
 
-[TestEq "OVERWRITE" [[[capitol "Australia" "Canberra"]] [[capitol "Poland" "Warsaw"]] [[capitol] [show capitol]]] *x [OVERWRITE 2 [[capitol] [show capitol]]]]
+[TestEq "OVERWRITE" [ [[capitol "USA" "Cupertino"]] [[capitol] [show capitol]]] [*x *y] [CL 2 capitol *x] [OVERWRITE 2 [[capitol] [show capitol]]] [CL 2 capitol *y]]
 [TestFails "OVERWRITE Fails 1" [OVERWRITE 3 [[capitol] [show capitol]]]]
-[TestFails "OVERWRITE Fails 2" [OVERWRITE 0 [[enter]]]]
+[TestFails "OVERWRITE Fails 2" [OVERWRITE 0 [[sonda]]]]
 
 [TestFails "OVERWRITE Protected" [OVERWRITE 0 [[not]]]]
-
 [TestFails "addcl0 protected" [addcl0 [[not]]]]
 [TestEq "addcl0" [[capitol 1] 2 3 fail] *x [addcl0 [[capitol 1] 2 3 fail]] [CL 0 capitol *x]]
 [TestEq "addcl0 :" [[capitol 2] 3 4 / fail] *x [addcl0 [capitol 2] 3 4 / fail] [CL 0 capitol *x]]
@@ -52,6 +51,8 @@
 [TestEq "addcl -1" [[capitol 123]] *x [addcl -1 [[capitol 123]]] [CL 0 capitol *x]]
 [TestEq "addcl 3" [[capitol fail]] *x [addcl [[capitol fail]] 3] [CL 3 capitol *x]]
 [TestEq "addcl : last" [[capitol fail] fail] *x [addcl [capitol fail] fail] [CL 9 capitol *x]]
+
+[TestEq "overwrite" "Krakow" *city [overwrite [[capitol "Poland" : *] : *] [[capitol "Poland" "Krakow"]]] [capitol "Poland" *city]]
 
 [TestFails "create_atom 127 (confirms not atom)" [create_atom 127]]
 [TestWorks "create_atom atom (confirms atom)" [create_atom sonda]]
