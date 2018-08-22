@@ -839,6 +839,21 @@ function (root, directory) {
     }
     return null;
   };
+	var nav_atom = root . search ('navigator');
+	if (nav_atom !== null) {
+		for (var ind in navigator) {
+			nav = navigator [ind];
+			if (typeof (nav) === 'number' || typeof (nav) === 'string') {
+				var clause = new prolog . Element ();
+				clause . setPair ();
+				var el = clause . left;
+				el . setPair (); el . left . setAtom (nav_atom);
+				el = el . right; el . setPair (); el . left . setNative (ind);
+				el = el . right; el . setPair (); el . left . setNative (navigator [ind]);
+				clause . attach ();
+			}
+		}
+	}
 }
 );
 
@@ -859,6 +874,7 @@ program studio #machine := ' prolog . studio '
     greater greater_eq less less_eq > >= => < <= =< min max
     ; I/O
     timestamp
+    operating_system implementation version navigator
     ; CLAUSE
     delallcl CL cl addcl addcl0 DELCL delcl OVERWRITE overwrite
     auto_atoms scripted_atoms
@@ -1095,6 +1111,10 @@ program studio #machine := ' prolog . studio '
 
 [[OVERWRITE *index [[*atom : *parameters] : *body]] [DELCL *atom *index] [addcl *index [*atom : *parameters] : *body]]
 [[overwrite [[*a:*b]:*c] [[*a:*h]:*i]] [cl *x [[*a:*b]:*c]] [OVERWRITE *x [[*a:*h]:*i]]]
+
+[[operating_system *op] [navigator 'appName' *op]]
+[[implementation 'JavaScript']]
+[[version 2018 8]]
 
 [[exit : *]]
 
