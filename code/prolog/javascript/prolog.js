@@ -246,14 +246,14 @@ Root . prototype . close = function () {
 	this . root = sub;
 };
 Root . prototype . drop = function (name) {
-	if (this . root === null) return;
-	if (name === undefined) {this . root = this . root . next; return;}
-	if (this . root . name === name) this . root = this . root . next;
+	if (this . root === null) return false;
+	if (name === undefined || this . root . name === name) {this . root = this . root . next; return true;}
 	var sub = this . root;
 	while (sub . next !== null) {
-		if (sub . next . name === name) {sub . next = sub . next . next; return;}
+		if (sub . next . name === name) {sub . next = sub . next . next; return true;}
 		sub = sub . next;
 	}
+	return false;
 };
 Root . prototype . createAtom = function (name, module) {
 	if (this . root === null) return null;
