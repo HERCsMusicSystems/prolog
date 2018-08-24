@@ -32,7 +32,9 @@ Atom . prototype . raw_clause_pointer = function (position) {
 	return cl;
 };
 Atom . prototype . delcl = function (position) {
+	if (this . Protected) return false;
 	if (this . firstClause === null || this . Protected) return false;
+	if (position < 0) return false;
 	if (position === 0) {this . firstClause = this . firstClause . left . left . left; return true;}
 	var clause = this . firstClause, next = clause . left . left . left;
 	while (next !== null && position > 1) {clause = next; next = clause . left . left . left; position --;}
@@ -217,7 +219,8 @@ Root . prototype . searchDirectory = function (name) {
 	while (ret !== null) {if (ret . name === name) return ret; ret = ret . next;}
 	return null;
 };
-Root . prototype . search = function (name) {
+Root . prototype . search = function (name, module) {
+	if (module !== undefined) {module = this . searchDirectory (module); if (module === null) return null; return module . searchAtom (name);}
 	var sub = this . root;
 	while (sub !== null) {
 		var ret = sub . searchAtom (name);
@@ -232,7 +235,7 @@ Root . prototype . list = function (name) {
 		return this . root . names ();
 	}
 	var sub = this . searchDirectory (name);
-	return sub === null ? [] : sub . list ();
+	return sub === null ? null : sub . list ();
 };
 Root . prototype . close = function () {
 	if (this . root === null) return;
@@ -252,17 +255,18 @@ Root . prototype . drop = function (name) {
 		sub = sub . next;
 	}
 };
-Root . prototype . createAtom = function (name) {
+Root . prototype . createAtom = function (name, module) {
 	if (this . root === null) return null;
+	if (module !== undefined) {module = this . searchDirectory (module); if (module === null) return null; return module . createAtom (name);}
 	return this . root . createAtom (name);
 };
 Root . prototype . removeAtom = function (name) {
 	if (this . root === null) return false;
 	return this . root . removeAtom (name);
 };
-Root . prototype . searchC = function (name) {
-	var atom = this . search (name);
-	if (atom === null) return this . createAtom (name);
+Root . prototype . searchC = function (name, module) {
+	var atom = this . search (name, module);
+	if (atom === null) return this . createAtom (name, module);
 	return atom;
 };
 Root . prototype . Private = function (name) {
@@ -541,9 +545,9 @@ Reader . prototype . readRightSide = function (left, bracket) {
 			if (this . control !== '.') return this . error ("Syntax error (dot expected).");
 			this . getSymbol ();
 			if (this . control !== 'atom') return this . error ("Syntax error (atom after dot expected).");
-			dir = dir . searchAtom (this . symbol);
+			dir = el . searchAtom (this . symbol);
 			if (dir === null) return this . error ("Semantic error (qualified atom " + this . symbol + " not found in " + el . name + ").");
-			el = new Element (); dir . setAtom (dir);
+			el = new Element (); el . setAtom (dir);
 			break;
 		case 'number': el = new Element (); el . setNative (this . symbol); break;
 		case '[]': case '()': el = new Element (); break;
@@ -965,7 +969,7 @@ Resolution . prototype . resolution = function (query) {
 	if (query . type !== 1) return null;
 	this . q_root = new Query (query . duplicate ());
 	var ctrl;
-	var limit = 512
+	var limit = 16384;
 	do {
 		//this . sa ();
 		ctrl = this . res_forward ();

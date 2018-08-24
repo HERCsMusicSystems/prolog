@@ -20,6 +20,8 @@
 <script src="prolog.js" type="text/javascript" charset="UTF-8"></script>
 <script src="studio.prc.js" type="text/javascript" charset="UTF-8"></script>
 <script src="test.prc.js" type="text/javascript" charset="UTF-8"></script>
+<script src="test.prb.js" type="text/javascript" charset="UTF-8"></script>
+<script src="test_studio.prb.js" type="text/javascript" charset="UTF-8"></script>
 <script type="text/javascript" charset="UTF-8">
 	studio . setResource (['sonda', 123, 'mariner'], "Joker was here!");
 	studio . setResource (['sonda', 123, 'mariner.prc'], "JOKER");
@@ -35,7 +37,8 @@
 		if (e !== undefined && e . key !== 'Enter') return;
 		console . log (root . textResolution (command));
 	};
-	root . auto_atoms = true;
+	//root . auto_atoms = true;
+	resolutionCommand ("[* [batch 'test.prb']]");
 </script>
 
 <script type="text/javascript" charset="UTF-8">

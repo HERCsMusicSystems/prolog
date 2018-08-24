@@ -18,23 +18,32 @@ function (root, directory) {
           if (el . type === 0) {root . log (root . listAtom (first . left) . join ('\n')); return true;}
           if (el . type === 2) {
             el . type = 0;
-            var l = root . listAtom (first . left);
-            for (var ind in l) el = el . setNativePair (l [ind]);
+            var clause = first . left . firstClause;
+            while (clause !== null) {
+              el . setPair ();
+              clause . duplicate (el . left); el . left . left . left . setAtom (first . left);
+              el = el . right;
+              clause = clause . left . left . left;
+            }
             return true;
           }
-          if (el . type === 1) {el . left . setNative (root . listAtom (first . left) . join ('\n')); return true;}
+          if (el . type === 1) {el . left . setNative (root . listAtom (first . left) . join ('\n') + '\n'); return true;}
         }
         if (first . type === 6) {
           first = first . left;
           if (typeof (first) !== 'string') return false;
-          if (el . type === 0) {root . log (root . list (first) . join (' ')); return true;}
           if (el . type === 2) {
             el . type = 0;
-            var l = root . list (first);
-            for (var ind in l) el = el . setNativePair (l [ind]);
+            var directory = root . searchDirectory (first);
+            if (directory === null) return false;
+            var atom = directory . firstAtom;
+            while (atom !== null) {el . setPair (); el . left . setAtom (atom); el = el . right; atom = atom . next;}
             return true;
           }
-          if (el . type === 1) {el . left . setNative (root . list (first) . join (' ')); return true;}
+          var listing = root . list (first);
+          if (listing === null) return false;
+          if (el . type === 0) {root . log (listing . join (' ')); return true;}
+          if (el . type === 1) {el . left . setNative (listing . join (' ')); return true;}
         }
       }
       return false;
@@ -71,9 +80,9 @@ function (root, directory) {
   };
   var add = new function () {
     this . code = function (el) {
-      if (! el . type === 1) return false;
+      if (el . type !== 1) return false;
       var result = null, sum = 0;
-      if (el . left . type === 2) {result = el . left; el = el . right;}
+      if (el . left . type === 2) {result = el . left; el = el . right; if (el . type !== 1) {result . setNative (0); return true;}}
       switch (el . left . type) {
         case 6: sum = el . left . left; el = el . right; break;
         case 3: sum = el . left . left . name; el = el . right; break;
@@ -176,7 +185,7 @@ function (root, directory) {
   };
   var comparator = function (f) {
     this . code = function (el) {
-      if (el . type !== 1) return false;
+      if (el . type !== 1) return el . type === 0;
       var first = el . left;
       switch (first . type) {
         case 6: first = first . left; break;
@@ -209,29 +218,39 @@ function (root, directory) {
   var greater_eq = new comparator (function (a, b) {return a >= b;});
   var less = new comparator (function (a, b) {return a < b;});
   var less_eq = new comparator (function (a, b) {return a <= b;});
-  var sub = new function () {
-    this . code = function (el) {
-      this . code = function (el) {
-        if (el . type !== 1) return false;
-        var a = el . left; el = el . right;
-        if (el . type !== 1) {
-          if (a . type === 6) {el . setNative (- a . left); return true;}
-          if (el . type === 6) {a . setNative (- el . left); return true;}
-          return false;
-        }
-        var b = el . left; el = el . right;
-        if (el . type === 0) {
-          if (a . type === 6) {b . setNative (- a . left); return true;}
-          if (b . type === 6) {a . setNative (- b . left); return true;}
-        }
-        if (el . type === 1) el = el . left;
-        if (a . type === 6) {
-          if (b . type === 6) {el . setNative (a . left - b . left); return true;}
-          if (el . type === 6) {n . setNative (a . left - el . left); return true;}
-        }
-        if (b . type === 6) {a . setNative (b . left + el . left); return true;}
-      };
-    };
+  var sub = {
+    code: function (el) {
+      if (el . type !== 1) return false;
+      var a = el . left; el = el . right;
+      if (el . type !== 1) {
+        if (a . type === 6) {el . setNative (- a . left); return true;}
+        if (el . type === 6) {a . setNative (- el . left); return true;}
+        return false;
+      }
+      var b = el . left; el = el . right;
+      if (el . type === 0) {
+        if (a . type === 6) {b . setNative (- a . left); return true;}
+        if (b . type === 6) {a . setNative (- b . left); return true;}
+      }
+      if (el . type === 1) el = el . left;
+      if (a . type === 6) {
+        if (b . type === 6) {el . setNative (a . left - b . left); return true;}
+        if (el . type === 6) {n . setNative (a . left - el . left); return true;}
+      }
+      if (b . type === 6) {a . setNative (b . left + el . left); return true;}
+    }
+  };
+  var divmod = {
+    code: function (el) {
+      if (el . type !== 1) return false;
+      var a = el . left; if (a . type !== 6) return false; a = a . left; el = el . right; if (el . type !== 1) return false;
+      var b = el . left; if (b . type !== 6) return false; b = b . left; el = el . right;
+      if (el . type !== 1) {el . setNative (a % b); return true;}
+      el . left . setNative (a % b); el = el . right;
+      if (el . type === 1) el . left . setNative (Math . trunc (a / b));
+      else if (el . type !== 0) el . setNative (Math . trunc (a / b));
+      return true;
+    }
   };
   var comparator_runner = function (f) {
     this . code = function (el) {
@@ -370,7 +389,7 @@ function (root, directory) {
 			if (el . type === 1) {atom = el . left; el = el . right; if (el . type === 1) el = el . left;} else atom = el;
 			if (atom . type === 2) atom . setAtom (new prolog . Atom);
 			if (atom . left . machine !== null) return false;
-			return atom . left . setMachine (new variabler (atom, atom === el ? new prolog . Element () : el));
+			return atom . left . setMachine (new variabler (atom . left, atom === el ? new prolog . Element () : el));
 		};
 		// [VARIABLE : atom] [VARIABLE atom] [VARIABLE atom : value] [VARIABLE atom value]
 	};
@@ -690,12 +709,14 @@ function (root, directory) {
 				if (e . type === 1) clause = e;
 				el = el . right;
 			}
+      if (el . type === 3) atom = el . left;
+      if (el . type === 6) index = el;
 			if (el . type === 2) {if (index === null) index = el; else if (clause === null) clause = el;}
-			if (atom === null) return false;
-			if (index . type === 2) {index . setNative (atom . clauseCount ()); return true;}
+			if (atom === null || index === null) return false;
+      if (clause === null) {index . setNative (atom . clauseCount ()); return true;}
 			if (index . type === 6) {
 				index = index . left;
-				if (typeof (index) !== 'number' || index < 0 || clause === null) return false;
+				if (typeof (index) !== 'number' || index < 0) return false;
 				var cl = atom . raw_clause_pointer (index);
 				if (cl === null) return false;
 				cl . duplicate (clause);
@@ -707,9 +728,20 @@ function (root, directory) {
 	};
 	var addcl = {
 		code: function (el) {
-			var index = Number . MAX_VALUE;
-			if (el . type === 1 && el . left . type === 6) {index = el . left . left; el = el . right;}
-			el = el . duplicate (); if (el . attach (index)) return true; if (el . type !== 1) return false; return el . left . attach (0);
+			if (el . type !== 1) return false;
+			var ind = el . left;
+			if (ind . type === 1) {
+				if (ind . left . type === 3) return el . duplicate () . attach ();
+				el = el . right;
+				if (el . type === 6) return ind . duplicate () . attach (el . left);
+				if (el . type === 1) el = el . left;
+				if (el . type === 6) return ind . duplicate (). attach (el . left);
+			}
+			if (ind . type !== 6) return false;
+			el = el . right . duplicate ();
+			if (el . attach (ind . left)) return true;
+			if (el . type !== 1) return false;
+			return el . left . attach (ind . left);
 		}
 	};
 	var addcl0 = {
@@ -726,6 +758,149 @@ function (root, directory) {
 			}
 			if (atom === null || index === null) return false;
 			return atom . delcl (index);
+		}
+	};
+	var auto_atoms = {code: function (el) {root . auto_atoms = true; return true;}};
+	var scripted_atoms = {code: function (el) {root . auto_atoms = false; return true;}};
+	var create_atom = {
+		code: function (el) {
+			if (el . type === 3) return true;
+			if (el . type === 2) {el . setAtom (new prolog . Atom ()); return true;}
+			if (el . type !== 1) return false;
+			var sub = el . left; el = el . right; if (el . type === 1) el = el . left;
+			if (sub . type === 3) return true;
+			if (sub . type === 2) {
+				if (el . type === 6) {sub . setAtom (new prolog . Atom (el . left)); return true;}
+				if (el . type === 0) {sub . setAtom (new prolog . Atom ()); return true;}
+			}
+			if (sub . type === 6) {
+				if (el . type === 2) {el . setAtom (new prolog . Atom (sub . left)); return true;}
+				if (el . type === 0) {if (typeof (sub . left) !== 'string') return false; root . createAtom (sub . left); return true;}
+			}
+			return false;
+		}
+	};
+	var create_atoms = {
+		code: function (el) {
+			while (el . type === 1) {
+				var e = el . left;
+				if (e . type === 2) e . setAtom (new prolog . Atom ());
+				else if (e . type !== 3) return false;
+				el = el . right;
+			}
+			return true;
+		}
+	};
+	var search_atom = function (search) {
+		this . code = function (el) {
+			var module = null, name = null, atom = null;
+			while (el . type === 1) {
+				var sub = el . left;
+				if (sub . type === 6) {if (module === null) module = sub; else name = sub;} else if (sub . type === 2) atom = sub;
+				el = el . right;
+			}
+			if (el . type === 6) {if (module === null) module = el; else name = el;} else if (el . type === 2) atom = el;
+			if (atom === null) return false;
+			if (module === null) {atom . setAtom (root . createAtom ()); return true;}
+			if (name === null) {var sub = root [search] (module . left); if (sub === null) return false; atom . setAtom (sub); return true;}
+			var sub = root [search] (name . left, module . left); if (sub === null) return false; atom . setAtom (sub); return true;
+		};
+	};
+	var unique_atoms = new function () {
+		var process = function (directory, atom) {
+			var area = [];
+			var dir = root . root;
+			while (dir !== null) {
+				var sub = dir . firstAtom;
+				if (directory !== dir) {
+					while (sub !== null) {if (sub !== atom && sub . name === atom . name) area . push ({atom: sub, directory: dir}); sub = sub . next;}
+				}
+				dir = dir . next;
+			}
+			return area;
+		};
+		var setArea = function (list, area) {
+			for (var ind in area) {
+				list . setPair ();
+				list . left . setPair ();
+				list . left . left . setAtom (area [ind] . atom);
+				list . left . right . setPair ();
+				list . left . right . left . setNative (area [ind] . directory . name);
+				list = list . right;
+			}
+		};
+		var writeArea = function (area) {for (var ind in area) {root . log ('@', area [ind] . directory . name, area [ind] . atom . name);}};
+		this . code = function (el) {
+			var list = null, atoms = [], directories = [];
+			while (el . type === 1) {
+				var e = el . left;
+				switch (e . type) {
+					case 2: list = e; break; case 3: atoms . push (e . left); break; case 6: directories . push (e . left); break; default: break;}
+				el = el . right;
+			}
+			switch (el . type) {case 2: list = el; break; case 3: atoms . push (el . left); break; case 6: directories . push (el . left); break; default: break;}
+			if (list !== null) list . type = 0;
+			if (atoms . length < 1 && directories . length < 1) {
+				var dir = root . root;
+				var area = [];
+				while (dir !== null) {
+					var atom = dir . firstAtom;
+					while (atom !== null) {
+						area = area . concat (process (dir, atom));
+						atom = atom . next;
+					}
+					dir = dir . next;
+				}
+				if (list !== null) {setArea (list, area); return true;}
+				writeArea (area);
+				return area . length < 1;
+			}
+			if (atoms . length > 0 && directories . length > 0) {
+				var area = [];
+				for (var ind in directories) {
+					var dir = root . searchDirectory (directories [ind]);
+					if (dir === null) return false;
+					for (var sub in atoms) area = area . concat (process (dir, atoms [sub]));
+				}
+				if (list !== null) {setArea (list, area); return true;}
+				writeArea (area);
+				return area . length < 1;
+			}
+			if (atoms . length > 0) {
+				var area = [];
+				for (var ind in atoms) area = area . concat (process (null, atoms [ind]));
+				if (list !== null) {setArea (list, area); return true;}
+				writeArea (area);
+				return area . length < 1;
+			}
+			if (directories . length > 0) {
+				area = [];
+				for (var ind in directories) {
+					var dir = root . searchDirectory (directories [ind]);
+					if (dir === null) return false;
+					var atom = dir . firstAtom;
+					while (atom !== null) {
+						area = area . concat (process (dir, atom));
+						atom = atom . next;
+					}
+				}
+				if (list != null) {setArea (list, area); return true;}
+				writeArea (area);
+				return area . length < 1;
+			}
+			return false;
+		};
+	};
+	var has_machine = {
+		code: function (el) {
+			if (el . type === 1) el = el . left;
+			if (el . type === 3) return el . left . machine !== null;
+			if (el . type === 6) {
+				var dir = root . searchDirectory (el . left);
+				if (dir === null) return false;
+				return dir . service_class !== null;
+			}
+			return false;
 		}
 	};
   this . getNativeCode = function (name) {
@@ -746,10 +921,10 @@ function (root, directory) {
       case 'mult': return mult;
       case 'times': return new two_params (function (a, b) {return a * b;}, function (a, c) {return c / a;}, function (b, c) {return c / b;});
       case 'div': return new two_params (function (a, b) {return a / b;}, function (a, c) {return a / c;}, function (b, c) {return b * c;});
-      case 'mod': return new logical_two_params (function (a, b) {return a % b;});
+      case 'mod': return divmod;
       case 'e': return new zero_param (Math . E);
       case 'pi': return new zero_param (Math . PI);
-      case 'abs': return new logical_one_param (function (a) {return a < 0 ? - a : a;});
+      case 'abs': return new logical_one_param (function (a) {return Math . abs (a);});
       case 'trunc': return new logical_one_param (function (a) {return Math . trunc (a);});
       case 'floor': return new logical_one_param (function (a) {return Math . floor (a);});
       case 'ceil': return new logical_one_param (function (a) {return Math . ceil (a);});
@@ -792,15 +967,22 @@ function (root, directory) {
       case 'addcl': return addcl;
       case 'addcl0': return addcl0;
       case 'DELCL': return DELCL;
+      case 'auto_atoms': return auto_atoms;
+      case 'scripted_atoms': return scripted_atoms;
+      case 'create_atom': return create_atom;
+      case 'create_atoms': return create_atoms;
+      case 'search_atom': return new search_atom ('search');
+      case 'search_atom_c': return new search_atom ('searchC');
+      case 'unique_atoms': return unique_atoms;
       case 'e32': return e32;
       case 'atom?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 3;}};
       case 'integer?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && Number . isInteger (el . left);}};
       case 'double?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && typeof (el . left) === 'number' && ! Number . isInteger (el . left);}};
       case 'number?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && typeof (el . left) === 'number';}};
-      case 'text?': return {code: function (e) {if (el . type === 1) el = el . left; return el . type === 6 && typeof (el . left) === 'string';}};
+      case 'text?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6 && typeof (el . left) === 'string';}};
       case 'var?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 2;}};
       case 'head?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 6;}};
-      case 'machine?': return {code: function (el) {if (el . type === 1) el = el . left; return el . type === 3 && el . left . machine !== null;}};
+      case 'machine?': return has_machine;
       case 'text_list': return text_list;
       case 'text_term': return text_term;
       case 'CONSTANT': return constant;
@@ -813,15 +995,27 @@ function (root, directory) {
     }
     return null;
   };
+	var nav_atom = root . search ('navigator');
+	if (nav_atom !== null) {
+		for (var ind in navigator) {
+			nav = navigator [ind];
+			if (typeof (nav) === 'number' || typeof (nav) === 'string') {
+				var clause = new prolog . Element ();
+				clause . setPair ();
+				var el = clause . left;
+				el . setPair (); el . left . setAtom (nav_atom);
+				el = el . right; el . setPair (); el . left . setNative (ind);
+				el = el . right; el . setPair (); el . left . setNative (navigator [ind]);
+				clause . attach ();
+			}
+		}
+	}
 }
 );
 
 studio . setResource (['studio.prc'], `
 program studio #machine := ' prolog . studio '
 	[
-    exit list
-    pp write
-    file_writer file_reader create_file open_file erase_file import load batch
     e pi
     abs trunc floor ceil round
     add1 ++ sub1 --
@@ -833,8 +1027,13 @@ program studio #machine := ' prolog . studio '
     greater greater_eq less less_eq > >= => < <= =< min max
     ; I/O
     timestamp
+    operating_system implementation version navigator
+    command exit
+    list pp write
+    file_writer file_reader create_file open_file erase_file import load batch
     ; CLAUSE
-    delallcl CL cl addcl addcl0 DELCL delcl
+    delallcl CL cl addcl addcl0 DELCL delcl OVERWRITE overwrite
+    auto_atoms scripted_atoms unique_atoms create_atom create_atoms search_atom search_atom_c
     ; TERM
     e32 atom? integer? double? number? text? var? head? machine? text_list text_term
     ; META
@@ -932,6 +1131,13 @@ program studio #machine := ' prolog . studio '
 #machine addcl := 'addcl'
 #machine addcl0 := 'addcl0'
 #machine DELCL := 'DELCL'
+#machine auto_atoms := 'auto_atoms'
+#machine scripted_atoms := 'scripted_atoms'
+#machine create_atom := 'create_atom'
+#machine create_atoms := 'create_atoms'
+#machine search_atom := 'search_atom'
+#machine search_atom_c := 'search_atom_c'
+#machine unique_atoms := 'unique_atoms'
 
 #machine e32 := 'e32'
 #machine atom? := 'atom?'
@@ -1064,7 +1270,16 @@ program studio #machine := ' prolog . studio '
 [[cl *x *y [[*a:*b]:*c]] [add *x 1 *x2] / [CL *x2 *a *X] [cl *x2 *y [[*a:*b]:*c]]]
 [[delcl [[*a:*b]:*c]] [cl *x [[*a:*b]:*c]] [DELCL *x *a]]
 
-[[exit]]
+[[OVERWRITE *index [[*atom : *parameters] : *body]] [DELCL *atom *index] [addcl *index [*atom : *parameters] : *body]]
+[[overwrite [[*a:*b]:*c] [[*a:*h]:*i]] [cl *x [[*a:*b]:*c]] [OVERWRITE *x [[*a:*h]:*i]]]
+
+[[operating_system *op] [navigator 'appName' *op]]
+[[implementation 'JavaScript']]
+[[version 2018 8]]
+
+[[exit : *]]
+
+protect [not]
 
 end .
 `);
