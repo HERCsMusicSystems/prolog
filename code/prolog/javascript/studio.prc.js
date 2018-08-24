@@ -80,9 +80,9 @@ function (root, directory) {
   };
   var add = new function () {
     this . code = function (el) {
-      if (! el . type === 1) return false;
+      if (el . type !== 1) return false;
       var result = null, sum = 0;
-      if (el . left . type === 2) {result = el . left; el = el . right;}
+      if (el . left . type === 2) {result = el . left; el = el . right; if (el . type !== 1) {result . setNative (0); return true;}}
       switch (el . left . type) {
         case 6: sum = el . left . left; el = el . right; break;
         case 3: sum = el . left . left . name; el = el . right; break;
@@ -185,7 +185,7 @@ function (root, directory) {
   };
   var comparator = function (f) {
     this . code = function (el) {
-      if (el . type !== 1) return false;
+      if (el . type !== 1) return el . type === 0;
       var first = el . left;
       switch (first . type) {
         case 6: first = first . left; break;
@@ -218,29 +218,39 @@ function (root, directory) {
   var greater_eq = new comparator (function (a, b) {return a >= b;});
   var less = new comparator (function (a, b) {return a < b;});
   var less_eq = new comparator (function (a, b) {return a <= b;});
-  var sub = new function () {
-    this . code = function (el) {
-      this . code = function (el) {
-        if (el . type !== 1) return false;
-        var a = el . left; el = el . right;
-        if (el . type !== 1) {
-          if (a . type === 6) {el . setNative (- a . left); return true;}
-          if (el . type === 6) {a . setNative (- el . left); return true;}
-          return false;
-        }
-        var b = el . left; el = el . right;
-        if (el . type === 0) {
-          if (a . type === 6) {b . setNative (- a . left); return true;}
-          if (b . type === 6) {a . setNative (- b . left); return true;}
-        }
-        if (el . type === 1) el = el . left;
-        if (a . type === 6) {
-          if (b . type === 6) {el . setNative (a . left - b . left); return true;}
-          if (el . type === 6) {n . setNative (a . left - el . left); return true;}
-        }
-        if (b . type === 6) {a . setNative (b . left + el . left); return true;}
-      };
-    };
+  var sub = {
+    code: function (el) {
+      if (el . type !== 1) return false;
+      var a = el . left; el = el . right;
+      if (el . type !== 1) {
+        if (a . type === 6) {el . setNative (- a . left); return true;}
+        if (el . type === 6) {a . setNative (- el . left); return true;}
+        return false;
+      }
+      var b = el . left; el = el . right;
+      if (el . type === 0) {
+        if (a . type === 6) {b . setNative (- a . left); return true;}
+        if (b . type === 6) {a . setNative (- b . left); return true;}
+      }
+      if (el . type === 1) el = el . left;
+      if (a . type === 6) {
+        if (b . type === 6) {el . setNative (a . left - b . left); return true;}
+        if (el . type === 6) {n . setNative (a . left - el . left); return true;}
+      }
+      if (b . type === 6) {a . setNative (b . left + el . left); return true;}
+    }
+  };
+  var divmod = {
+    code: function (el) {
+      if (el . type !== 1) return false;
+      var a = el . left; if (a . type !== 6) return false; a = a . left; el = el . right; if (el . type !== 1) return false;
+      var b = el . left; if (b . type !== 6) return false; b = b . left; el = el . right;
+      if (el . type !== 1) {el . setNative (a % b); return true;}
+      el . left . setNative (a % b); el = el . right;
+      if (el . type === 1) el . left . setNative (Math . trunc (a / b));
+      else if (el . type !== 0) el . setNative (Math . trunc (a / b));
+      return true;
+    }
   };
   var comparator_runner = function (f) {
     this . code = function (el) {
@@ -911,10 +921,10 @@ function (root, directory) {
       case 'mult': return mult;
       case 'times': return new two_params (function (a, b) {return a * b;}, function (a, c) {return c / a;}, function (b, c) {return c / b;});
       case 'div': return new two_params (function (a, b) {return a / b;}, function (a, c) {return a / c;}, function (b, c) {return b * c;});
-      case 'mod': return new logical_two_params (function (a, b) {return a % b;});
+      case 'mod': return divmod;
       case 'e': return new zero_param (Math . E);
       case 'pi': return new zero_param (Math . PI);
-      case 'abs': return new logical_one_param (function (a) {return a < 0 ? - a : a;});
+      case 'abs': return new logical_one_param (function (a) {return Math . abs (a);});
       case 'trunc': return new logical_one_param (function (a) {return Math . trunc (a);});
       case 'floor': return new logical_one_param (function (a) {return Math . floor (a);});
       case 'ceil': return new logical_one_param (function (a) {return Math . ceil (a);});

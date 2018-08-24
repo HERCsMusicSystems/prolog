@@ -9,7 +9,7 @@ studio . setResource (['test.prb'], `
 ;[batch "test_json.prb"]
 
 ;[nl]
-[TestSummary]
+[FailedTestSummary]
 ;[nl]
 ;[foreground 0xffff00]
 
