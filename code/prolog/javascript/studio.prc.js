@@ -305,6 +305,37 @@ function (root, directory) {
       return false;
     };
   };
+	var random_permutation = {
+		code: function (el) {
+			if (el . type !== 1) return false;
+			var a = el . left; el = el . right;
+			if (a . type === 1) {
+				var accu = [];
+				while (a . type === 1) {accu . push (a . left); a = a . right;}
+				studio . random_permutation (accu);
+				if (el . type === 1) el = el . left;
+				el . type = 0;
+				for (var ind in accu) {el . setPair (); accu [ind] . duplicate (el . left); el = el . right;}
+				return true;
+			}
+			if (a . type === 0) {if (el . type === 1) el = el . left; el . type = 0; return true;}
+			if (a . type === 6) {
+				a = a . left; if (typeof (a) !== 'number') return false;
+				if (el . type !== 1) return false;
+				var b = el . left; if (b . type !== 6) return false; b = b . left; if (typeof (b) !== 'number') return false;
+				el = el . right; if (el . type !== 1) return false;
+				var c = el . left; if (c . type !== 6) return false; c = c . left; if (typeof (c) !== 'number') return false;
+				el = el . right; if (el . type === 1) el = el . left;
+				var accu = [];
+				for (var ind = 0; ind < b; ind++) accu . push (a + ind * c);
+				studio . random_permutation (accu);
+				el . type = 0;
+				for (var ind in accu) {el . setPair (); el . left . setNative (accu [ind]); el = el . right;}
+				return true;
+			}
+			return false;
+		}
+	};
   var stack = function (method) {
     var stacker = function (atom) {
       var q = [];
@@ -992,6 +1023,7 @@ function (root, directory) {
       case 'min': return new comparator_runner (function (a, b) {return a > b;});
       case 'max': return new comparator_runner (function (a, b) {return a < b;});
       case 'rnd': return rnd;
+      case 'series': return random_permutation;
       case 'timestamp': return timestamp;
       case 'delallcl': return delallcl;
       case 'CL': return CL;
@@ -1054,7 +1086,7 @@ program studio #machine := ' prolog . studio '
     sum times add + sub - mult div mod %
     degrad sin cos tan cotan asin acos atan acotan atan2
     pow exp log log2 log10 ln
-    rnd grnd
+    rnd grnd series random_permutation
     greater greater_eq less less_eq > >= => < <= =< min max
     ; I/O
     timestamp
@@ -1144,6 +1176,8 @@ program studio #machine := ' prolog . studio '
 #machine ln := 'ln'
 
 #machine rnd := 'rnd'
+#machine series := 'series'
+#machine random_permutation := 'series'
 
 #machine greater := 'greater'
 #machine > := 'greater'
