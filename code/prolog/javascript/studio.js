@@ -118,4 +118,13 @@ this . reimport = function (file_name) {
 	if (! local_imports . includes (file_name)) local_imports . push (file_name);
 };
 
+this . random_permutation = function (a) {
+	var ind = a . length;
+	while (ind > 1) {
+		var r = Math . floor (Math . random () * ind); ind --;
+		var swap = a [ind]; a [ind] = a [r]; a [r] = swap;
+	}
+	return a;
+};
+
 };
