@@ -78,6 +78,17 @@ this . setResource = function (path, resource) {
 	target [key] = resource;
 };
 
+this . getService = function (name) {
+	var service = this . readResource (name);
+	if (service === null) return null;
+	if (typeof (service) === 'string') {
+		eval . call (window, service);
+		service = this . readResource (name);
+		if (service === null || typeof (service) === 'string') return null;
+	}
+	return service;
+};
+
 this . callback = function () {};
 
 this . writeFile = function (path, content) {localStorage . setItem (this . pwd () + path, content); if (this . callback !== undefined) this . callback ();};

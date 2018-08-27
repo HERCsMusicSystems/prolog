@@ -606,14 +606,10 @@ Reader . prototype . readProgram = function () {
 	};
 	this . search_context = this . root . root . duplicate (this . search_context);
 	if (service_class_name !== null) {
+		var service_class = studio . getService (service_class_name);
 		var service_class = studio . readResource (service_class_name);
-		if (service_class === null) return this . dropError ("Semantic error (service class " + service_class_name + " not found).");
-		if (typeof (service_class) === 'string') {
-			eval . call (window, service_class);
-			service_class = studio . readResource (service_class_name);
-			if (service_class === null || typeof (service_class) === 'string') return this . dropError ("Semantic error (service class " + service_class_name + " could not be imported).");
-		}
-		this . root . root . service_class = new service_class (this . root, this . root . root);
+		if (service_class === null) return this . dropError ("Semantic error (service class " + service_class_name + " could not be imported).");
+		directory . service_class = new service_class (this . root, directory);
 	}
 	this . getSymbol ();
 	while (this . control === '[' || this . control === 'atom') {

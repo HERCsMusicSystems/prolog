@@ -946,20 +946,26 @@ function (root, directory) {
   var create_module = {
     code: function (el) {
       if (el . type === 0) {root . close (); return true;}
+      if (el . type === 1) el = el . left;
+      if (el . type !== 6) return false;
+      root . createDirectory (el . left);
+      return true;
+    }
+  };
+  var attach_service = {
+    code: function (el) {
       if (el . type !== 1) return false;
       var name = el . left; if (name . type !== 6) return false; name = name . left; el = el . right;
-      root . createDirectory (name);
-      if (el . type === 0) return true;
-      if (el . type !== 1) return false;
-      el = el . left; if (el . type !== 6) return false; el = el . left;
-      var service_class = studio . readResource (el);
-      if (service_class === null) return false;
-      if (typeof (service_class) === 'string') {
-        eval . call (window, service_class);
-        service_class = studio . readResource (el);
-        if (service_class === null || typeof (service_class) === 'string') return false;
+      if (el . type === 0) {
+        var service = studio . getService (name); if (service === null) return false;
+        root . root . service_class = new service (root, root . root);
+        return true;
       }
-      root . root . service_class = new service_class (root, root . root);
+      name = root . searchDirectory (name); if (name === null) return false;
+      if (el . type !== 1) return false;
+      var service = el . left; if (service . type !== 6) return false;
+      service = studio . getService (service . left); if (service === null) return false;
+      name . service_class = new service (root, name);
       return true;
     }
   };
@@ -977,6 +983,7 @@ function (root, directory) {
       case 'load': return new importer (false);
       case 'remove_module': return remove_module;
       case 'create_module': return create_module;
+      case 'attach_service': return attach_service;
       case 'sum': return sum;
       case 'add': return add;
       case 'sub': return sub;
@@ -1094,7 +1101,7 @@ program studio #machine := ' prolog . studio '
     command exit
     list pp write
     file_writer file_reader create_file open_file erase_file import load batch
-    remove_module create_module
+    remove_module create_module attach_service
     ; CLAUSE
     delallcl CL cl addcl addcl0 DELCL delcl OVERWRITE overwrite
     auto_atoms scripted_atoms unique_atoms create_atom create_atoms search_atom search_atom_c
@@ -1122,6 +1129,7 @@ program studio #machine := ' prolog . studio '
 #machine load := 'load'
 #machine remove_module := 'remove_module'
 #machine create_module := 'create_module'
+#machine attach_service := 'attach_service'
 
 #machine e := 'e'
 #machine pi := 'pi'
