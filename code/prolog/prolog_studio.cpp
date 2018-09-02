@@ -453,7 +453,9 @@ public:
 	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
-		PrologElement * dup = parameters -> getLeft () -> duplicate ();
+		PrologElement * dup = parameters -> getLeft ();
+		if (dup -> isPair () && dup -> getLeft () -> isAtom ()) dup = parameters -> duplicate ();
+		else dup = dup -> duplicate ();
 		if (root -> attachClause (dup, 0) == 0) return true;
 		delete dup;
 		return false;
