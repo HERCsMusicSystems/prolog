@@ -468,7 +468,7 @@ public class PrologRoot {
 	public String list () {if (root == null) return ""; return root . names ();}
 	public String list (String name) {
 		PrologDirectory sub = searchDirectory (name);
-		if (sub == null) return "";
+		if (sub == null) return null;
 		return sub . list ();
 	}
 	public void close () {if (root == null) return; root = root . close ();}

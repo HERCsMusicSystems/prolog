@@ -165,6 +165,7 @@ class list extends PrologNativeCode {
 				return true;
 			}
 			String area = root . list (parameters . getText ());
+			if (area == null) return false;
 			if (ret . isPair ()) ret . getLeft () . setText (area); else root . print (area + root . new_line_caption);
 		}
 		return true;
