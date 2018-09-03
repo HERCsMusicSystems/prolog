@@ -39,6 +39,14 @@
 	};
 	//root . auto_atoms = true;
 	//resolutionCommand ("[* [batch 'test.prb']]");
+	function res (command) {
+		command = root . res ('[[' + command + ']' + command + ']');
+		if (command === null) {console . log ("Doesn't work."); return false;}
+		command = root . getValue (command . left);
+		command = command . substring (1, command . length - 1);
+		console . log (command);
+		return true;
+	};
 </script>
 
 <script type="text/javascript" charset="UTF-8">

@@ -1026,5 +1026,6 @@ Root . prototype . textResolution = function (command) {
 	return this . resolution (new Reader (this, command) . getElement ());
 };
 
-};
+Root . prototype . res = function (command) {return new Resolution (this) . resolution (new Reader (this, command) . getElement ());};
 
+};
