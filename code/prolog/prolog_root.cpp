@@ -535,7 +535,7 @@ int PrologRoot :: list (char * area, int ind) {
 
 int PrologRoot :: list (char * name, char * area, int ind) {
 	PrologDirectory * sub = searchDirectory (name);
-	if (sub == NULL) return ind;
+	if (sub == NULL) return -1;
 	return sub -> list (area, ind);
 }
 
