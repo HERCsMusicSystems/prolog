@@ -764,9 +764,8 @@ function (root, directory) {
 			if (ind . type === 1) {
 				if (ind . left . type === 3) return el . duplicate () . attach ();
 				el = el . right;
-				if (el . type === 6) return ind . duplicate () . attach (el . left);
 				if (el . type === 1) el = el . left;
-				if (el . type === 6) return ind . duplicate (). attach (el . left);
+				if (el . type === 6) return ind . duplicate () . attach (el . left);
 			}
 			if (ind . type !== 6) return false;
 			el = el . right . duplicate ();
