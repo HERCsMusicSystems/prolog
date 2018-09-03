@@ -321,8 +321,10 @@ class addcl0 extends PrologNativeCode {
 	public PrologRoot root;
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
 		if (! parameters . isPair ()) return false;
-		PrologElement dup = parameters . getLeft () . duplicate ();
-		return root . attachClause (parameters . getLeft () . duplicate (), 0) == 0;
+		PrologElement dup = parameters . getLeft ();
+		if (dup . isPair () && dup . getLeft () . isAtom ()) dup = parameters . duplicate ();
+		else dup = dup . duplicate ();
+		return root . attachClause (dup, 0) == 0;
 	}
 	public addcl0 (PrologRoot root) {this . root = root;}
 }
@@ -331,16 +333,19 @@ class addcl extends PrologNativeCode {
 	public PrologRoot root;
 	public boolean code (PrologElement parameters, PrologResolution resolution) {
 		if (! parameters . isPair ()) return false;
-		PrologElement dup = parameters . getLeft () . duplicate ();
-		parameters = parameters . getRight ();
-		if (parameters . isEarth ()) {if (root . attachClause (dup) == 0) return true;}
-		if (parameters . isPair ()) {
-			parameters = parameters . getLeft ();
-			if (parameters . isInteger ()) {
-				if (root . attachClause (dup, parameters . getInteger ()) == 0) return true;
-			}
+		PrologElement ind = parameters . getLeft ();
+		if (ind . isPair ()) {
+			if (ind . getLeft () . isAtom ()) return root . attachClause (parameters . duplicate ()) == 0;
+			parameters = parameters . getRight ();
+			if (parameters . isPair ()) parameters = parameters . getLeft ();
+			if (parameters . isInteger ()) return root . attachClause (ind . duplicate (), parameters . getInteger ()) == 0;
 		}
-		return false;
+		if (! ind . isInteger ()) return false;
+		parameters = parameters . getRight ();
+		if (! parameters . isPair ()) return false;
+		PrologElement dup = parameters . getLeft ();
+		if (dup . isPair () && dup . getLeft () . isAtom ()) dup = parameters . duplicate (); else dup = dup . duplicate ();
+		return root . attachClause (dup, ind . getInteger ()) == 0;
 	}
 	public addcl (PrologRoot root) {this . root = root;}
 }
