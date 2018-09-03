@@ -478,11 +478,13 @@ public:
 			}
 			parameters = parameters -> getRight ();
 			if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+			ind = ind -> duplicate ();
 			if (parameters -> isInteger ()) {
-				ind = ind -> duplicate ();
 				if (root -> attachClause (ind, parameters -> getInteger ()) == 0) return true;
 				delete ind; return false;
 			}
+			if (root -> attachClause (ind) == 0) return true;
+			delete ind; return false;
 		}
 		if (! ind -> isInteger ()) return false;
 		parameters = parameters -> getRight ();
