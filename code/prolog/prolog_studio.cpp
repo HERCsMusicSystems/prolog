@@ -468,17 +468,27 @@ public:
 	PrologRoot * root;
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
-		PrologElement * dup = parameters -> getLeft () -> duplicate ();
-		parameters = parameters -> getRight ();
-		if (parameters -> isEarth ()) {if (root -> attachClause (dup) == 0) return true;}
-		if (parameters -> isPair ()) {
-			parameters = parameters -> getLeft ();
+		PrologElement * ind = parameters -> getLeft ();
+		if (ind -> isPair ()) {
+			if (ind -> getLeft () -> isAtom ()) {
+				ind = parameters -> duplicate ();
+				if (root -> attachClause (ind) == 0) return true;
+				delete ind; return false;
+			}
+			parameters = parameters -> getRight ();
+			if (parameters -> isPair ()) parameters = parameters -> getLeft ();
 			if (parameters -> isInteger ()) {
-				if (root -> attachClause (dup, parameters -> getInteger ()) == 0) return true;
+				ind = ind -> duplicate ();
+				if (root -> attachClause (ind, parameters -> getInteger ()) == 0) return true;
+				delete ind; return false;
 			}
 		}
-		delete dup;
-		return false;
+		if (! ind -> isInteger ()) return false;
+		parameters = parameters -> getRight ();
+		PrologElement * dup = parameters -> getLeft ();
+		if (dup -> isPair () && dup -> getLeft () -> isAtom ()) dup = parameters -> duplicate (); else dup = dup -> duplicate ();
+		if (root -> attachClause (dup, ind -> getInteger ()) == 0) return true;
+		delete dup; return false;
 	}
 	addcl (PrologRoot * root) {this -> root = root;}
 };
