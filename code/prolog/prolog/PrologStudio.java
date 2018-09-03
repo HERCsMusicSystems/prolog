@@ -339,7 +339,9 @@ class addcl extends PrologNativeCode {
 			if (ind . getLeft () . isAtom ()) return root . attachClause (parameters . duplicate ()) == 0;
 			parameters = parameters . getRight ();
 			if (parameters . isPair ()) parameters = parameters . getLeft ();
-			if (parameters . isInteger ()) return root . attachClause (ind . duplicate (), parameters . getInteger ()) == 0;
+			ind = ind . duplicate ();
+			if (parameters . isInteger ()) return root . attachClause (ind, parameters . getInteger ()) == 0;
+			return root . attachClause (ind) == 0;
 		}
 		if (! ind . isInteger ()) return false;
 		parameters = parameters . getRight ();
