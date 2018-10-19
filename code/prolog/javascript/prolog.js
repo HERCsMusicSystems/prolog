@@ -298,7 +298,7 @@ Root . prototype . load = function (name, no_overwrite) {
 	var existing = this . searchDirectory (name);
 	if (existing !== null) {
 		if (no_overwrite) return new Element ();
-		this . drop ();
+		this . drop (name);
 	}
 	var content = studio . readFile (name);
 	if (content === null) content = studio . readFile (name + ".prc");
@@ -624,7 +624,7 @@ Reader . prototype . readProgram = function () {
 					if (this . control !== 'atom' || this . symbol !== this . root . assignment_caption) return this . dropError ("Syntax error (operator := expected in machine assignment).");
 					this . getSymbol ();
 					if (this . control !== 'text') return this . dropError ("Syntax error (location of native code in machine assignment expected).");
-					if (this . root . root . service_class === null) return this . dropError ("Syntax error (no service class for machine assignment).");
+					if (this . root . root . service_class === null) return this . dropError ("Semantic error (no service class for machine assignment).");
 					var machine = this . root . root . service_class . getNativeCode (this . symbol);
 					if (machine === null) return this . dropError ("Semantic error (native code " + this . symbol + " not found).");
 					if (! atom . setMachine (machine)) return this . dropError ("Semantic error (machine assignment of " + atom . name  + " failed).");
