@@ -21,6 +21,7 @@
 <script src="studio.js" type="text/javascript" charset="UTF-8"></script>
 <script src="prolog.js" type="text/javascript" charset="UTF-8"></script>
 <script src="studio.prc.js" type="text/javascript" charset="UTF-8"></script>
+<script src="fxg.prc.js" type="text/javascript" charset="UTF-8"></script>
 <script src="test.prc.js" type="text/javascript" charset="UTF-8"></script>
 <script src="test.prb.js" type="text/javascript" charset="UTF-8"></script>
 <script src="test_studio.prb.js" type="text/javascript" charset="UTF-8"></script>
@@ -33,13 +34,14 @@
 	studio . search ('test_scripts');
 	studio . cd (['test']);
 	root = new prolog.Root();
+	console . log ('fxg', root . load ('fxg'));
 	console . log ('test', root . load ('test'));
 	console . log ('capitol', root . load ('capitol'));
 	function resolutionCommand (command, e) {
 		if (e !== undefined && e . key !== 'Enter') return;
 		console . log (root . textResolution (command));
 	};
-	//root . auto_atoms = true;
+	root . auto_atoms = true;
 	//resolutionCommand ("[* [batch 'test.prb']]");
 	function res (command) {
 		command = root . res ('[[' + command + ']' + command + ']');
