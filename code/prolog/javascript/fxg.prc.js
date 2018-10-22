@@ -3,11 +3,12 @@ studio . setResource (['prolog', 'fxg'],
 function (root, directory) {
   var viewport = function (atom) {
     var div = document . createElement ('div');
-    var divx = 0, divy = 0;
+    var divp = {x: 200, y: 100};
     div . innerHTML = 'VOYAGER';
-    div . style . background = 'blue'; div . style . position = 'absolute'; div . style . top = 100; div . style . left = 200;
-    div . onmousedown = function (e) {divx = e . layerX; divy = e . layerY;};
-    div . onmouseup = function (e) {div . style . left = 0; div . style . top += e . layerY - divy; console . log (div . style);};
+    div . style . background = 'blue'; div . style . position = 'absolute'; div . style . top = divp . y; div . style . left = divp . x;
+    var mouseup = function (e) {document . onmouseup = null; document . onmousemove = null;};
+    var mousemove = function (e) {divp . x += e . movementX; divp . y += e . movementY; div . style . top = divp . y; div . style . left = divp . x;};
+    div . onmousedown = function (e) {document . onmouseup = mouseup; document . onmousemove = mousemove;};
     document . body . appendChild (div);
     this . code = function (el) {
       if (el . type === 0) {div . parentElement . removeChild (div); return atom . setMachine (null);}
