@@ -2,13 +2,24 @@
 studio . setResource (['prolog', 'fxg'],
 function (root, directory) {
   var viewport = function (atom) {
+    var bar = document . createElement ('div'); bar . innerHTML = 'bar';
+    //var content = document . createElement ('div'); content . innerHTML = 'VOYAGER<br />SPUTNIK<br />SONDA';
+    var content = document . createElement ('canvas');
+    content . id = 'cx';
+    var info = document . createElement ('div');
+    var resize = document . createElement ('input'); resize . type = 'button'; resize . value = 'x'; console . log (resize);
+    info . appendChild (resize);
     var div = document . createElement ('div');
     var divp = {x: 200, y: 100};
-    div . innerHTML = 'VOYAGER';
+    div . appendChild (bar);
+    div . appendChild (content);
+    div . appendChild (info);
     div . style . background = 'blue'; div . style . position = 'absolute'; div . style . top = divp . y; div . style . left = divp . x;
+    info . align = 'right';
     var mouseup = function (e) {document . onmouseup = null; document . onmousemove = null;};
     var mousemove = function (e) {divp . x += e . movementX; divp . y += e . movementY; div . style . top = divp . y; div . style . left = divp . x;};
-    div . onmousedown = function (e) {document . onmouseup = mouseup; document . onmousemove = mousemove;};
+    bar . onmousedown = function (e) {document . onmouseup = mouseup; document . onmousemove = mousemove;};
+    resize = onmousedown = function (e) {document . onmouseup = mouseup; document . onmousemove = mousemove;};
     document . body . appendChild (div);
     this . code = function (el) {
       if (el . type === 0) {div . parentElement . removeChild (div); return atom . setMachine (null);}
