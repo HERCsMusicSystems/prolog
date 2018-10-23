@@ -18,6 +18,8 @@ function (root, directory) {
     info . appendChild (resize);
     var div = document . createElement ('div');
     var divp = {x: x === null ? 0 : x, y: y === null ? 0 : y};
+    var position = {x: 0, y: 0, scaling: 1};
+    var mode = 'navigate';
     div . appendChild (bar);
     div . appendChild (content);
     div . appendChild (info);
@@ -32,13 +34,43 @@ function (root, directory) {
     this . code = function (el) {
       if (el . type === 0) {div . parentElement . removeChild (div); return atom . setMachine (null);}
       if (el . type !== 1) return false;
-      var selector = el . left;
+      var selector = el . left; el = el . right;
       if (selector . type === 3) {
-        console . log (selector . left, Location);
-        if (selector . left === Location) {return true;}
-        return false;
+        switch (selector . left) {
+          case Location:
+            if (el . type === 2) {
+              el = el . setNativePair (divp . x);
+              el = el . setNativePair (divp . y);
+              el = el . setNativePair (content . width);
+              el . setNativePair (content . height);
+              return true;
+            }
+            if (el . type !== 1 || el . left . type !== 6) return false; divp . x = el . left . left; div . style . left = divp . x; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return false; divp . y = el . left . left; div . style . top = divp . y; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return true; content . width = el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return false; content . height = el . left . left;
+            return true;
+          case Position:
+            if (el . type === 2) {el = el . setNativePair (position . x); el . setNativePair (position . y); return true;}
+            if (el . type !== 1 || el . left . type !== 6) return false; position . x = el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return false; position . y = el . left . left;
+            return true;
+          case Size:
+            if (el . type === 2) {el = el . setNativePair (content . width); el . setNativePair (content . height); return true;}
+            if (el . type !== 1 || el . left . type !== 6) return false; content . width = el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return false; content . height = el . left . left;
+            return true;
+          case Scaling:
+            if (el . type === 2) {el . setNativePair (position . scaling); return true;}
+            if (el . type !== 1 || el . left . type !== 6) return false; position . scaling = el . left . left;
+            return true;
+          case Mode:
+            if (el . type === 2) {el . setNativePair (mode); return true;}
+            if (el . type !== 1 || el . left . type !== 6) return false; mode = el . left . left;
+            return true;
+        }
       }
-      return true;
+      return false;
     };
   };
   var Viewport = {

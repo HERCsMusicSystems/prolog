@@ -3,6 +3,7 @@ COMMANDS:
 [Viewport (*)atom ("name") (x) (y) (width) (height)] => create a viewport
 	[viewport] => close the viewport
 	[viewport Location x y width height]
+	[viewport Location x y]
 	[viewport Location : *x]                                => [x y width height]
 	[viewport Position x y]                                 ; position on the board
 	[viewport Position : *x]                                => [x y]
