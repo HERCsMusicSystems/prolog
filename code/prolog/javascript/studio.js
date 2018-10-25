@@ -101,7 +101,8 @@ this . edit_file = function (file_name, area, location) {
 };
 
 this . erase_file = function (file_name) {
-	localStorage . removeItem (file_name . startsWith ('/') ? file_name . substring (1) : this . pwd () + file_name);
+	if (localStorage . getItem (this . pwd () + file_name) !== null) localStorage . removeItem (this . pwd () + file_name);
+	else localStorage . removeItem (file_name);
 	if (this . callback !== undefined) this . callback ();
 };
 

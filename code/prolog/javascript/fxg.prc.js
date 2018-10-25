@@ -19,8 +19,8 @@ function (root, directory) {
     if (width === null) width = content . width; else content . width = width;
     if (height === null) height = content . height; else content . height = height;
     if (x === null) x = 0; if (y === null) y = 0;
-    if (name === null) name = 'VIEWPORT';
-    var viewport = {atom: atom . name, location: {x: x, y: y}, position: {x: 0, y: 0}, size: {x: width, y: height}, scaling: 1};
+    if (name === null) name = atom . name;
+    var viewport = {atom: atom . name, name: name, location: {x: x, y: y}, position: {x: 0, y: 0}, size: {x: width, y: height}, scaling: 1};
     structure . viewports . push (viewport);
     var bar = document . createElement ('div'); bar . style . background = 'yellow'; bar . appendChild (document . createTextNode (name)); bar . style ['font-family'] = 'arial';
     var close = document . createElement ('input'); close . type = 'button'; close . value = String . fromCharCode (0xd7); close . style . float = 'right';
@@ -59,7 +59,7 @@ function (root, directory) {
     };
     content . repaint ();
     this . code = function (el) {
-      if (el . type === 0) {div . parentElement . removeChild (div); return atom . setMachine (null);}
+      if (el . type === 0) {div . parentElement . removeChild (div); structure . viewports . splice (structure . viewports . indexOf (viewport, 1)); return atom . setMachine (null);}
       if (el . type !== 1) return false;
       var selector = el . left; el = el . right;
       if (selector . type === 3) {
