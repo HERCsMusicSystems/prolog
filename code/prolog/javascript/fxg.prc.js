@@ -30,7 +30,6 @@ function (root, directory) {
     var resize = document . createElement ('input'); resize . type = 'button'; resize . value = String . fromCharCode (0x21f2); resize . style . float = 'right';
     info . appendChild (resize);
     var div = document . createElement ('div');
-    var position = {x: 0, y: 0, scaling: 1};
     var mode = 'navigate';
     div . appendChild (bar);
     div . appendChild (content);
@@ -78,18 +77,18 @@ function (root, directory) {
             if (el . type !== 1 || el . left . type !== 6) return false; viewport . size . y = el . left . left; content . height = viewport . size . y;
             return true;
           case Position:
-            if (el . type === 2) {el = el . setNativePair (position . x); el . setNativePair (position . y); return true;}
-            if (el . type !== 1 || el . left . type !== 6) return false; position . x = el . left . left; el = el . right;
-            if (el . type !== 1 || el . left . type !== 6) return false; position . y = el . left . left;
+            if (el . type === 2) {el = el . setNativePair (viewport . position . x); el . setNativePair (viewport . position . y); return true;}
+            if (el . type !== 1 || el . left . type !== 6) return false; viewport . position . x = el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return false; viewport . position . y = el . left . left;
             return true;
           case Size:
-            if (el . type === 2) {el = el . setNativePair (content . width); el . setNativePair (content . height); return true;}
+            if (el . type === 2) {el = el . setNativePair (viewport . size . x); el . setNativePair (viewport . size . y); return true;}
             if (el . type !== 1 || el . left . type !== 6) return false; viewport . size . x = el . left . left; content . width = viewport . size . x; el = el . right;
             if (el . type !== 1 || el . left . type !== 6) return false; viewport . size . y = el . left . left; content . height = viewport . size . y;
             return true;
           case Scaling:
-            if (el . type === 2) {el . setNativePair (position . scaling); return true;}
-            if (el . type !== 1 || el . left . type !== 6) return false; position . scaling = el . left . left;
+            if (el . type === 2) {el . setNativePair (viewport . scaling); return true;}
+            if (el . type !== 1 || el . left . type !== 6) return false; viewport . scaling = el . left . left;
             return true;
           case Mode:
             if (el . type === 1) el = el . left;
@@ -142,11 +141,72 @@ function (root, directory) {
       return false;
     }
   };
+  var token = function (atom, type) {
+    var token = {
+      atom: atom, type: type, location: {position: {x: 0, y: 0}, size: {x: 128, y: 32}},
+      BackgroundColour: 'transparent', ForegroundColour: 'white'
+    };
+    structure . tokens . push (token);
+    this . code = function (el) {
+      if (el . type === 0) {structure . tokens . splice (structure . tokens . indexOf (token), 1); return atom . setMachine (null);}
+      if (el . type !== 1) return false;
+      var selector = el . left; el = el . right;
+      if (selector . type === 3) {
+        switch (selector . left) {
+          case Location:
+            if (el . type === 2) {
+              el = el . setNativePair (token . location . position . x);
+              el = el . setNativePair (token . location . position . y);
+              el = el . setNativePair (token . location . size . x);
+              el . setNativePair (token . location . size . y);
+              return true;
+            }
+            if (el . type !== 1 || el . left . type !== 6) return false; token . location . position . x = el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return false; token . location . position . y = el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return true; token . location . size . x = el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return false; token . location . size . y = el . left . left;
+            return true;
+          case Position:
+            if (el . type === 2) {el = el . setNativePair (token . location . position . x); el . setNativePair (token . location . position . y); return true;}
+            if (el . type !== 1 || el . left . type !== 6) return false; token . location . position . x = el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return false; token . location . position . y = el . left . left;
+            return true;
+          case Size:
+            if (el . type === 2) {el = el . setNativePair (token . location . size . x); el . setNativePair (token . location . size . y); return true;}
+            if (el . type !== 1 || el . left . type !== 6) return false; token . location . size . x = el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return false; token . location . size . y = el . left . left;
+            return true;
+          default:
+            if (el . type === 1) el = el . left;
+            if (el . type === 2) {if (! token [selector . left . name]) return false; el . setNative (token [selector . left . name]); return true;}
+            if (el . type === 6) {token [selector . left . name] = el . left; return true;}
+            return true;
+        }
+      }
+      return false;
+    };
+  };
+  var Token = {
+    code: function (el) {
+      var atom = null, type = null;
+      while (el . type === 1) {
+        if (el . left . type === 2) atom = el . left;
+        if (el . left . type === 3) {if (atom === null) atom = el . left; else type = el . left . left . name;}
+        if (el . left . type === 6) type = el . left . left;
+        el = el . right;
+      }
+      if (atom === null || type === null) return false;
+      if (atom . type === 2) atom . setAtom (new prolog . Atom ());
+      if (atom . left . machine !== null) return false;
+      return atom . left . setMachine (new token (atom . left . name, type));
+    }
+  };
   this . getNativeCode = function (name) {
     switch (name) {
       case 'Viewport': return Viewport;
       case 'BackgroundColour': return new ColourFunction ('Background');
       case 'ForegroundColour': return new ColourFunction ('Foreground');
+      case 'Token': return Token;
       default: break;
     }
     return null;
@@ -160,7 +220,7 @@ studio . setResource (['fxg.prc'], `
 program fxg #machine := 'prolog . fxg'
   [
     Viewport
-    Rectangle Circle Picture Dice Grid Text Deck
+    Token Rectangle Circle Picture Dice Grid Text Deck
     Location Position Size Scaling Mode
     BackgroundColour ForegroundColour
     Repaint
@@ -169,6 +229,7 @@ program fxg #machine := 'prolog . fxg'
 #machine Viewport := 'Viewport'
 #machine BackgroundColour := 'BackgroundColour'
 #machine ForegroundColour := 'ForegroundColour'
+#machine Token := 'Token'
 
 end .
 `);
