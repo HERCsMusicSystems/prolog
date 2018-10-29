@@ -183,6 +183,21 @@ function (root, directory) {
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . size . x = el . left . left; el = el . right;
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . size . y = el . left . left;
             return true;
+          case Indexing:
+            if (el . type === 2) {
+              if (token . indexing === undefined) return false;
+              el = el . setNativePair (token . indexing . x); el = el . setNativePair (token . indexing . y);
+              el = el . setNativePair (token . indexing . rows); el . setNativePair (token . indexing . columns);
+              return true;
+            }
+            if (el . type === 0) {delete token . indexing; return true;}
+            var index = {};
+            if (el . type !== 1 || el . left . type !== 6) return false; index . x = el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return false; index . y = el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return false; index . rows = el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return false; index . columns = el . left . left;
+            token . indexing = index;
+            return true;
           default:
             if (el . type === 1) el = el . left;
             if (el . type === 2) {if (! token [selector . left . name]) return false; el . setNative (token [selector . left . name]); return true;}
@@ -228,7 +243,7 @@ program fxg #machine := 'prolog . fxg'
   [
     Viewport
     Token Rectangle Circle Picture Dice Grid Text Deck
-    Location Position Size Scaling Mode
+    Location Position Size Scaling Rotation Side Sides Text Indexing Mode
     BackgroundColour ForegroundColour
     Repaint
   ]
