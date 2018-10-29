@@ -43,6 +43,11 @@
 	};
 	root . auto_atoms = true;
 	//resolutionCommand ("[* [batch 'test.prb']]");
+	res ('[Token r "Circle"]');
+	res ('[r Position 64 16]');
+	res ('[r Rotation 1]');
+	res ('[r Scaling 0.8 2]');
+	res ('[Viewport vv]');
 	function res (command) {
 		command = root . res ('[[' + command + ']' + command + ']');
 		if (command === null) {console . log ("Doesn't work."); return false;}

@@ -18,9 +18,28 @@ function (root, directory) {
   var Indexing = directory . searchAtom ('Indexing');
   var draws = {
     Rectangle: function (ctx, viewport, token) {
-      //ctx . beginPath ();
-      ctx . fillRect (token . location . position . x, token . location . position . y, 60, 60);
-      //ctx . stroke ();
+      ctx . save ();
+      ctx . strokeStyle = token . ForegroundColour;
+      var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
+      ctx . translate (token . location . position . x, token . location . position . y);
+      ctx . rotate (token . Rotation * Math . PI / 12);
+      ctx . beginPath ();
+      ctx . moveTo (- hw, - hh); ctx . lineTo (hw, - hh); ctx . lineTo (hw, hh); ctx . lineTo (- hw, hh); ctx . closePath ();
+      if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill ();}
+      ctx . stroke ();
+      ctx . restore ();
+    },
+    Circle: function (ctx, viewport, token) {
+      ctx . save ();
+      ctx . strokeStyle = token . ForegroundColour;
+      var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
+      ctx . translate (token . location . position . x, token . location . position . y);
+      ctx . rotate (token . Rotation * Math . PI / 12);
+      ctx . beginPath ();
+      ctx . ellipse (0, 0, hw, hh, 0, 0, Math . PI + Math . PI);
+      if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill ();}
+      ctx . stroke ();
+      ctx . restore ();
     }
   };
   var viewport = function (atom, name, x, y, width, height) {
@@ -61,7 +80,10 @@ function (root, directory) {
     content . repaint = function () {
       ctx . fillStyle = viewport . BackgroundColour || structure . BackgroundColour;
       ctx . fillRect (0, 0, viewport . size . x, viewport . size . y);
+      ctx . save ();
+      ctx . translate (- viewport . position . x, - viewport . position . y);
       for (var ind in structure . tokens) {draws [structure . tokens [ind] . type] (ctx, viewport, structure . tokens [ind]);}
+      ctx . restore ();
     };
     content . repaint ();
     this . code = function (el) {
@@ -151,7 +173,8 @@ function (root, directory) {
   var token = function (atom, type) {
     var token = {
       atom: atom, type: type, location: {position: {x: 0, y: 0}, size: {x: 128, y: 32}},
-      BackgroundColour: 'transparent', ForegroundColour: 'white'
+      scaling: {x: 1, y: 1}, Rotation: 0,
+      ForegroundColour: 'white'
     };
     structure . tokens . push (token);
     this . code = function (el) {
@@ -182,6 +205,12 @@ function (root, directory) {
             if (el . type === 2) {el = el . setNativePair (token . location . size . x); el . setNativePair (token . location . size . y); return true;}
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . size . x = el . left . left; el = el . right;
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . size . y = el . left . left;
+            return true;
+          case Scaling:
+            if (el . type === 2) {el = el . setNativePair (token . scaling . x); el . setNativePair (token . scaling . y); return true;}
+            if (el . type !== 1 || el . left . type !== 6) return false; token . scaling . x = el . left . left; el = el . right;
+            if (el . type === 0) {token . scaling . y = token . scaling . x; return true;}
+            if (el . type !== 1 || el . left . type !== 6) return false; token . scaling . y = el . left . left;
             return true;
           case Indexing:
             if (el . type === 2) {
