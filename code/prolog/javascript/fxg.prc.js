@@ -14,6 +14,15 @@ function (root, directory) {
   var Scaling = directory . searchAtom ('Scaling');
   var Mode = directory . searchAtom ('Mode');
   var BackgroundColour = directory . searchAtom ('BackgroundColour');
+  var ForegroundColour = directory . searchAtom ('ForegroundColour');
+  var Indexing = directory . searchAtom ('Indexing');
+  var draws = {
+    Rectangle: function (ctx, viewport, token) {
+      //ctx . beginPath ();
+      ctx . fillRect (token . location . position . x, token . location . position . y, 60, 60);
+      //ctx . stroke ();
+    }
+  };
   var viewport = function (atom, name, x, y, width, height) {
     var content = document . createElement ('canvas');
     if (width === null) width = content . width; else content . width = width;
@@ -52,9 +61,7 @@ function (root, directory) {
     content . repaint = function () {
       ctx . fillStyle = viewport . BackgroundColour || structure . BackgroundColour;
       ctx . fillRect (0, 0, viewport . size . x, viewport . size . y);
-      ctx . beginPath ();
-      ctx . arc (100, 100, 40, 0, Math . PI);
-      ctx . stroke ();
+      for (var ind in structure . tokens) {draws [structure . tokens [ind] . type] (ctx, viewport, structure . tokens [ind]);}
     };
     content . repaint ();
     this . code = function (el) {
