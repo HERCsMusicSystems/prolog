@@ -16,6 +16,15 @@ function (root, directory) {
   var BackgroundColour = directory . searchAtom ('BackgroundColour');
   var ForegroundColour = directory . searchAtom ('ForegroundColour');
   var Indexing = directory . searchAtom ('Indexing');
+  var images = {};
+  var find_image = function (location) {
+    var image = images [location];
+    if (image !== undefined) return image;
+    image = studio . readResource (location);
+    if (image !== null) {images [location] = image; return image;}
+    image = new Image (); image . src = location; images [location] = image;
+    return image;
+  };
   var draws = {
     Rectangle: function (ctx, viewport, token) {
       ctx . save ();
@@ -39,6 +48,14 @@ function (root, directory) {
       ctx . ellipse (0, 0, hw, hh, 0, 0, Math . PI + Math . PI);
       if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill ();}
       ctx . stroke ();
+      ctx . restore ();
+    },
+    Picture: function (ctx, viewport, token) {
+      ctx . save ();
+      //var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
+      ctx . translate (token . location . position . x, token . location . position . y);
+      ctx . rotate (token . Rotation * Math . PI / 12);
+      ctx . drawImage (find_image (token . Text), 0, 0);
       ctx . restore ();
     }
   };
