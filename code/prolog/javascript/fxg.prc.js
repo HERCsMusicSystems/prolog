@@ -57,6 +57,7 @@ function (root, directory) {
       //var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
       ctx . translate (token . location . position . x, token . location . position . y);
       ctx . rotate (token . Rotation * Math . PI / 12);
+      ctx . scale (token . scaling . x, token . scaling . y);
       ctx . drawImage (find_image (token . Text), 0, 0);
       ctx . restore ();
     }
@@ -229,8 +230,8 @@ function (root, directory) {
             return true;
           case Size:
             if (el . type === 2) {el = el . setNativePair (token . location . size . x); el . setNativePair (token . location . size . y); return true;}
-            if (el . type === 0) {token . location . size . y = token . location . size . x; return true;}
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . size . x = el . left . left; el = el . right;
+            if (el . type === 0) {token . location . size . y = token . location . size . x; return true;}
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . size . y = el . left . left;
             return true;
           case Scaling:
@@ -293,7 +294,7 @@ function (root, directory) {
 }
 );
 
-var rep = function rep (command) {return res (command || '' + '[Repaint]');};
+var rep = function rep (command) {return res ((command || '') + '[Repaint]');};
 
 studio . setResource (['fxg.prc'], `
 program fxg #machine := 'prolog . fxg'
