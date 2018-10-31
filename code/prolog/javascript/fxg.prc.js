@@ -29,38 +29,43 @@ function (root, directory) {
     return image;
   };
   var draws = {
-    Rectangle: function (ctx, viewport, token) {
-      ctx . save ();
+    Grid: function (ctx, viewport, token) {
+      var xx = token . location . size . x * token . scaling . x, yy = token . location . size . y * token . scaling . y;
+      ctx . translate (token . location . position . x, token . location . position . y);
+      ctx . rotate (token . Rotation * Math . PI / 12);
+      if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fillRect (0, 0, xx * token . indexing . x, yy * token . indexing . y);}
+      ctx . beginPath ();
+      for (var ind = 0; ind <= token . indexing . x; ind ++) {ctx . moveTo (ind * xx, 0); ctx . lineTo (ind * xx, yy * token . indexing . y);}
+      for (var ind = 0; ind <= token . indexing . y; ind ++) {ctx . moveTo (0, ind * yy); ctx . lineTo (xx * token . indexing . x, ind * yy);}
       ctx . strokeStyle = token . ForegroundColour;
+      ctx . stroke ();
+    },
+    Rectangle: function (ctx, viewport, token) {
       var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
       ctx . translate (token . location . position . x, token . location . position . y);
       ctx . rotate (token . Rotation * Math . PI / 12);
       ctx . beginPath ();
       ctx . moveTo (- hw, - hh); ctx . lineTo (hw, - hh); ctx . lineTo (hw, hh); ctx . lineTo (- hw, hh); ctx . closePath ();
       if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill ();}
+      ctx . strokeStyle = token . ForegroundColour;
       ctx . stroke ();
-      ctx . restore ();
     },
     Circle: function (ctx, viewport, token) {
-      ctx . save ();
-      ctx . strokeStyle = token . ForegroundColour;
       var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
       ctx . translate (token . location . position . x, token . location . position . y);
       ctx . rotate (token . Rotation * Math . PI / 12);
       ctx . beginPath ();
       ctx . ellipse (0, 0, hw, hh, 0, 0, Math . PI + Math . PI);
       if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill ();}
+      ctx . strokeStyle = token . ForegroundColour;
       ctx . stroke ();
-      ctx . restore ();
     },
     Picture: function (ctx, viewport, token) {
-      ctx . save ();
       //var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
       ctx . translate (token . location . position . x, token . location . position . y);
       ctx . rotate (token . Rotation * Math . PI / 12);
       ctx . scale (token . scaling . x, token . scaling . y);
       ctx . drawImage (find_image (token . Text), 0, 0);
-      ctx . restore ();
     }
   };
   var viewport = function (atom, name, x, y, width, height) {
@@ -91,7 +96,7 @@ function (root, directory) {
       ctx . save ();
       ctx . scale (viewport . scaling . x, viewport . scaling . y);
       ctx . translate (- viewport . position . x, - viewport . position . y);
-      for (var ind in structure . tokens) {draws [structure . tokens [ind] . type] (ctx, viewport, structure . tokens [ind]);}
+      for (var ind in structure . tokens) {ctx . save (); draws [structure . tokens [ind] . type] (ctx, viewport, structure . tokens [ind]); ctx . restore ();}
       ctx . restore ();
     };
     var mouseup = function (e) {document . onmouseup = null; document . onmousemove = null;};
@@ -143,6 +148,7 @@ function (root, directory) {
           case Size:
             if (el . type === 2) {el = el . setNativePair (viewport . size . x); el . setNativePair (viewport . size . y); return true;}
             if (el . type !== 1 || el . left . type !== 6) return false; viewport . size . x = el . left . left; content . width = viewport . size . x; el = el . right;
+            if (el . type === 0) {viewport . size . y = viewport . size . x; return true;}
             if (el . type !== 1 || el . left . type !== 6) return false; viewport . size . y = el . left . left; content . height = viewport . size . y;
             return true;
           case Scaling:
@@ -200,7 +206,7 @@ function (root, directory) {
   };
   var token = function (atom, type) {
     var token = {
-      atom: atom, type: type, location: {position: {x: 0, y: 0}, size: {x: 128, y: 32}},
+      atom: atom, type: type, location: {position: {x: 0, y: 0}, size: {x: 128, y: 128}},
       scaling: {x: 1, y: 1}, Rotation: 0,
       indexing: {x: 4, y: 4},
       ForegroundColour: 'white'
