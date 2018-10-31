@@ -229,6 +229,7 @@ function (root, directory) {
             return true;
           case Size:
             if (el . type === 2) {el = el . setNativePair (token . location . size . x); el . setNativePair (token . location . size . y); return true;}
+            if (el . type === 0) {token . location . size . y = token . location . size . x; return true;}
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . size . x = el . left . left; el = el . right;
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . size . y = el . left . left;
             return true;
