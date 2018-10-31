@@ -65,7 +65,7 @@ function (root, directory) {
     if (height === null) height = content . height; else content . height = height;
     if (x === null) x = 0; if (y === null) y = 0;
     if (name === null) name = atom . name;
-    var viewport = {atom: atom . name, name: name, location: {x: x, y: y}, position: {x: 0, y: 0}, size: {x: width, y: height}, scaling: 1};
+    var viewport = {atom: atom . name, name: name, location: {x: x, y: y}, position: {x: 0, y: 0}, size: {x: width, y: height}, scaling: {x: 1, y: 1}};
     structure . viewports . push (viewport);
     var bar = document . createElement ('div'); bar . style . background = 'yellow'; bar . appendChild (document . createTextNode (name)); bar . style ['font-family'] = 'arial';
     var close = document . createElement ('input'); close . type = 'button'; close . value = String . fromCharCode (0xd7); close . style . float = 'right';
@@ -98,6 +98,7 @@ function (root, directory) {
       ctx . fillStyle = viewport . BackgroundColour || structure . BackgroundColour;
       ctx . fillRect (0, 0, viewport . size . x, viewport . size . y);
       ctx . save ();
+      ctx . scale (viewport . scaling . x, viewport . scaling . y);
       ctx . translate (- viewport . position . x, - viewport . position . y);
       for (var ind in structure . tokens) {draws [structure . tokens [ind] . type] (ctx, viewport, structure . tokens [ind]);}
       ctx . restore ();
@@ -133,8 +134,10 @@ function (root, directory) {
             if (el . type !== 1 || el . left . type !== 6) return false; viewport . size . y = el . left . left; content . height = viewport . size . y;
             return true;
           case Scaling:
-            if (el . type === 2) {el . setNativePair (viewport . scaling); return true;}
-            if (el . type !== 1 || el . left . type !== 6) return false; viewport . scaling = el . left . left;
+            if (el . type === 2) {el = el . setNativePair (viewport . scaling . x); el . setNativePair (viewport . scaling . y); return true;}
+            if (el . type !== 1 || el . left . type !== 6) return false; viewport . scaling . x = el . left . left; el = el . right;
+            if (el . type === 0) {viewport . scaling . y = viewport . scaling . x; return true;}
+            if (el . type !== 1 || el . left . type !== 6) return false; viewport . scaling . y = el . left . left;
             return true;
           case Mode:
             if (el . type === 1) el = el . left;
