@@ -13,6 +13,7 @@ COMMANDS:
 	[viewport Scaling : *double]                            => scaling
 	[viewport Mode integer]
 	[viewport Mode : *integer]                              => current edit mode
+	[viewport Repaint]
 
 [BackgroundColour (token) colour]
 [BackgroundColour (token) (:) *x]
