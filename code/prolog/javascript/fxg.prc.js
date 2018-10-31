@@ -15,6 +15,7 @@ function (root, directory) {
   var Mode = directory . searchAtom ('Mode');
   var BackgroundColour = directory . searchAtom ('BackgroundColour');
   var ForegroundColour = directory . searchAtom ('ForegroundColour');
+  var Index = directory . searchAtom ('Index');
   var Indexing = directory . searchAtom ('Indexing');
   var Repaint = directory . searchAtom ('Repaint');
   var repaints = [];
@@ -201,6 +202,7 @@ function (root, directory) {
     var token = {
       atom: atom, type: type, location: {position: {x: 0, y: 0}, size: {x: 128, y: 32}},
       scaling: {x: 1, y: 1}, Rotation: 0,
+      indexing: {x: 4, y: 4},
       ForegroundColour: 'white'
     };
     structure . tokens . push (token);
@@ -241,19 +243,20 @@ function (root, directory) {
             if (el . type !== 1 || el . left . type !== 6) return false; token . scaling . y = el . left . left;
             return true;
           case Indexing:
+            if (el . type === 2) {el = el . setNativePair (token . indexing . x); el . setNativePair (token . indexing . y); return true;}
+            if (el . type !== 1 || el . left . type !== 6) return false; token . indexing . x = el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return false; token . indexing . y = el . left . left;
+            return true;
+          case Index:
             if (el . type === 2) {
-              if (token . indexing === undefined) return false;
-              el = el . setNativePair (token . indexing . x); el = el . setNativePair (token . indexing . y);
-              el = el . setNativePair (token . indexing . rows); el . setNativePair (token . indexing . columns);
+              if (token . index === undefined) return false;
+              el = el . setNativePair (token . index . x); el . setNativePair (token . index . y);
               return true;
             }
-            if (el . type === 0) {delete token . indexing; return true;}
-            var index = {};
-            if (el . type !== 1 || el . left . type !== 6) return false; index . x = el . left . left; el = el . right;
-            if (el . type !== 1 || el . left . type !== 6) return false; index . y = el . left . left; el = el . right;
-            if (el . type !== 1 || el . left . type !== 6) return false; index . rows = el . left . left; el = el . right;
-            if (el . type !== 1 || el . left . type !== 6) return false; index . columns = el . left . left;
-            token . indexing = index;
+            if (el . type === 0) {delete token . index; return true;}
+            var token . index = {};
+            if (el . type !== 1 || el . left . type !== 6) return false; token . index . x = el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return false; token . index . y = el . left . left;
             return true;
           default:
             if (el . type === 1) el = el . left;
@@ -301,7 +304,7 @@ program fxg #machine := 'prolog . fxg'
   [
     Viewport
     Token Rectangle Circle Picture Dice Grid Text Deck
-    Location Position Size Scaling Rotation Side Sides Text Indexing Mode
+    Location Position Size Scaling Rotation Side Sides Text Index Indexing Mode
     BackgroundColour ForegroundColour
     Repaint
   ]
