@@ -16,6 +16,8 @@ function (root, directory) {
   var BackgroundColour = directory . searchAtom ('BackgroundColour');
   var ForegroundColour = directory . searchAtom ('ForegroundColour');
   var Indexing = directory . searchAtom ('Indexing');
+  var Repaint = directory . searchAtom ('Repaint');
+  var repaints = [];
   var images = {};
   var find_image = function (location) {
     var image = images [location];
@@ -80,6 +82,16 @@ function (root, directory) {
     div . appendChild (content);
     div . appendChild (info);
     div . style . position = 'absolute'; div . style . top = viewport . location . y; div . style . left = viewport . location . x;
+    var repaint = function () {
+      ctx . fillStyle = viewport . BackgroundColour || structure . BackgroundColour;
+      ctx . clearRect (0, 0, viewport . size . x, viewport . size . y);
+      ctx . fillRect (0, 0, viewport . size . x, viewport . size . y);
+      ctx . save ();
+      ctx . scale (viewport . scaling . x, viewport . scaling . y);
+      ctx . translate (- viewport . position . x, - viewport . position . y);
+      for (var ind in structure . tokens) {draws [structure . tokens [ind] . type] (ctx, viewport, structure . tokens [ind]);}
+      ctx . restore ();
+    };
     var mouseup = function (e) {document . onmouseup = null; document . onmousemove = null;};
     var mousemove = function (e) {
       viewport . location . x += e . movementX; viewport . location . y += e . movementY;
@@ -88,24 +100,22 @@ function (root, directory) {
     var mousesize = function (e) {
       viewport . size . x += e . movementX; viewport . size . y += e . movementY;
       content . width = viewport . size . x; content . height = viewport . size . y;
-      content . repaint ();
+      repaint ();
     };
     bar . onmousedown = function (e) {document . onmouseup = mouseup; document . onmousemove = mousemove;};
     resize . onmousedown = function (e) {document . onmouseup = mouseup; document . onmousemove = mousesize;};
     document . body . appendChild (div);
-    close . onmousedown = function (e) {div . parentElement . removeChild (div); atom . setMachine (null);};
-    content . repaint = function () {
-      ctx . fillStyle = viewport . BackgroundColour || structure . BackgroundColour;
-      ctx . fillRect (0, 0, viewport . size . x, viewport . size . y);
-      ctx . save ();
-      ctx . scale (viewport . scaling . x, viewport . scaling . y);
-      ctx . translate (- viewport . position . x, - viewport . position . y);
-      for (var ind in structure . tokens) {draws [structure . tokens [ind] . type] (ctx, viewport, structure . tokens [ind]);}
-      ctx . restore ();
+    var remove_viewport = function () {
+      div . parentElement . removeChild (div);
+      repaints . splice (repaints . indexOf (repaint, 1));
+      structure . viewports . splice (structure . viewports . indexOf (viewport, 1));
+      return atom . setMachine (null);
     };
-    content . repaint ();
+    close . onmousedown = function (e) {remove_viewport ();};
+    repaint ();
+    repaints . push (repaint);
     this . code = function (el) {
-      if (el . type === 0) {div . parentElement . removeChild (div); structure . viewports . splice (structure . viewports . indexOf (viewport, 1)); return atom . setMachine (null);}
+      if (el . type === 0) return remove_viewport ();
       if (el . type !== 1) return false;
       var selector = el . left; el = el . right;
       if (selector . type === 3) {
@@ -139,16 +149,12 @@ function (root, directory) {
             if (el . type === 0) {viewport . scaling . y = viewport . scaling . x; return true;}
             if (el . type !== 1 || el . left . type !== 6) return false; viewport . scaling . y = el . left . left;
             return true;
-          case Mode:
+          case Repaint: repaint (); return true;
+          default:
             if (el . type === 1) el = el . left;
-            if (el . type === 2) {el . setNative (mode); return true;}
-            if (el . type === 6) {mode = el . left . left; return true;}
-            return false;
-          case BackgroundColour:
-            if (el . type === 1) el = el . left;
-            if (el . type === 2) {if (! viewport . BackgroundColour) return false; el . setNative (viewport . BackgroundColour); return true;}
-            if (el . type === 6) {viewport . BackgroundColour = el . left; return true;}
-            return false;
+            if (el . type === 2) {if (! viewport [selector . left . name]) return false; el . setNative (viewport [selector . left . name]); return true;}
+            if (el . type === 6) {viewport [selector . left . name] = el . left; return true;}
+            return true;
         }
       }
       return false;
@@ -278,6 +284,7 @@ function (root, directory) {
       case 'BackgroundColour': return new ColourFunction ('Background');
       case 'ForegroundColour': return new ColourFunction ('Foreground');
       case 'Token': return Token;
+      case 'Repaint': return {code: function (el) {for (var ind in repaints) repaints [ind] (); return true;}};
       default: break;
     }
     return null;
@@ -285,7 +292,7 @@ function (root, directory) {
 }
 );
 
-
+var rep = function rep (command) {return res (command || '' + '[Repaint]');};
 
 studio . setResource (['fxg.prc'], `
 program fxg #machine := 'prolog . fxg'
@@ -301,6 +308,7 @@ program fxg #machine := 'prolog . fxg'
 #machine BackgroundColour := 'BackgroundColour'
 #machine ForegroundColour := 'ForegroundColour'
 #machine Token := 'Token'
+#machine Repaint := 'Repaint'
 
 end .
 `);
