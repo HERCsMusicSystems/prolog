@@ -254,7 +254,7 @@ function (root, directory) {
               return true;
             }
             if (el . type === 0) {delete token . index; return true;}
-            var token . index = {};
+            token . index = {};
             if (el . type !== 1 || el . left . type !== 6) return false; token . index . x = el . left . left; el = el . right;
             if (el . type !== 1 || el . left . type !== 6) return false; token . index . y = el . left . left;
             return true;
