@@ -18,6 +18,8 @@ function (root, directory) {
   var Index = directory . searchAtom ('Index');
   var Indexing = directory . searchAtom ('Indexing');
   var Repaint = directory . searchAtom ('Repaint');
+  var RotateBy = directory . searchAtom ('RotateBy');
+  var MoveBy = directory . searchAtom ('MoveBy');
   var repaints = [];
   var images = {};
   var find_image = function (location) {
@@ -39,6 +41,13 @@ function (root, directory) {
       for (var ind = 0; ind <= token . indexing . y; ind ++) {ctx . moveTo (0, ind * yy); ctx . lineTo (xx * token . indexing . x, ind * yy);}
       ctx . strokeStyle = token . ForegroundColour;
       ctx . stroke ();
+      if (token . index == null) return;
+      ctx . font = '12px arial'; ctx . textBaseline = 'top';
+      ctx . fillStyle = token . ForegroundColour;
+      for (var ind = 0; ind < token . indexing . x; ind ++) {
+        for (var sub = 0; sub < token . indexing . y; sub ++)
+          ctx . fillText (String (ind) . padStart (2, '0') + String (sub) . padStart (2, '0'), 2 + ind * xx, 2 + sub * yy);
+      }
     },
     Rectangle: function (ctx, viewport, token) {
       var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
@@ -264,6 +273,11 @@ function (root, directory) {
             if (el . type !== 1 || el . left . type !== 6) return false; token . index . x = el . left . left; el = el . right;
             if (el . type !== 1 || el . left . type !== 6) return false; token . index . y = el . left . left;
             return true;
+          case RotateBy: if (el . type !== 1 || el . left . type !== 6) return false; token . Rotation += el . left . left; return true;
+          case MoveBy:
+            if (el . type !== 1 || el . left . type !== 6) return false; token . location . position . x += el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return false; token . location . position . y += el . left . left;
+            return true;
           default:
             if (el . type === 1) el = el . left;
             if (el . type === 2) {if (! token [selector . left . name]) return false; el . setNative (token [selector . left . name]); return true;}
@@ -311,6 +325,7 @@ program fxg #machine := 'prolog . fxg'
     Viewport
     Token Rectangle Circle Picture Dice Grid Text Deck
     Location Position Size Scaling Rotation Side Sides Text Index Indexing Mode
+    RotateBy MoveBy
     BackgroundColour ForegroundColour
     Repaint
   ]
