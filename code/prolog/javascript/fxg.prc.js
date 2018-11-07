@@ -83,7 +83,7 @@ function (root, directory) {
     if (height === null) height = content . height; else content . height = height;
     if (x === null) x = 0; if (y === null) y = 0;
     if (name === null) name = atom . name;
-    var viewport = {atom: atom . name, name: name, location: {x: x, y: y}, position: {x: 0, y: 0}, size: {x: width, y: height}, scaling: {x: 1, y: 1}};
+    var viewport = {atom: atom . name, name: name, location: {x: x, y: y}, position: {x: 0, y: 0}, size: {x: width, y: height}, scaling: {x: 1, y: 1}, Mode: 'move'};
     structure . viewports . push (viewport);
     var bar = document . createElement ('div'); bar . style . background = 'yellow'; bar . appendChild (document . createTextNode (name)); bar . style ['font-family'] = 'arial';
     var close = document . createElement ('input'); close . type = 'button'; close . value = String . fromCharCode (0xd7); close . style . float = 'right';
@@ -92,6 +92,12 @@ function (root, directory) {
     var info = document . createElement ('div'); info . style . background = 'yellow'; info . appendChild (document . createTextNode ('info')); info . style ['font-family'] = 'arial';
     var resize = document . createElement ('input'); resize . type = 'button'; resize . value = String . fromCharCode (0x21f2); resize . style . float = 'right';
     info . appendChild (resize);
+    var radio_rotate = document . createElement ('input'); radio_rotate . type = 'radio'; radio_rotate . name = `${atom . name}@mode`; radio_rotate . style . float = 'right';
+    radio_rotate . onmousedown = function () {viewport . Mode = 'rotate';}; info . appendChild  (radio_rotate);
+    var radio_select = document . createElement ('input'); radio_select . type = 'radio'; radio_select . name = `${atom . name}@mode`; radio_select . style . float = 'right';
+    radio_select . onmousedown = function () {viewport . Mode = 'select';}; info . appendChild (radio_select);
+    var radio_move = document . createElement ('input'); radio_move . type = 'radio'; radio_move . name = `${atom . name}@mode`; radio_move . checked = true; radio_move . style . float = 'right';
+    radio_move . onmousedown = function () {viewport . Mode = 'move';}; info . appendChild (radio_move);
     var div = document . createElement ('div');
     var mode = 'navigate';
     div . appendChild (bar);
@@ -118,6 +124,21 @@ function (root, directory) {
       content . width = viewport . size . x; content . height = viewport . size . y;
       repaint ();
     };
+    var canvas_move = function (e) {
+      switch (viewport . Mode) {
+      case 'move': viewport . position . x -= e . movementX; viewport . position . y -= e . movementY; repaint (); break;
+      default: break;
+      }
+    };
+    content . onwheel = function (e) {
+      e . preventDefault ();
+      var fraction = Math . pow (1.0625, - e . deltaY);
+      switch (viewport . Mode) {
+      case 'move': viewport . scaling . x *= fraction; viewport . scaling . y *= fraction; repaint (); break;
+      default: break;
+      }
+      console . log (viewport . Mode, viewport . scaling);
+    };
     bar . onmousedown = function (e) {document . onmouseup = mouseup; document . onmousemove = mousemove;};
     resize . onmousedown = function (e) {document . onmouseup = mouseup; document . onmousemove = mousesize;};
     document . body . appendChild (div);
@@ -128,6 +149,7 @@ function (root, directory) {
       return atom . setMachine (null);
     };
     close . onmousedown = function (e) {remove_viewport ();};
+    content . onmousedown = function (e) {document . onmouseup = mouseup; document . onmousemove = canvas_move;};
     repaint ();
     repaints . push (repaint);
     this . code = function (el) {
