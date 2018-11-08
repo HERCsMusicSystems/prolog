@@ -31,7 +31,7 @@ function (root, directory) {
     return image;
   };
   var draws = {
-    Grid: function (ctx, viewport, token) {
+    Grid: function (ctx, viewport, token, token_index) {
       var xx = token . location . size . x * token . scaling . x, yy = token . location . size . y * token . scaling . y;
       ctx . translate (token . location . position . x, token . location . position . y);
       ctx . rotate (token . Rotation * Math . PI / 12);
@@ -49,7 +49,7 @@ function (root, directory) {
           ctx . fillText (String (ind) . padStart (2, '0') + String (sub) . padStart (2, '0'), 2 + ind * xx, 2 + sub * yy);
       }
     },
-    Rectangle: function (ctx, viewport, token) {
+    Rectangle: function (ctx, viewport, token, token_index) {
       var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
       ctx . translate (token . location . position . x, token . location . position . y);
       ctx . rotate (token . Rotation * Math . PI / 12);
@@ -58,8 +58,9 @@ function (root, directory) {
       if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill ();}
       ctx . strokeStyle = token . ForegroundColour;
       ctx . stroke ();
+      ctx . addHitRegion ({id: token_index});
     },
-    Circle: function (ctx, viewport, token) {
+    Circle: function (ctx, viewport, token, token_index) {
       var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
       ctx . translate (token . location . position . x, token . location . position . y);
       ctx . rotate (token . Rotation * Math . PI / 12);
@@ -68,6 +69,7 @@ function (root, directory) {
       if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill ();}
       ctx . strokeStyle = token . ForegroundColour;
       ctx . stroke ();
+      ctx . addHitRegion ({id: token_index});
     },
     Picture: function (ctx, viewport, token) {
       //var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
@@ -111,7 +113,7 @@ function (root, directory) {
       ctx . save ();
       ctx . scale (viewport . scaling . x, viewport . scaling . y);
       ctx . translate (- viewport . position . x, - viewport . position . y);
-      for (var ind in structure . tokens) {ctx . save (); draws [structure . tokens [ind] . type] (ctx, viewport, structure . tokens [ind]); ctx . restore ();}
+      for (var ind in structure . tokens) {ctx . save (); draws [structure . tokens [ind] . type] (ctx, viewport, structure . tokens [ind], ind); ctx . restore ();}
       ctx . restore ();
     };
     var mouseup = function (e) {document . onmouseup = null; document . onmousemove = null;};
@@ -124,20 +126,35 @@ function (root, directory) {
       content . width = viewport . size . x; content . height = viewport . size . y;
       repaint ();
     };
+    var selected = [];
     var canvas_move = function (e) {
       switch (viewport . Mode) {
       case 'move': viewport . position . x -= e . movementX; viewport . position . y -= e . movementY; repaint (); break;
+      case 'select':
+        if (selected . length > 0) {
+          for (var ind in selected) {
+            selected [ind] . location . position . x += e . movementX;
+            selected [ind] . location . position . y += e . movementY;
+          }
+          repaint ();
+        }
+        break;
       default: break;
       }
     };
     content . onwheel = function (e) {
       e . preventDefault ();
-      var fraction = Math . pow (1.0625, - e . deltaY);
+      var delta = e . deltaX + e . deltaY;
+      var fraction = Math . pow (1.0625, - delta);
       switch (viewport . Mode) {
       case 'move': viewport . scaling . x *= fraction; viewport . scaling . y *= fraction; repaint (); break;
+      case 'select':
+        if (selected . length > 0) {
+          for (var ind in selected) selected [ind] . Rotation += delta;
+          repaint ();
+        }
       default: break;
       }
-      console . log (viewport . Mode, viewport . scaling);
     };
     bar . onmousedown = function (e) {document . onmouseup = mouseup; document . onmousemove = mousemove;};
     resize . onmousedown = function (e) {document . onmouseup = mouseup; document . onmousemove = mousesize;};
@@ -149,7 +166,18 @@ function (root, directory) {
       return atom . setMachine (null);
     };
     close . onmousedown = function (e) {remove_viewport ();};
-    content . onmousedown = function (e) {document . onmouseup = mouseup; document . onmousemove = canvas_move;};
+    content . onmousedown = function (e) {
+      document . onmouseup = mouseup; document . onmousemove = canvas_move;
+      if (e . region . length > 0) {
+        var ind = Number (e . region);
+        var token = structure . tokens [ind];
+        structure . tokens . splice (ind, 1);
+        structure . tokens . push (token);
+        selected . push (token);
+        repaint ();
+      }
+    };
+    content . onmouseup = function (e) {selected = [];};
     repaint ();
     repaints . push (repaint);
     this . code = function (el) {
