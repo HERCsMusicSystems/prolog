@@ -30,31 +30,57 @@ function (root, directory) {
     image = new Image (); image . src = location; images [location] = image;
     return image;
   };
+  var DrawSquareGrid = function (ctx, viewport, token, token_index) {
+    var xx = token . location . size . x * token . scaling . x, yy = token . location . size . y * token . scaling . y;
+    ctx . translate (token . location . position . x, token . location . position . y);
+    ctx . rotate (token . Rotation * Math . PI / 12);
+    if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fillRect (0, 0, xx * token . indexing . x, yy * token . indexing . y);}
+    ctx . beginPath ();
+    for (var ind = 0; ind <= token . indexing . x; ind ++) {ctx . moveTo (ind * xx, 0); ctx . lineTo (ind * xx, yy * token . indexing . y);}
+    for (var ind = 0; ind <= token . indexing . y; ind ++) {ctx . moveTo (0, ind * yy); ctx . lineTo (xx * token . indexing . x, ind * yy);}
+    ctx . strokeStyle = token . ForegroundColour;
+    ctx . stroke ();
+    if (token . index == null) return;
+    ctx . font = '12px arial'; ctx . textBaseline = 'top';
+    ctx . fillStyle = token . ForegroundColour;
+    for (var ind = 0; ind < token . indexing . x; ind ++) {
+      for (var sub = 0; sub < token . indexing . y; sub ++)
+        ctx . fillText (String (ind) . padStart (2, '0') + String (sub) . padStart (2, '0'), 2 + ind * xx, 2 + sub * yy);
+    }
+    var pth = new Path2D ();
+    pth . moveTo (0, 0);
+    pth . lineTo (token . indexing . x * xx, 0);
+    pth . lineTo (token . indexing . x * xx, token . indexing . y * yy);
+    pth . lineTo (0, token . indexing . y * yy);
+    pth . closePath ();
+    ctx . addHitRegion ({path: pth, id: token_index});
+  };
+  var h = Math . sqrt (3) * 0.5;
+  var DrawHorizontalHexGrid1 = function (ctx, viewport, token, token_index) {
+    var xx = token . location . size . x * token . scaling . x * 0.5, yy = token . location . size . y * token . scaling . y * 0.5;
+    var hx = xx * 0.5, hy = yy * 0.5, hg = yy * h, hg2 = hg + hg, hshift = xx + hx, vswitch = 0;
+    ctx . translate (token . location . position . x, token . location . position . y);
+    ctx . rotate (token . Rotation * Math . PI / 12);
+    ctx . beginPath ();
+    var xxx = 0;
+    for (var ind = 0; ind < token . indexing . x; ind ++) {
+      var yyy = vswitch;
+      for (var sub = 0; sub < token . indexing . y; sub ++) {
+        ctx . moveTo (xxx - hx, yyy + hg); ctx . lineTo (xxx - xx, yyy); ctx . lineTo (xxx - hx, yyy - hg); ctx . lineTo (xxx + hx, yyy - hg);
+        yyy += hg2;
+      }
+      xxx += hshift;
+      vswitch = vswitch === 0 ? hg : 0;
+    }
+    ctx . strokeStyle = token . ForegroundColour;
+    ctx . stroke ();
+  };
   var draws = {
     Grid: function (ctx, viewport, token, token_index) {
-      var xx = token . location . size . x * token . scaling . x, yy = token . location . size . y * token . scaling . y;
-      ctx . translate (token . location . position . x, token . location . position . y);
-      ctx . rotate (token . Rotation * Math . PI / 12);
-      if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fillRect (0, 0, xx * token . indexing . x, yy * token . indexing . y);}
-      ctx . beginPath ();
-      for (var ind = 0; ind <= token . indexing . x; ind ++) {ctx . moveTo (ind * xx, 0); ctx . lineTo (ind * xx, yy * token . indexing . y);}
-      for (var ind = 0; ind <= token . indexing . y; ind ++) {ctx . moveTo (0, ind * yy); ctx . lineTo (xx * token . indexing . x, ind * yy);}
-      ctx . strokeStyle = token . ForegroundColour;
-      ctx . stroke ();
-      if (token . index == null) return;
-      ctx . font = '12px arial'; ctx . textBaseline = 'top';
-      ctx . fillStyle = token . ForegroundColour;
-      for (var ind = 0; ind < token . indexing . x; ind ++) {
-        for (var sub = 0; sub < token . indexing . y; sub ++)
-          ctx . fillText (String (ind) . padStart (2, '0') + String (sub) . padStart (2, '0'), 2 + ind * xx, 2 + sub * yy);
+      switch (token . Side) {
+      case 1: DrawHorizontalHexGrid1 (ctx, viewport, token, token_index); break;
+      default: DrawSquareGrid (ctx, viewport, token, token_index); break;
       }
-      var pth = new Path2D ();
-      pth . moveTo (0, 0);
-      pth . lineTo (token . indexing . x * xx, 0);
-      pth . lineTo (token . indexing . x * xx, token . indexing . y * yy);
-      pth . lineTo (0, token . indexing . y * yy);
-      pth . closePath ();
-      ctx . addHitRegion ({path: pth, id: token_index});
     },
     Rectangle: function (ctx, viewport, token, token_index) {
       var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
@@ -101,6 +127,8 @@ function (root, directory) {
     var info = document . createElement ('div'); info . style . background = 'yellow'; info . appendChild (document . createTextNode ('info')); info . style ['font-family'] = 'arial';
     var resize = document . createElement ('input'); resize . type = 'button'; resize . value = String . fromCharCode (0x21f2); resize . style . float = 'right';
     info . appendChild (resize);
+    var radio_side = document . createElement ('input'); radio_side . type = 'radio'; radio_side . name = `${atom . name}@mode`; radio_side . style .float = 'right';
+    radio_side . onmousedown = function () {viewport . Mode = 'side';}; info . appendChild (radio_side);
     var radio_rotate = document . createElement ('input'); radio_rotate . type = 'radio'; radio_rotate . name = `${atom . name}@mode`; radio_rotate . style . float = 'right';
     radio_rotate . onmousedown = function () {viewport . Mode = 'rotate';}; info . appendChild  (radio_rotate);
     var radio_select = document . createElement ('input'); radio_select . type = 'radio'; radio_select . name = `${atom . name}@mode`; radio_select . style . float = 'right';
@@ -160,6 +188,14 @@ function (root, directory) {
           for (var ind in selected) selected [ind] . Rotation += delta;
           repaint ();
         }
+        break;
+      case 'side':
+        console . log ("I am here!");
+        if (selected . length > 0) {
+          for (var ind in selected) selected [ind] . Side += delta;
+          repaint ();
+        }
+        break;
       default: break;
       }
     };
@@ -275,7 +311,8 @@ function (root, directory) {
       atom: atom, type: type, location: {position: {x: 0, y: 0}, size: {x: 128, y: 128}},
       scaling: {x: 1, y: 1}, Rotation: 0,
       indexing: {x: 4, y: 4},
-      ForegroundColour: 'white'
+      ForegroundColour: 'white',
+      Side: 0
     };
     structure . tokens . push (token);
     this . code = function (el) {
