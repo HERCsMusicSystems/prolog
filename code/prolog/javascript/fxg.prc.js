@@ -48,6 +48,13 @@ function (root, directory) {
         for (var sub = 0; sub < token . indexing . y; sub ++)
           ctx . fillText (String (ind) . padStart (2, '0') + String (sub) . padStart (2, '0'), 2 + ind * xx, 2 + sub * yy);
       }
+      var pth = new Path2D ();
+      pth . moveTo (0, 0);
+      pth . lineTo (token . indexing . x * xx, 0);
+      pth . lineTo (token . indexing . x * xx, token . indexing . y * yy);
+      pth . lineTo (0, token . indexing . y * yy);
+      pth . closePath ();
+      ctx . addHitRegion ({path: pth, id: token_index});
     },
     Rectangle: function (ctx, viewport, token, token_index) {
       var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
