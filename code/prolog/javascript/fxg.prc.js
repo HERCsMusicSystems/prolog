@@ -72,8 +72,53 @@ function (root, directory) {
       xxx += hshift;
       vswitch = vswitch === 0 ? hg : 0;
     }
+    xxx -= xx;
+    var yyy = - vswitch;
+    ctx . moveTo (xxx, yyy);
+    for (var ind = 0; ind < token . indexing . y; ind ++) {
+      yyy += hg; ctx . lineTo (xxx + hx, yyy); yyy += hg; ctx . lineTo (xxx, yyy);
+    }
+    ctx . lineTo (xxx - xx, yyy);
+    xxx = hx;
+    for (var ind = 1; ind < token . indexing . x; ind += 2) {ctx . moveTo (xxx, - hg); ctx . lineTo (xxx + hx, 0); xxx += hshift + hshift;}
+    xxx = - hx;
+    for (var ind = 1; ind < token . indexing . x; ind ++) {
+      vswitch = vswitch === 0 ? hg : 0;
+      ctx . moveTo (xxx, yyy + vswitch); ctx . lineTo (xxx + xx, yyy + vswitch); xxx += hshift;
+    }
+    xxx = xx + xx;
+    for (var ind = 2; ind < token . indexing . x; ind += 2) {ctx . moveTo (xxx, yyy + hg); ctx . lineTo (xxx + hx, yyy); xxx += hshift + hshift;}
     ctx . strokeStyle = token . ForegroundColour;
     ctx . stroke ();
+    var pth = new Path2D ();
+    yyy = token . indexing . y * hg2 - hg;
+    xxx = - hx - hx;
+    pth . moveTo (xxx + xx + hx, yyy); pth . lineTo (xxx + hx, yyy);
+    for (var ind = 0; ind < token . indexing . y; ind ++) {
+      yyy -= hg; pth . lineTo (xxx, yyy); yyy -= hg; pth . lineTo (xxx + hx, yyy);
+    }
+    xxx += xx + hx;
+    pth . lineTo (xxx, yyy);
+    var ind = token . indexing . x;
+    while (ind > 1) {
+      yyy += hg; xxx += hx; pth . lineTo (xxx, yyy); xxx += xx; pth . lineTo (xxx, yyy); ind -= 1;
+      if (ind > 1) {yyy -= hg; xxx += hx; pth . lineTo (xxx, yyy); xxx += xx; pth . lineTo (xxx, yyy); ind -= 1;}
+    }
+    for (var ind = 0; ind < token . indexing . y; ind ++) {
+      yyy += hg; pth . lineTo (xxx + hx, yyy); yyy += hg; pth . lineTo (xxx, yyy);
+    }
+    ind = token . indexing . x;
+    while (ind > 1) {
+      xxx -= xx; pth . lineTo (xxx, yyy);
+      xxx -= hx; yyy += hg; pth . lineTo (xxx, yyy);
+      if (ind > 2) {xxx -= xx; pth . lineTo (xxx, yyy); xxx -= hx; yyy -= hg; pth . lineTo (xxx, yyy); ind --;}
+      ind --;
+    }
+    pth . lineTo (xxx, yyy + 100);
+    pth . closePath ();
+    ctx . strokeStyle = 'white';
+    ctx . stroke (pth);
+    ctx . addHitRegion ({path: pth, id: token_index});
   };
   var draws = {
     Grid: function (ctx, viewport, token, token_index) {
