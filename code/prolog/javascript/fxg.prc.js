@@ -100,9 +100,10 @@ function (root, directory) {
     xxx += xx + hx;
     pth . lineTo (xxx, yyy);
     var ind = token . indexing . x;
+    var hhg = hg;
     while (ind > 1) {
-      yyy += hg; xxx += hx; pth . lineTo (xxx, yyy); xxx += xx; pth . lineTo (xxx, yyy); ind -= 1;
-      if (ind > 1) {yyy -= hg; xxx += hx; pth . lineTo (xxx, yyy); xxx += xx; pth . lineTo (xxx, yyy); ind -= 1;}
+      yyy += hhg; xxx += hx; pth . lineTo (xxx, yyy); xxx += xx; pth . lineTo (xxx, yyy); ind -= 1; hhg = - hhg;
+      if (ind > 1) {yyy = hhg; xxx += hx; pth . lineTo (xxx, yyy); xxx += xx; pth . lineTo (xxx, yyy); ind -= 1; hhg = - hhg;}
     }
     for (var ind = 0; ind < token . indexing . y; ind ++) {
       yyy += hg; pth . lineTo (xxx + hx, yyy); yyy += hg; pth . lineTo (xxx, yyy);
@@ -110,8 +111,9 @@ function (root, directory) {
     ind = token . indexing . x;
     while (ind > 1) {
       xxx -= xx; pth . lineTo (xxx, yyy);
-      xxx -= hx; yyy += hg; pth . lineTo (xxx, yyy);
-      if (ind > 2) {xxx -= xx; pth . lineTo (xxx, yyy); xxx -= hx; yyy -= hg; pth . lineTo (xxx, yyy); ind --;}
+      xxx -= hx; yyy += hhg; pth . lineTo (xxx, yyy);
+      hhg = - hhg;
+      if (ind > 2) {xxx -= xx; pth . lineTo (xxx, yyy); xxx -= hx; yyy += hhg; pth . lineTo (xxx, yyy); ind --; hhg = - hhg;}
       ind --;
     }
     pth . lineTo (xxx, yyy + 100);
