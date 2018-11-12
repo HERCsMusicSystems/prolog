@@ -80,7 +80,8 @@ function (root, directory) {
     if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill (pth);}
     // =========
     ctx . beginPath ();
-    xxx = 0, vswitch = 0, vvswitch = direction ? hg : - hg;
+    xxx = 0;
+    var vswitch = 0, vvswitch = direction ? hg : - hg;
     for (var ind = 0; ind < token . indexing . x; ind ++) {
       yyy = vswitch;
       for (var sub = 0; sub < token . indexing . y; sub ++) {
@@ -138,7 +139,8 @@ function (root, directory) {
     if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill (pth);}
     // =========
     ctx . beginPath ();
-    yyy = 0, vswitch = 0, vvswitch = direction ? hg : - hg;
+    yyy = 0;
+    var vswitch = 0, vvswitch = direction ? hg : - hg;
     for (var ind = 0; ind < token . indexing . y; ind ++) {
       xxx = vswitch;
       for (var sub = 0; sub < token . indexing . x; sub ++) {
