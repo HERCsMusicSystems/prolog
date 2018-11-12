@@ -40,12 +40,13 @@ function (root, directory) {
     for (var ind = 0; ind <= token . indexing . y; ind ++) {ctx . moveTo (0, ind * yy); ctx . lineTo (xx * token . indexing . x, ind * yy);}
     ctx . strokeStyle = token . ForegroundColour;
     ctx . stroke ();
-    if (token . index == null) return;
-    ctx . font = '12px arial'; ctx . textBaseline = 'top';
-    ctx . fillStyle = token . ForegroundColour;
-    for (var ind = 0; ind < token . indexing . x; ind ++) {
-      for (var sub = 0; sub < token . indexing . y; sub ++)
-        ctx . fillText (String (ind) . padStart (2, '0') + String (sub) . padStart (2, '0'), 2 + ind * xx, 2 + sub * yy);
+    if (token . index != null) {
+      ctx . font = '12px arial'; ctx . textBaseline = 'top';
+      ctx . fillStyle = token . ForegroundColour;
+      for (var ind = 0; ind < token . indexing . x; ind ++) {
+        for (var sub = 0; sub < token . indexing . y; sub ++)
+          ctx . fillText (String (ind) . padStart (2, '0') + String (sub) . padStart (2, '0'), 2 + ind * xx, 2 + sub * yy);
+      }
     }
     var pth = new Path2D ();
     pth . moveTo (0, 0);
@@ -56,76 +57,130 @@ function (root, directory) {
     ctx . addHitRegion ({path: pth, id: token_index});
   };
   var h = Math . sqrt (3) * 0.5;
-  var DrawHorizontalHexGrid1 = function (ctx, viewport, token, token_index) {
+  var DrawHorizontalHexGrid = function (ctx, viewport, token, token_index, direction) {
     var xx = token . location . size . x * token . scaling . x * 0.5, yy = token . location . size . y * token . scaling . y * 0.5;
-    var hx = xx * 0.5, hy = yy * 0.5, hg = yy * h, hg2 = hg + hg, hshift = xx + hx, vswitch = 0;
+    var hx = xx * 0.5, hy = yy * 0.5, hg = yy * h, hg2 = hg + hg, hshift = xx + hx;
     ctx . translate (token . location . position . x, token . location . position . y);
     ctx . rotate (token . Rotation * Math . PI / 12);
+    // =============
+    var pth = new Path2D ();
+    var yyy = token . indexing . y * hg2 - hg;
+    var xxx = - hx - hx;
+    pth . moveTo (xxx + xx + hx, yyy); pth . lineTo (xxx + hx, yyy);
+    for (var ind = 0; ind < token . indexing . y; ind ++) {yyy -= hg; pth . lineTo (xxx, yyy); yyy -= hg; pth . lineTo (xxx + hx, yyy);}
+    xxx += xx + hx;
+    pth . lineTo (xxx, yyy);
+    var ind = token . indexing . x, hhg = direction ? hg : - hg;
+    while (ind > 1) {yyy += hhg; xxx += hx; pth . lineTo (xxx, yyy); xxx += xx; pth . lineTo (xxx, yyy); ind --; hhg = - hhg;}
+    for (var ind = 0; ind < token . indexing . y; ind ++) {yyy += hg; pth . lineTo (xxx + hx, yyy); yyy += hg; pth . lineTo (xxx, yyy);}
+    ind = token . indexing . x;
+    while (ind > 1) {xxx -= xx; pth . lineTo (xxx, yyy); xxx -= hx; yyy += hhg; pth . lineTo (xxx, yyy); ind --; hhg = - hhg;}
+    pth . lineTo (100, 100);
+    pth . closePath ();
+    if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill (pth);}
+    // =========
     ctx . beginPath ();
-    var xxx = 0;
+    xxx = 0, vswitch = 0, vvswitch = direction ? hg : - hg;
     for (var ind = 0; ind < token . indexing . x; ind ++) {
-      var yyy = vswitch;
+      yyy = vswitch;
       for (var sub = 0; sub < token . indexing . y; sub ++) {
         ctx . moveTo (xxx - hx, yyy + hg); ctx . lineTo (xxx - xx, yyy); ctx . lineTo (xxx - hx, yyy - hg); ctx . lineTo (xxx + hx, yyy - hg);
         yyy += hg2;
       }
       xxx += hshift;
-      vswitch = vswitch === 0 ? hg : 0;
+      vswitch = vswitch === 0 ? vvswitch : 0;
     }
-    xxx -= xx;
-    var yyy = - vswitch;
-    ctx . moveTo (xxx, yyy);
-    for (var ind = 0; ind < token . indexing . y; ind ++) {
-      yyy += hg; ctx . lineTo (xxx + hx, yyy); yyy += hg; ctx . lineTo (xxx, yyy);
-    }
-    ctx . lineTo (xxx - xx, yyy);
-    xxx = hx;
-    for (var ind = 1; ind < token . indexing . x; ind += 2) {ctx . moveTo (xxx, - hg); ctx . lineTo (xxx + hx, 0); xxx += hshift + hshift;}
-    xxx = - hx;
+    xxx -= xx; yyy = direction ? - vswitch : - vswitch - hg2; ctx . moveTo (xxx, yyy);
+    for (var ind = 0; ind < token . indexing . y; ind ++) {yyy += hg; ctx . lineTo (xxx + hx, yyy); yyy += hg; ctx . lineTo (xxx, yyy);}
+    ctx . lineTo (xxx - xx, yyy); xxx = direction ? hx : xx + xx;
+    var dhg = direction ? 0 : - hg;
+    for (var ind = direction ? 1 : 2; ind < token . indexing . x; ind += 2) {ctx . moveTo (xxx, dhg - hg); ctx . lineTo (xxx + hx, dhg); xxx += hshift + hshift;}
+    xxx = - hx; vswitch = 0; yyy = token . indexing . y * hg2 - hg;
     for (var ind = 1; ind < token . indexing . x; ind ++) {
-      vswitch = vswitch === 0 ? hg : 0;
-      ctx . moveTo (xxx, yyy + vswitch); ctx . lineTo (xxx + xx, yyy + vswitch); xxx += hshift;
+      ctx . moveTo (xxx, yyy + vswitch); ctx . lineTo (xxx + xx, yyy + vswitch); xxx += hshift; vswitch = vswitch === 0 ? vvswitch : 0;
     }
-    xxx = xx + xx;
-    for (var ind = 2; ind < token . indexing . x; ind += 2) {ctx . moveTo (xxx, yyy + hg); ctx . lineTo (xxx + hx, yyy); xxx += hshift + hshift;}
+    xxx = direction ? xx + xx : hx; if (! direction) yyy -= hg;
+    for (var ind = direction ? 2 : 1; ind < token . indexing . x; ind += 2) {ctx . moveTo (xxx, yyy + hg); ctx . lineTo (xxx + hx, yyy); xxx += hshift + hshift;}
     ctx . strokeStyle = token . ForegroundColour;
     ctx . stroke ();
+    if (token . index != null) {
+      xxx = - hx; yyy = 2 - hg;
+      ctx . font = '8px arial'; ctx . textBaseline = 'top';
+      ctx . fillStyle = token . ForegroundColour;
+      vswitch = 0;
+      for (var ind = 0; ind < token . indexing . x; ind ++) {
+        for (var sub = 0; sub < token . indexing . y; sub ++)
+          ctx . fillText (String (ind) . padStart (2, '0') + String (sub) . padStart (2, '0'), xxx + ind * hshift, yyy + sub * hg2 + vswitch);
+        vswitch = vswitch === 0 ? vvswitch : 0;
+      }
+    }
+    ctx . addHitRegion ({path: pth, id: token_index});
+  };
+  var DrawVerticalHexGrid = function (ctx, viewport, token, token_index, direction) {
+    var yy = token . location . size . y * token . scaling . y * 0.5, xx = token . location . size . x * token . scaling . x * 0.5;
+    var hy = yy * 0.5, hx = yy * 0.5, hg = xx * h, hg2 = hg + hg, yshift = yy + hy;
+    ctx . translate (token . location . position . x, token . location . position . y);
+    ctx . rotate (token . Rotation * Math . PI / 12);
+    // =============
     var pth = new Path2D ();
-    yyy = token . indexing . y * hg2 - hg;
-    xxx = - hx - hx;
-    pth . moveTo (xxx + xx + hx, yyy); pth . lineTo (xxx + hx, yyy);
-    for (var ind = 0; ind < token . indexing . y; ind ++) {
-      yyy -= hg; pth . lineTo (xxx, yyy); yyy -= hg; pth . lineTo (xxx + hx, yyy);
-    }
-    xxx += xx + hx;
+    var xxx = token . indexing . x * hg2 - hg;
+    var yyy = - hy - hy;
+    pth . moveTo (xxx, yyy + yy + hy); pth . lineTo (xxx, yyy + hy);
+    for (var ind = 0; ind < token . indexing . x; ind ++) {xxx -= hg; pth . lineTo (xxx, yyy); xxx -= hg; pth . lineTo (xxx, yyy + hy);}
+    yyy += yy + hy;
     pth . lineTo (xxx, yyy);
-    var ind = token . indexing . x;
-    var hhg = hg;
-    while (ind > 1) {
-      yyy += hhg; xxx += hx; pth . lineTo (xxx, yyy); xxx += xx; pth . lineTo (xxx, yyy); ind -= 1; hhg = - hhg;
-      if (ind > 1) {yyy = hhg; xxx += hx; pth . lineTo (xxx, yyy); xxx += xx; pth . lineTo (xxx, yyy); ind -= 1; hhg = - hhg;}
-    }
-    for (var ind = 0; ind < token . indexing . y; ind ++) {
-      yyy += hg; pth . lineTo (xxx + hx, yyy); yyy += hg; pth . lineTo (xxx, yyy);
-    }
-    ind = token . indexing . x;
-    while (ind > 1) {
-      xxx -= xx; pth . lineTo (xxx, yyy);
-      xxx -= hx; yyy += hhg; pth . lineTo (xxx, yyy);
-      hhg = - hhg;
-      if (ind > 2) {xxx -= xx; pth . lineTo (xxx, yyy); xxx -= hx; yyy += hhg; pth . lineTo (xxx, yyy); ind --; hhg = - hhg;}
-      ind --;
-    }
-    pth . lineTo (xxx, yyy + 100);
+    var ind = token . indexing . y, hhg = direction ? hg : - hg;
+    while (ind > 1) {xxx += hhg; yyy += hy; pth . lineTo (xxx, yyy); yyy += yy; pth . lineTo (xxx, yyy); ind --; hhg = - hhg;}
+    for (var ind = 0; ind < token . indexing . x; ind ++) {xxx += hg; pth . lineTo (xxx, yyy + hy); xxx += hg; pth . lineTo (xxx, yyy);}
+    ind = token . indexing . y;
+    while (ind > 1) {yyy -= yy; pth . lineTo (xxx, yyy); yyy -= hy; xxx += hhg; pth . lineTo (xxx, yyy); ind --; hhg = - hhg;}
     pth . closePath ();
-    ctx . strokeStyle = 'white';
-    ctx . stroke (pth);
+    if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill (pth);}
+    // =========
+    ctx . beginPath ();
+    yyy = 0, vswitch = 0, vvswitch = direction ? hg : - hg;
+    for (var ind = 0; ind < token . indexing . y; ind ++) {
+      xxx = vswitch;
+      for (var sub = 0; sub < token . indexing . x; sub ++) {
+        ctx . moveTo (xxx + hg, yyy - hy); ctx . lineTo (xxx, yyy - yy); ctx . lineTo (xxx - hg, yyy - hy); ctx . lineTo (xxx - hg, yyy + hy);
+        xxx += hg2;
+      }
+      yyy += yshift;
+      vswitch = vswitch === 0 ? vvswitch : 0;
+    }
+    yyy -= yy; xxx = direction ? - vswitch : - vswitch - hg2; ctx . moveTo (xxx, yyy);
+    for (var ind = 0; ind < token . indexing . x; ind ++) {xxx += hg; ctx . lineTo (xxx, yyy + hy); xxx += hg; ctx . lineTo (xxx, yyy);}
+    ctx . lineTo (xxx, yyy - yy); yyy = direction ? hy : yy + yy;
+    var dhg = direction ? 0 : - hg;
+    for (var ind = direction ? 1 : 2; ind < token . indexing . y; ind += 2) {ctx . moveTo (dhg - hg, yyy); ctx . lineTo (dhg, yyy + hy); yyy += yshift + yshift;}
+    yyy = - hy; vswitch = 0; xxx = token . indexing . x * hg2 - hg;
+    for (var ind = 1; ind < token . indexing . y; ind ++) {
+      ctx . moveTo (xxx + vswitch, yyy); ctx . lineTo (xxx + vswitch, yyy + yy); yyy += yshift; vswitch = vswitch === 0 ? vvswitch : 0;
+    }
+    yyy = direction ? yy + yy : hy; if (! direction) xxx -= hg;
+    for (var ind = direction ? 2 : 1; ind < token . indexing . y; ind += 2) {ctx . moveTo (xxx + hg, yyy); ctx . lineTo (xxx, yyy + hy); yyy += yshift + yshift;}
+    ctx . strokeStyle = token . ForegroundColour;
+    ctx . stroke ();
+    if (token . index != null) {
+      yyy = - hy; xxx = 2 - hg;
+      ctx . font = '8px arial'; ctx . textBaseline = 'top';
+      ctx . fillStyle = token . ForegroundColour;
+      vswitch = 0;
+      for (var ind = 0; ind < token . indexing . y; ind ++) {
+        for (var sub = 0; sub < token . indexing . x; sub ++)
+          ctx . fillText (String (sub) . padStart (2, '0') + String (ind) . padStart (2, '0'), xxx + sub * hg2 + vswitch, yyy + ind * yshift);
+        vswitch = vswitch === 0 ? vvswitch : 0;
+      }
+    }
     ctx . addHitRegion ({path: pth, id: token_index});
   };
   var draws = {
     Grid: function (ctx, viewport, token, token_index) {
       switch (token . Side) {
-      case 1: DrawHorizontalHexGrid1 (ctx, viewport, token, token_index); break;
+      case 1: DrawHorizontalHexGrid (ctx, viewport, token, token_index, true); break;
+      case 2: DrawHorizontalHexGrid (ctx, viewport, token, token_index, false); break;
+      case 3: DrawVerticalHexGrid (ctx, viewport, token, token_index, true); break;
+      case 4: DrawVerticalHexGrid (ctx, viewport, token, token_index, false); break;
       default: DrawSquareGrid (ctx, viewport, token, token_index); break;
       }
     },
@@ -237,9 +292,8 @@ function (root, directory) {
         }
         break;
       case 'side':
-        console . log ("I am here!");
         if (selected . length > 0) {
-          for (var ind in selected) selected [ind] . Side += delta;
+          for (var ind in selected) selected [ind] . Side -= delta;
           repaint ();
         }
         break;
