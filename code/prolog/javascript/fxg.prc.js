@@ -22,7 +22,8 @@ function (root, directory) {
   var MoveBy = directory . searchAtom ('MoveBy');
   var repaints = [];
   var images = {};
-  var find_image = function (location) {
+  var find_image = function (token) {
+    var location = token . Text;
     var image = images [location];
     if (image !== undefined) return image;
     image = studio . readResource (location);
@@ -208,12 +209,17 @@ function (root, directory) {
       ctx . stroke ();
       ctx . addHitRegion ({id: token_index});
     },
-    Picture: function (ctx, viewport, token) {
+    Picture: function (ctx, viewport, token, token_index) {
       //var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
+      var image = find_image (token);
       ctx . translate (token . location . position . x, token . location . position . y);
       ctx . rotate (token . Rotation * Math . PI / 12);
       ctx . scale (token . scaling . x, token . scaling . y);
-      ctx . drawImage (find_image (token . Text), 0, 0);
+      ctx . translate (image . width * -0.5, image . height * -0.5);
+      ctx . drawImage (image, 0, 0);
+      var pth = new Path2D ();
+      pth . moveTo (0, 0); pth . lineTo (image . width, 0); pth . lineTo (image . width, image . height); pth . lineTo (0, image . height); pth . closePath ();
+      ctx . addHitRegion ({path: pth, id: token_index});
     }
   };
   var viewport = function (atom, name, x, y, width, height) {
@@ -411,7 +417,7 @@ function (root, directory) {
   };
   var token = function (atom, type) {
     var token = {
-      atom: atom, type: type, location: {position: {x: 0, y: 0}, size: {x: 128, y: 128}},
+      atom: atom, type: type, location: {position: {x: 0, y: 0}, size: type === "Picture" ? null : {x: 128, y: 128}},
       scaling: {x: 1, y: 1}, Rotation: 0,
       indexing: {x: 4, y: 4},
       ForegroundColour: 'white',
@@ -434,7 +440,9 @@ function (root, directory) {
             }
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . position . x = el . left . left; el = el . right;
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . position . y = el . left . left; el = el . right;
-            if (el . type !== 1 || el . left . type !== 6) return true; token . location . size . x = el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return true;
+            if (token . location . size === null) token . location . size = {};
+            token . location . size . x = el . left . left; el = el . right;
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . size . y = el . left . left;
             return true;
           case Position:
@@ -444,7 +452,9 @@ function (root, directory) {
             return true;
           case Size:
             if (el . type === 2) {el = el . setNativePair (token . location . size . x); el . setNativePair (token . location . size . y); return true;}
-            if (el . type !== 1 || el . left . type !== 6) return false; token . location . size . x = el . left . left; el = el . right;
+            if (el . type !== 1 || el . left . type !== 6) return false;
+            if (token . location . size === null) token . location . size = {};
+            token . location . size . x = el . left . left; el = el . right;
             if (el . type === 0) {token . location . size . y = token . location . size . x; return true;}
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . size . y = el . left . left;
             return true;
