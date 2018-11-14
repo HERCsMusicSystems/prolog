@@ -37,6 +37,7 @@ function (root, directory) {
     var xx = token . location . size . x * token . scaling . x, yy = token . location . size . y * token . scaling . y;
     ctx . translate (token . location . position . x, token . location . position . y);
     ctx . rotate (token . Rotation * Math . PI / 12);
+    ctx . translate (token . location . size . x * -0.5, token . location . size . y * -0.5);
     if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fillRect (0, 0, xx * token . indexing . x, yy * token . indexing . y);}
     ctx . beginPath ();
     for (var ind = 0; ind <= token . indexing . x; ind ++) {ctx . moveTo (ind * xx, 0); ctx . lineTo (ind * xx, yy * token . indexing . y);}
@@ -460,6 +461,25 @@ function (root, directory) {
             return true;
           case Position:
             if (el . type === 2) {el = el . setNativePair (token . location . position . x); el . setNativePair (token . location . position . y); return true;}
+            if (el . type === 1 && el . left . type === 3) {
+              var target = el . left . left . machine;
+              if (target !== null) target = target . token;
+              if (target === null) return false;
+              el = el . right;
+              if (el . type !== 1 || el . left . type !== 6) return false;
+              var x = el . left . left; el = el . right;
+              if (el . type !== 1 || el . left . type !== 6) return false;
+              var y = el . left . left;
+              if (token . type === "Grid") {
+                x *= token . location . size . x * token . scaling . x;
+                y *= token . location . size . y * token . scaling . y;
+                var sn = Math . sin (token . Rotation * Math . PI / 12);
+                var cs = Math . cos (token . Rotation * Math . PI / 12);
+                target . location . position . x = token . location . position . x + x * cs - y * sn;
+                target . location . position . y = token . location . position . y + y * cs + x * sn;
+              }
+              return true;
+            }
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . position . x = el . left . left; el = el . right;
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . position . y = el . left . left;
             return true;

@@ -21,6 +21,12 @@ COMMANDS:
 [ForegroundColour (token) (:) *x]
 	token = Viewport, Rectangle, Circle, Picture, Dice, Grid, Text, Deck
 
+[Token token "Type"]             => Creates a token
+	Type = Rectangle, Circle, Picture, Dice, Grid, Text, Deck
+
+
+Token actions:
+
 [picture Index x y]              => X/Y portion of the picture based on Indexing (x/y can be fractions)
 [grid Index x y]                 => Draws indices on grid
 [token Index]                    => Removes Index
