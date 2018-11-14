@@ -314,7 +314,11 @@ function (root, directory) {
         break;
       case 'side':
         if (selected . length > 0) {
-          for (var ind in selected) selected [ind] . Side -= delta;
+          for (var ind in selected) {
+            selected [ind] . Side -= delta;
+            if (selected [ind] . Side < 0) selected [ind] . Side = 0;
+            if (selected [ind] . Side >= selected [ind] . Sides) selected [ind] . Side = selected [ind] . Sides - 1;
+          }
           repaint ();
         }
         break;
@@ -434,8 +438,9 @@ function (root, directory) {
       scaling: {x: 1, y: 1}, Rotation: 0,
       indexing: {x: 4, y: 4},
       ForegroundColour: 'white',
-      Sides: 1, Side: 0
+      Sides: type === "Grid" ? 5 : 1, Side: 0
     };
+    this . token = token;
     structure . tokens . push (token);
     this . code = function (el) {
       if (el . type === 0) {structure . tokens . splice (structure . tokens . indexOf (token), 1); return atom . setMachine (null);}
