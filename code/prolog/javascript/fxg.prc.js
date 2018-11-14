@@ -419,7 +419,7 @@ function (root, directory) {
       if (el . type !== 1) return false;
       var selector = el . left;
       if (selector . type === 2) {selector . setNative (structure [`${colour_type}Colour`]); return true;}
-      if (selector . type === 6) {structure . BackgroundColour = selector . left; return true;}
+      if (selector . type === 6) {structure [`${colour_type}Colour`] = selector . left; return true;}
       if (selector . type !== 3) return false;
       el = el . right; if (el . type === 1) el = el . left;
       if (el . type === 2) {el . setNative (structure [`${selector . left . name}${colour_type}Colour`]); return true;}

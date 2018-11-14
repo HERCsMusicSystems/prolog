@@ -21,7 +21,15 @@ COMMANDS:
 [ForegroundColour (token) (:) *x]
 	token = Viewport, Rectangle, Circle, Picture, Dice, Grid, Text, Deck
 
+[picture Index x y]              => X/Y portion of the picture based on Indexing (x/y can be fractions)
+[grid Index x y]                 => Draws indices on grid
+[token Index]                    => Removes Index
+[picture Index : *x]             => Returns index x/y
+[picture Indexing x y]           => Divides picture into a number of tiles for index
+[grid Indexing x y]              => Determines the size of the grid
+[token Indexing : *x]            => Returns indexing x/y
 
+==================================
 
 [Default***Background/Foreground red green blue (alpha)]    => all integers 0..255, alpha optional defualt = 255
 [Default***Background/Foreground : *x]                      => [red green blue alpha] all integers
