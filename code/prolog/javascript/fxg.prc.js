@@ -49,7 +49,7 @@ function (root, directory) {
       ctx . fillStyle = token . ForegroundColour;
       for (var ind = 0; ind < token . indexing . x; ind ++) {
         for (var sub = 0; sub < token . indexing . y; sub ++)
-          ctx . fillText (String (ind) . padStart (2, '0') + String (sub) . padStart (2, '0'), 2 + ind * xx, 2 + sub * yy);
+          ctx . fillText (String (ind + token . index . x) . padStart (2, '0') + String (sub + token . index . y) . padStart (2, '0'), 2 + ind * xx, 2 + sub * yy);
       }
     }
     var pth = new Path2D ();
@@ -115,7 +115,7 @@ function (root, directory) {
       vswitch = 0;
       for (var ind = 0; ind < token . indexing . x; ind ++) {
         for (var sub = 0; sub < token . indexing . y; sub ++)
-          ctx . fillText (String (ind) . padStart (2, '0') + String (sub) . padStart (2, '0'), xxx + ind * hshift, yyy + sub * hg2 + vswitch);
+          ctx . fillText (String (ind + token . index . x) . padStart (2, '0') + String (sub + token . index . y) . padStart (2, '0'), xxx + ind * hshift, yyy + sub * hg2 + vswitch);
         vswitch = vswitch === 0 ? vvswitch : 0;
       }
     }
@@ -174,7 +174,7 @@ function (root, directory) {
       vswitch = 0;
       for (var ind = 0; ind < token . indexing . y; ind ++) {
         for (var sub = 0; sub < token . indexing . x; sub ++)
-          ctx . fillText (String (sub) . padStart (2, '0') + String (ind) . padStart (2, '0'), xxx + sub * hg2 + vswitch, yyy + ind * yshift);
+          ctx . fillText (String (sub + token . index . x) . padStart (2, '0') + String (ind + token . index . y) . padStart (2, '0'), xxx + sub * hg2 + vswitch, yyy + ind * yshift);
         vswitch = vswitch === 0 ? vvswitch : 0;
       }
     }
@@ -432,6 +432,15 @@ function (root, directory) {
       return false;
     }
   };
+  var grid_token_position = function (grid, token, x, y) {
+    if (grid . index != null) {x -= grid . index . x; y -= grid . index . y;}
+    x *= grid . location . size . x * grid . scaling . x;
+    y *= grid . location . size . y * grid . scaling . y;
+    var sn = Math . sin (grid . Rotation * Math . PI / 12);
+    var cs = Math . cos (grid . Rotation * Math . PI / 12);
+    token . location . position . x = grid . location . position . x + x * cs - y * sn;
+    token . location . position . y = grid . location . position . y + y * cs + x * sn;
+  };
   var token = function (atom, type) {
     var token = {
       atom: atom, type: type, location: {position: {x: 0, y: 0}, size: type === "Picture" ? null : {x: 128, y: 128}},
@@ -475,14 +484,8 @@ function (root, directory) {
               var x = el . left . left; el = el . right;
               if (el . type !== 1 || el . left . type !== 6) return false;
               var y = el . left . left;
-              if (token . type === "Grid") {
-                x *= token . location . size . x * token . scaling . x;
-                y *= token . location . size . y * token . scaling . y;
-                var sn = Math . sin (token . Rotation * Math . PI / 12);
-                var cs = Math . cos (token . Rotation * Math . PI / 12);
-                target . location . position . x = token . location . position . x + x * cs - y * sn;
-                target . location . position . y = token . location . position . y + y * cs + x * sn;
-              }
+              if (token . type === "Grid") grid_token_position (token, target, x, y);
+              else if (target . type === "Grid") grid_token_position (target, token, x, y);
               return true;
             }
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . position . x = el . left . left; el = el . right;

@@ -34,6 +34,8 @@ Token actions:
 [picture Indexing x y]           => Divides picture into a number of tiles for index
 [grid Indexing x y]              => Determines the size of the grid
 [token Indexing : *x]            => Returns indexing x/y
+[grid Position token x y]        => Position token on grid
+[token Position grid x y]
 
 ==================================
 
