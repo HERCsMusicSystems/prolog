@@ -219,7 +219,16 @@ function (root, directory) {
       ctx . scale (token . scaling . x, token . scaling . y);
       var width = token . location . size . x, height = token . location . size .y;
       ctx . translate (width * -0.5, height * -0.5);
-      ctx . drawImage (image, 0, 0, width, height);
+      if (token . index === undefined) {
+        if (token . Sides === 1) ctx . drawImage (image, 0, 0, width, height);
+        else {
+          var fraction = image . height / token . Sides;
+          ctx . drawImage (image, 0, fraction * token . Side, image . width, fraction, 0, 0, width, height);
+        }
+      } else {
+        var fraction_x = image . width / token . indexing . x, fraction_y = image . height / token . indexing . y;
+        ctx . drawImage (image, fraction_x * token . index . x, fraction_y * token . index . y, fraction_x, fraction_y, 0, 0, width, height);
+      }
       var pth = new Path2D ();
       pth . moveTo (0, 0); pth . lineTo (width, 0); pth . lineTo (width, height); pth . lineTo (0, height); pth . closePath ();
       ctx . addHitRegion ({path: pth, id: token_index});
