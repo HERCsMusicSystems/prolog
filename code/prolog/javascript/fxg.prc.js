@@ -27,8 +27,10 @@ function (root, directory) {
     var image = images [location];
     if (image !== undefined) return image;
     image = studio . readResource (location);
-    if (image !== null) {images [location] = image; return image;}
-    image = new Image (); image . src = location; images [location] = image;
+    if (image === null) {image = new Image (); image . src = location;}
+    if (image === null) return null;
+    images [location] = image;
+    if (token . location . size === null) token . location . size = {x: image . width, y: image . height};
     return image;
   };
   var DrawSquareGrid = function (ctx, viewport, token, token_index) {
@@ -215,10 +217,11 @@ function (root, directory) {
       ctx . translate (token . location . position . x, token . location . position . y);
       ctx . rotate (token . Rotation * Math . PI / 12);
       ctx . scale (token . scaling . x, token . scaling . y);
-      ctx . translate (image . width * -0.5, image . height * -0.5);
-      ctx . drawImage (image, 0, 0);
+      var width = token . location . size . x, height = token . location . size .y;
+      ctx . translate (width * -0.5, height * -0.5);
+      ctx . drawImage (image, 0, 0, width, height);
       var pth = new Path2D ();
-      pth . moveTo (0, 0); pth . lineTo (image . width, 0); pth . lineTo (image . width, image . height); pth . lineTo (0, image . height); pth . closePath ();
+      pth . moveTo (0, 0); pth . lineTo (width, 0); pth . lineTo (width, height); pth . lineTo (0, height); pth . closePath ();
       ctx . addHitRegion ({path: pth, id: token_index});
     }
   };
@@ -421,7 +424,7 @@ function (root, directory) {
       scaling: {x: 1, y: 1}, Rotation: 0,
       indexing: {x: 4, y: 4},
       ForegroundColour: 'white',
-      Side: 0
+      Sides: 1, Side: 0
     };
     structure . tokens . push (token);
     this . code = function (el) {
@@ -434,6 +437,7 @@ function (root, directory) {
             if (el . type === 2) {
               el = el . setNativePair (token . location . position . x);
               el = el . setNativePair (token . location . position . y);
+              if (token . location . size === null) return true;
               el = el . setNativePair (token . location . size . x);
               el . setNativePair (token . location . size . y);
               return true;
