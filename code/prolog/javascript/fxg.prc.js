@@ -20,6 +20,7 @@ function (root, directory) {
   var Repaint = directory . searchAtom ('Repaint');
   var RotateBy = directory . searchAtom ('RotateBy');
   var MoveBy = directory . searchAtom ('MoveBy');
+  var Deck = directory . searchAtom ('Deck');
   var repaints = [];
   var images = {};
   var find_image = function (token) {
@@ -58,7 +59,7 @@ function (root, directory) {
     pth . lineTo (token . indexing . x * xx, token . indexing . y * yy);
     pth . lineTo (0, token . indexing . y * yy);
     pth . closePath ();
-    ctx . addHitRegion ({path: pth, id: token_index});
+    if (token_index !== null) ctx . addHitRegion ({path: pth, id: token_index});
   };
   var h = Math . sqrt (3) * 0.5;
   var DrawHorizontalHexGrid = function (ctx, viewport, token, token_index, direction) {
@@ -119,7 +120,7 @@ function (root, directory) {
         vswitch = vswitch === 0 ? vvswitch : 0;
       }
     }
-    ctx . addHitRegion ({path: pth, id: token_index});
+    if (token_index !== null) ctx . addHitRegion ({path: pth, id: token_index});
   };
   var DrawVerticalHexGrid = function (ctx, viewport, token, token_index, direction) {
     var yy = token . location . size . y * token . scaling . y * 0.5, xx = token . location . size . x * token . scaling . x * 0.5;
@@ -178,7 +179,7 @@ function (root, directory) {
         vswitch = vswitch === 0 ? vvswitch : 0;
       }
     }
-    ctx . addHitRegion ({path: pth, id: token_index});
+    if (token_index !== null) ctx . addHitRegion ({path: pth, id: token_index});
   };
   var draws = {
     Grid: function (ctx, viewport, token, token_index) {
@@ -199,7 +200,7 @@ function (root, directory) {
       if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill ();}
       ctx . strokeStyle = token . ForegroundColour;
       ctx . stroke ();
-      ctx . addHitRegion ({id: token_index});
+      if (token_index !== null) ctx . addHitRegion ({id: token_index});
     },
     Circle: function (ctx, viewport, token, token_index) {
       var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
@@ -210,7 +211,7 @@ function (root, directory) {
       if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill ();}
       ctx . strokeStyle = token . ForegroundColour;
       ctx . stroke ();
-      ctx . addHitRegion ({id: token_index});
+      if (token_index !== null) ctx . addHitRegion ({id: token_index});
     },
     Picture: function (ctx, viewport, token, token_index) {
       //var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
@@ -232,7 +233,7 @@ function (root, directory) {
       }
       var pth = new Path2D ();
       pth . moveTo (0, 0); pth . lineTo (width, 0); pth . lineTo (width, height); pth . lineTo (0, height); pth . closePath ();
-      ctx . addHitRegion ({path: pth, id: token_index});
+      if (token_index !== null) ctx . addHitRegion ({path: pth, id: token_index});
     }
   };
   var viewport = function (atom, name, x, y, width, height) {
@@ -264,17 +265,38 @@ function (root, directory) {
     div . appendChild (content);
     div . appendChild (info);
     div . style . position = 'absolute'; div . style . top = viewport . location . y; div . style . left = viewport . location . x;
+    var selected = [];
     var repaint = function () {
+      ctx . clearHitRegions ();
       ctx . fillStyle = viewport . BackgroundColour || structure . BackgroundColour;
       ctx . clearRect (0, 0, viewport . size . x, viewport . size . y);
       ctx . fillRect (0, 0, viewport . size . x, viewport . size . y);
       ctx . save ();
       ctx . scale (viewport . scaling . x, viewport . scaling . y);
       ctx . translate (- viewport . position . x, - viewport . position . y);
-      for (var ind in structure . tokens) {ctx . save (); draws [structure . tokens [ind] . type] (ctx, viewport, structure . tokens [ind], ind); ctx . restore ();}
+      for (var ind in structure . tokens) {
+        ctx . save ();
+        var index = selected . indexOf (structure . tokens [ind]) >= 0 ? null : ind;
+        draws [structure . tokens [ind] . type] (ctx, viewport, structure . tokens [ind], index);
+        ctx . restore ();}
       ctx . restore ();
     };
-    var mouseup = function (e) {document . onmouseup = null; document . onmousemove = null;};
+    var mouseup = function (e) {
+      document . onmouseup = null; document . onmousemove = null;
+      if (viewport . Mode === 'select' && e . region . length > 0) {
+        var ind = Number (e . region);
+        var deck = structure . tokens [ind];
+        if (deck != null && deck . deck !== undefined) {
+          for (var sub in selected) {
+            if (deck !== selected [sub]) {
+              structure . tokens . splice (structure . tokens . indexOf (selected [sub]), 1);
+              deck . deck . push (selected [sub]);
+            }
+          }
+        }
+      }
+      selected = []; repaint ();
+    };
     var mousemove = function (e) {
       viewport . location . x += e . movementX; viewport . location . y += e . movementY;
       div . style . top = viewport . location . y; div . style . left = viewport . location . x;
@@ -284,7 +306,6 @@ function (root, directory) {
       content . width = viewport . size . x; content . height = viewport . size . y;
       repaint ();
     };
-    var selected = [];
     var canvas_move = function (e) {
       switch (viewport . Mode) {
       case 'move': viewport . position . x -= e . movementX; viewport . position . y -= e . movementY; repaint (); break;
@@ -346,7 +367,6 @@ function (root, directory) {
         repaint ();
       }
     };
-    content . onmouseup = function (e) {selected = [];};
     repaint ();
     repaints . push (repaint);
     this . code = function (el) {
@@ -526,6 +546,7 @@ function (root, directory) {
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . position . x += el . left . left; el = el . right;
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . position . y += el . left . left;
             return true;
+          case Deck: if (token . deck === undefined) token . deck = []; return true;
           default:
             if (el . type === 1) el = el . left;
             if (el . type === 2) {if (! token [selector . left . name]) return false; el . setNative (token [selector . left . name]); return true;}
