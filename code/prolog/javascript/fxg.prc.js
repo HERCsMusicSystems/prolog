@@ -263,6 +263,13 @@ function (root, directory) {
     radio_select . onmousedown = function () {viewport . Mode = 'select';}; info . appendChild (radio_select);
     var radio_move = document . createElement ('input'); radio_move . type = 'radio'; radio_move . name = `${atom . name}@mode`; radio_move . checked = true; radio_move . style . float = 'right';
     radio_move . onmousedown = function () {viewport . Mode = 'move';}; info . appendChild (radio_move);
+    var save_button = document . createElement ('input'); save_button . type = 'button'; save_button . value = 'SAVE'; save_button . style . float = 'right';
+    save_button . onmousedown = function () {
+      var location = prompt ('File Name:');
+      if (location == null) return;
+      studio . writeFile (location, JSON . stringify (structure));
+    };
+    info . appendChild (save_button);
     var div = document . createElement ('div');
     var mode = 'navigate';
     div . appendChild (bar);
@@ -613,6 +620,15 @@ function (root, directory) {
       return atom . left . setMachine (new token (atom . left . name, type));
     }
   };
+  var SaveBoard = {
+    code: function (el) {
+      if (el . type !== 1) return false;
+      el = el . left;
+      if (el . type !== 6) return false;
+      studio . writeFile (el . left, JSON . stringify (structure));
+      return true;
+    }
+  };
   this . getNativeCode = function (name) {
     switch (name) {
       case 'Viewport': return Viewport;
@@ -620,6 +636,7 @@ function (root, directory) {
       case 'ForegroundColour': return new ColourFunction ('Foreground');
       case 'Token': return Token;
       case 'Repaint': return {code: function (el) {for (var ind in repaints) repaints [ind] (); return true;}};
+      case 'SaveBoard': return SaveBoard;
       default: break;
     }
     return null;
@@ -637,6 +654,7 @@ program fxg #machine := 'prolog . fxg'
     Location Position Size Scaling Rotation Side Sides Text Index Indexing Mode
     RotateBy MoveBy Release ReleaseRandom Shuffle
     BackgroundColour ForegroundColour
+    SaveBoard
     Repaint
   ]
 
@@ -645,6 +663,7 @@ program fxg #machine := 'prolog . fxg'
 #machine ForegroundColour := 'ForegroundColour'
 #machine Token := 'Token'
 #machine Repaint := 'Repaint'
+#machine SaveBoard := 'SaveBoard'
 
 end .
 `);
