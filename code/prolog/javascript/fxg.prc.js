@@ -293,6 +293,7 @@ function (root, directory) {
       ctx . restore ();
     };
     var for_double_click = null;
+    document . oncontextmenu = function (e) {return false;};
     var mouseup = function (e) {
       document . onmouseup = null; document . onmousemove = null;
       if (viewport . Mode === 'select' && e . region . length > 0) {
@@ -391,6 +392,7 @@ function (root, directory) {
         structure . tokens . splice (ind, 1);
         structure . tokens . push (token);
         selected . push (token);
+        if (token . deck != null && e . which > 1) {if (confirm (`Shuffle deck [${token . atom}] ?`)) studio . random_permutation (token . deck);}
         repaint ();
       }
     };
