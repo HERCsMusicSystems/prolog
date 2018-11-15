@@ -24,6 +24,7 @@ function (root, directory) {
   var Release = directory . searchAtom ('Release');
   var ReleaseRandom = directory . searchAtom ('ReleaseRandom');
   var Shuffle = directory . searchAtom ('Shuffle');
+  var Insert = directory . searchAtom ('Insert');
   var repaints = [];
   var images = {};
   var atoms = [];
@@ -392,7 +393,17 @@ function (root, directory) {
         structure . tokens . splice (ind, 1);
         structure . tokens . push (token);
         selected . push (token);
-        if (token . deck != null && e . which > 1) {if (confirm (`Shuffle deck [${token . atom}] ?`)) studio . random_permutation (token . deck);}
+        if (token . deck != null && e . which > 1) {
+          if (confirm (`Shuffle deck [${token . atom}] ?`)) studio . random_permutation (token . deck);
+          else {
+            var target = studio . random_pop (token . deck);
+            if (target != null) {
+              target . location . position . x = token . location . position . x;
+              target . location . position . y = token . location . position . y;
+              structure . tokens . push (target);
+            }
+          }
+        }
         repaint ();
       }
     };
@@ -589,12 +600,37 @@ function (root, directory) {
             target . location . position . y = token . location . position . y;
             structure . tokens . push (target);
             if (el . type === 1) el = el . left;
-            if (el . type === 2) {for (var ind in atoms) {if (atoms [ind] . machine . token === target) {el . setAtom (atoms [ind]); return true;}}}
+            if (el . type === 2) {for (var ind in atoms) {if (atoms [ind] . machine !== null && atoms [ind] . machine . token === target) {el . setAtom (atoms [ind]); return true;}}}
             return true;
           case Shuffle:
             if (token . deck !== undefined) {studio . random_permutation (token . deck); return true;}
             if (token . Sides > 1) token . Side = Math . floor (Math . random () * token . Sides);
             if (el . type === 1) el = el . left; if (el . type === 2) el . setNative (token . Side);
+            return true;
+          case Insert:
+            if (token . deck !== undefined) {
+              while (el . type === 1) {
+                var target = el . left;
+                if (target . type === 3) {
+                  target = target . left;
+                  target = target && target . machine && target . machine . token;
+                  if (! target) return false;
+                  var index = structure . tokens . indexOf (target);
+                  if (index < 0) return false;
+                  structure . tokens . splice (index, 1);
+                  token . deck . push (target);
+                }
+                el = el . right;
+              }
+              return true;
+            }
+            if (el . type === 1) el = el . left; if (el . type !== 3) return false;
+            var target = el . left;
+            target = target && target . machine && target . machine . token && target . machine . token . deck;
+            if (! target) return false;
+            var index = structure . tokens . indexOf (token); if (index < 0) return false;
+            structure . tokens . splice (index, 1);
+            target . push (token);
             return true;
           default:
             if (el . type === 1) el = el . left;
@@ -654,7 +690,7 @@ program fxg #machine := 'prolog . fxg'
     Viewport
     Token Rectangle Circle Picture Dice Grid Text Deck
     Location Position Size Scaling Rotation Side Sides Text Index Indexing Mode
-    RotateBy MoveBy Release ReleaseRandom Shuffle
+    RotateBy MoveBy Release ReleaseRandom Shuffle Insert
     BackgroundColour ForegroundColour
     SaveBoard
     Repaint

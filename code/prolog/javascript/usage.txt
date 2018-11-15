@@ -36,6 +36,13 @@ Token actions:
 [token Indexing : *x]            => Returns indexing x/y
 [grid Position token x y]        => Position token on grid
 [token Position grid x y]
+[token Deck]                     => Extends token by adding deck functionality (adds deck inside)
+[deck Release (: *x)]            => Release from top of the deck (and possibly return)
+[deck ReleaseRandom (: *x)]      => Release random from deck (and possibly return)
+[deck Insert token ....]         => Inserts token(s) into deck
+[token Insert deck]
+
+[SaveBoard]                      => Saves the board
 
 ==================================
 
