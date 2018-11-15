@@ -21,8 +21,12 @@ function (root, directory) {
   var RotateBy = directory . searchAtom ('RotateBy');
   var MoveBy = directory . searchAtom ('MoveBy');
   var Deck = directory . searchAtom ('Deck');
+  var Release = directory . searchAtom ('Release');
+  var ReleaseRandom = directory . searchAtom ('ReleaseRandom');
+  var Shuffle = directory . searchAtom ('Shuffle');
   var repaints = [];
   var images = {};
+  var atoms = [];
   var find_image = function (token) {
     var location = token . Text;
     var image = images [location];
@@ -281,6 +285,7 @@ function (root, directory) {
         ctx . restore ();}
       ctx . restore ();
     };
+    var for_double_click = null;
     var mouseup = function (e) {
       document . onmouseup = null; document . onmousemove = null;
       if (viewport . Mode === 'select' && e . region . length > 0) {
@@ -295,6 +300,7 @@ function (root, directory) {
           }
         }
       }
+      for_double_click = selected;
       selected = []; repaint ();
     };
     var mousemove = function (e) {
@@ -356,7 +362,21 @@ function (root, directory) {
       return atom . setMachine (null);
     };
     close . onmousedown = function (e) {remove_viewport ();};
+    content . ondblclick = function (e) {
+      if (for_double_click === null) return;
+      for (var ind in for_double_click) {
+        if (for_double_click [ind] . deck != null) {
+          var target = for_double_click [ind] . deck . pop ();
+          if (target == null) return;
+          target . location . position . x = for_double_click [ind] . location . position . x;
+          target . location . position . y = for_double_click [ind] . location . position . y;
+          structure . tokens . push (target);
+        }
+      }
+      repaint ();
+    };
     content . onmousedown = function (e) {
+      e . preventDefault ();
       document . onmouseup = mouseup; document . onmousemove = canvas_move;
       if (e . region . length > 0) {
         var ind = Number (e . region);
@@ -472,10 +492,15 @@ function (root, directory) {
     this . token = token;
     structure . tokens . push (token);
     this . code = function (el) {
-      if (el . type === 0) {structure . tokens . splice (structure . tokens . indexOf (token), 1); return atom . setMachine (null);}
+      if (el . type === 0) {
+        structure . tokens . splice (structure . tokens . indexOf (token), 1);
+        atoms . splice (atoms . indexOf (atom), 1);
+        return atom . setMachine (null);
+      }
       if (el . type !== 1) return false;
       var selector = el . left; el = el . right;
       if (selector . type === 3) {
+        var random_pop = false;
         switch (selector . left) {
           case Location:
             if (el . type === 2) {
@@ -547,6 +572,21 @@ function (root, directory) {
             if (el . type !== 1 || el . left . type !== 6) return false; token . location . position . y += el . left . left;
             return true;
           case Deck: if (token . deck === undefined) token . deck = []; return true;
+          case ReleaseRandom: random_pop = true;
+          case Release:
+            if (token . deck === undefined || token . deck . length < 1) return false;
+            var target = random_pop ? studio . random_pop (token . deck) : token . deck . pop ();
+            target . location . position . x = token . location . position . x;
+            target . location . position . y = token . location . position . y;
+            structure . tokens . push (target);
+            if (el . type === 1) el = el . left;
+            if (el . type === 2) {for (var ind in atoms) {if (atoms [ind] . machine . token === target) {el . setAtom (atoms [ind]); return true;}}}
+            return true;
+          case Shuffle:
+            if (token . deck !== undefined) {studio . random_permutation (token . deck); return true;}
+            if (token . Sides > 1) token . Side = Math . floor (Math . random () * token . Sides);
+            if (el . type === 1) el = el . left; if (el . type === 2) el . setNative (token . Side);
+            return true;
           default:
             if (el . type === 1) el = el . left;
             if (el . type === 2) {if (! token [selector . left . name]) return false; el . setNative (token [selector . left . name]); return true;}
@@ -569,6 +609,7 @@ function (root, directory) {
       if (atom === null || type === null) return false;
       if (atom . type === 2) atom . setAtom (new prolog . Atom ());
       if (atom . left . machine !== null) return false;
+      atoms . push (atom . left);
       return atom . left . setMachine (new token (atom . left . name, type));
     }
   };
@@ -594,7 +635,7 @@ program fxg #machine := 'prolog . fxg'
     Viewport
     Token Rectangle Circle Picture Dice Grid Text Deck
     Location Position Size Scaling Rotation Side Sides Text Index Indexing Mode
-    RotateBy MoveBy
+    RotateBy MoveBy Release ReleaseRandom Shuffle
     BackgroundColour ForegroundColour
     Repaint
   ]

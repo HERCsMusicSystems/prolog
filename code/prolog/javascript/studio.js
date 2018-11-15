@@ -139,4 +139,11 @@ this . random_permutation = function (a) {
 	return a;
 };
 
+this . random_pop = function (a) {
+	var ind = Math . floor (Math . random () * a . length);
+	var e = a [ind];
+	a . splice (ind, 1);
+	return e;
+};
+
 };
