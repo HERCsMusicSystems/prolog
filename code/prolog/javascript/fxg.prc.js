@@ -25,6 +25,7 @@ function (root, directory) {
   var ReleaseRandom = directory . searchAtom ('ReleaseRandom');
   var Shuffle = directory . searchAtom ('Shuffle');
   var Insert = directory . searchAtom ('Insert');
+  var Side = directory . searchAtom ('Side');
   var repaints = [];
   var images = {};
   var atoms = [];
@@ -187,6 +188,59 @@ function (root, directory) {
     }
     if (token_index !== null) ctx . addHitRegion ({path: pth, id: token_index});
   };
+  var DrawRoundedRectangle = function (ctx, w, h, rx, ry) {
+    ctx . moveTo (- w, - h + ry); ctx . ellipse (- w + rx, - h + ry, rx, ry, 0, Math . PI, Math . PI * 1.5);
+    ctx . lineTo (w - rx, - h); ctx . ellipse (w - rx, - h + ry, rx, ry, 0, Math . PI * 1.5, Math . PI * 2);
+    ctx . lineTo (w, h - ry); ctx . ellipse (w - rx, h - ry, rx, ry, 0, 0, Math . PI * 0.5);
+    ctx . lineTo (- w + rx, h); ctx . ellipse (- w + rx, h - ry, rx, ry, 0, Math . PI * 0.5, Math . PI); ctx . closePath ();
+  };
+  var DrawDice = function (ctx, viewport, token, token_index) {
+    var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
+    ctx . translate (token . location . position . x, token . location . position . y);
+    ctx . rotate (token . Rotation * Math . PI / 12);
+    ctx . beginPath (); DrawRoundedRectangle (ctx, hw, hh, token . indexing . x, token . indexing . y);
+    if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill ();}
+    ctx . strokeStyle = token . ForegroundColour;
+    ctx . stroke ();
+    if (token_index !== null) ctx . addHitRegion ({id: token_index});
+    var sx = token . location . size . x, sy = token . location . size . y;
+    var radius = (sx + sy) * 0.0625; sx *= 0.28; sy *= 0.28;
+    ctx . fillStyle = ctx . strokeStyle;
+    switch (token . Side) {
+      case 0: ctx . beginPath (); ctx . arc (0, 0, radius, 0, Math . PI * 2); ctx . fill (); break;
+      case 1:
+        ctx . beginPath (); ctx . arc (sx, - sy, radius, 0, Math . PI * 2); ctx . fill ();
+        ctx . beginPath (); ctx . arc (- sx, sy, radius, 0, Math . PI * 2); ctx . fill ();
+        break;
+      case 2:
+        ctx . beginPath (); ctx . arc (0, 0, radius, 0, Math . PI * 2); ctx . fill ();
+        ctx . beginPath (); ctx . arc (sx, - sy, radius, 0, Math . PI * 2); ctx . fill ();
+        ctx . beginPath (); ctx . arc (- sx, sy, radius, 0, Math . PI * 2); ctx . fill ();
+        break;
+      case 3:
+        ctx . beginPath (); ctx . arc (sx, - sy, radius, 0, Math . PI * 2); ctx . fill ();
+        ctx . beginPath (); ctx . arc (- sx, sy, radius, 0, Math . PI * 2); ctx . fill ();
+        ctx . beginPath (); ctx . arc (sx, sy, radius, 0, Math . PI * 2); ctx . fill ();
+        ctx . beginPath (); ctx . arc (- sx, - sy, radius, 0, Math . PI * 2); ctx . fill ();
+        break;
+      case 4:
+        ctx . beginPath (); ctx . arc (0, 0, radius, 0, Math . PI * 2); ctx . fill ();
+        ctx . beginPath (); ctx . arc (sx, - sy, radius, 0, Math . PI * 2); ctx . fill ();
+        ctx . beginPath (); ctx . arc (- sx, sy, radius, 0, Math . PI * 2); ctx . fill ();
+        ctx . beginPath (); ctx . arc (sx, sy, radius, 0, Math . PI * 2); ctx . fill ();
+        ctx . beginPath (); ctx . arc (- sx, - sy, radius, 0, Math . PI * 2); ctx . fill ();
+        break;
+      case 5:
+        ctx . beginPath (); ctx . arc (sx, 0, radius, 0, Math . PI * 2); ctx . fill ();
+        ctx . beginPath (); ctx . arc (- sx, 0, radius, 0, Math . PI * 2); ctx . fill ();
+        ctx . beginPath (); ctx . arc (sx, - sy, radius, 0, Math . PI * 2); ctx . fill ();
+        ctx . beginPath (); ctx . arc (- sx, sy, radius, 0, Math . PI * 2); ctx . fill ();
+        ctx . beginPath (); ctx . arc (sx, sy, radius, 0, Math . PI * 2); ctx . fill ();
+        ctx . beginPath (); ctx . arc (- sx, - sy, radius, 0, Math . PI * 2); ctx . fill ();
+        break;
+      default: break;
+    }
+  };
   var draws = {
     Grid: function (ctx, viewport, token, token_index) {
       switch (token . Side) {
@@ -240,6 +294,12 @@ function (root, directory) {
       var pth = new Path2D ();
       pth . moveTo (0, 0); pth . lineTo (width, 0); pth . lineTo (width, height); pth . lineTo (0, height); pth . closePath ();
       if (token_index !== null) ctx . addHitRegion ({path: pth, id: token_index});
+    },
+    Dice: function (ctx, viewport, token, token_index) {
+      switch (token . Sides) {
+        case 1: DrawDice (ctx, viewport, token, token_index); break;
+        default: DrawDice (ctx, viewport, token, token_index); break;
+      }
     }
   };
   var viewport = function (atom, name, x, y, width, height) {
@@ -376,6 +436,7 @@ function (root, directory) {
     content . ondblclick = function (e) {
       if (for_double_click === null) return;
       for (var ind in for_double_click) {
+        if (for_double_click [ind] . type === 'Dice') for_double_click [ind] . Side = Math . floor (Math . random () * for_double_click [ind] . Sides);
         if (for_double_click [ind] . deck != null) {
           var target = for_double_click [ind] . deck . pop ();
           if (target == null) return;
@@ -395,6 +456,7 @@ function (root, directory) {
         structure . tokens . splice (ind, 1);
         structure . tokens . push (token);
         selected . push (token);
+        if (token . type === 'Dice' && e . which > 1) token . Side = Math . floor (Math . random () * token . Sides);
         if (token . deck != null && e . which > 1) {
           if (confirm (`Shuffle deck [${token . atom}] ?`)) studio . random_permutation (token . deck);
           else {
@@ -507,9 +569,10 @@ function (root, directory) {
     var token = {
       atom: atom, type: type, location: {position: {x: 0, y: 0}, size: type === "Picture" ? null : {x: 128, y: 128}},
       scaling: {x: 1, y: 1}, Rotation: 0,
-      indexing: {x: 4, y: 4},
+      indexing: type === "Dice" ? {x: 16, y: 16} : {x: 4, y: 4},
       ForegroundColour: 'white',
-      Sides: type === "Grid" ? 5 : 1, Side: 0
+      Sides: type === "Grid" ? 5 : type === "Dice" ? 6 : 1, Side: 0,
+      Shift: type === "Dice" ? 1 : 0, Multiplier: 1
     };
     this . token = token;
     structure . tokens . push (token);
@@ -634,6 +697,10 @@ function (root, directory) {
             structure . tokens . splice (index, 1);
             target . push (token);
             return true;
+          case Side:
+            if (el . type === 1) el = el . left;
+            if (el . type === 2) {el . setNative (token . Side + token . Shift); return true;}
+            if (el . type === 6) {token . Side = el . left - token . Shift; return true;}
           default:
             if (el . type === 1) el = el . left;
             if (el . type === 2) {if (! token [selector . left . name]) return false; el . setNative (token [selector . left . name]); return true;}
