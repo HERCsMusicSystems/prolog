@@ -669,11 +669,17 @@ function (root, directory) {
       return true;
     }
   };
+  var EraseBoard = {
+    code: function (el) {
+      for (var ind in atoms) atoms [ind] . setMachine (null);
+      atoms = []; structure . tokens = [];
+      return true;
+    }
+  };
   var Erase = {
     code: function (el) {
       for (var ind in atoms) atoms [ind] . setMachine (null);
-      atoms = [];
-      structure . tokens = [];
+      atoms = []; structure . tokens = [];
       for (var ind in viewport_removers) viewport_removers [ind] ();
       viewport_removers = [];
       return true;
@@ -688,6 +694,7 @@ function (root, directory) {
       case 'Repaint': return {code: function (el) {for (var ind in repaints) repaints [ind] (); return true;}};
       case 'SaveBoard': return SaveBoard;
       case 'Erase': return Erase;
+      case 'EraseBoard': return EraseBoard;
       default: break;
     }
     return null;
@@ -705,7 +712,7 @@ program fxg #machine := 'prolog . fxg'
     Location Position Size Scaling Rotation Side Sides Text Index Indexing Mode
     RotateBy MoveBy Release ReleaseRandom Shuffle Insert
     BackgroundColour ForegroundColour
-    SaveBoard Erase
+    SaveBoard EraseBoard Erase
     Repaint
   ]
 
@@ -715,6 +722,7 @@ program fxg #machine := 'prolog . fxg'
 #machine Token := 'Token'
 #machine Repaint := 'Repaint'
 #machine SaveBoard := 'SaveBoard'
+#machine EraseBoard := 'EraseBoard'
 #machine Erase := 'Erase'
 
 end .
