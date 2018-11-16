@@ -28,6 +28,7 @@ function (root, directory) {
   var repaints = [];
   var images = {};
   var atoms = [];
+  var viewport_removers = [];
   var find_image = function (token) {
     var location = token . Text;
     var image = images [location];
@@ -370,6 +371,7 @@ function (root, directory) {
       structure . viewports . splice (structure . viewports . indexOf (viewport, 1));
       return atom . setMachine (null);
     };
+    viewport_removers . push (remove_viewport);
     close . onmousedown = function (e) {remove_viewport ();};
     content . ondblclick = function (e) {
       if (for_double_click === null) return;
@@ -667,6 +669,16 @@ function (root, directory) {
       return true;
     }
   };
+  var Erase = {
+    code: function (el) {
+      for (var ind in atoms) atoms [ind] . setMachine (null);
+      atoms = [];
+      structure . tokens = [];
+      for (var ind in viewport_removers) viewport_removers [ind] ();
+      viewport_removers = [];
+      return true;
+    }
+  };
   this . getNativeCode = function (name) {
     switch (name) {
       case 'Viewport': return Viewport;
@@ -675,6 +687,7 @@ function (root, directory) {
       case 'Token': return Token;
       case 'Repaint': return {code: function (el) {for (var ind in repaints) repaints [ind] (); return true;}};
       case 'SaveBoard': return SaveBoard;
+      case 'Erase': return Erase;
       default: break;
     }
     return null;
@@ -692,7 +705,7 @@ program fxg #machine := 'prolog . fxg'
     Location Position Size Scaling Rotation Side Sides Text Index Indexing Mode
     RotateBy MoveBy Release ReleaseRandom Shuffle Insert
     BackgroundColour ForegroundColour
-    SaveBoard
+    SaveBoard Erase
     Repaint
   ]
 
@@ -702,6 +715,7 @@ program fxg #machine := 'prolog . fxg'
 #machine Token := 'Token'
 #machine Repaint := 'Repaint'
 #machine SaveBoard := 'SaveBoard'
+#machine Erase := 'Erase'
 
 end .
 `);

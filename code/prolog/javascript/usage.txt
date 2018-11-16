@@ -43,6 +43,7 @@ Token actions:
 [token Insert deck]
 
 [SaveBoard]                      => Saves the board
+[Erase]                          => Erase all tokens and all views
 
 ==================================
 
