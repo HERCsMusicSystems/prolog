@@ -669,19 +669,19 @@ function (root, directory) {
       return true;
     }
   };
-  var EraseBoard = {
+  var erase_board = function () {for (var ind in atoms) atoms [ind] . setMachine (null); atoms = []; structure . tokens = [];};
+  var erase = function () {erase_board (); for (var ind in viewport_removers) viewport_removers [ind] (); viewport_removers = [];};
+  var EraseBoard = {code: function (el) {erase_board (); return true;}};
+  var Erase = {code: function (el) {erase (); return true;}};
+  var LoadBoard = {
     code: function (el) {
-      for (var ind in atoms) atoms [ind] . setMachine (null);
-      atoms = []; structure . tokens = [];
-      return true;
-    }
-  };
-  var Erase = {
-    code: function (el) {
-      for (var ind in atoms) atoms [ind] . setMachine (null);
-      atoms = []; structure . tokens = [];
-      for (var ind in viewport_removers) viewport_removers [ind] ();
-      viewport_removers = [];
+      if (el . type === 1) el = el . left; if (el . type !== 6) return false;
+      var loaded = studio . readFile (el . left);
+      if (! loaded) return false;
+      try {loaded = JSON . parse (loaded);} catch (e) {return false;}
+      erase ();
+      structure = loaded;
+      str = structure;
       return true;
     }
   };
@@ -695,6 +695,7 @@ function (root, directory) {
       case 'SaveBoard': return SaveBoard;
       case 'Erase': return Erase;
       case 'EraseBoard': return EraseBoard;
+      case 'LoadBoard': return LoadBoard;
       default: break;
     }
     return null;
@@ -712,7 +713,7 @@ program fxg #machine := 'prolog . fxg'
     Location Position Size Scaling Rotation Side Sides Text Index Indexing Mode
     RotateBy MoveBy Release ReleaseRandom Shuffle Insert
     BackgroundColour ForegroundColour
-    SaveBoard EraseBoard Erase
+    SaveBoard EraseBoard Erase LoadBoard
     Repaint
   ]
 
@@ -724,6 +725,7 @@ program fxg #machine := 'prolog . fxg'
 #machine SaveBoard := 'SaveBoard'
 #machine EraseBoard := 'EraseBoard'
 #machine Erase := 'Erase'
+#machine LoadBoard := 'LoadBoard'
 
 end .
 `);
