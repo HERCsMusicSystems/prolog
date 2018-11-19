@@ -700,6 +700,7 @@ function (root, directory) {
       }
       return false;
     };
+    return this;
   };
   var token = function (atom, type) {
     var token = {
@@ -750,8 +751,12 @@ function (root, directory) {
       if (! loaded) return false;
       try {loaded = JSON . parse (loaded);} catch (e) {return false;}
       erase_board ();
-      console . log (loaded);
       structure . tokens = loaded . tokens;
+      for (var ind in structure . tokens) {
+        var token = structure . tokens [ind];
+        var atom = root . searchC (token . atom);
+        console . log (atom . setMachine (bind_token_with_prolog_code . call ({token: token}, atom, token)));
+      }
       return true;
     }
   };
