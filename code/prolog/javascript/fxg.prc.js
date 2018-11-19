@@ -302,13 +302,18 @@ function (root, directory) {
       }
     }
   };
-  var viewport = function (atom, name, x, y, width, height) {
+  var viewport = function (atom, viewport, name, x, y, width, height) {
+    if (viewport !== null) {
+      name = viewport . name;
+      x = viewport . location . x; y = viewport . location . y;
+      width = viewport . size . x; height = viewport . size . y;
+    }
     var content = document . createElement ('canvas');
     if (width === null) width = content . width; else content . width = width;
     if (height === null) height = content . height; else content . height = height;
     if (x === null) x = 0; if (y === null) y = 0;
     if (name === null) name = atom . name;
-    var viewport = {atom: atom . name, name: name, location: {x: x, y: y}, position: {x: 0, y: 0}, size: {x: width, y: height}, scaling: {x: 1, y: 1}, Mode: 'move'};
+    if (viewport === null) viewport = {atom: atom . name, name: name, location: {x: x, y: y}, position: {x: 0, y: 0}, size: {x: width, y: height}, scaling: {x: 1, y: 1}, Mode: 'move'};
     structure . viewports . push (viewport);
     var bar = document . createElement ('div'); bar . style . background = 'yellow'; bar . appendChild (document . createTextNode (name)); bar . style ['font-family'] = 'arial';
     var close = document . createElement ('input'); close . type = 'button'; close . value = String . fromCharCode (0xd7); close . style . float = 'right';
@@ -539,7 +544,7 @@ function (root, directory) {
       if (atom === null) return false;
       if (atom . type === 2) atom . setAtom (new prolog . Atom ());
       if (atom . left . machine !== null) return false;
-      return atom . left . setMachine (new viewport (atom . left, name, x, y, width, height));
+      return atom . left . setMachine (new viewport (atom . left, name, null, x, y, width, height));
     }
   };
   var ColourFunction = function (colour_type) {
@@ -750,12 +755,17 @@ function (root, directory) {
       var loaded = studio . readFile (el . left);
       if (! loaded) return false;
       try {loaded = JSON . parse (loaded);} catch (e) {return false;}
-      erase_board ();
+      erase ();
       structure . tokens = loaded . tokens;
       for (var ind in structure . tokens) {
         var token = structure . tokens [ind];
         var atom = root . searchC (token . atom);
-        console . log (atom . setMachine (bind_token_with_prolog_code . call ({token: token}, atom, token)));
+        atom . setMachine (bind_token_with_prolog_code . call ({token: token}, atom, token));
+      }
+      for (var ind in loaded . viewports) {
+        var view = loaded . viewports [ind];
+        var atom = root . searchC (view . atom);
+        atom . setMachine (new viewport (atom, view));
       }
       return true;
     }
