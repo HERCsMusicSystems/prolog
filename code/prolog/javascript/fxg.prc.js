@@ -570,7 +570,18 @@ function (root, directory) {
     token . location . position . x = grid . location . position . x + x * cs - y * sn;
     token . location . position . y = grid . location . position . y + y * cs + x * sn;
   };
-  var bind_token_with_prolog_code = function (atom, token) {
+  var token = function (atom, token, type) {
+    if (token !== null) type = token . type;
+    else token = {
+      atom: atom . name, type: type, location: {position: {x: 0, y: 0}, size: type === "Picture" ? null : {x: 128, y: 128}},
+      scaling: {x: 1, y: 1}, Rotation: 0,
+      indexing: type === "Dice" ? {x: 16, y: 16} : {x: 4, y: 4},
+      ForegroundColour: 'white',
+      Sides: type === "Grid" ? 5 : type === "Dice" ? 6 : 1, Side: 0,
+      Shift: type === "Dice" ? 1 : 0, Multiplier: 1
+    };
+    this . token = token;
+    structure . tokens . push (token);
     this . code = function (el) {
       if (el . type === 0) {
         structure . tokens . splice (structure . tokens . indexOf (token), 1);
@@ -705,20 +716,6 @@ function (root, directory) {
       }
       return false;
     };
-    return this;
-  };
-  var token = function (atom, type) {
-    var token = {
-      atom: atom . name, type: type, location: {position: {x: 0, y: 0}, size: type === "Picture" ? null : {x: 128, y: 128}},
-      scaling: {x: 1, y: 1}, Rotation: 0,
-      indexing: type === "Dice" ? {x: 16, y: 16} : {x: 4, y: 4},
-      ForegroundColour: 'white',
-      Sides: type === "Grid" ? 5 : type === "Dice" ? 6 : 1, Side: 0,
-      Shift: type === "Dice" ? 1 : 0, Multiplier: 1
-    };
-    this . token = token;
-    structure . tokens . push (token);
-    bind_token_with_prolog_code . call (this, atom, token);
   };
   var Token = {
     code: function (el) {
@@ -733,7 +730,7 @@ function (root, directory) {
       if (atom . type === 2) atom . setAtom (new prolog . Atom ());
       if (atom . left . machine !== null) return false;
       atoms . push (atom . left);
-      return atom . left . setMachine (new token (atom . left, type));
+      return atom . left . setMachine (new token (atom . left, null, type));
     }
   };
   var SaveBoard = {
@@ -752,18 +749,17 @@ function (root, directory) {
   var LoadBoard = {
     code: function (el) {
       if (el . type === 1) el = el . left; if (el . type !== 6) return false;
-      var loaded = studio . readFile (el . left);
-      if (! loaded) return false;
-      try {loaded = JSON . parse (loaded);} catch (e) {return false;}
+      var json = studio . readFile (el . left);
+      if (! json) return false;
+      try {json = JSON . parse (json);} catch (e) {return false;}
       erase ();
-      structure . tokens = loaded . tokens;
-      for (var ind in structure . tokens) {
-        var token = structure . tokens [ind];
-        var atom = root . searchC (token . atom);
-        atom . setMachine (bind_token_with_prolog_code . call ({token: token}, atom, token));
+      for (var ind in json . tokens) {
+        var element = json . tokens [ind];
+        var atom = root . searchC (element . atom);
+        atom . setMachine (new token (atom, element));
       }
-      for (var ind in loaded . viewports) {
-        var view = loaded . viewports [ind];
+      for (var ind in json . viewports) {
+        var view = json . viewports [ind];
         var atom = root . searchC (view . atom);
         atom . setMachine (new viewport (atom, view));
       }
