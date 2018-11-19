@@ -300,6 +300,20 @@ function (root, directory) {
         case 1: DrawDice (ctx, viewport, token, token_index); break;
         default: DrawDice (ctx, viewport, token, token_index); break;
       }
+    },
+    Text: function (ctx, viewport, token, token_index) {
+      if (token . Font === undefined) token . Font = token . location . size . y + 'px arial';
+      ctx . font = token . Font;
+      if (token . Text !== undefined) token . location . size . x = ctx . measureText (token . Text) . width;
+      var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
+      ctx . translate (token . location . position . x, token . location . position . y);
+      ctx . rotate (token . Rotation * Math . PI / 12);
+      var pth = new Path2D ();
+      pth . moveTo (- hw, - hh); pth . lineTo (hw, - hh); pth . lineTo (hw, hh); pth . lineTo (- hw, hh); ctx . closePath ();
+      ctx . fillStyle = token . ForegroundColour;
+      ctx . textAlign = 'center'; ctx . textBaseline = 'middle';
+      ctx . fillText (token . Text, 0, 0);
+      if (token_index !== null) ctx . addHitRegion ({path: pth, id: token_index});
     }
   };
   var viewport = function (atom, viewport, name, x, y, width, height) {
