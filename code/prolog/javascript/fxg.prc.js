@@ -433,11 +433,14 @@ function (root, directory) {
     var remove_viewport = function () {
       div . parentElement . removeChild (div);
       repaints . splice (repaints . indexOf (repaint, 1));
-      structure . viewports . splice (structure . viewports . indexOf (viewport, 1));
+      structure . viewports . splice (structure . viewports . indexOf (viewport), 1);
       return atom . setMachine (null);
     };
     viewport_removers . push (remove_viewport);
-    close . onmousedown = function (e) {remove_viewport ();};
+    close . onmousedown = function (e) {
+      viewport_removers . splice (viewport_removers . indexOf (remove_viewport), 1);
+      remove_viewport ();
+    };
     content . ondblclick = function (e) {
       if (for_double_click === null) return;
       for (var ind in for_double_click) {
@@ -746,23 +749,41 @@ function (root, directory) {
   var erase = function () {erase_board (); for (var ind in viewport_removers) viewport_removers [ind] (); viewport_removers = [];};
   var EraseBoard = {code: function (el) {erase_board (); return true;}};
   var Erase = {code: function (el) {erase (); return true;}};
+  var load_json = function (el) {
+    if (el . type === 1) el = el . left; if (el . type !== 6) return false;
+    var json = studio . readFile (el . left);
+    if (! json) return false;
+    try {json = JSON . parse (json);} catch (e) {return null;}
+    return json;
+  };
+  var load_tokens = function (json) {
+    for (var ind in json . tokens) {
+      var element = json . tokens [ind];
+      var atom = root . searchC (element . atom);
+      atom . setMachine (new token (atom, element));
+    }
+  };
+  var load_viewports = function (json) {
+    for (var ind in json . viewports) {
+      var view = json . viewports [ind];
+      var atom = root . searchC (view . atom);
+      atom . setMachine (new viewport (atom, view));
+    }
+  };
   var LoadBoard = {
     code: function (el) {
-      if (el . type === 1) el = el . left; if (el . type !== 6) return false;
-      var json = studio . readFile (el . left);
-      if (! json) return false;
-      try {json = JSON . parse (json);} catch (e) {return false;}
+      var json = load_json (el); if (json === null) return false;
+      erase_board ();
+      load_tokens (json);
+      return true;
+    }
+  };
+  var Load = {
+    code: function (el) {
+      var json = load_json (el); if (json === null) return false;
       erase ();
-      for (var ind in json . tokens) {
-        var element = json . tokens [ind];
-        var atom = root . searchC (element . atom);
-        atom . setMachine (new token (atom, element));
-      }
-      for (var ind in json . viewports) {
-        var view = json . viewports [ind];
-        var atom = root . searchC (view . atom);
-        atom . setMachine (new viewport (atom, view));
-      }
+      load_tokens (json);
+      load_viewports (json);
       return true;
     }
   };
@@ -777,6 +798,7 @@ function (root, directory) {
       case 'Erase': return Erase;
       case 'EraseBoard': return EraseBoard;
       case 'LoadBoard': return LoadBoard;
+      case 'Load': return Load;
       default: break;
     }
     return null;
@@ -794,7 +816,7 @@ program fxg #machine := 'prolog . fxg'
     Location Position Size Scaling Rotation Side Sides Text Index Indexing Mode
     RotateBy MoveBy Release ReleaseRandom Shuffle Insert
     BackgroundColour ForegroundColour
-    SaveBoard EraseBoard Erase LoadBoard
+    SaveBoard EraseBoard Erase LoadBoard Load
     Repaint
   ]
 
@@ -807,6 +829,7 @@ program fxg #machine := 'prolog . fxg'
 #machine EraseBoard := 'EraseBoard'
 #machine Erase := 'Erase'
 #machine LoadBoard := 'LoadBoard'
+#machine Load := 'Load'
 
 end .
 `);
