@@ -565,17 +565,7 @@ function (root, directory) {
     token . location . position . x = grid . location . position . x + x * cs - y * sn;
     token . location . position . y = grid . location . position . y + y * cs + x * sn;
   };
-  var token = function (atom, type) {
-    var token = {
-      atom: atom, type: type, location: {position: {x: 0, y: 0}, size: type === "Picture" ? null : {x: 128, y: 128}},
-      scaling: {x: 1, y: 1}, Rotation: 0,
-      indexing: type === "Dice" ? {x: 16, y: 16} : {x: 4, y: 4},
-      ForegroundColour: 'white',
-      Sides: type === "Grid" ? 5 : type === "Dice" ? 6 : 1, Side: 0,
-      Shift: type === "Dice" ? 1 : 0, Multiplier: 1
-    };
-    this . token = token;
-    structure . tokens . push (token);
+  var bind_token_with_prolog_code = function (atom, token) {
     this . code = function (el) {
       if (el . type === 0) {
         structure . tokens . splice (structure . tokens . indexOf (token), 1);
@@ -711,6 +701,19 @@ function (root, directory) {
       return false;
     };
   };
+  var token = function (atom, type) {
+    var token = {
+      atom: atom, type: type, location: {position: {x: 0, y: 0}, size: type === "Picture" ? null : {x: 128, y: 128}},
+      scaling: {x: 1, y: 1}, Rotation: 0,
+      indexing: type === "Dice" ? {x: 16, y: 16} : {x: 4, y: 4},
+      ForegroundColour: 'white',
+      Sides: type === "Grid" ? 5 : type === "Dice" ? 6 : 1, Side: 0,
+      Shift: type === "Dice" ? 1 : 0, Multiplier: 1
+    };
+    this . token = token;
+    structure . tokens . push (token);
+    bind_token_with_prolog_code . call (this, atom, token);
+  };
   var Token = {
     code: function (el) {
       var atom = null, type = null;
@@ -746,9 +749,9 @@ function (root, directory) {
       var loaded = studio . readFile (el . left);
       if (! loaded) return false;
       try {loaded = JSON . parse (loaded);} catch (e) {return false;}
-      erase ();
-      structure = loaded;
-      str = structure;
+      erase_board ();
+      console . log (loaded);
+      structure . tokens = loaded . tokens;
       return true;
     }
   };
