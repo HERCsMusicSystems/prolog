@@ -679,7 +679,7 @@ function (root, directory) {
           case Shuffle:
             if (token . deck !== undefined) {studio . random_permutation (token . deck); return true;}
             if (token . Sides > 1) token . Side = Math . floor (Math . random () * token . Sides);
-            if (el . type === 1) el = el . left; if (el . type === 2) el . setNative (token . Side);
+            if (el . type === 1) el = el . left; if (el . type === 2) el . setNative (token . Side + token . Shift);
             return true;
           case Insert:
             if (token . deck !== undefined) {
@@ -706,13 +706,9 @@ function (root, directory) {
             structure . tokens . splice (index, 1);
             target . push (token);
             return true;
-          case Side:
-            if (el . type === 1) el = el . left;
-            if (el . type === 2) {el . setNative (token . Side + token . Shift); return true;}
-            if (el . type === 6) {token . Side = el . left - token . Shift; return true;}
           default:
             if (el . type === 1) el = el . left;
-            if (el . type === 2) {if (! token [selector . left . name]) return false; el . setNative (token [selector . left . name]); return true;}
+            if (el . type === 2) {if (token [selector . left . name] === undefined) return false; el . setNative (token [selector . left . name]); return true;}
             if (el . type === 6) {token [selector . left . name] = el . left; return true;}
             return true;
         }
