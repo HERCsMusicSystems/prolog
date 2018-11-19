@@ -703,7 +703,7 @@ function (root, directory) {
   };
   var token = function (atom, type) {
     var token = {
-      atom: atom, type: type, location: {position: {x: 0, y: 0}, size: type === "Picture" ? null : {x: 128, y: 128}},
+      atom: atom . name, type: type, location: {position: {x: 0, y: 0}, size: type === "Picture" ? null : {x: 128, y: 128}},
       scaling: {x: 1, y: 1}, Rotation: 0,
       indexing: type === "Dice" ? {x: 16, y: 16} : {x: 4, y: 4},
       ForegroundColour: 'white',
@@ -727,7 +727,7 @@ function (root, directory) {
       if (atom . type === 2) atom . setAtom (new prolog . Atom ());
       if (atom . left . machine !== null) return false;
       atoms . push (atom . left);
-      return atom . left . setMachine (new token (atom . left . name, type));
+      return atom . left . setMachine (new token (atom . left, type));
     }
   };
   var SaveBoard = {
