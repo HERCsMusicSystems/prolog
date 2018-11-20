@@ -322,6 +322,36 @@ function (root, directory) {
     ctx . font = (hh / prop) + 'px arial'; ctx . textBaseline = 'middle'; ctx . textAlign = 'center';
     ctx . fillText (value, 0, 0);
   };
+  var DrawIcosahedron = function (ctx, viewport, token, token_index) {
+    var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
+    ctx . translate (token . location . position . x, token . location . position . y);
+    ctx . rotate (token . Rotation * Math . PI / 12);
+    var pq = Math . sqrt (3) * 0.5;
+    var pth = new Path2D ();
+    pth . moveTo (0, - hh);
+    for (var ind = -0.5 * Math . PI; ind < 5; ind += Math . PI / 3) pth . lineTo (hw * Math . cos (ind), hh * Math . sin (ind));
+    pth . closePath ();
+    if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill (pth);}
+    ctx . strokeStyle = token . ForegroundColour;
+    ctx . stroke (pth);
+    if (token_index !== null) ctx . addHitRegion ({path: pth, id: token_index});
+    var prop = Math . sin (Math . PI * 3 / 10) * 2;
+    var hhw = hw / prop, hhh = hh / prop;
+    ctx . beginPath ();
+    for (var ind = -0.5 * Math . PI; ind < 5; ind += Math . PI / 1.5) {
+      ctx . moveTo (hw * Math . cos (ind), hh * Math . sin (ind));
+      ctx . lineTo (hhw * Math . cos (ind), hhh * Math . sin (ind));
+      ctx . lineTo (hw * Math . cos (ind + Math . PI / 3), hh * Math . sin (ind + Math . PI / 3));
+      ctx . lineTo (hhw * Math . cos (ind + Math . PI / 1.5), hhh * Math . sin (ind + Math . PI / 1.5));
+      ctx . lineTo (hhw * Math . cos (ind), hhh * Math . sin (ind));
+    }
+    ctx . stroke ();
+    ctx . fillStyle = token . ForegroundColour;
+    var value = (token . Side + token . Shift) * token . Multiplier + '';
+    if (token . Sides >= 9 && (value . indexOf ('9') >= 0 || value . indexOf ('6') >= 0)) value += '.';
+    ctx . font = (hh * 0.4) + 'px arial'; ctx . textBaseline = 'middle'; ctx . textAlign = 'center';
+    ctx . fillText (value, 0, 0);
+  };
   var draws = {
     Grid: function (ctx, viewport, token, token_index) {
       switch (token . Side) {
