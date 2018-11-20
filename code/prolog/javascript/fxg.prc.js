@@ -375,6 +375,8 @@ function (root, directory) {
   };
   var rollDice = function (dice) {
     dice . Side = Math . floor (Math . random () * (dice . Sides === 0 ? 6 : dice . Sides));
+    var current_rotation = dice . Rotation % 4;
+    while (current_rotation === (dice . Rotation % 4)) dice . Rotation = Math . floor (Math . random () * 24);
   };
   var viewport = function (atom, viewport, name, x, y, width, height) {
     if (viewport !== null) {
