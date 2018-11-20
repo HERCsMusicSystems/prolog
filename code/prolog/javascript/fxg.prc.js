@@ -194,6 +194,21 @@ function (root, directory) {
     ctx . lineTo (w, h - ry); ctx . ellipse (w - rx, h - ry, rx, ry, 0, 0, Math . PI * 0.5);
     ctx . lineTo (- w + rx, h); ctx . ellipse (- w + rx, h - ry, rx, ry, 0, Math . PI * 0.5, Math . PI); ctx . closePath ();
   };
+  var DrawCube = function (ctx, viewport, token, token_index) {
+    var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
+    ctx . translate (token . location . position . x, token . location . position . y);
+    ctx . rotate (token . Rotation * Math . PI / 12);
+    ctx . beginPath (); DrawRoundedRectangle (ctx, hw, hh, token . indexing . x, token . indexing . y);
+    if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill ();}
+    ctx . strokeStyle = token . ForegroundColour;
+    ctx . stroke ();
+    if (token_index !== null) ctx . addHitRegion ({id: token_index});
+    ctx . fillStyle = token . ForegroundColour;
+    var value = (token . Side + token . Shift) * token . Multiplier + '';
+    if (token . Sides >= 9 && (value . indexOf ('9') >= 0 || value . indexOf ('6') >= 0)) value += '.';
+    ctx . font = hh + 'px arial'; ctx . textBaseline = 'middle'; ctx . textAlign = 'center';
+    ctx . fillText (value, 0, 0);
+  };
   var DrawDice = function (ctx, viewport, token, token_index) {
     var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
     ctx . translate (token . location . position . x, token . location . position . y);
@@ -297,8 +312,9 @@ function (root, directory) {
     },
     Dice: function (ctx, viewport, token, token_index) {
       switch (token . Sides) {
-        case 1: DrawDice (ctx, viewport, token, token_index); break;
-        default: DrawDice (ctx, viewport, token, token_index); break;
+        case 0: DrawDice (ctx, viewport, token, token_index); break;
+        case 6: DrawCube (ctx, viewport, token, token_index); break;
+        default: DrawCube (ctx, viewport, token, token_index); break;
       }
     },
     Text: function (ctx, viewport, token, token_index) {
@@ -315,6 +331,9 @@ function (root, directory) {
       ctx . fillText (token . Text, 0, 0);
       if (token_index !== null) ctx . addHitRegion ({path: pth, id: token_index});
     }
+  };
+  var rollDice = function (dice) {
+    dice . Side = Math . floor (Math . random () * (dice . Sides === 0 ? 6 : dice . Sides));
   };
   var viewport = function (atom, viewport, name, x, y, width, height) {
     if (viewport !== null) {
@@ -458,7 +477,7 @@ function (root, directory) {
     content . ondblclick = function (e) {
       if (for_double_click === null) return;
       for (var ind in for_double_click) {
-        if (for_double_click [ind] . type === 'Dice') for_double_click [ind] . Side = Math . floor (Math . random () * for_double_click [ind] . Sides);
+        if (for_double_click [ind] . type === 'Dice') rollDice (for_double_click [ind]);
         if (for_double_click [ind] . deck != null) {
           var target = for_double_click [ind] . deck . pop ();
           if (target == null) return;
@@ -478,7 +497,7 @@ function (root, directory) {
         structure . tokens . splice (ind, 1);
         structure . tokens . push (token);
         selected . push (token);
-        if (token . type === 'Dice' && e . which > 1) token . Side = Math . floor (Math . random () * token . Sides);
+        if (token . type === 'Dice' && e . which > 1) rollDice (token);
         if (token . deck != null && e . which > 1) {
           if (confirm (`Shuffle deck [${token . atom}] ?`)) studio . random_permutation (token . deck);
           else {
@@ -594,7 +613,7 @@ function (root, directory) {
       scaling: {x: 1, y: 1}, Rotation: 0,
       indexing: type === "Dice" ? {x: 16, y: 16} : {x: 4, y: 4},
       ForegroundColour: 'white',
-      Sides: type === "Grid" ? 5 : type === "Dice" ? 6 : 1, Side: 0,
+      Sides: type === "Grid" ? 5 : type === "Dice" ? 0 : 1, Side: 0,
       Shift: type === "Dice" ? 1 : 0, Multiplier: 1
     };
     this . token = token;
@@ -692,7 +711,7 @@ function (root, directory) {
             return true;
           case Shuffle:
             if (token . deck !== undefined) {studio . random_permutation (token . deck); return true;}
-            if (token . Sides > 1) token . Side = Math . floor (Math . random () * token . Sides);
+            if (token . Sides > 1) rollDice (token);
             if (el . type === 1) el = el . left; if (el . type === 2) el . setNative (token . Side + token . Shift);
             return true;
           case Insert:
