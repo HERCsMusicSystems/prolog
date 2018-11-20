@@ -24,6 +24,7 @@ function (root, directory) {
   var Release = directory . searchAtom ('Release');
   var ReleaseRandom = directory . searchAtom ('ReleaseRandom');
   var Shuffle = directory . searchAtom ('Shuffle');
+  var Roll = directory . searchAtom ('Roll');
   var Insert = directory . searchAtom ('Insert');
   var Side = directory . searchAtom ('Side');
   var repaints = [];
@@ -752,10 +753,10 @@ function (root, directory) {
             if (el . type === 1) el = el . left;
             if (el . type === 2) {for (var ind in atoms) {if (atoms [ind] . machine !== null && atoms [ind] . machine . token === target) {el . setAtom (atoms [ind]); return true;}}}
             return true;
-          case Shuffle:
+          case Shuffle: case Roll:
             if (token . deck !== undefined) {studio . random_permutation (token . deck); return true;}
             if (token . Sides > 1) rollDice (token);
-            if (el . type === 1) el = el . left; if (el . type === 2) el . setNative (token . Side + token . Shift);
+            if (el . type === 1) el = el . left; if (el . type === 2) el . setNative ((token . Side + token . Shift) * token . Multiplier);
             return true;
           case Insert:
             if (token . deck !== undefined) {
@@ -886,7 +887,7 @@ program fxg #machine := 'prolog . fxg'
     Viewport
     Token Rectangle Circle Picture Dice Grid Text Deck
     Location Position Size Scaling Rotation Side Sides Text Index Indexing Mode
-    RotateBy MoveBy Release ReleaseRandom Shuffle Insert
+    RotateBy MoveBy Release ReleaseRandom Shuffle Roll Insert
     BackgroundColour ForegroundColour
     SaveBoard EraseBoard Erase LoadBoard Load
     Repaint
