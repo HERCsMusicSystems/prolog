@@ -194,21 +194,6 @@ function (root, directory) {
     ctx . lineTo (w, h - ry); ctx . ellipse (w - rx, h - ry, rx, ry, 0, 0, Math . PI * 0.5);
     ctx . lineTo (- w + rx, h); ctx . ellipse (- w + rx, h - ry, rx, ry, 0, Math . PI * 0.5, Math . PI); ctx . closePath ();
   };
-  var DrawCube = function (ctx, viewport, token, token_index) {
-    var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
-    ctx . translate (token . location . position . x, token . location . position . y);
-    ctx . rotate (token . Rotation * Math . PI / 12);
-    ctx . beginPath (); DrawRoundedRectangle (ctx, hw, hh, token . indexing . x, token . indexing . y);
-    if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill ();}
-    ctx . strokeStyle = token . ForegroundColour;
-    ctx . stroke ();
-    if (token_index !== null) ctx . addHitRegion ({id: token_index});
-    ctx . fillStyle = token . ForegroundColour;
-    var value = (token . Side + token . Shift) * token . Multiplier + '';
-    if (token . Sides >= 9 && (value . indexOf ('9') >= 0 || value . indexOf ('6') >= 0)) value += '.';
-    ctx . font = hh + 'px arial'; ctx . textBaseline = 'middle'; ctx . textAlign = 'center';
-    ctx . fillText (value, 0, 0);
-  };
   var DrawDice = function (ctx, viewport, token, token_index) {
     var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
     ctx . translate (token . location . position . x, token . location . position . y);
@@ -261,12 +246,46 @@ function (root, directory) {
     ctx . translate (token . location . position . x, token . location . position . y);
     ctx . rotate (token . Rotation * Math . PI / 12);
     ctx . beginPath ();
-    hw *= Math . sqrt (3) / 2;
+    hw *= Math . sqrt (3) * 0.5;
     ctx . moveTo (0, - hh); ctx . lineTo (hw, hh * 0.5); ctx . lineTo (- hw, hh * 0.5); ctx . closePath ();
     if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill ();}
     ctx . strokeStyle = token . ForegroundColour;
     ctx . stroke ();
     if (token_index !== null) ctx . addHitRegion ({id: token_index});
+    ctx . fillStyle = token . ForegroundColour;
+    var value = (token . Side + token . Shift) * token . Multiplier + '';
+    if (token . Sides >= 9 && (value . indexOf ('9') >= 0 || value . indexOf ('6') >= 0)) value += '.';
+    ctx . font = hh + 'px arial'; ctx . textBaseline = 'middle'; ctx . textAlign = 'center';
+    ctx . fillText (value, 0, 0);
+  };
+  var DrawCube = function (ctx, viewport, token, token_index) {
+    var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
+    ctx . translate (token . location . position . x, token . location . position . y);
+    ctx . rotate (token . Rotation * Math . PI / 12);
+    ctx . beginPath (); DrawRoundedRectangle (ctx, hw, hh, token . indexing . x, token . indexing . y);
+    if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill ();}
+    ctx . strokeStyle = token . ForegroundColour;
+    ctx . stroke ();
+    if (token_index !== null) ctx . addHitRegion ({id: token_index});
+    ctx . fillStyle = token . ForegroundColour;
+    var value = (token . Side + token . Shift) * token . Multiplier + '';
+    if (token . Sides >= 9 && (value . indexOf ('9') >= 0 || value . indexOf ('6') >= 0)) value += '.';
+    ctx . font = hh + 'px arial'; ctx . textBaseline = 'middle'; ctx . textAlign = 'center';
+    ctx . fillText (value, 0, 0);
+  };
+  var DrawOctahedron = function (ctx, viewport, token, token_index) {
+    var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
+    ctx . translate (token . location . position . x, token . location . position . y);
+    ctx . rotate (token . Rotation * Math . PI / 12);
+    var pq = Math . sqrt (3) * 0.5;
+    var pth = new Path2D ();
+    pth . moveTo (0, - hh); pth . lineTo (hw * pq, hh * -0.5); pth . lineTo (hw * pq, hh * 0.5);
+    pth . lineTo (0, hh); pth . lineTo (- hw * pq, hh * 0.5); pth . lineTo (- hw * pq, hh * -0.5); pth . closePath ();
+    if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill (pth);}
+    ctx . strokeStyle = token . ForegroundColour;
+    pth . lineTo (hw * pq, hh * 0.5); pth . lineTo (- hw * pq, hh * 0.5); pth . closePath ();
+    ctx . stroke (pth);
+    if (token_index !== null) ctx . addHitRegion ({path: pth, id: token_index});
     ctx . fillStyle = token . ForegroundColour;
     var value = (token . Side + token . Shift) * token . Multiplier + '';
     if (token . Sides >= 9 && (value . indexOf ('9') >= 0 || value . indexOf ('6') >= 0)) value += '.';
