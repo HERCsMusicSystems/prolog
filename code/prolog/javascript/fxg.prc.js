@@ -242,6 +242,12 @@ function (root, directory) {
       default: break;
     }
   };
+  var DiceValue = function (token) {
+    var value = (token . Side + token . Shift) * token . Multiplier + '';
+    if (token . Sides >= 9 && token . Multiplier !== 10 && (value . indexOf ('9') >= 0 || value . indexOf ('6') >= 0)) value += '.';
+    if (token . Multiplier > 9) value = value . padStart (2, '0');
+    return value;
+  };
   var DrawTetrahedron = function (ctx, viewport, token, token_index) {
     var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
     ctx . translate (token . location . position . x, token . location . position . y);
@@ -254,10 +260,8 @@ function (root, directory) {
     ctx . stroke ();
     if (token_index !== null) ctx . addHitRegion ({id: token_index});
     ctx . fillStyle = token . ForegroundColour;
-    var value = (token . Side + token . Shift) * token . Multiplier + '';
-    if (token . Sides >= 9 && (value . indexOf ('9') >= 0 || value . indexOf ('6') >= 0)) value += '.';
     ctx . font = hh + 'px arial'; ctx . textBaseline = 'middle'; ctx . textAlign = 'center';
-    ctx . fillText (value, 0, 0);
+    ctx . fillText (DiceValue (token), 0, 0);
   };
   var DrawCube = function (ctx, viewport, token, token_index) {
     var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
@@ -269,10 +273,8 @@ function (root, directory) {
     ctx . stroke ();
     if (token_index !== null) ctx . addHitRegion ({id: token_index});
     ctx . fillStyle = token . ForegroundColour;
-    var value = (token . Side + token . Shift) * token . Multiplier + '';
-    if (token . Sides >= 9 && (value . indexOf ('9') >= 0 || value . indexOf ('6') >= 0)) value += '.';
     ctx . font = hh + 'px arial'; ctx . textBaseline = 'middle'; ctx . textAlign = 'center';
-    ctx . fillText (value, 0, 0);
+    ctx . fillText (DiceValue (token), 0, 0);
   };
   var DrawOctahedron = function (ctx, viewport, token, token_index) {
     var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
@@ -290,10 +292,8 @@ function (root, directory) {
     ctx . lineTo (hw * pq, hh * 0.5); ctx . lineTo (- hw * pq, hh * 0.5); ctx . closePath ();
     ctx . stroke ();
     ctx . fillStyle = token . ForegroundColour;
-    var value = (token . Side + token . Shift) * token . Multiplier + '';
-    if (token . Sides >= 9 && (value . indexOf ('9') >= 0 || value . indexOf ('6') >= 0)) value += '.';
     ctx . font = hh + 'px arial'; ctx . textBaseline = 'middle'; ctx . textAlign = 'center';
-    ctx . fillText (value, 0, 0);
+    ctx . fillText (DiceValue (token), 0, 0);
   };
   var DrawDeltohedron = function (ctx, viewport, token, token_index) {
     var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
@@ -340,10 +340,8 @@ function (root, directory) {
     ctx . stroke ();
     ctx . stroke ();
     ctx . fillStyle = token . ForegroundColour;
-    var value = (token . Side + token . Shift) * token . Multiplier + '';
-    if (token . Sides >= 9 && (value . indexOf ('9') >= 0 || value . indexOf ('6') >= 0)) value += '.';
     ctx . font = (hh * 0.6) + 'px arial'; ctx . textBaseline = 'bottom'; ctx . textAlign = 'center';
-    ctx . fillText (value, 0, hh * centre);
+    ctx . fillText (DiceValue (token), 0, hh * centre);
   };
   var DrawDodecahedron = function (ctx, viewport, token, token_index) {
     var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
@@ -367,10 +365,8 @@ function (root, directory) {
     }
     ctx . stroke ();
     ctx . fillStyle = token . ForegroundColour;
-    var value = (token . Side + token . Shift) * token . Multiplier + '';
-    if (token . Sides >= 9 && (value . indexOf ('9') >= 0 || value . indexOf ('6') >= 0)) value += '.';
     ctx . font = (hh / prop) + 'px arial'; ctx . textBaseline = 'middle'; ctx . textAlign = 'center';
-    ctx . fillText (value, 0, 0);
+    ctx . fillText (DiceValue (token), 0, 0);
   };
   var DrawIcosahedron = function (ctx, viewport, token, token_index) {
     var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
@@ -397,10 +393,8 @@ function (root, directory) {
     }
     ctx . stroke ();
     ctx . fillStyle = token . ForegroundColour;
-    var value = (token . Side + token . Shift) * token . Multiplier + '';
-    if (token . Sides >= 9 && (value . indexOf ('9') >= 0 || value . indexOf ('6') >= 0)) value += '.';
     ctx . font = (hh * 0.4) + 'px arial'; ctx . textBaseline = 'middle'; ctx . textAlign = 'center';
-    ctx . fillText (value, 0, 0);
+    ctx . fillText (DiceValue (token), 0, 0);
   };
   var draws = {
     Grid: function (ctx, viewport, token, token_index) {
