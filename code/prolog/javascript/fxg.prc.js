@@ -295,6 +295,56 @@ function (root, directory) {
     ctx . font = hh + 'px arial'; ctx . textBaseline = 'middle'; ctx . textAlign = 'center';
     ctx . fillText (value, 0, 0);
   };
+  var DrawDeltohedron = function (ctx, viewport, token, token_index) {
+    var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
+    ctx . translate (token . location . position . x, token . location . position . y);
+    ctx . rotate (token . Rotation * Math . PI / 12);
+    var pq = Math . sqrt (3) * 0.5;
+    var pth = new Path2D ();
+    //============
+    var alpha = 0.0168338 * Math . PI;
+    var ratio = Math . cos (Math . PI / 5);
+    var radius = Math . tan (Math . PI / 4 + alpha);
+    var sub = Math . tan (Math . PI / 4 - alpha);
+    var compensation = radius - sub;
+    var prism_height = compensation / sub;
+    var edge = Math . sqrt (1 + radius * radius);
+    var across = Math . sqrt (radius * radius + (1 + prism_height) * (1 + prism_height));
+    var centre = Math . sqrt (1 + sub * sub);
+    var kite = radius * Math . sin (Math . PI / 5);
+    var short_edge = radius * Math . sin (Math . PI / 10) * 2;
+    var visible_edge_length = short_edge * Math . cos (radius) + prism_height * Math . sin (radius);
+    var distance_to_edge = radius * Math . cos (Math . PI / 10);
+    // console . log (radius, sub, compensation, prism_height);
+    // console . log ('Edge', edge, 'Across', across, 'Kite', kite, 'Centre', centre, 'Visible edge', visible_edge_length, 'Width', distance_to_edge);
+    sub *= sub;
+    // console . log (sub, radius, ratio);
+    //=============
+    pth . moveTo (0, 0);
+    pth . lineTo (hw * distance_to_edge, hh * 0.5 * (across - visible_edge_length));
+    pth . lineTo (hw * distance_to_edge, hh * 0.5 * (across + visible_edge_length));
+    pth . lineTo (0, hh * across);
+    pth . lineTo (- hw * distance_to_edge, hh * 0.5 * (across + visible_edge_length));
+    pth . lineTo (- hw * distance_to_edge, hh * 0.5 * (across - visible_edge_length));
+    pth . closePath ();
+    if (token . BackgroundColour != null) {ctx . fillStyle = token . BackgroundColour; ctx . fill (pth);}
+    ctx . strokeStyle = token . ForegroundColour;
+    ctx . stroke (pth);
+    if (token_index !== null) ctx . addHitRegion ({path: pth, id: token_index});
+    var prop = Math . sin (Math . PI * 3 / 10) * 2;
+    var hhw = hw / prop, hhh = hh / prop;
+    ctx . beginPath ();
+    ctx . moveTo (- hw * kite, hh * centre);
+    ctx . lineTo (0, 0);
+    ctx . lineTo (hw * kite, hh * centre);
+    ctx . stroke ();
+    ctx . stroke ();
+    ctx . fillStyle = token . ForegroundColour;
+    var value = (token . Side + token . Shift) * token . Multiplier + '';
+    if (token . Sides >= 9 && (value . indexOf ('9') >= 0 || value . indexOf ('6') >= 0)) value += '.';
+    ctx . font = (hh * 0.6) + 'px arial'; ctx . textBaseline = 'bottom'; ctx . textAlign = 'center';
+    ctx . fillText (value, 0, hh * centre);
+  };
   var DrawDodecahedron = function (ctx, viewport, token, token_index) {
     var hw = token . location . size . x * 0.5 * token . scaling . x, hh = token . location . size . y * 0.5 * token . scaling . y;
     ctx . translate (token . location . position . x, token . location . position . y);
@@ -412,7 +462,7 @@ function (root, directory) {
         case 4: DrawTetrahedron (ctx, viewport, token, token_index); break;
         case 6: DrawCube (ctx, viewport, token, token_index); break;
         case 8: DrawOctahedron (ctx, viewport, token, token_index); break;
-        case 10: DrawDeltahedron (ctx, viewport, token, token_index); break;
+        case 10: DrawDeltohedron (ctx, viewport, token, token_index); break;
         case 12: DrawDodecahedron (ctx, viewport, token, token_index); break;
         case 20: DrawIcosahedron (ctx, viewport, token, token_index); break;
         default: DrawCube (ctx, viewport, token, token_index); break;
