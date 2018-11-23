@@ -575,7 +575,11 @@ function (root, directory) {
     };
     var canvas_move = function (e) {
       switch (viewport . Mode) {
-      case 'move': viewport . position . x -= e . movementX; viewport . position . y -= e . movementY; repaint (); break;
+      case 'move':
+        viewport . position . x -= e . movementX / viewport . scaling . x;
+        viewport . position . y -= e . movementY / viewport . scaling . y;
+        repaint ();
+        break;
       case 'select':
         if (selected . length > 0) {
           for (var ind in selected) {
