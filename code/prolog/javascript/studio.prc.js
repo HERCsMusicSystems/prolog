@@ -968,6 +968,36 @@ function (root, directory) {
       return true;
     }
   };
+	var Alert = {code: function (el) {if (el . type === 1) el = el . left; alert (el . type === 6 ? el . left : root . getValue (el)); return true;}};
+	var Confirm = {code: function (el) {if (el . type === 1) el = el . left; return confirm (el . type === 6 ? el . left: root . getValue (el));}};
+	var Prompt = {
+		code: function (el) {
+			var command = null, def = null, variable = null;
+			while (el . type === 1) {
+				var e = el . left;
+				if (e . type === 2) variable = e;
+				else {var msg = e . type === 6 ? e . left : root . getValue (e); if (command === null) command = msg; else def = msg;}
+				el = el . right;
+			}
+			var ret = def === null ? prompt (command) : prompt (command, def);
+			if (ret === null) return false;
+			if (variable !== null) variable . setNative (ret);
+			return true;
+		}
+	};
+	var ProcessTimeout_atom = root . search ('ProcessTimeout');
+	var timeouter = function (atom, clear, id) {
+		this . code = function (el) {clear (id); atom . setMachine (null); return true;}
+	};
+	var SetTimeout = function (set, clear) {
+		this . code = function (el) {
+			if (el . type !== 1) return false;
+			var interval = el . left; if (interval . type !== 6) return false; el = el . right;
+			if (el . type !== 1) return false;
+			var timeout = el . left; if (timeout . type !== 3 || timeout . left . machine !== null) return false;
+			return timeout . left . setMachine (new timeouter (timeout . left, clear, set (function () {root . resolution (el);}, interval . left)));
+		};
+	};
   this . getNativeCode = function (name) {
     switch (name) {
       case 'list': return list;
@@ -1031,6 +1061,11 @@ function (root, directory) {
       case 'rnd': return rnd;
       case 'series': return random_permutation;
       case 'timestamp': return timestamp;
+      case 'alert': return Alert;
+      case 'confirm': return Confirm;
+      case 'prompt': return Prompt;
+      case 'setTimeout': return new SetTimeout (setTimeout, clearTimeout);
+      case 'setInterval': return new SetTimeout (setInterval, clearInterval);
       case 'delallcl': return delallcl;
       case 'CL': return CL;
       case 'addcl': return addcl;
@@ -1101,6 +1136,8 @@ program studio #machine := ' prolog . studio '
     list pp write
     file_writer file_reader create_file open_file erase_file import load batch
     remove_module create_module attach_service
+    ; JavaScript
+    alert confirm prompt Prompt setTimeout setInterval SetTimeout SetInterval
     ; CLAUSE
     delallcl CL cl addcl addcl0 DELCL delcl OVERWRITE overwrite
     auto_atoms scripted_atoms unique_atoms create_atom create_atoms search_atom search_atom_c
@@ -1200,6 +1237,12 @@ program studio #machine := ' prolog . studio '
 #machine max := 'max'
 
 #machine timestamp := 'timestamp'
+
+#machine alert := 'alert'
+#machine confirm := 'confirm'
+#machine prompt := 'prompt'
+#machine setTimeout := 'setTimeout'
+#machine setInterval := 'setInterval'
 
 #machine delallcl := 'delallcl'
 #machine CL := 'CL'
@@ -1350,7 +1393,13 @@ program studio #machine := ' prolog . studio '
 
 [[operating_system *op] [navigator 'appName' *op]]
 [[implementation 'JavaScript']]
-[[version 2018 8]]
+[[version 2019 1]]
+
+[[Prompt *x : *command] [prompt *y : *command] [text_term *y *x]]
+[[SetInterval *interval *timeout : *command] [create_atoms *timeout] / [setInterval *interval *timeout : *command]]
+[[SetInterval *interval : *command] [create_atoms *timeout] [setInterval *interval *timeout : *command]]
+[[SetTimeout *interval *timeout : *command] [create_atoms *timeout] / [setTimeout *interval *timeout [*timeout] : *command]]
+[[SetTimeout *interval : *command] [create_atoms *timeout] [setTimeout *interval *timeout [*timeout] : *command]]
 
 [[exit : *]]
 
