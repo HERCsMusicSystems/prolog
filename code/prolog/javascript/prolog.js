@@ -462,7 +462,7 @@ Reader . prototype . atomC = function (name) {
 		while (atom === null && dir !== null) {atom = dir . searchAtom (name); dir = dir . next;}
 	}
 	if (atom === null && this . root . auto_atoms) {
-		atom = root . createAtom (name);
+		atom = this . root . createAtom (name);
 		if (this . search_context !== null) this . search_context . firstAtom = atom;
 	}
 	if (atom === null) return null;
