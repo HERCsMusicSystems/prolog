@@ -1,4 +1,6 @@
 
+if (typeof module !== 'undefined') node_file_system = require ('fs');
+
 var studio = new function () {
 
 var pwd = [];
@@ -40,6 +42,7 @@ var resourceRead = function (path) {
 };
 
 var fileRead = function (path) {
+	if (typeof localStorage === 'undefined') try {return node_file_system . readFileSync (st . pwd() + path, 'utf-8');} catch (e) {return null;}
 	var content = localStorage . getItem (st . pwd () + path);
 	if (content === null) {
 		var searches = st . search ();
@@ -147,3 +150,6 @@ this . random_pop = function (a) {
 };
 
 };
+
+if (typeof module !== 'undefined') module . exports . studio = studio;
+

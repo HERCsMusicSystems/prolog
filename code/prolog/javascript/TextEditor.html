@@ -33,15 +33,15 @@
 <script type="text/javascript" charset="UTF-8">
 	studio . search ('test_scripts');
 	studio . cd (['test']);
-	root = new prolog.Root();
-	console . log ('fxg', root . load ('fxg'));
-	console . log ('test', root . load ('test'));
-	console . log ('capitol', root . load ('capitol'));
+	rooot = new prolog.Root();
+	console . log ('fxg', rooot . load ('fxg'));
+	console . log ('test', rooot . load ('test'));
+	console . log ('capitol', rooot . load ('capitol'));
 	function resolutionCommand (command, e) {
 		if (e !== undefined && e . key !== 'Enter') return;
-		console . log (root . textResolution (command));
+		console . log (rooot . textResolution (command));
 	};
-	root . auto_atoms = true;
+	rooot . auto_atoms = true;
 	// //resolutionCommand ("[* [batch 'test.prb']]");
 	// res ('[Token r "Grid"] [r Size 36] [r BackgroundColour "blue"] [r Index 0 0]');
 	// //res ('[Token rr "Grid"] [rr Size 36] [rr ForegroundColour "white"] [rr Index 0 0] [rr Side 0] [rr Indexing 8 5]');
@@ -58,9 +58,9 @@
 	res ('[vv Position -100 -32]');
 	rep ();
 	function res (command) {
-		command = root . res ('[[' + command + ']' + command + ']');
+		command = rooot . res ('[[' + command + ']' + command + ']');
 		if (command === null) {console . log ("Doesn't work."); return false;}
-		command = root . getValue (command . left);
+		command = rooot . getValue (command . left);
 		command = command . substring (1, command . length - 1);
 		console . log (command);
 		return true;

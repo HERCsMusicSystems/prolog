@@ -1,4 +1,9 @@
 
+if (typeof module !== 'undefined') {
+	studio = require ('./studio') . studio;
+	prolog = require ('./prolog') . prolog;
+}
+
 studio . setResource (['prolog', 'studio'],
 function (root, directory) {
   var list = new function () {
@@ -1101,16 +1106,18 @@ function (root, directory) {
   };
 	var nav_atom = root . search ('navigator');
 	if (nav_atom !== null) {
-		for (var ind in navigator) {
-			nav = navigator [ind];
-			if (typeof (nav) === 'number' || typeof (nav) === 'string') {
-				var clause = new prolog . Element ();
-				clause . setPair ();
-				var el = clause . left;
-				el . setPair (); el . left . setAtom (nav_atom);
-				el = el . right; el . setPair (); el . left . setNative (ind);
-				el = el . right; el . setPair (); el . left . setNative (navigator [ind]);
-				clause . attach ();
+		if (typeof navigator !== 'undefined') {
+			for (var ind in navigator) {
+				nav = navigator [ind];
+				if (typeof (nav) === 'number' || typeof (nav) === 'string') {
+					var clause = new prolog . Element ();
+					clause . setPair ();
+					var el = clause . left;
+					el . setPair (); el . left . setAtom (nav_atom);
+					el = el . right; el . setPair (); el . left . setNative (ind);
+					el = el . right; el . setPair (); el . left . setNative (navigator [ind]);
+					clause . attach ();
+				}
 			}
 		}
 	}

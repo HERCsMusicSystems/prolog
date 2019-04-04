@@ -1,4 +1,6 @@
 
+if (typeof module !== 'undefined') studio = require ('./studio') . studio;
+
 var prolog = new function () {
 
 //////// ATOM ////////
@@ -1029,3 +1031,6 @@ Root . prototype . textResolution = function (command) {
 Root . prototype . res = function (command) {return new Resolution (this) . resolution (new Reader (this, command) . getElement ());};
 
 };
+
+if (typeof module !== 'undefined') module . exports . prolog = prolog;
+
