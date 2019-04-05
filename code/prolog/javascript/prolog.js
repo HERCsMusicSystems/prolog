@@ -573,14 +573,17 @@ Reader . prototype . readProgram = function () {
 	this . getSymbol ();
 	while (this . control === 'atom' && this . symbol === 'import') {
 		this . getSymbol ();
-		if (this . control !== 'atom') return this . error ("Syntax error (import name expected).");
-		var dir = this . root . searchDirectory (this . symbol);
-		if (dir === null) {
-			this . root . load (this . symbol);
-			dir = this . root . searchDirectory (this . symbol);
+		if (this . control === 'text') studio . search (this . symbol);
+		else {
+			if (this . control !== 'atom') return this . error ("Syntax error (import name expected).");
+			var dir = this . root . searchDirectory (this . symbol);
+			if (dir === null) {
+				this . root . load (this . symbol);
+				dir = this . root . searchDirectory (this . symbol);
+			}
+			if (dir === null) return this . error ("Semantic error (program " + this . symbol + " could not be imported).");
+			this . search_context = dir . duplicate (this . search_context);
 		}
-		if (dir === null) return this . error ("Semantic error (program " + this . symbol + " could not be imported).");
-		this . search_context = dir . duplicate (this . search_context);
 		this . getSymbol ();
 	}
 	if (this . control !== 'atom' || this . symbol !== this . root . program_caption) return this . error ("Syntax error (program keyword expected).");
