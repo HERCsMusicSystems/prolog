@@ -53,7 +53,7 @@ function (root, directory) {
     this . code = function (el) {
       var out = '';
       while (el . type === 1) {out += root . getValue (el . left); el = el . right;}
-      console . log (out);
+      root . log (out);
       return true;
     };
   };
@@ -576,6 +576,24 @@ function (root, directory) {
 			return true;
 		}
 	};
+	var search_directories = {
+		code: function (el) {
+			if (el . type === 0) {root . log ("SEARCH DIRECTORIES:"); root . log (studio . search ()); return true;}
+			if (el . type === 2) {
+				var searches = studio . search ();
+				el . type = 0;
+				for (var ind in searches) el = el . setNativePair (searches [ind]);
+				return true;
+			}
+			while (el . type === 1) {
+				var e = el . left;
+				if (e . type === 0) studio . eraseSearch ();
+				if (e . type === 6) studio . search (e . left);
+				el = el . right;
+			}
+			return true;
+		}
+	};
 	var file_writer = new function () {
 		var writer = function (atom, file_name) {
 			var text = [];
@@ -1020,6 +1038,7 @@ function (root, directory) {
       case 'pp': return pp;
       case 'write': return write;
       case 'cd': return cd;
+      case 'search_directories': return search_directories;
       case 'file_writer': return file_writer;
       case 'file_reader': return file_reader;
       case 'create_file': return create_file;
@@ -1151,7 +1170,7 @@ program studio #machine := ' prolog . studio '
     operating_system implementation version navigator
     command exit
     list pp write
-    cd file_writer file_reader create_file open_file erase_file import load batch
+    cd search_directories file_writer file_reader create_file open_file erase_file import load batch
     remove_module create_module attach_service
     ; JavaScript
     alert confirm prompt Prompt setTimeout setInterval SetTimeout SetInterval
@@ -1174,6 +1193,7 @@ program studio #machine := ' prolog . studio '
 #machine pp := 'pp'
 #machine write := 'write'
 #machine cd := 'cd'
+#machine search_directories := 'search_directories'
 #machine file_writer := 'file_writer'
 #machine file_reader := 'file_reader'
 #machine create_file := 'create_file'

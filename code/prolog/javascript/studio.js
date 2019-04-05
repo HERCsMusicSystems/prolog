@@ -28,6 +28,8 @@ this . search = function (path) {
 	return this . search ();
 };
 
+this . eraseSearch = function () {search = [];};
+
 var st = this;
 
 var resourceRead = function (path) {
