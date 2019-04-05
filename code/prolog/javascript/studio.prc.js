@@ -560,6 +560,22 @@ function (root, directory) {
 			return true;
 		}
 	};
+	var cd = {
+		code: function (el) {
+			while (el . type === 1) {
+				var e = el . left;
+				switch (e . type) {
+				case 0: studio . cd (); break;
+				case 3: studio . cd (e . left . name); break;
+				case 6: studio . cd (e . left); break;
+				case 2: e . setNative (studio . pwd ()); break;
+				}
+				el = el . right;
+			}
+			if (el . type === 2) el . setNative (studio . pwd ());
+			return true;
+		}
+	};
 	var file_writer = new function () {
 		var writer = function (atom, file_name) {
 			var text = [];
@@ -1003,6 +1019,7 @@ function (root, directory) {
       case 'list': return list;
       case 'pp': return pp;
       case 'write': return write;
+      case 'cd': return cd;
       case 'file_writer': return file_writer;
       case 'file_reader': return file_reader;
       case 'create_file': return create_file;
@@ -1134,7 +1151,7 @@ program studio #machine := ' prolog . studio '
     operating_system implementation version navigator
     command exit
     list pp write
-    file_writer file_reader create_file open_file erase_file import load batch
+    cd file_writer file_reader create_file open_file erase_file import load batch
     remove_module create_module attach_service
     ; JavaScript
     alert confirm prompt Prompt setTimeout setInterval SetTimeout SetInterval
@@ -1156,6 +1173,7 @@ program studio #machine := ' prolog . studio '
 #machine list := 'list'
 #machine pp := 'pp'
 #machine write := 'write'
+#machine cd := 'cd'
 #machine file_writer := 'file_writer'
 #machine file_reader := 'file_reader'
 #machine create_file := 'create_file'
