@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "github"
+    "url": "git@github.com:HERCsMusicSystems/prolog.git"
   },
   "keywords": [
     "prolog"
