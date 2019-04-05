@@ -1,4 +1,6 @@
 
+if (typeof module !== 'undefined') node_file_system = require ('fs');
+
 var studio = new function () {
 
 var pwd = [];
@@ -41,12 +43,17 @@ var resourceRead = function (path) {
 	return content;
 };
 
+var extractFile = function (path) {
+	if (typeof localStorage === 'undefined') try {return node_file_system . readFileSync (path, 'utf-8');} catch (e) {return null;};
+	return localStorage . getItem (path);
+};
+
 var fileRead = function (path) {
-	var content = localStorage . getItem (st . pwd () + path);
+	var content = extractFile (st . pwd () + path);
 	if (content === null) {
 		var searches = st . search ();
 		for (var ind in searches) {
-			content = localStorage . getItem (searches [ind] + path);
+			content = extractFile (searches [ind] + path);
 			if (content !== null) return content;
 		}
 	}
@@ -93,7 +100,10 @@ this . getService = function (name) {
 
 this . callback = function () {};
 
-this . writeFile = function (path, content) {localStorage . setItem (this . pwd () + path, content); if (this . callback !== undefined) this . callback ();};
+this . writeFile = function (path, content) {
+	if (typeof localStorage === 'undefined') {node_file_system . writeFileSync (this . pwd () + path, content, 'utf-8'); return;}
+	localStorage . setItem (this . pwd () + path, content); if (this . callback !== undefined) this . callback ();
+};
 
 this . edit_file = function (file_name, area, location) {
 	var content = localStorage . getItem (file_name);
@@ -149,3 +159,6 @@ this . random_pop = function (a) {
 };
 
 };
+
+if (typeof module !== 'undefined') module . exports . studio = studio;
+

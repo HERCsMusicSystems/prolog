@@ -1,4 +1,9 @@
 
+if (typeof module !== 'undefined') {
+	studio = require ('./studio') . studio;
+	prolog = require ('./prolog') . prolog;
+}
+
 studio . setResource (['test.prc'], `
 import studio
 
