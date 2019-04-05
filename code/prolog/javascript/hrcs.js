@@ -13,16 +13,20 @@ console . log (studio . readResource (['test.prc']));
 console . log (studio);
 console . log (prolog);
 
-var root = new prolog . Root ();
+var rooot = new prolog . Root ();
 
-root . load ('studio');
-root . load ('test');
+rooot . load ('studio');
+rooot . load ('test');
 
-console . log (root . list ());
+console . log (rooot . list ());
 
-console . log (root);
+console . log (rooot);
 //console . log (root . textResolution ("[[] [import 'capitol.prc']]"));
-console . log (root . textResolution ("[[*fr *command] [batch 'test.prb']]"));
+console . log (rooot . textResolution ("[[*fr *command] [batch 'test.prb']]"));
 
-console . log (root . list ());
+console . log (rooot . textResolution ("[[] [import 'capitol']]"));
+
+console . log (rooot . textResolution ("[*tc [cd 'voyager'] [file_writer *tc 'sonda.txt'] [*tc 'sonda'] [*tc]]"));
+
+console . log (rooot . list ());
 
