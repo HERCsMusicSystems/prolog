@@ -1,7 +1,7 @@
 
 if (typeof module !== 'undefined') {
-	studio = require ('./studio') . studio;
-	prolog = require ('./prolog') . prolog;
+	var studio = require ('./studio') . studio;
+	var prolog = require ('./prolog') . prolog;
 }
 
 studio . setResource (['test_studio.prb'], `

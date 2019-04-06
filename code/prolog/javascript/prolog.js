@@ -1,5 +1,5 @@
 
-if (typeof module !== 'undefined') studio = require ('./studio') . studio;
+if (typeof module !== 'undefined') var studio = require ('./studio') . studio;
 
 var prolog = new function () {
 
@@ -1032,6 +1032,12 @@ Root . prototype . textResolution = function (command) {
 };
 
 Root . prototype . res = function (command) {return new Resolution (this) . resolution (new Reader (this, command) . getElement ());};
+
+Root . prototype . rep = function (command) {
+	command = this . res ('[[' + command + ']' + command + ']');
+	if (command === null) return false;
+	return toJS (command . left);
+};
 
 };
 

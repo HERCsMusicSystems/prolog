@@ -8,10 +8,10 @@ require ('./test.prc');
 require ('./test.prb');
 require ('./test_studio.prb');
 
-console . log (studio . readResource (['studio.prc']));
-console . log (studio . readResource (['test.prc']));
-console . log (studio);
-console . log (prolog);
+//console . log (studio . readResource (['studio.prc']));
+//console . log (studio . readResource (['test.prc']));
+//console . log (studio);
+//console . log (prolog);
 
 var rooot = new prolog . Root ();
 
@@ -20,7 +20,7 @@ rooot . load ('test');
 
 console . log (rooot . list ());
 
-console . log (rooot);
+//console . log (rooot);
 //console . log (root . textResolution ("[[] [import 'capitol.prc']]"));
 console . log (rooot . textResolution ("[[*fr *command] [batch 'test.prb']]"));
 

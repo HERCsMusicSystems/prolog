@@ -1,5 +1,5 @@
 
-if (typeof module !== 'undefined') node_file_system = require ('fs');
+if (typeof module !== 'undefined') var node_file_system = require ('fs');
 
 var studio = new function () {
 
