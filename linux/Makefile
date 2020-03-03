@@ -361,6 +361,11 @@ prcgtk_prc.o: $(pc)prcgtk.prc
 		--redefine-sym _binary____code_prolog_prcgtk_prc_start=resource_prcgtk\
 		$(pc)prcgtk.prc prcgtk_prc.o
 
+jack_prc.o: $(pc)jack.prc
+	objcopy --input binary --output elf64-x86-64 --binary-architecture i386\
+		--redefine-sym _binary____code_prolog_jack_prc_start=resource_jack\
+		$(pc)jack.prc jack_prc.o
+
 ~/bin/studio: encoder.o $(objects) prc.o prolog_neural.o prolog_conductor.o midi_command_prompt.o $(prc_resources)
 	g++ -Wl,--export-dynamic encoder.o $(objects) $(prc_resources) prc.o \
 	-o ~/bin/studio -lreadline -lpthread -ldl
@@ -371,8 +376,16 @@ studio: ~/bin/studio
 ~/bin/prcgtk: $(pc)prcgtk.cpp prcgtk_prc.o
 	g++ -Wno-write-strings -fPIC -shared prcgtk_prc.o $(pc)prcgtk.cpp -o ~/bin/prcgtk `pkg-config --cflags gtk+-2.0 --libs gtk+-2.0`
 
+~/bin/jack: $(pc)jack.cpp jack_prc.o
+	g++ -Wno-write-strings -fPIC -shared jack_prc.o $(pc)jack.cpp -o ~/bin/jack
+
 /usr/lib/prcgtk.so: ~/bin/prcgtk
 	sudo cp ~/bin/prcgtk /usr/lib/prcgtk.so
 
+/usr/lib/jack.so: ~/bin/jack
+	sudo cp ~/bin/jack /usr/lib/jack.so
+
 prcgtk: /usr/lib/prcgtk.so
+
+jack: /usr/lib/jack.so
 

@@ -31,6 +31,7 @@ static void usleep (int delay) {Sleep (delay);}
 #include "joystick_linux.h"
 #include <string.h>
 #include <unistd.h>
+#include <sys/select.h>
 #endif
 
 #include <fcntl.h>
