@@ -377,7 +377,7 @@ studio: ~/bin/studio
 	g++ -Wno-write-strings -fPIC -shared prcgtk_prc.o $(pc)prcgtk.cpp -o ~/bin/prcgtk `pkg-config --cflags gtk+-2.0 --libs gtk+-2.0`
 
 ~/bin/jack: $(pc)jack.cpp jack_prc.o
-	g++ -Wno-write-strings -fPIC -shared jack_prc.o $(pc)jack.cpp -o ~/bin/jack
+	g++ -Wno-write-strings -fPIC -shared jack_prc.o $(pc)jack.cpp -o ~/bin/jack `pkg-config --libs jack`
 
 /usr/lib/prcgtk.so: ~/bin/prcgtk
 	sudo cp ~/bin/prcgtk /usr/lib/prcgtk.so
