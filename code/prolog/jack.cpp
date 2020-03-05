@@ -14,6 +14,8 @@ char * get_module_code (void) {return & resource_jack;}
 #endif
 
 jack_client_t * jack_client;
+jack_port_t * jack_midi_in;
+jack_port_t * jack_midi_out;
 
 class port_code : public PrologNativeCode {
 public:
@@ -31,7 +33,7 @@ public:
 	}
 	~ port_code (void) {
 		jack_port_unregister (jack_client, jack_midi_in);
-		printf ("Port closed\n");
+		jack_port_unregister (jack_client, jack_midi_out);
 	}
 };
 
@@ -61,16 +63,29 @@ public:
 
 class jack_service : public PrologServiceClass {
 public:
+	PrologRoot * root;
+	PrologDirectory * directory;
+	void init (PrologRoot * root, PrologDirectory * directory) {
+		this -> root = root;
+		this -> directory = directory;
+		PrologString * args = root -> args;
+		jack_client = jack_client_open (args == 0 ? "HRCS" : args -> text, JackNullOption, 0);
+		jack_midi_out = jack_port_register (jack_client, "out", JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
+		jack_midi_in = jack_port_register (jack_client, "in", JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0);
+		while (args != 0) {printf ("ARGS [%s]\n", args -> text); args = args -> next;}
+		char * * port_names = (char * *) jack_get_ports (jack_client, 0, 0, 0);
+		while (* port_names != 0) {printf ("PORTS [%s]\n", * port_names); port_names ++;}
+	}
 	PrologNativeCode * getNativeCode (char * name) {
 		if (strcmp (name, "port") == 0) return new port_class ();
 		return 0;
 	}
 	jack_service (void) {
-		jack_client = jack_client_open ("HRCS", JackNullOption, 0);
-		printf ("Service init....\n");
 	}
 	~ jack_service (void) {
-		printf ("Service stop..[%i]..\n", jack_client_close (jack_client));
+		jack_port_unregister (jack_client, jack_midi_in);
+		jack_port_unregister (jack_client, jack_midi_out);
+		jack_client_close (jack_client);
 	}
 };
 
