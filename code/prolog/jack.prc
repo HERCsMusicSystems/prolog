@@ -1,6 +1,11 @@
 
-program jack #machine := 'jack' [jack port]
+program jack #machine := 'jack' [
+		jack port activate
+		keyon
+	]
 
 #machine port := 'port'
+#machine activate := 'activate'
+#machine keyon := 'keyon'
 
-end := [[command]] .
+end := [[activate 'HERCs' 'in' 'out'] [command]] .
