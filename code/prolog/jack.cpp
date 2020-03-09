@@ -216,10 +216,12 @@ public:
 		}
 		if (ll == 0) return false;
 		int b1 = (channel -> getInteger () & 0xf) | 0xe0;
-		int b2 = ll -> getInteger () & 0x7f;
+		int b2 = ll -> getInteger ();
 		int b3;
 		if (hh == 0) {b3 = b2; b2 = 0;}
-		else b3 = hh -> getInteger () & 0x7f;
+		else b3 = hh -> getInteger ();
+		if (b3 > 127) b3 = b2 = 127;
+		b2 &= 0x7f; b3 &= 0x7f;
 		// CRITICAL ////////////////////////
 		pthread_mutex_lock (& mutex);     //
 		line -> insert_midi (b1, b2, b3); //
