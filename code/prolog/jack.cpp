@@ -112,14 +112,18 @@ public:
 	};
 };
 
+int global_time = 0;
+
 int Callback (jack_nframes_t nframes, void * args) {
 	void * ib = jack_port_get_buffer (jack_midi_in, nframes);
 	void * ob = jack_port_get_buffer (jack_midi_out, nframes);
 	pthread_mutex_lock (& mutex);
+	int new_time = prolog_root -> get_system_time ();
+	double delta = (double) nframes / (double) (new_time - global_time);
 	jack_midi_clear_buffer (ob);
 	midi * md = line -> root;
 	while (md != 0) {
-		unsigned char * b = jack_midi_event_reserve (ob, 0, 3);
+		unsigned char * b = jack_midi_event_reserve (ob, (int) ((double) (md -> time - global_time) * delta) , 3);
 		b [0] = md -> b1;
 		b [1] = md -> b2;
 		b [2] = md -> b3;
@@ -127,6 +131,7 @@ int Callback (jack_nframes_t nframes, void * args) {
 	}
 	line -> erase_line ();
 	line = line == & line1 ? & line2 : & line1;
+	global_time = new_time;
 	pthread_mutex_unlock (& mutex);
 	jack_nframes_t events = jack_midi_get_event_count (ib);
 	jack_midi_event_t event;
@@ -209,6 +214,7 @@ public:
 //		while (* port_names != 0) {printf ("PORTS [%s]\n", * port_names); port_names ++;}
 //		printf ("callback registering [%i]\n", jack_set_process_callback (jack_client, Callback, 0));
 //		printf ("activate [%i]\n", jack_activate (jack_client));
+		global_time = root -> get_system_time ();
 	}
 	PrologNativeCode * getNativeCode (char * name) {
 		if (strcmp (name, "port") == 0) return new port_class ();
