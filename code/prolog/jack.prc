@@ -2,7 +2,8 @@
 program jack #machine := 'jack' [
 		activate
 		keyoff keyon polyaftertouch control programchange aftertouch pitch
-		sysex
+		sysex quarterframe songpositionpointer songselect uF4 uF5 tunerequest
+		timingclock uF9 START CONTINUE STOP uFD activesensing systemreset
 	]
 
 #machine activate := 'activate'
@@ -14,5 +15,19 @@ program jack #machine := 'jack' [
 #machine aftertouch := 'aftertouch'
 #machine pitch := 'pitch'
 #machine sysex := 'sysex'
+#machine quarterframe := 'quarterframe'
+#machine songpositionpointer := 'songpositionpointer'
+#machine songselect := 'songselect'
+#machine uF4 := 'uF4'
+#machine uF5 := 'uF5'
+#machine tunerequest := 'tunerequest'
+#machine timingclock := 'timingclock'
+#machine uF9 := 'uF9'
+#machine START := 'START'
+#machine CONTINUE := 'CONTINUE'
+#machine STOP := 'STOP'
+#machine uFD := 'uFD'
+#machine activesensing := 'activesensing'
+#machine systemreset := 'systemreset'
 
 end := [[activate 'HERCs' 'in' 'out'] [command]] .

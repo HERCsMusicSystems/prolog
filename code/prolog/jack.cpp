@@ -43,29 +43,33 @@ public:
 		}
 		root = 0; top = 0;
 	};
+	void insert_midi (int b1) {
+		midi * md = new midi;
+		md -> time = prolog_root -> get_system_time ();
+		md -> b1 = b1; md -> size = 1;
+		md -> next = 0; md -> sysex = 0;
+		if (top == 0) top = root = md; else top = top -> next = md;
+	}
 	void insert_midi (int b1, int b2) {
 		midi * md = new midi;
 		md -> time = prolog_root -> get_system_time ();
 		md -> b1 = b1; md -> b2 = b2; md -> size = 2;
 		md -> next = 0; md -> sysex = 0;
-		if (top == 0) top = root = md;
-		else top = top -> next = md;
+		if (top == 0) top = root = md; else top = top -> next = md;
 	};
 	void insert_midi (int b1, int b2, int b3) {
 		midi * md = new midi;
 		md -> time = prolog_root -> get_system_time ();
 		md -> b1 = b1; md -> b2 = b2; md -> b3 = b3; md -> size = 3;
 		md -> next = 0; md -> sysex = 0;
-		if (top == 0) top = root = md;
-		else top = top -> next = md;
+		if (top == 0) top = root = md; else top = top -> next = md;
 	};
 	void insert_midi (int * sysex, int size) {
 		midi * md = new midi;
 		md -> time = prolog_root -> get_system_time ();
 		md -> sysex = sysex; md -> size = size;
 		md -> next = 0;
-		if (top == 0) top = root = md;
-		else top = top -> next = md;
+		if (top == 0) top = root = md; else top = top -> next = md;
 	}
 	midi_line (void) {root = 0; top = 0;};
 	~ midi_line (void) {erase_line ();};
@@ -98,7 +102,7 @@ int Callback (jack_nframes_t nframes, void * args) {
 		if (md -> sysex == 0) {
 			unsigned char * b = jack_midi_event_reserve (ob, shift , md -> size);
 			b [0] = md -> b1;
-			b [1] = md -> b2;
+			if (md -> size > 1) b [1] = md -> b2;
 			if (md -> size > 2) b [2] = md -> b3;
 		} else {
 			unsigned char * b = jack_midi_event_reserve (ob, shift, md -> size);
@@ -252,7 +256,61 @@ public:
 		pthread_mutex_unlock (& mutex);      //
 		///////////////////////////////////////
 		return true;
-	}
+	};
+};
+
+class realtime_class_0 : public PrologNativeCode {
+public:
+	int msg;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		// CRITICAL ////////////////////////
+		pthread_mutex_lock (& mutex);     //
+		line -> insert_midi (msg);        //
+		pthread_mutex_unlock (& mutex);   //
+		////////////////////////////////////
+		return true;
+	};
+	realtime_class_0 (int msg) {this -> msg = msg;};
+};
+
+class realtime_class_1 : public PrologNativeCode {
+public:
+	int msg;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		parameters = parameters -> getLeft (); if (! parameters -> isInteger ()) return false;
+		int dd = parameters -> getInteger () & 0x7f;
+		// CRITICAL ////////////////////////
+		pthread_mutex_lock (& mutex);     //
+		line -> insert_midi (msg, dd);    //
+		pthread_mutex_unlock (& mutex);   //
+		////////////////////////////////////
+		return true;
+	};
+	realtime_class_1 (int msg) {this -> msg = msg;};
+};
+
+class realtime_class_2 : public PrologNativeCode {
+public:
+	int msg;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		PrologElement * ll = 0, * hh = 0;
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isInteger ()) {if (ll == 0) ll = el; else hh = el;}
+			parameters = parameters -> getRight ();
+		}
+		if (hh == 0) return false;
+		int lll = ll -> getInteger () & 0x7f;
+		int hhh = hh -> getInteger () & 0x7f;
+		// CRITICAL ///////////////////////////
+		pthread_mutex_lock (& mutex);        //
+		line -> insert_midi (msg, lll, hhh); //
+		pthread_mutex_unlock (& mutex);      //
+		///////////////////////////////////////
+		return true;
+	};
+	realtime_class_2 (int msg) {this -> msg = msg;};
 };
 
 class jack_service : public PrologServiceClass {
@@ -278,6 +336,20 @@ public:
 		if (strcmp (name, "aftertouch") == 0) return new programchange_class (0xd0);
 		if (strcmp (name, "pitch") == 0) return new pitch_class ();
 		if (strcmp (name, "sysex") == 0) return new sysex_class ();
+		if (strcmp (name, "quarterframe") == 0) return new realtime_class_1 (0xf1);
+		if (strcmp (name, "songpositionpointer") == 0) return new realtime_class_2 (0xf2);
+		if (strcmp (name, "songselect") == 0) return new realtime_class_1 (0xf3);
+		if (strcmp (name, "uF4") == 0) return new realtime_class_0 (0xf4);
+		if (strcmp (name, "uF5") == 0) return new realtime_class_0 (0xf5);
+		if (strcmp (name, "tunerequest") == 0) return new realtime_class_0 (0xf6);
+		if (strcmp (name, "timingclock") == 0) return new realtime_class_0 (0xf8);
+		if (strcmp (name, "uF9") == 0) return new realtime_class_0 (0xf9);
+		if (strcmp (name, "START") == 0) return new realtime_class_0 (0xfa);
+		if (strcmp (name, "CONTINUE") == 0) return new realtime_class_0 (0xfb);
+		if (strcmp (name, "STOP") == 0) return new realtime_class_0 (0xfc);
+		if (strcmp (name, "uFD") == 0) return new realtime_class_0 (0xfd);
+		if (strcmp (name, "activesensing") == 0) return new realtime_class_0 (0xfe);
+		if (strcmp (name, "systemreset") == 0) return new realtime_class_0 (0xff);
 		return 0;
 	}
 	jack_service (void) {
