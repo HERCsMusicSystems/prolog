@@ -19,6 +19,19 @@ jack_port_t * jack_midi_out = 0;
 pthread_mutex_t mutex;
 PrologRoot * prolog_root = 0;
 PrologDirectory * prolog_directory = 0;
+PrologAtom * income_midi_atom = 0;
+
+void prolog_midi_callback (int size, unsigned char * data) {
+	PrologRoot * r = prolog_root;
+	PrologElement * el = r -> earth ();
+	for (int ind = 0; ind < size; ind ++) {el = r -> pair (r -> integer (data [ind]), el);}
+	PrologElement * query = r -> pair (r -> atom (income_midi_atom), el);
+	query = r -> pair (query, r -> earth ());
+	query = r -> pair (r -> head (0), query);
+	printf ("MIDI [%i]\n", size);
+	r -> resolution (query);
+	delete query;
+};
 
 struct midi {
 public:
@@ -115,9 +128,10 @@ int Callback (jack_nframes_t nframes, void * args) {
 	jack_midi_event_t event;
 	for (int ind = 0; ind < events; ind ++) {
 		jack_midi_event_get (& event, ib, ind);
-		printf ("midi [%0X ", event . time);
-		for (int sub = 0; sub < event . size; sub ++) printf (" %0X", event . buffer [sub]);
-		printf ("]\n");
+		prolog_midi_callback (event . size, event . buffer);
+		// printf ("midi [%0X ", event . time);
+		// for (int sub = 0; sub < event . size; sub ++) printf (" %0X", event . buffer [sub]);
+		// printf ("]\n");
 	}
 	return 0;
 };
@@ -318,6 +332,7 @@ public:
 	void init (PrologRoot * root, PrologDirectory * directory) {
 		prolog_root = root;
 		prolog_directory = directory;
+		income_midi_atom = directory -> searchAtom ("income_midi");
 		PrologString * args = root -> args;
 		while (args != 0) {printf ("ARGS [%s]\n", args -> text); args = args -> next;}
 //		char * * port_names = (char * *) jack_get_ports (jack_client, 0, 0, 0);

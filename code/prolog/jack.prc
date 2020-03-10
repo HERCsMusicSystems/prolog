@@ -4,6 +4,7 @@ program jack #machine := 'jack' [
 		keyoff keyon polyaftertouch control programchange aftertouch pitch
 		sysex quarterframe songpositionpointer songselect uF4 uF5 tunerequest
 		timingclock uF9 START CONTINUE STOP uFD activesensing systemreset
+		income_midi
 	]
 
 #machine activate := 'activate'
@@ -29,5 +30,7 @@ program jack #machine := 'jack' [
 #machine uFD := 'uFD'
 #machine activesensing := 'activesensing'
 #machine systemreset := 'systemreset'
+
+[[income_midi : *command] [show *command]]
 
 end := [[activate 'HERCs' 'in' 'out'] [command]] .
