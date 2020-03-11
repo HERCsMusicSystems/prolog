@@ -17,19 +17,54 @@ jack_client_t * jack_client = 0;
 jack_port_t * jack_midi_in = 0;
 jack_port_t * jack_midi_out = 0;
 pthread_mutex_t mutex;
-PrologRoot * prolog_root = 0;
+PrologRoot * proot = 0;
 PrologDirectory * prolog_directory = 0;
 PrologAtom * income_midi_atom = 0;
+PrologAtom * keyoff_atom = 0, * keyon_atom = 0, * polyaftertouch_atom = 0, * control_atom = 0, * programchange_atom = 0, * aftertouch_atom = 0, * pitch_atom = 0,
+* sysex_atom = 0, * quarterframe_atom = 0, * songpositionpointer_atom = 0, * songselect_atom = 0, * uF4_atom = 0, * uF5_atom = 0, * tunerequest_atom = 0,
+* timingclock_atom = 0, * uF9_atom = 0, * START_atom = 0, * CONTINUE_atom = 0, * STOP_atom = 0, * uFD_atom = 0, * activesensing_atom = 0, * systemreset_atom = 0;
 
 void prolog_midi_callback (int size, unsigned char * data) {
-	PrologRoot * r = prolog_root;
-	PrologElement * el = r -> earth ();
-	for (int ind = 0; ind < size; ind ++) {el = r -> pair (r -> integer (data [ind]), el);}
-	PrologElement * query = r -> pair (r -> atom (income_midi_atom), el);
-	query = r -> pair (query, r -> earth ());
-	query = r -> pair (r -> head (0), query);
-	printf ("MIDI [%i]\n", size);
-	r -> resolution (query);
+	PrologAtom * atom;
+	switch (data [0] >> 4) {
+	case 0x8: atom = keyoff_atom; break;
+	case 0x9: atom = keyon_atom; break;
+	case 0xa: atom = polyaftertouch_atom; break;
+	case 0xb: atom = control_atom; break;
+	case 0xc: atom = programchange_atom; break;
+	case 0xd: atom = aftertouch_atom; break;
+	case 0xe: atom = pitch_atom; break;
+	case 0xf: {
+		switch (data [0]) {
+		case 0xf0: atom = sysex_atom; break;
+		case 0xf1: atom = quarterframe_atom; break;
+		case 0xf2: atom = songpositionpointer_atom; break;
+		case 0xf3: atom = songselect_atom; break;
+		case 0xf4: atom = uF4_atom; break;
+		case 0xf5: atom = uF5_atom; break;
+		case 0xf6: atom = tunerequest_atom; break;
+		case 0xf7: atom = sysex_atom; break;
+		case 0xf8: atom = timingclock_atom; break;
+		case 0xf9: atom = uF9_atom; break;
+		case 0xfa: atom = START_atom; break;
+		case 0xfb: atom = CONTINUE_atom; break;
+		case 0xfc: atom = STOP_atom; break;
+		case 0xfd: atom = uFD_atom; break;
+		case 0xfe: atom = activesensing_atom; break;
+		case 0xff: atom = systemreset_atom; break;
+		}
+		break;
+	}
+	default: atom = income_midi_atom; break;
+	}
+	PrologElement * el = proot -> pair (proot -> atom (atom), proot -> earth ());
+	PrologElement * query = proot -> pair (proot -> atom (income_midi_atom), el);
+	el = el -> getRight ();
+	if (data [0] < 0xf0) {el -> setPair (proot -> integer (data [0] & 0xf), proot -> earth ()); el = el -> getRight ();}
+	for (int ind = 1; ind < size; ind ++) {if (data [ind] < 128) {el -> setPair (proot -> integer (data [ind]), proot -> earth ()); el = el -> getRight ();}}
+	query = proot -> pair (query, proot -> earth ());
+	query = proot -> pair (proot -> head (0), query);
+	proot -> resolution (query);
 	delete query;
 };
 
@@ -58,28 +93,28 @@ public:
 	};
 	void insert_midi (int b1) {
 		midi * md = new midi;
-		md -> time = prolog_root -> get_system_time ();
+		md -> time = proot -> get_system_time ();
 		md -> b1 = b1; md -> size = 1;
 		md -> next = 0; md -> sysex = 0;
 		if (top == 0) top = root = md; else top = top -> next = md;
 	}
 	void insert_midi (int b1, int b2) {
 		midi * md = new midi;
-		md -> time = prolog_root -> get_system_time ();
+		md -> time = proot -> get_system_time ();
 		md -> b1 = b1; md -> b2 = b2; md -> size = 2;
 		md -> next = 0; md -> sysex = 0;
 		if (top == 0) top = root = md; else top = top -> next = md;
 	};
 	void insert_midi (int b1, int b2, int b3) {
 		midi * md = new midi;
-		md -> time = prolog_root -> get_system_time ();
+		md -> time = proot -> get_system_time ();
 		md -> b1 = b1; md -> b2 = b2; md -> b3 = b3; md -> size = 3;
 		md -> next = 0; md -> sysex = 0;
 		if (top == 0) top = root = md; else top = top -> next = md;
 	};
 	void insert_midi (int * sysex, int size) {
 		midi * md = new midi;
-		md -> time = prolog_root -> get_system_time ();
+		md -> time = proot -> get_system_time ();
 		md -> sysex = sysex; md -> size = size;
 		md -> next = 0;
 		if (top == 0) top = root = md; else top = top -> next = md;
@@ -99,7 +134,7 @@ int Callback (jack_nframes_t nframes, void * args) {
 	void * ob = jack_port_get_buffer (jack_midi_out, nframes);
 	// CRITICAL //
 	pthread_mutex_lock (& mutex);
-	int new_time = prolog_root -> get_system_time ();
+	int new_time = proot -> get_system_time ();
 	int previous_time = global_time;
 	global_time = new_time;
 	double delta = (double) nframes / (double) (new_time - previous_time);
@@ -183,10 +218,18 @@ public:
 			if (el -> isInteger ()) {if (channel == 0) channel = el; else if (key == 0) key = el; else velocity = el;}
 			parameters = parameters -> getRight ();
 		}
-		if (velocity == 0) return false;
+		if (key == 0) {
+			if (shift != 0x80) return false;
+			// CRITICAL //////////////////////////////////////////////////////////////
+			pthread_mutex_lock (& mutex);                                           //
+			line -> insert_midi (0xb0 | (channel -> getInteger () & 0xf), 0x7b, 0); //
+			pthread_mutex_unlock (& mutex);                                         //
+			//////////////////////////////////////////////////////////////////////////
+			return true;
+		}
 		int b1 = (channel -> getInteger () & 0xf) | shift;
 		int b2 = key -> getInteger () & 0x7f;
-		int b3 = velocity -> getInteger () & 0xff;
+		int b3 = velocity == 0 ? 100 : velocity -> getInteger () & 0xff;
 		// CRITICAL ////////////////////////
 		pthread_mutex_lock (& mutex);     //
 		line -> insert_midi (b1, b2, b3); //
@@ -330,9 +373,31 @@ public:
 class jack_service : public PrologServiceClass {
 public:
 	void init (PrologRoot * root, PrologDirectory * directory) {
-		prolog_root = root;
+		proot = root;
 		prolog_directory = directory;
 		income_midi_atom = directory -> searchAtom ("income_midi");
+		keyoff_atom = directory -> searchAtom ("keyoff");
+		keyon_atom = directory -> searchAtom ("keyon");
+		polyaftertouch_atom = directory -> searchAtom ("polyaftertouch");
+		control_atom = directory -> searchAtom ("control");
+		programchange_atom = directory -> searchAtom ("programchange");
+		aftertouch_atom = directory -> searchAtom ("aftertouch");
+		pitch_atom = directory -> searchAtom ("pitch");
+		sysex_atom = directory -> searchAtom ("sysex");
+		quarterframe_atom = directory -> searchAtom ("quarterframe");
+		songpositionpointer_atom = directory -> searchAtom ("songpositionpointer");
+		songselect_atom = directory -> searchAtom ("songselect");
+		uF4_atom = directory -> searchAtom ("uF4");
+		uF5_atom = directory -> searchAtom ("uF5");
+		tunerequest_atom = directory -> searchAtom ("tunerequest");
+		timingclock_atom = directory -> searchAtom ("timingclock");
+		uF9_atom = directory -> searchAtom ("uF9");
+		START_atom = directory -> searchAtom ("START");
+		CONTINUE_atom = directory -> searchAtom ("CONTINUE");
+		STOP_atom = directory -> searchAtom ("STOP");
+		uFD_atom = directory -> searchAtom ("uFD");
+		activesensing_atom = directory -> searchAtom ("activesensing");
+		systemreset_atom = directory -> searchAtom ("systemreset");
 		PrologString * args = root -> args;
 		while (args != 0) {printf ("ARGS [%s]\n", args -> text); args = args -> next;}
 //		char * * port_names = (char * *) jack_get_ports (jack_client, 0, 0, 0);
