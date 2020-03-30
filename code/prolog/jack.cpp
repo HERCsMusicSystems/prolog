@@ -174,6 +174,19 @@ int Callback (jack_nframes_t nframes, void * args) {
 bool activate (char * client, char * in, char * out) {
 	if (jack_client != 0) return false;
 	jack_client = jack_client_open (client, JackNullOption, 0);
+	char * * ports = (char * *) jack_get_ports (jack_client, 0, 0, 0);
+	char * * names = ports;
+	while (* names != 0) {
+		if (strstr (* names, client) != 0) {
+			printf ("Program [%s] is already active.", client);
+			jack_client_close (jack_client);
+			jack_client = 0;
+			delete ports;
+			return false;
+		}
+		names ++;
+	}
+	delete ports;
 	jack_midi_out = jack_port_register (jack_client, out, JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
 	jack_midi_in = jack_port_register (jack_client, in, JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0);
 	jack_set_process_callback (jack_client, Callback, 0);
