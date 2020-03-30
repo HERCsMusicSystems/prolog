@@ -178,7 +178,7 @@ bool activate (char * client, char * in, char * out) {
 	char * * names = ports;
 	while (* names != 0) {
 		if (strstr (* names, client) != 0) {
-			printf ("Program [%s] is already active.", client);
+			printf ("Program [%s] is already active.\n", client);
 			jack_client_close (jack_client);
 			jack_client = 0;
 			delete ports;
