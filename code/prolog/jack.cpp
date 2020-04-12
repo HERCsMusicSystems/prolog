@@ -310,13 +310,21 @@ public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		PrologElement * el = parameters;
 		int counter = 0;
-		while (el -> isPair ()) {PrologElement * ell = el -> getLeft (); if (ell -> isInteger ()) counter ++; el = el -> getRight ();}
+		while (el -> isPair ()) {
+			PrologElement * ell = el -> getLeft ();
+			if (ell -> isInteger ()) counter ++;
+			if (ell -> isText ()) counter += strlen (ell -> getText ());
+			if (ell -> isAtom ()) counter += strlen (ell -> getAtom () -> name ());
+			el = el -> getRight ();
+		}
 		if (counter < 1) return false;
 		int * data = new int [counter + 2];
 		counter = 1; data [0] = 0xf0;
 		while (parameters -> isPair ()) {
 			el = parameters -> getLeft ();
 			if (el -> isInteger ()) data [counter ++] = el -> getInteger ();
+			if (el -> isText ()) {char * cp = el -> getText (); while (* cp != '\0') data [counter ++] = * cp ++;}
+			if (el -> isAtom ()) {char * cp = el -> getAtom () -> name (); while (* cp != '\0') data [counter ++] = * cp ++;}
 			parameters = parameters -> getRight ();
 		}
 		data [counter ++] = 0xf7;
