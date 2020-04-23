@@ -295,6 +295,11 @@
 [TestWorks "xor 3 2 1" [xor 3 2 1]]
 [TestFails "xor 3 2 2" [xor 3 2 2]]
 
+[TestEq "shiftl 3 1 *" 6 *x [shiftl 3 1 *x]]
+[TestEq "shiftl 3 1 : *" 6 *x [shiftl 3 1 : *x]]
+[TestEq "shiftr 6 1 *" 3 *x [shiftr 6 1 *x]]
+[TestEq "shiftr 6 1 : *" 3 *x [shiftr 6 1 : *x]]
+
 [TestEq "abs 127:*" 127 *x [abs 127 : *x]]
 [TestEq "abs -127 *" 127 *x [abs -127 *x]]
 [TestEq "abs 127.5 *" 127.5 *x [abs 127.5 *x]]

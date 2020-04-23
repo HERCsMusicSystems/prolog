@@ -116,6 +116,8 @@
             <a href="#predicate_rnd">rnd</a>
             <a href="#predicate_rnd_control">rnd_control</a>
             <a href="#predicate_series">series</a>
+            <a href="#predicate_shiftl">shiftl</a>
+            <a href="#predicate_shiftr">shiftr</a>
             <a href="#predicate_sin">sin</a>
             <a href="#predicate_sub">sub</a>
             <a href="#predicate_sub1">sub1</a>
@@ -886,6 +888,32 @@
             Both <b>from</b> and <b>step</b> can be either integer or double.
             If either <b>from</b> or <b>step</b> is double then the result will contain
             double values.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_shiftl">
+        <div class="doc_predicate_header">
+            [shiftl x shift *v] [lshift x shiftl : *v]<br />
+        </div>
+        <div class="doc_predicate_body">
+            Left shift.<br />
+            All arguments expected to be integers.
+            Can be used for tests.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_shiftr">
+        <div class="doc_predicate_header">
+            [shiftr x shift *v] [shiftr x shift : *v]<br />
+        </div>
+        <div class="doc_predicate_body">
+            Right shift.<br />
+            All arguments expected to be integers.
+            Can be used for tests.
         </div>
     </a>
 </div>

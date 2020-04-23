@@ -1491,6 +1491,16 @@ public:
 	int operation (int a, int b) {return a ^ b;}
 };
 
+class logical_shiftl : public logical {
+public:
+	int operation (int a, int b) {return a << b;}
+};
+
+class logical_shiftr : public logical {
+public:
+	int operation (int a, int b) {return a >> b;}
+};
+
 class abs_operation : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -4334,6 +4344,10 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "and") == 0) return new logical_and ();
 	if (strcmp (name, "or") == 0) return new logical_or ();
 	if (strcmp (name, "xor") == 0) return new logical_xor ();
+	if (strcmp (name, "shiftl") == 0) return new logical_shiftl ();
+	if (strcmp (name, "<<") == 0) return new logical_shiftl ();
+	if (strcmp (name, "shiftr") == 0) return new logical_shiftr ();
+	if (strcmp (name, ">>") == 0) return new logical_shiftr ();
 
 	if (strcmp (name, "abs") == 0) return new abs_operation ();
 	if (strcmp (name, "cos") == 0) return new cos_operation ();

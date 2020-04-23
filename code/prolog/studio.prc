@@ -20,9 +20,9 @@ program studio #machine := "prolog.studio"
 		operating_system implementation version root
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
 		create_atom create_atoms search_atom search_atom_c unique_atoms preprocessor prompt
-		+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^ := true false null nil
+		+ - ++ -- ~ % < = > <=> <= =< >= => <> << >> ! & | ^ := true false null nil
 		::= toSymbolicForm addSymbolicForm multiplySymbolicForm sortSymbolicForm
-		add add1 sub sub1 mult div mod and or xor sum times mac less less_eq greater greater_eq max min
+		add add1 sub sub1 mult div mod and or xor rshift lshift sum times mac less less_eq greater greater_eq max min
 		abs cos degrad e exp log2 log10 ln log pi pow sin tan trunc DFT FFT
 		StringToLower StringToUpper StringReplaceOnce StringReplaceAll StringSplit StringSplitOnce
 		timestamp
@@ -67,6 +67,10 @@ program studio #machine := "prolog.studio"
 #machine | := "or"
 #machine xor := "xor"
 #machine ^ := "xor"
+#machine shiftl := "shiftl"
+#machine << := "shiftl"
+#machine shiftr := "shiftr"
+#machine >> := "shiftr"
 
 #machine abs := "abs"
 #machine cos := "cos"
