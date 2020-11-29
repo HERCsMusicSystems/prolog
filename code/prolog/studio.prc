@@ -33,7 +33,7 @@ program studio #machine := "prolog.studio"
 		TRY ONE PROBE SELECT APPEND LENGTH REVERSE AT ONLIST INLIST NODUP MAP MEMBER REPLACE
 		sort divide
 		WHILE FOR FOREVER forever REPEAT IF
-		CONSTANT VARIABLE ACCUMULATOR STACK QUEUE ARRAY INDEX var inc dec ALL ISALL isall isallr isallq
+		CONSTANT VARIABLE ACCUMULATOR STACK QUEUE ARRAY INDEX var inc dec ALL all ISALL isall isallr isallq
 		rnd rnd_control grnd series
 		crack wait timeout enter signal semaphore msemaphore mutex accept select critical_section monitor task
 		background foreground open_editor close_editor screen_coordinates
@@ -225,6 +225,8 @@ program studio #machine := "prolog.studio"
 [[ONE :*o][res :*o]/]
 [[ALL :*o][res : *o] fail]
 [[ALL :*]]
+[[all : *o][res : *o][show *o][show "More?"][readln *s][eq *s "n"]/[show "No (more) answers."]]
+[[all :*][show "No (more) answers."]]
 [[TRY :*o]:*o]
 [[TRY :*o]]
 [[PROBE :*o][ONE :*o] fail]

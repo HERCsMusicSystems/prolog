@@ -244,6 +244,7 @@
         <li><a href="#metalogical">Metalogical</a>
             <br />
             <a href="#predicate_ACCUMULATOR">ACCUMULATOR</a>
+            <a href="#predicate_all">all</a>
             <a href="#predicate_ALL">ALL</a>
             <a href="#predicate_APPEND">APPEND</a>
             <a href="#predicate_ARRAY">ARRAY</a>
@@ -2633,6 +2634,23 @@
             it is added as the head of the list.<br />
             <b>Note:</b> ACCUMULATOR takes special care with numbering variables, which takes extra processing time.
             If variables are not going to be accumulated then <a href="#predicate_STACK">STACK</a> can be used instead.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_all">
+        <div class="doc_predicate_header">
+            [all : *commands]
+        </div>
+        <div class="doc_predicate_body">
+            Checks all possible solutions to <b>*commands</b> with prompting the user for implicit fail.
+            Variables may be instantiated if the user answers "n".<br />
+            Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+			[[all : *o][res : *o][show *o][show "More?"][readln *s][eq *s "n"]/[show "No (more) answers."]]<br/>
+			[[all :*][show "No (more) answers."]]
         </div>
     </a>
 </div>
