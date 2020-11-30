@@ -178,6 +178,7 @@
             <a href="#predicate_query_stack">query_stack</a>
             <a href="#predicate_read">read</a>
             <a href="#predicate_root">root</a>
+            <a href="#predicate_run">run</a>
             <a href="#predicate_load_history">load_history</a>
             <a href="#predicate_readln">readln</a>
             <a href="#predicate_relativise_path">relativise_path</a>
@@ -1720,6 +1721,21 @@
             Root accepts a clause with header interface.
             It needs to be noted that the symbols in the results will come from the new root and will be remote in relation to the calling program.<br />
             Calling root without parameters closes the root.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_run">
+        <div class="doc_predicate_header">
+            [run "file_name.prb"]
+        </div>
+        <div class="doc_predicate_body">
+            Runs the specified file as if it was a series of interactive commands.
+            The file is expected to be terminated by [exit] command
+            (as if in a real interactive session).
+            If any of the commands fail or if the series of commands is not terminated with [exit]
+            then the entire batch fails.
         </div>
     </a>
 </div>
