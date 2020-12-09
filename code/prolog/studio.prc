@@ -388,7 +388,11 @@ program studio #machine := "prolog.studio"
 [[overwrite [[*a:*b]:*c] [[*a:*h]:*i]][cl *x [[*a:*b]:*c]]
 	[OVERWRITE *x [[*a:*h]:*i]]]
 [[let *name *selector : *value]
-	[overwrite [[*name *selector : *] : *] [[*name *selector : *value]]]]
+	[overwrite [[*name *selector : *] : *] [[*name *selector : *value]]]
+]
+[[let *name *selector : *value]
+	[addcl [[*name *selector : *value]]]
+]
 
 
 ; multithreading and synchronization

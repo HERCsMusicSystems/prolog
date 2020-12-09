@@ -2131,13 +2131,16 @@
             [let atom selector : value]
         </div>
         <div class="doc_predicate_body">
-            Obsolete method for simulating global variables (with optional selector for tables).<br />
+            Method for simulating global variables (with optional selector for tables).<br />
             Macrodefinition:
         </div>
         <div class="doc_predicate_code">
             [[let *name *selector : *value]
             &emsp;&emsp;&emsp;[overwrite [[*name *selector : *] : *] [[*name *selector : *value]]]
-            ]
+            ]<br/>
+			[[let *name *selector : *value]
+			&emsp;&emsp;&emsp;[addcl [[*name *selector : *value]]]
+			]
         </div>
     </a>
 </div>
