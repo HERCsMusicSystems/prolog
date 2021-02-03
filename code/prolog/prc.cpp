@@ -24,12 +24,12 @@
 
 #include <string.h>
 
-#include "prolog_neural.h"
+// #include "prolog_neural.h"
 #include "prolog_conductor.h"
-#include "prolog_midi.h"
-#include "prolog_xml.h"
-#include "prolog_json.h"
-#include "prolog_distribution.h"
+// #include "prolog_midi.h"
+// #include "prolog_xml.h"
+// #include "prolog_json.h"
+// #include "prolog_distribution.h"
 #include "prolog_control.h"
 #include "prolog_http.h"
 
@@ -68,40 +68,40 @@ public:
 #include "prolog_linux_console.h"
 extern char resource_studio;
 extern char resource_conductor;
-extern char resource_midi;
+// extern char resource_midi;
 extern char resource_http;
 extern char resource_store;
 extern char resource_f1;
-extern char resource_help;
-extern char resource_record;
-extern char resource_neural;
+// extern char resource_help;
+// extern char resource_record;
+// extern char resource_neural;
 extern char resource_keyboard;
-extern char resource_sql;
+// extern char resource_sql;
 extern char resource_test;
-extern char resource_xml;
-extern char resource_distribution;
+// extern char resource_xml;
+// extern char resource_distribution;
 extern char resource_control;
-extern char resource_json;
+// extern char resource_json;
 class resource_loader_class : public PrologResourceLoader {
 public:
 	char * load (char * name) {
 		char * ret = 0;
 		if (strcmp (name, "studio.prc") == 0) ret = & resource_studio;
 		if (strcmp (name, "conductor.prc") == 0) ret = & resource_conductor;
-		if (strcmp (name, "midi.prc") == 0) ret = & resource_midi;
+		// if (strcmp (name, "midi.prc") == 0) ret = & resource_midi;
 		if (strcmp (name, "http.prc") == 0) ret = & resource_http;
 		if (strcmp (name, "store.prc") == 0) ret = & resource_store;
 		if (strcmp (name, "f1.prc") == 0) ret = & resource_f1;
-		if (strcmp (name, "help.prc") == 0) ret = & resource_help;
-		if (strcmp (name, "record.prc") == 0) ret = & resource_record;
-		if (strcmp (name, "neural.prc") == 0) ret = & resource_neural;
+		// if (strcmp (name, "help.prc") == 0) ret = & resource_help;
+		// if (strcmp (name, "record.prc") == 0) ret = & resource_record;
+		// if (strcmp (name, "neural.prc") == 0) ret = & resource_neural;
 		if (strcmp (name, "keyboard.prc") == 0) ret = & resource_keyboard;
-		if (strcmp (name, "sql.prc") == 0) ret = & resource_sql;
+		// if (strcmp (name, "sql.prc") == 0) ret = & resource_sql;
 		if (strcmp (name, "test.prc") == 0) ret = & resource_test;
-		if (strcmp (name, "xml.prc") == 0) ret = & resource_xml;
-		if (strcmp (name, "distribution.prc") == 0) ret = & resource_distribution;
+		// if (strcmp (name, "xml.prc") == 0) ret = & resource_xml;
+		// if (strcmp (name, "distribution.prc") == 0) ret = & resource_distribution;
 		if (strcmp (name, "control.prc") == 0) ret = & resource_control;
-		if (strcmp (name, "json.prc") == 0) ret = & resource_json;
+		// if (strcmp (name, "json.prc") == 0) ret = & resource_json;
 		return ret;
 	}
 } resource_loader;
@@ -111,13 +111,13 @@ class service_class_loader_class : public PrologServiceClassLoader {
 public:
 	PrologServiceClass * load (char * name) {
 		if (strcmp (name, "prolog.conductor") == 0) return new PrologConductorServiceClass ();
-		if (strcmp (name, "prolog.midi") == 0) return new PrologMidiServiceClass ();
+		// if (strcmp (name, "prolog.midi") == 0) return new PrologMidiServiceClass ();
 		if (strcmp (name, "prolog.http") == 0) return new PrologHttpServiceClass ();
-		if (strcmp (name, "prolog.neural") == 0) return new PrologNeuralServiceClass ();
-		if (strcmp (name, "prolog.xml") == 0) return new PrologXMLServiceClass ();
-		if (strcmp (name, "prolog.distribution") == 0) return new PrologDistributionServiceClass ();
+		// if (strcmp (name, "prolog.neural") == 0) return new PrologNeuralServiceClass ();
+		// if (strcmp (name, "prolog.xml") == 0) return new PrologXMLServiceClass ();
+		// if (strcmp (name, "prolog.distribution") == 0) return new PrologDistributionServiceClass ();
 		if (strcmp (name, "prolog.control") == 0) return new PrologControlServiceClass ();
-		if (strcmp (name, "prolog.json") == 0) return new PrologJSONServiceClass ();
+		// if (strcmp (name, "prolog.json") == 0) return new PrologJSONServiceClass ();
 		return NULL;
 	}
 } service_class_loader;
