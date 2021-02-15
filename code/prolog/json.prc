@@ -1,9 +1,8 @@
 
 import studio
 
-program json #machine := "prolog.json" [json]
+program json #machine := "json" [json]
 
 #machine json := "json"
 
 end .
-
