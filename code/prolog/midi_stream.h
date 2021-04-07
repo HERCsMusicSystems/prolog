@@ -23,6 +23,7 @@
 #ifndef _MIDI_STREAM
 #define _MIDI_STREAM
 
+#define HAVE_STRUCT_TIMESPEC
 #include <pthread.h>
 
 class midi_stream {

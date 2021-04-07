@@ -36,6 +36,7 @@
  *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
+#define HAVE_STRUCT_TIMESPEC
 #include "pthread.h"
 #include "implement.h"
 

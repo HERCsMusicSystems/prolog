@@ -56,6 +56,7 @@
 #endif
 #include <windows.h>
 #include <winbase.h>
+#define HAVE_STRUCT_TIMESPEC
 #include <pthread.h>
 
 #define COLLECTOR_RESET(index) reference_counter = index; InitializeCriticalSectionAndSpinCount (& critical_section, 0x4000);
