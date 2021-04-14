@@ -151,6 +151,7 @@
             <a href="#predicate_dir">dir</a>
             <a href="#predicate_DIR">DIR</a>
             <a href="#predicate_edit">edit</a>
+            <a href="#predicate_encoder">encoder</a>
             <a href="#predicate_erase">erase</a>
             <a href="#predicate_erase_directory">erase_directory</a>
             <a href="#predicate_execute">execute</a>
@@ -1318,6 +1319,26 @@
         </div>
         <div class="doc_predicate_body">
             Opens a file for editing.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_encoder">
+        <div class="doc_predicate_header">
+            [encoder "FileToBeEncoded" "EncodedFile" "EncodingKey"]<br />
+            [encoder "AB-012345-??" *normalised *key]<br/>
+            [encoder "AB-012345-??" *shift *normalised *key]<br/>
+            [encoder serial optional_key optional_shift optional_volume]<br/>
+        </div>
+        <div class="doc_predicate_body">
+            Encoder can encrypt files using XOR.<br/>
+            It also calculates keys for serial numbers with optional shift.<br/>
+            The last version sets the values for Prolog root (key, shift and volume are optional).<br/>
+            Explanations of the concept:<br/>
+            1. The middle part of the serial number can be XORed with volume number, i.e. VF-000001-?? XOR 2 => VF-000003-??.<br/>
+            2. Serial number needs to be normalised by calculating checksum, i.e. VF-000000-?? => VF-000000-16.<br/>
+            3. Key is calculated using serial number, random number generator and initial shift (default shift = 0).
         </div>
     </a>
 </div>
