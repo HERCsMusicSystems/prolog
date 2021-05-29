@@ -445,6 +445,7 @@ PrologAtom * PrologReader :: searchAtom (char * name) {
 	if (search_context == NULL) {return root -> search (name);}
 	PrologDirectory * dir = search_context;
 	PrologAtom * atom = NULL;
+	if (dir != NULL) {atom = dir -> searchPrivateAtom (name); if (atom != NULL) return atom;}
 	while (dir != NULL) {
 		atom = dir -> searchAtom (name);
 		if (atom != NULL) return atom;
