@@ -2901,7 +2901,9 @@ public:
 		PrologElement * ev = parameters -> getLeft (); if (! ev -> isText ()) return false;
 		parameters = parameters -> getRight ();
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		parameters -> setText (getenv (ev -> getText ()));
+		char * env = getenv (ev -> getText ());
+		if (env == 0) return false;
+		parameters -> setText (env);
 		return true;
 	}
 	environment (PrologRoot * root) {this -> root = root;}
