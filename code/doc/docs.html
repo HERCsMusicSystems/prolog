@@ -152,6 +152,7 @@
             <a href="#predicate_DIR">DIR</a>
             <a href="#predicate_edit">edit</a>
             <a href="#predicate_encoder">encoder</a>
+            <a href="#predicate_environment">environment</a>
             <a href="#predicate_erase">erase</a>
             <a href="#predicate_erase_directory">erase_directory</a>
             <a href="#predicate_execute">execute</a>
@@ -1339,6 +1340,18 @@
             1. The middle part of the serial number can be XORed with volume number, i.e. VF-000001-?? XOR 2 => VF-000003-??.<br/>
             2. Serial number needs to be normalised by calculating checksum, i.e. VF-000000-?? => VF-000000-16.<br/>
             3. Key is calculated using serial number, random number generator and initial shift (default shift = 0).
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_environment">
+        <div class="doc_predicate_header">
+            [environment NAME *VALUE]<br />
+            [environment NAME : *VALUE]
+        </div>
+        <div class="doc_predicate_body">
+            Reads the environmental variable from the underlying Operating System.
         </div>
     </a>
 </div>

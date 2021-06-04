@@ -2893,6 +2893,20 @@ public:
 	search_directories (PrologRoot * root) {this -> root = root;}
 };
 
+class environment : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (! parameters -> isPair ()) return false;
+		PrologElement * ev = parameters -> getLeft (); if (! ev -> isText ()) return false;
+		parameters = parameters -> getRight ();
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		parameters -> setText (getenv (ev -> getText ()));
+		return true;
+	}
+	environment (PrologRoot * root) {this -> root = root;}
+};
+
 class cd : public PrologNativeCode {
 public:
 	PrologRoot * root;
@@ -4441,6 +4455,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "create_module") == 0) return new create_module (root);
 	if (strcmp (name, "add_search_directory") == 0) return new add_search_directory (root);
 	if (strcmp (name, "search_directories") == 0) return new search_directories (root);
+	if (strcmp (name, "environment") == 0) return new environment (root);
 	if (strcmp (name, "cd") == 0) return new cd (root);
 	if (strcmp (name, "relativise_path") == 0) return new relativise_path (root);
 	if (strcmp (name, "DIR") == 0) return new DIR (root);
