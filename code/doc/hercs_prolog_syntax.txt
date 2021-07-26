@@ -26,3 +26,17 @@ HERCs Prolog Syntax
 <machine>	 ::=	#machine <atom> := <text>
 <preprocessor>	 ::=	preprocessor := ( <atom> | "[" "]" )
 
+Searching rules:
+
+There are four types: batch files, text modules, binary modules and embedded modules.
+If no name is specified then studio is loaded and [command] started.
+If name has .prc extension then loads studio.prc first, then bootstraps the name.
+Bootstrapping means it is first tries to load a batch file and if it can not be found, then imports module.
+If name has no .prc extension the it is simply loaded and the tail instructions are performed.
+
+The file is searched in the following order:
+1. Embedded modules are searched.
+2. Files from present working directory are searched.
+3. Files from locations specified by search_directories array.
+4. Binary files are searched.
+
