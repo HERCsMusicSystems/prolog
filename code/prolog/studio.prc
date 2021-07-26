@@ -20,7 +20,7 @@ program studio #machine := "prolog.studio"
 		operating_system implementation version root
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
 		create_atom create_atoms search_atom search_atom_c unique_atoms preprocessor prompt
-		+ - ++ -- ~ ~~ `*` % < = > <=> <= =< >= => <> << >> ! & | ^ := true false null nil
+		+ - ++ -- ~ ~~ ~+ `*` % < = > <=> <= =< >= => <> << >> ! & | ^ := true false null nil
 		::= toSymbolicForm addSymbolicForm multiplySymbolicForm sortSymbolicForm
 		add add1 sub sub1 mult div mod and or xor shiftl shiftr sum times mac less less_eq greater greater_eq max min
 		abs cos degrad e exp log2 log10 ln log pi pow sin tan trunc DFT FFT
@@ -55,6 +55,7 @@ program studio #machine := "prolog.studio"
 #machine - := "sub"
 #machine sub := "sub"
 #machine times := "times"
+#machine ~+ := 'mac'
 #machine mac := "mac"
 #machine ~ := "mult"
 #machine `*` := "mult"
@@ -568,7 +569,7 @@ program studio #machine := "prolog.studio"
 [[::= *e *x *y : *t] / [toSymbolicForm *x *xse] [toSymbolicForm *y *yse] [multiplySymbolicForm *xse *yse *ex] [::= *e *ex : *t]]
 
 protect [
-	+ - ++ -- ~ % < = > <=> <= =< >= => <> ! & | ^
+	+ - ++ -- ~ ~~ ~+ `*` % < = > <=> <= =< >= => <> ! & | ^
 	eq grnd
 	not res ONE ALL TRY PROBE SELECT APPEND LENGTH REVERSE ONLIST INLIST NODUP MAP MEMBER REPLACE
 	exit command inner inner_addcl inner_call random_cl explode
