@@ -97,6 +97,7 @@
             <a href="#predicate_e">e</a>
             <a href="#predicate_exp">exp</a>
             <a href="#predicate_FFT">FFT</a>
+            <a href="#predicate_grandom">grandom</a>
             <a href="#predicate_greater">greater</a>
             <a href="#predicate_greater_eq">greater_eq</a>
             <a href="#predicate_grnd">grnd</a>
@@ -113,6 +114,7 @@
             <a href="#predicate_or">or</a>
             <a href="#predicate_pi">pi</a>
             <a href="#predicate_pow">pow</a>
+            <a href="#predicate_random">random</a>
             <a href="#predicate_rnd">rnd</a>
             <a href="#predicate_rnd_control">rnd_control</a>
             <a href="#predicate_series">series</a>
@@ -593,6 +595,18 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_grandom">
+        <div class="doc_predicate_header">
+            [grandom : *parameters]
+        </div>
+        <div class="doc_predicate_body">
+            Calculates random number indentically as <a href="#predicate_random">random</a>
+            except it re-generates another value when backtracking.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_greater">
         <div class="doc_predicate_header">
             [greater arg-1 arg-2 .... arg-n]
@@ -836,6 +850,17 @@
             It can also be used as a test.
             Fails if x <= 0 or a = 1.
             Can be used for tests.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_random">
+        <div class="doc_predicate_header">
+            [random *rnd] [random : *rnd]
+        </div>
+        <div class="doc_predicate_body">
+            Calculates pseudo-random number between 0 (inclusive) and 1 (exclusive).
         </div>
     </a>
 </div>

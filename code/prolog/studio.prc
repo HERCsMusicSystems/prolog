@@ -34,7 +34,7 @@ program studio #machine := "prolog.studio"
 		sort divide
 		WHILE FOR FOREVER forever REPEAT IF
 		CONSTANT VARIABLE ACCUMULATOR STACK QUEUE ARRAY INDEX var inc dec ALL all ISALL isall isallr isallq
-		rnd rnd_control grnd series
+		rnd rnd_control grnd series random grandom
 		crack wait timeout enter signal semaphore msemaphore mutex accept select critical_section monitor task
 		background foreground open_editor close_editor screen_coordinates
 		get_volume_serial_number security_check encoder
@@ -163,6 +163,7 @@ program studio #machine := "prolog.studio"
 #machine mutex := "mutex"
 #machine rnd := "rnd"
 #machine rnd_control := "rnd_control"
+#machine random := "random"
 #machine series := "series"
 
 #machine file_writer := "file_writer"
@@ -217,6 +218,8 @@ program studio #machine := "prolog.studio"
 
 [[grnd : *parameters] [rnd : *parameters]]
 [[grnd : *parameters] / [grnd : *parameters]]
+[[grandom : *parameters] [random : *parameters]]
+[[grandom : *parameters] / [grandom : *parameters]]
 [[eq *x *x]]
 [[= *x *x]]
 [[<> *x *x] / fail]
@@ -570,7 +573,7 @@ program studio #machine := "prolog.studio"
 
 protect [
 	+ - ++ -- ~ ~~ ~+ `*` % < = > <=> <= =< >= => <> ! & | ^
-	eq grnd
+	eq grnd grandom
 	not res ONE ALL TRY PROBE SELECT APPEND LENGTH REVERSE ONLIST INLIST NODUP MAP MEMBER REPLACE
 	exit command inner inner_addcl inner_call random_cl explode
 	sort divide

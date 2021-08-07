@@ -3839,6 +3839,16 @@ public:
 	rnd_control (PrologNoise * n) {this -> n = n;}
 };
 
+class random_class : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		parameters -> setDouble ((double) rand () / ((double) RAND_MAX + 1.0));
+		return true;
+	};
+	random_class (void) {srand (time (NULL));};
+};
+
 class series : public PrologNativeCode {
 public:
 	PrologNoise * n;
@@ -4479,6 +4489,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 
 	if (strcmp (name, "rnd") == 0) return new rnd (& n);
 	if (strcmp (name, "rnd_control") == 0) return new rnd_control (& n);
+	if (strcmp (name, "random") == 0) return new random_class ();
 	if (strcmp (name, "series") == 0) return new series (& n);
 
 	if (strcmp (name, "CONSTANT") == 0) return new CONSTANT ();
