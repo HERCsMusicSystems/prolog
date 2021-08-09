@@ -3842,8 +3842,9 @@ public:
 class random_class : public PrologNativeCode {
 public:
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isVar ()) {parameters -> setDouble ((double) rand () / ((double) RAND_MAX + 1.0)); return true;}
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
-		parameters -> setDouble ((double) rand () / ((double) RAND_MAX + 1.0));
+		parameters -> setInteger (rand ());
 		return true;
 	};
 	random_class (void) {srand (time (NULL));};
