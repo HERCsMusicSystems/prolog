@@ -860,7 +860,8 @@
             [random *rnd] [random : *rnd]
         </div>
         <div class="doc_predicate_body">
-            Calculates pseudo-random number between 0 (inclusive) and 1 (exclusive).
+            Calculates pseudo-random number using underlying system (C++. JavaScript or other).
+            The pair version (with ":") returns fractional value between 0 (inclusive) and 1 (exclusive).
         </div>
     </a>
 </div>
@@ -880,6 +881,7 @@
             The default resolution (without min and max) is 24 bits.
             Consequently the unrestricted result can range from 0 to 16,777,215.
             To impose other restrictions use rnd_control.
+            The pair version (with ":") returns fractional value between 0 (inclusive) and 1 (exclusive).
         </div>
     </a>
 </div>
