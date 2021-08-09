@@ -54,6 +54,7 @@ public:
 	int a, c, m, v, range;
 	int get (void);
 	int get (int min, int max);
+	double get (double min, double max);
 	void resolution (int bits);
 	void control (int v);
 	void control (int a, int c);

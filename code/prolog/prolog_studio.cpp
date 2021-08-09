@@ -3762,20 +3762,30 @@ public:
 
 int PrologNoise :: get (void) {v = (v * a + c) & m; return v;}
 int PrologNoise :: get (int min, int max) {
-	float out = (float) get () * (float) (max - min);
-	out /= (float) range;
+	double out = (double) get () * (double) (max - min);
+	out /= (double) range;
 	return min + (int) out;
 }
+double PrologNoise :: get (double min, double max) {return (double) min + (double) get () * (double) (max - min) / (double) range;}
 void PrologNoise :: resolution (int bits) {range = 1 << bits; m = range - 1;}
-void PrologNoise :: control (int v) {this -> v = v;}
+void PrologNoise :: control (int v) {this -> v = v & m;}
 void PrologNoise :: control (int a, int c) {this -> a = a; this -> c = c;}
 PrologNoise :: PrologNoise (void) TRACKING (4) {resolution (24); control (0); control (0x5599d1, 1);}
 
 class rnd : public PrologNativeCode {
 public:
 	PrologNoise * n;
+	void set (PrologElement * min, PrologElement * max, PrologElement * result) {
+		if (min -> isInteger ()) {
+			if (max -> isInteger ()) result -> setInteger (n -> get (min -> getInteger (), max -> getInteger ()));
+			else result -> setDouble (n -> get ((double) min -> getInteger (), max -> getDouble ()));
+		} else {
+			if (max -> isInteger ()) result -> setDouble (n -> get (min -> getDouble (), (double) max -> getInteger ()));
+			else result -> setDouble (n -> get (min -> getDouble (), max -> getDouble ()));
+		}
+	}
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
-		if (parameters -> isVar ()) {parameters -> setInteger (n -> get ()); return true;}
+		if (parameters -> isVar ()) {parameters -> setDouble (n -> get (0.0, 1.0)); return true;}
 		if (! parameters -> isPair ()) return false;
 		PrologElement * a = parameters -> getLeft ();
 		parameters = parameters -> getRight ();
@@ -3784,24 +3794,14 @@ public:
 		PrologElement * b = parameters -> getLeft ();
 		PrologElement * c = parameters -> getRight ();
 		if (c -> isPair ()) c = c -> getLeft ();
-		if (a -> isInteger ()) {
-			if (b -> isInteger ()) {
-				c -> setInteger (n -> get (a -> getInteger (), b -> getInteger ()));
-				return true;
-			} else if (c -> isInteger ()) {
-				b -> setInteger (n -> get (a -> getInteger (), c -> getInteger ()));
-				return true;
-			} else return false;
+		if (a -> isNumber ()) {
+			if (b -> isNumber ()) {set (a, b, c); return true;}
+			if (c -> isNumber ()) {set (a, c, b); return true;}
 		}
-		if (b -> isInteger ()) {
-			if (c -> isInteger ()) {
-				a -> setInteger (n -> get (b -> getInteger (), c -> getInteger ()));
-				return true;
-			}
-		}
+		if (b -> isNumber () && c -> isNumber ()) {set (b, c, a); return true;}
 		return false;
 	}
-	rnd (PrologNoise * n) {this -> n = n;}
+	rnd (PrologNoise * n) {this -> n = n; n -> control (time (NULL));}
 };
 
 class rnd_control : public PrologNativeCode {
