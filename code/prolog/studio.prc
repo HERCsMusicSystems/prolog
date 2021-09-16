@@ -27,6 +27,7 @@ program studio #machine := "prolog.studio"
 		StringToLower StringToUpper StringReplaceOnce StringReplaceAll StringSplit StringSplitOnce
 		timestamp
 		is_atom is_integer is_double is_number is_var is_head is_text has_machine
+		atom? int? integer? double? number? var? head? text? machine?
 		text_list text_term e32 query_stack object_counter
 		exit halt command save_history load_history inner inner_addcl inner_call minimise maximise
 		res not eq rres ures lazy random_cl explode
@@ -110,6 +111,15 @@ program studio #machine := "prolog.studio"
 #machine is_head := "is_head"
 #machine is_text := "is_text"
 #machine has_machine := "has_machine"
+#machine atom? := "is_atom"
+#machine int? := "is_integer"
+#machine integer? := "is_integer"
+#machine double? := "is_double"
+#machine number? := "is_number"
+#machine var? := "is_var"
+#machine head? := "is_head"
+#machine text? := "is_text"
+#machine machine? := "has_machine"
 #machine text_list := "text_list"
 #machine text_term := "text_term"
 #machine e32 := "e32"
