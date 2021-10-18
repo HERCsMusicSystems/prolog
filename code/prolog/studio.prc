@@ -19,7 +19,7 @@ program studio #machine := "prolog.studio"
 		cd relativise_path dir ls DIR ARGS args args_tail edit execute make_directory erase erase_directory move copy
 		operating_system implementation version root
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
-		create_atom create_atoms search_atom search_atom_c unique_atoms preprocessor prompt
+		create_atom create_atoms search_atom search_atom_c unique_atoms preprocessor prompt QueryPrompt ReplyPrompt
 		+ - ++ -- ~ ~~ ~+ `*` % < = > <=> <= =< >= => <> << >> ! & | ^ := true false null nil
 		::= toSymbolicForm addSymbolicForm multiplySymbolicForm sortSymbolicForm
 		add add1 sub sub1 mult div mod and or xor shiftl shiftr sum times mac less less_eq greater greater_eq max min
@@ -242,7 +242,7 @@ program studio #machine := "prolog.studio"
 [[ONE :*o][res :*o]/]
 [[ALL :*o][res : *o] fail]
 [[ALL :*]]
-[[all : *o][res : *o][show *o][show "More?"][readln *s][eq *s "n"]/[show "No (more) answers."]]
+[[all : *o][res : *o][ReplyPrompt : *prompt][write *prompt][show *o][show "More?"][readln *s][StringToUpper *s *S][ONLIST *S ["N" "NO"]]/[show "No (more) answers."]]
 [[all :*][show "No (more) answers."]]
 [[TRY :*o]:*o]
 [[TRY :*o]]
@@ -496,12 +496,12 @@ program studio #machine := "prolog.studio"
 
 [[command [exit : *]]]
 [[command [[exit : *]]]]
-[[command *x] [inner [*y *z]] [command *y *z] / [command [*y : *z]]]
+[[command *x] [QueryPrompt : *prompt] [write *prompt] [inner [*y *z]] [command *y *z] / [command [*y : *z]]]
 [[command *x] [write "Doesn't work"] [nl] / [command *x]]
-[[command] [command [command]]]
+[[command] [TRY [var QueryPrompt ReplyPrompt]] [command [command]]]
 [[command [[*atom : *t1] : *t2] []] [inner_addcl [[*atom : *t1] :*t2]]]
 [[command [[*atom : *t1] : *t2] []] [write "Can not add clause: " [[[*atom : *t1] : *t2]] "\n"] / fail]
-[[command [*x : *y] []] / [inner_call [*x : *y]] [show [*x : *y]]]
+[[command [*x : *y] []] / [inner_call [*x : *y]] [ReplyPrompt : *prompt] [write *prompt] [show [*x : *y]]]
 [[command *x *y] [inner_call [*x : *y]]]
 
 [[bootstrap *command] [shebang_reader *atom *command] / [batch [batch] *atom]]

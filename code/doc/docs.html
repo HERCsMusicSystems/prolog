@@ -180,7 +180,9 @@
             <a href="#predicate_prompt">prompt</a>
             <a href="#predicate_pt">pt</a>
             <a href="#predicate_query_stack">query_stack</a>
+            <a href="#predicate_QueryPrompt">QueryPrompt</a>
             <a href="#predicate_read">read</a>
+            <a href="#predicate_ReplyPrompt">ReplyPrompt</a>
             <a href="#predicate_root">root</a>
             <a href="#predicate_run">run</a>
             <a href="#predicate_load_history">load_history</a>
@@ -1730,6 +1732,7 @@
         </div>
         <div class="doc_predicate_body">
             Sets or gets the current prompt, which is used by command console.
+            It only works if the system is using command console.
             Default value is usually "".
         </div>
     </a>
@@ -1758,12 +1761,38 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_QueryPrompt">
+        <div class="doc_predicate_header">
+            [QueryPrompt "=> "]<br />
+            [QueryPrompt *x] [QueryPrompt : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Variable used by [command], which is printed like a prompt in front of every new query.
+            Default value is [].
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_read">
         <div class="doc_predicate_header">
             [read *text]
         </div>
         <div class="doc_predicate_body">
             Skips whitespaces and then reads the input text from the console, until a whitespace is detected.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_ReplyPrompt">
+        <div class="doc_predicate_header">
+            [ReplyPrompt "=> "]<br />
+            [ReplyPrompt *x] [ReplyPrompt : *x]
+        </div>
+        <div class="doc_predicate_body">
+            Variable used by [command], which is printed in front of each reply.
+            Default value is [].
         </div>
     </a>
 </div>
@@ -3508,7 +3537,7 @@
 </div>
 
 <div class="doc_predicate">
-    <a id="predicate_variable">
+    <a id="predicate_var">
         <div class="doc_predicate_header">
             [var v1 v2 .... vn]<br />
             [var [v1 value] [v2 value] .... [vn value]]<br />

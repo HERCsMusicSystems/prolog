@@ -69,6 +69,7 @@ public:
 		while (parameters -> isPair ()) {
 			el = parameters -> getLeft ();
 			if (el -> isText ()) root -> print (el -> getText());
+			if (el -> isAtom ()) root -> print (el -> getAtom () -> name ());
 			if (el -> isInteger ()) root -> print_character (el -> getInteger ());
 			while (el -> isPair ()) {
 				root -> getValue (el -> getLeft (), area, 0);
