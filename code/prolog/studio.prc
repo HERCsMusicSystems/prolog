@@ -498,11 +498,13 @@ program studio #machine := "prolog.studio"
 [[command [[exit : *]]]]
 [[command *x] [QueryPrompt : *prompt] [write *prompt] [inner [*y *z]] [command *y *z] / [command [*y : *z]]]
 [[command *x] [write "Doesn't work"] [nl] / [command *x]]
-[[command] [TRY [var QueryPrompt ReplyPrompt]] [command [command]]]
+[[command] [command [command]]]
 [[command [[*atom : *t1] : *t2] []] [inner_addcl [[*atom : *t1] :*t2]]]
 [[command [[*atom : *t1] : *t2] []] [write "Can not add clause: " [[[*atom : *t1] : *t2]] "\n"] / fail]
 [[command [*x : *y] []] / [inner_call [*x : *y]] [ReplyPrompt : *prompt] [write *prompt] [show [*x : *y]]]
 [[command *x *y] [inner_call [*x : *y]]]
+
+auto := [[var QueryPrompt ReplyPrompt]]
 
 [[bootstrap *command] [shebang_reader *atom *command] / [batch [batch] *atom]]
 [[bootstrap *command] [import *command : *main] / : *main]
