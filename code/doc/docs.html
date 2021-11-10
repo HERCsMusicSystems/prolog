@@ -177,7 +177,9 @@
             <a href="#predicate_pp">pp</a>
             <a href="#predicate_pr">pr</a>
             <a href="#predicate_preprocessor">preprocessor</a>
+            <a href="#predicate_private">private</a>
             <a href="#predicate_prompt">prompt</a>
+            <a href="#predicate_protect">protect</a>
             <a href="#predicate_pt">pt</a>
             <a href="#predicate_query_stack">query_stack</a>
             <a href="#predicate_QueryPrompt">QueryPrompt</a>
@@ -1725,6 +1727,17 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_private">
+        <div class="doc_predicate_header">
+            [private atom atom ....]
+        </div>
+        <div class="doc_predicate_body">
+            Makes all the atoms on the list private. There is no reverse command.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_prompt">
         <div class="doc_predicate_header">
             [prompt "=> "]<br />
@@ -1734,6 +1747,17 @@
             Sets or gets the current prompt, which is used by command console.
             It only works if the system is using command console.
             Default value is usually "".
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_protect">
+        <div class="doc_predicate_header">
+            [protect atom atom ....]
+        </div>
+        <div class="doc_predicate_body">
+            Make all the atoms on the list protected. There is no reverse command.
         </div>
     </a>
 </div>

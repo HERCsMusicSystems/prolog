@@ -2776,6 +2776,30 @@ public:
 	create_module (PrologRoot * root) {this -> root = root;}
 };
 
+class private_code : public PrologNativeCode {
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isAtom ()) el -> getAtom () -> Private ();
+			parameters = parameters -> getRight ();
+		}
+		return true;
+	}
+};
+
+class protect_code : public PrologNativeCode {
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isAtom ()) el -> getAtom () -> Protect ();
+			parameters = parameters -> getRight ();
+		}
+		return true;
+	}
+};
+
 class set_machine : public PrologNativeCode {
 private:
 	PrologRoot * root;
@@ -4467,6 +4491,8 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "set_machine") == 0) return new set_machine (root);
 	if (strcmp (name, "machine_type") == 0) return new machine_type ();
 	if (strcmp (name, "create_module") == 0) return new create_module (root);
+	if (strcmp (name, "private") == 0) return new private_code ();
+	if (strcmp (name, "protect") == 0) return new protect_code ();
 	if (strcmp (name, "add_search_directory") == 0) return new add_search_directory (root);
 	if (strcmp (name, "search_directories") == 0) return new search_directories (root);
 	if (strcmp (name, "environment") == 0) return new environment (root);
