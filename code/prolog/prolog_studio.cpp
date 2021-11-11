@@ -2788,6 +2788,18 @@ public:
 	}
 };
 
+class private_Q_code : public PrologNativeCode {
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isAtom ()) return el -> getAtom () -> Privated;
+			parameters = parameters -> getRight ();
+		}
+		return false;
+	}
+};
+
 class protect_code : public PrologNativeCode {
 public:
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
@@ -2797,6 +2809,18 @@ public:
 			parameters = parameters -> getRight ();
 		}
 		return true;
+	}
+};
+
+class protect_Q_code : public PrologNativeCode {
+public:
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		while (parameters -> isPair ()) {
+			PrologElement * el = parameters -> getLeft ();
+			if (el -> isAtom ()) return el -> getAtom () -> Protected;
+			parameters = parameters -> getRight ();
+		}
+		return false;
 	}
 };
 
@@ -4493,6 +4517,8 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "create_module") == 0) return new create_module (root);
 	if (strcmp (name, "private") == 0) return new private_code ();
 	if (strcmp (name, "protect") == 0) return new protect_code ();
+	if (strcmp (name, "private?") == 0) return new private_Q_code ();
+	if (strcmp (name, "protect?") == 0) return new protect_Q_code ();
 	if (strcmp (name, "add_search_directory") == 0) return new add_search_directory (root);
 	if (strcmp (name, "search_directories") == 0) return new search_directories (root);
 	if (strcmp (name, "environment") == 0) return new environment (root);

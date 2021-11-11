@@ -14,7 +14,7 @@ program studio #machine := "prolog.studio"
 		pr read readln
 		write nl pp pt list
 		file_writer import load consult batch run file_reader bootstrap shebang_reader reload
-		remove_module create_module set_machine machine_type protect private
+		remove_module create_module set_machine machine_type protect private protect? private?
 		add_search_directory search_directories environment
 		cd relativise_path dir ls DIR ARGS args args_tail edit execute make_directory erase erase_directory move copy
 		operating_system implementation version root
@@ -188,6 +188,8 @@ program studio #machine := "prolog.studio"
 #machine machine_type := "machine_type"
 #machine private := "private"
 #machine protect := "protect"
+#machine private? := "private?"
+#machine protect? := "protect?"
 #machine add_search_directory := "add_search_directory"
 #machine search_directories := "search_directories"
 #machine environment := "environment"
