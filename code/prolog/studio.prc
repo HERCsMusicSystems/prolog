@@ -502,7 +502,7 @@ program studio #machine := "prolog.studio"
 [[command [exit : *]]]
 [[command [[exit : *]]]]
 [[command *x] [QueryPrompt : *prompt] [write *prompt] [inner [*y *z]] [command *y *z] / [command [*y : *z]]]
-[[command *x] [FailPrompt : *fp] [write *fp] [nl] / [command *x]]
+[[command *x] [FailPrompt : *prompt] [write *prompt] [nl] / [command *x]]
 [[command] [command [command]]]
 [[command [[*atom : *t1] : *t2] []] [inner_addcl [[*atom : *t1] :*t2]]]
 [[command [[*atom : *t1] : *t2] []] [write "Can not add clause: " [[[*atom : *t1] : *t2]] "\n"] / fail]
