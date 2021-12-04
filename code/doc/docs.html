@@ -159,6 +159,7 @@
             <a href="#predicate_erase_directory">erase_directory</a>
             <a href="#predicate_execute">execute</a>
             <a href="#predicate_exit">exit</a>
+            <a href="#predicate_expand_search_directory">expand_search_directory</a>
             <a href="#predicate_file_reader">file_reader</a>
             <a href="#predicate_file_writer">file_writer</a>
             <a href="#predicate_foreground">foreground</a>
@@ -1443,6 +1444,22 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_expand_search_directory">
+        <div class="doc_predicate_header">
+            [expand_search_directory "ENVIRONMENT" "path"]<br />
+            [expand_search_directory "ENVIRONMENT" "dir-1" "dir-2" .... "dir-n"]<br />
+            [expand_search_directory]
+        </div>
+        <div class="doc_predicate_body">
+            Adds path(s) to the collection of search paths.
+            The new path(s) begin with the value of the ENVIRONMENT variable.
+            (If the ENVIRONMENT variable does not exist then it fails.)
+            The path, which was added last is the first location to look for files.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_file_reader">
         <div class="doc_predicate_header">
             [file_reader *reader "file_name.extension"] with search path context<br />
@@ -1991,6 +2008,7 @@
             [search_directories] => display<br />
             [search_directories []] => erase<br />
             [search_directories *x] => retrive<br />
+            [search_directories : *x] => retrive<br />
             [search_directories ["dir-1" "dir-2" .... "dir-n"]] => set
         </div>
         <div class="doc_predicate_body">

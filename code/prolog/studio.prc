@@ -15,7 +15,7 @@ program studio #machine := "prolog.studio"
 		write nl pp pt list
 		file_writer import load consult batch run file_reader bootstrap shebang_reader reload
 		remove_module create_module set_machine machine_type protect private protect? private?
-		add_search_directory search_directories environment
+		add_search_directory search_directories environment expand_search_directory
 		cd relativise_path dir ls DIR ARGS args args_tail edit execute make_directory erase erase_directory move copy
 		operating_system implementation version root
 		CL cl addcl addcl0 DELCL OVERWRITE delcl delallcl lambda overwrite let
@@ -544,6 +544,14 @@ auto := [[var QueryPrompt ReplyPrompt [FailPrompt "Doesn't work"]]]
 [[args_tail [] []] /]
 [[args_tail [*t1 : *t] *a] [text_term *t1 : *b] [APPEND *b *c *a] / [args_tail *t *c]]
 
+[[expand_search_directory *]]
+[[expand_search_directory *var *extension : *extensions]
+    [environment *var *varv]
+    [add *varv *extension *path]
+    [add_search_directory *path]
+    [expand_search_directory *var : *extensions]
+]
+
 [[:= *x *x] [is_number *x] /]
 [[:= *x *c] [is_atom *c] / [*c *x]]
 [[:= *x [*f *arg]] [is_atom *f] [:= *ff *arg] [*f *ff *x]]
@@ -594,6 +602,7 @@ protect [
 	not res ONE ALL TRY PROBE SELECT APPEND LENGTH REVERSE ONLIST INLIST NODUP MAP MEMBER REPLACE
 	exit command inner inner_addcl inner_call random_cl explode
 	sort divide
+	expand_search_directory
 	toSymbolicForm sortSymbolicForm addSymbolicForm multiplySymbolicForm := ::=
 	]
 private [inner inner_addcl inner_call random_cl explode divide args_tail]
