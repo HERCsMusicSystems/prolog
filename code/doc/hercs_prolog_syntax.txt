@@ -36,7 +36,7 @@ Otherwise the system bootstraps the name: the system assumes the name specifies 
 If the file was not found then the .prc extension is added at the end of the name, the module is loaded and the tail instructions are performed.
 
 Modules are searched in the following order:
-1. The system tries to load and embedded module.
+1. The system tries to load an embedded module.
 2. The system tries to load a text module from present working directory.
 3. The system tries to load a text module from locations specified by search_directories array.
 4. The system tries to load a binary module.
@@ -44,3 +44,4 @@ Modules are searched in the following order:
 Batch files are searched in the following order:
 1. The system tries to load a batch file from present working directory.
 2. The system tries to load a batch file from locations specified by search_directories array.
+
