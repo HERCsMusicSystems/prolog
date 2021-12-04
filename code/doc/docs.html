@@ -2798,7 +2798,7 @@
             [ACCUMULATOR accu]<br />
             ==================<br />
             [accu term] => adds term as head<br />
-            [accu : *term] => retrieves the current list<br />
+            [accu : *term] [accu *var] => retrieves the current list<br />
             [accu] => destroys the accumulator
         </div>
         <div class="doc_predicate_body">
@@ -2872,6 +2872,7 @@
             ==================<br />
             [array index-1 index-2 .... index-n value] => set value<br />
             [array index-1 index-2 .... index-n : *value] => get value<br />
+            [array index-1 index-2 .... index-n *value] => get value<br />
             [array] => destroys the array
         </div>
         <div class="doc_predicate_body">
@@ -2900,7 +2901,7 @@
         <div class="doc_predicate_header">
             [CONSTANT const value]<br />
             ==================<br />
-            [const : *term] => retrieves the value
+            [const : *var] [const *var] => retrieves the value
         </div>
         <div class="doc_predicate_body">
             Constructs a constant.
@@ -3630,7 +3631,11 @@
     <a id="predicate_VARIABLE">
         <div class="doc_predicate_header">
             [VARIABLE atom value]<br />
-            [VARIABLE atom]
+            [VARIABLE atom]<br/>
+            ==================<br />
+            [atom term] => sets the new value<br />
+            [atom : *term] [atom *var] => retrieves the current value<br />
+            [atom] => destroys the variable
         </div>
         <div class="doc_predicate_body">
             Creates a variable.

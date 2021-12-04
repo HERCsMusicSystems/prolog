@@ -3305,7 +3305,8 @@ private:
 	PrologElement * container;
 public:
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
-		parameters -> duplicate (container);
+		if (parameters -> isPair ()) parameters -> getLeft () -> duplicate (container);
+		else parameters -> duplicate (container);
 		return true;
 	}
 	constant (PrologElement * term) {container = term -> duplicate ();}
@@ -3342,8 +3343,10 @@ private:
 public:
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (parameters -> isPair ()) {
+			parameters = parameters -> getLeft ();
+			if (parameters -> isVar ()) {parameters -> duplicate (container); return true;}
 			delete container;
-			container = parameters -> getLeft () -> duplicate ();
+			container = parameters -> duplicate ();
 			return true;
 		}
 		if (parameters -> isVar ()) {
@@ -3399,9 +3402,11 @@ private:
 public:
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (parameters -> isPair ()) {
+			parameters = parameters -> getLeft ();
+			if (parameters -> isVar ()) {parameters -> duplicate (container); return true;}
 			resolution -> reset ();
 			PrologElement * e = new PrologElement ();
-			e -> setPair (resolution -> match_product (parameters -> getLeft (), true), resolution -> match_product (container, false));
+			e -> setPair (resolution -> match_product (parameters, true), resolution -> match_product (container, false));
 			delete container;
 			container = e;
 			return true;
@@ -3614,6 +3619,7 @@ public:
 			return true;
 		}
 		int ind = dimensions;
+		if (ind < 1) return false;
 		array_dimension * current_dimension = dimension;
 		PrologElement * left;
 		while (ind > 1) {
@@ -3632,8 +3638,10 @@ public:
 		PrologElement * * container = current_dimension -> get_element (left -> getInteger ());
 		if (container == NULL) return false;
 		if (parameters -> isPair ()) {
+			parameters = parameters -> getLeft ();
+			if (parameters -> isVar ()) {parameters -> duplicate (* container); return true;}
 			delete * container;
-			* container = parameters -> getLeft () -> duplicate ();
+			* container = parameters -> duplicate ();
 			return true;
 		}
 		if (parameters -> isVar ()) {
