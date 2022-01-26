@@ -487,7 +487,7 @@ program studio #machine := "prolog.studio"
 ;[[inner [[*atom : *] : *] []]]
 [[inner [* : *] []]]
 [[inner *x *y] [pr *y]]
-[[inner [*x *y]] [pr *x] [inner *x *y] /]
+[[inner [*x *y]] [pr *x] [inner *x *y] [TRY [eq exit *x] [save_history] [show 'Command history saved.']] /]
 [[inner [*x *y]] [readln *x] fail]
 
 [[inner_addcl [[*atom : *t1] : *t2]]
@@ -503,7 +503,7 @@ program studio #machine := "prolog.studio"
 [[command [[exit : *]]]]
 [[command *x] [QueryPrompt : *prompt] [write *prompt] [inner [*y *z]] [command *y *z] / [command [*y : *z]]]
 [[command *x] [FailPrompt : *prompt] [write *prompt] [nl] / [command *x]]
-[[command] [command [command]]]
+[[command] [TRY [load_history]] [command [command]]]
 [[command [[*atom : *t1] : *t2] []] [inner_addcl [[*atom : *t1] :*t2]]]
 [[command [[*atom : *t1] : *t2] []] [write "Can not add clause: " [[[*atom : *t1] : *t2]] "\n"] / fail]
 [[command [*x : *y] []] / [inner_call [*x : *y]] [ReplyPrompt : *prompt] [write *prompt] [show [*x : *y]]]
