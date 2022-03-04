@@ -77,6 +77,11 @@ bool PrologLoader :: load (char * file_name) {
 	return ret;
 }
 
+#define FAIL\
+	root -> drop ();\
+	close ();\
+	return false;
+
 extern char * load_plugin_module (char * name);
 bool PrologLoader :: LOAD (char * file_name) {
 	bool ret;
