@@ -163,6 +163,7 @@ bool PrologLoader :: LOAD (char * file_name) {
 		directory = root -> createDirectory (program_name, service_class);
 	} else directory = root -> createDirectory (program_name);
 	root -> auto_atoms = false;
+	if (symbol_control == 11 && strcmp (root -> public_caption, symbol) == 0) get_symbol ();
 	switch (symbol_control) {
 	case 11:
 		if (strcmp (root -> auto_atoms_caption, symbol) != 0) {message ("Syntax error: auto expected."); FAIL;}

@@ -103,6 +103,7 @@ void PrologRoot :: set_uap32_captions (void) {
 	prolog_string_copy (auto_atoms_caption, "#auto");
 	prolog_string_copy (auto_caption, "auto");
 	prolog_string_copy (preprocessor_caption, "preprocessor");
+	prolog_string_copy (public_caption, "public");
 	prolog_string_copy (protect_caption, "protect");
 	prolog_string_copy (private_caption, "private");
 	prolog_string_copy (end_caption, "end");
@@ -143,6 +144,7 @@ void PrologRoot :: set_standard_captions (void) {
 	prolog_string_copy (auto_atoms_caption, "#auto");
 	prolog_string_copy (auto_caption, "auto");
 	prolog_string_copy (preprocessor_caption, "preprocessor");
+	prolog_string_copy (public_caption, "public");
 	prolog_string_copy (protect_caption, "protect");
 	prolog_string_copy (private_caption, "private");
 	prolog_string_copy (end_caption, "end");
@@ -184,6 +186,7 @@ void PrologRoot :: set_edinburg_captions (void) {
 	prolog_string_copy (auto_atoms_caption, "#auto");
 	prolog_string_copy (auto_caption, "auto");
 	prolog_string_copy (preprocessor_caption, "preprocessor");
+	prolog_string_copy (public_caption, "public");
 	prolog_string_copy (protect_caption, "protect");
 	prolog_string_copy (private_caption, "private");
 	prolog_string_copy (end_caption, "end");
@@ -224,6 +227,7 @@ void PrologRoot :: set_marseille_captions (void) {
 	prolog_string_copy (auto_atoms_caption, "#auto");
 	prolog_string_copy (auto_caption, "auto");
 	prolog_string_copy (preprocessor_caption, "preprocessor");
+	prolog_string_copy (public_caption, "public");
 	prolog_string_copy (protect_caption, "protect");
 	prolog_string_copy (private_caption, "private");
 	prolog_string_copy (end_caption, "end");
@@ -264,6 +268,7 @@ void PrologRoot :: set_functional_captions (void) {
 	prolog_string_copy (auto_atoms_caption, "#auto");
 	prolog_string_copy (auto_caption, "auto");
 	prolog_string_copy (preprocessor_caption, "preprocessor");
+	prolog_string_copy (public_caption, "public");
 	prolog_string_copy (protect_caption, "protect");
 	prolog_string_copy (private_caption, "private");
 	prolog_string_copy (end_caption, "end");
@@ -304,6 +309,7 @@ void PrologRoot :: set_mathematical_captions (void) {
 	prolog_string_copy (auto_atoms_caption, "#auto");
 	prolog_string_copy (auto_caption, "auto");
 	prolog_string_copy (preprocessor_caption, "preprocessor");
+	prolog_string_copy (public_caption, "public");
 	prolog_string_copy (protect_caption, "protect");
 	prolog_string_copy (private_caption, "private");
 	prolog_string_copy (end_caption, "end");
