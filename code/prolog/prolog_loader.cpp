@@ -80,6 +80,7 @@ bool PrologLoader :: load (char * file_name) {
 #define FAIL\
 	root -> drop ();\
 	close ();\
+	if (private_atoms) delete private_atoms;\
 	return false;
 
 extern char * load_plugin_module (char * name);
@@ -163,7 +164,9 @@ bool PrologLoader :: LOAD (char * file_name) {
 		directory = root -> createDirectory (program_name, service_class);
 	} else directory = root -> createDirectory (program_name);
 	root -> auto_atoms = false;
-	if (symbol_control == 11 && strcmp (root -> public_caption, symbol) == 0) get_symbol ();
+	bool public_section = false;
+	PrologString * private_atoms = 0;
+	if (symbol_control == 11 && strcmp (root -> public_caption, symbol) == 0) {get_symbol (); public_section = true;}
 	switch (symbol_control) {
 	case 11:
 		if (strcmp (root -> auto_atoms_caption, symbol) != 0) {message ("Syntax error: auto expected."); FAIL;}
@@ -241,6 +244,8 @@ bool PrologLoader :: LOAD (char * file_name) {
 					get_symbol ();
 				}
 				if (symbol_control == 21) {
+					PrologString * pa = private_atoms; while (pa != 0) {root -> Private (pa -> text); pa = pa -> next;}
+					if (private_atoms) delete private_atoms;
 					if (echo) message ("");
 					root -> close ();
 					if (clause != 0) instructions = clause;
@@ -273,7 +278,9 @@ bool PrologLoader :: LOAD (char * file_name) {
 				get_symbol ();
 				while (symbol_control != 2) {
 					if (symbol_control != 11) {message ("Syntax error: atom expected."); FAIL;}
-					if (! root -> Private (symbol)) {root -> message ("Can not lock unknown atom as private:", symbol); FAIL;}
+					if (public_section) {
+						if (! root -> Private (symbol)) {root -> createAtom (symbol); search_context -> firstAtom = root -> root -> firstAtom; private_atoms = new PrologString (symbol, private_atoms);}
+					} else if (! root -> Private (symbol)) {root -> message ("Can not lock unknown atom as private:", symbol); FAIL;}
 					get_symbol ();
 					if (strlen (root -> separator_caption) > 0) {
 						if (symbol_control != 23 && symbol_control != 2) {message ("Syntax error: separator missing."); FAIL;}
