@@ -166,7 +166,7 @@ bool PrologLoader :: LOAD (char * file_name) {
 	} else directory = root -> createDirectory (program_name);
 	root -> auto_atoms = false;
 	bool public_section = false;
-	PrologString * private_atoms = 0, * protected_atoms = 0;
+	PrologString * protected_atoms = 0, * private_atoms = 0;
 	if (symbol_control == 11 && strcmp (root -> public_caption, symbol) == 0) {get_symbol (); public_section = true;}
 	switch (symbol_control) {
 	case 11:
@@ -256,6 +256,24 @@ bool PrologLoader :: LOAD (char * file_name) {
 					return true;
 				}
 				message ("Syntax error: dot expected."); FAIL;
+			}
+			if (strcmp (root -> public_caption, symbol) == 0) {
+				public_section = true;
+				get_symbol ();
+				if (symbol_control == 6) {get_symbol (); break;}
+				if (symbol_control != 1) {message ("Syntax error: atome list expected."); FAIL;}
+				get_symbol ();
+				while (symbol_control != 2) {
+					if (symbol_control != 11) {message ("Syntax error: atom expected."); FAIL;}
+					root -> createAtom (symbol); search_context -> firstAtom = root -> root -> firstAtom;
+					get_symbol ();
+					if (strlen (root -> separator_caption) > 0) {
+						if (symbol_control != 23 && symbol_control != 2) {message ("Syntax error: separator missing."); FAIL;}
+						if (symbol_control == 23) get_symbol ();
+					}
+				}
+				get_symbol ();
+				break;
 			}
 			if (strcmp (root -> protect_caption, symbol) == 0) {
 				get_symbol ();
