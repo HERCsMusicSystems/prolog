@@ -81,6 +81,7 @@ bool PrologLoader :: load (char * file_name) {
 	root -> drop ();\
 	close ();\
 	if (private_atoms) delete private_atoms;\
+	if (protected_atoms) delete protected_atoms;\
 	return false;
 
 extern char * load_plugin_module (char * name);
@@ -165,7 +166,7 @@ bool PrologLoader :: LOAD (char * file_name) {
 	} else directory = root -> createDirectory (program_name);
 	root -> auto_atoms = false;
 	bool public_section = false;
-	PrologString * private_atoms = 0;
+	PrologString * private_atoms = 0, * protected_atoms = 0;
 	if (symbol_control == 11 && strcmp (root -> public_caption, symbol) == 0) {get_symbol (); public_section = true;}
 	switch (symbol_control) {
 	case 11:
@@ -244,7 +245,9 @@ bool PrologLoader :: LOAD (char * file_name) {
 					get_symbol ();
 				}
 				if (symbol_control == 21) {
-					PrologString * pa = private_atoms; while (pa != 0) {root -> Private (pa -> text); pa = pa -> next;}
+					PrologString * pa = protected_atoms; while (pa != 0) {root -> Protect (pa -> text); pa = pa -> next;}
+					if (protected_atoms) delete protected_atoms;
+					pa = private_atoms; while (pa != 0) {root -> Private (pa -> text); pa = pa -> next;}
 					if (private_atoms) delete private_atoms;
 					if (echo) message ("");
 					root -> close ();
@@ -261,7 +264,9 @@ bool PrologLoader :: LOAD (char * file_name) {
 				get_symbol ();
 				while (symbol_control != 2) {
 					if (symbol_control != 11) {message ("Syntax error: atom expected."); FAIL;}
-					if (! root -> Protect (symbol)) {root -> message ("Can not protect unknown atom:", symbol); FAIL;}
+					if (public_section) {
+						if (! root -> Protect (symbol)) {root -> createAtom (symbol); search_context -> firstAtom = root -> root -> firstAtom; protected_atoms = new PrologString (symbol, protected_atoms);}
+					} else if (! root -> Protect (symbol)) {root -> message ("Can not protect unknown atom:", symbol); FAIL;}
 					get_symbol ();
 					if (strlen (root -> separator_caption) > 0) {
 						if (symbol_control != 23 && symbol_control != 2) {message ("Syntax error: separator missing."); FAIL;}
@@ -354,9 +359,13 @@ bool PrologLoader :: LOAD (char * file_name) {
 			clause = readClause ();
 			get_symbol ();
 			// suspicious drop 3
-			if (clause == NULL) {FAIL;}
+			if (clause == NULL) {message ("Clause was null."); FAIL;}
 			if (root -> attachClause (clause) == 0) break;
 			// suspicious drop 4
+			AREA area;
+			root -> getValue (clause, area, 0);
+			message_v ("Can not add clause", area);
+			delete clause;
 			FAIL;
 		default: message ("Syntax error: at least clause expected."); FAIL;
 		}
