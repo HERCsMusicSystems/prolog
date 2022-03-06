@@ -77,6 +77,13 @@ bool PrologLoader :: load (char * file_name) {
 	return ret;
 }
 
+#define FAIL\
+	root -> drop ();\
+	close ();\
+	if (private_atoms) delete private_atoms;\
+	if (protected_atoms) delete protected_atoms;\
+	return false;
+
 extern char * load_plugin_module (char * name);
 bool PrologLoader :: LOAD (char * file_name) {
 	bool ret;
@@ -158,14 +165,12 @@ bool PrologLoader :: LOAD (char * file_name) {
 		directory = root -> createDirectory (program_name, service_class);
 	} else directory = root -> createDirectory (program_name);
 	root -> auto_atoms = false;
+	bool public_section = false;
+	PrologString * protected_atoms = 0, * private_atoms = 0;
+	if (symbol_control == 11 && strcmp (root -> public_caption, symbol) == 0) {get_symbol (); public_section = true;}
 	switch (symbol_control) {
 	case 11:
-		if (strcmp (root -> auto_atoms_caption, symbol) != 0) {
-			message ("Syntax error: auto expected.");
-			root -> drop ();
-			close ();
-			return false;
-		}
+		if (strcmp (root -> auto_atoms_caption, symbol) != 0) {message ("Syntax error: auto expected."); FAIL;}
 		root -> auto_atoms = true;
 		get_symbol ();
 		break;
@@ -176,27 +181,17 @@ bool PrologLoader :: LOAD (char * file_name) {
 			switch (symbol_control) {
 			case 11: root -> createAtom (symbol); break;
 			case 21: root -> createAtom (symbol); break;
-			default:
-				message ("Syntax error: atom expected.");
-				root -> drop ();
-				close ();
-				return false;
-				break;
+			default: message ("Syntax error: atom expected."); FAIL; break;
 			}
 			get_symbol ();
 			if (strlen (root -> separator_caption) > 0) {
-				if (symbol_control != 23 && symbol_control != 2) {
-					message ("Syntax error: separator missing.");
-					root -> drop ();
-					close ();
-					return false;
-				}
+				if (symbol_control != 23 && symbol_control != 2) {message ("Syntax error: separator missing."); FAIL;}
 				if (symbol_control == 23) get_symbol ();
 			}
 		}
 		get_symbol ();
 		break;
-	default: message ("Syntax error: atome list expected."); root -> drop (); close (); return false;
+	default: message ("Syntax error: atome list expected."); FAIL;
 	}
 	//
 	if (service_class != 0) service_class -> init (root, directory);
@@ -225,52 +220,17 @@ bool PrologLoader :: LOAD (char * file_name) {
 		case 11:
 			if (strcmp (root -> machine_caption, symbol) == 0) {
 				get_symbol ();
-				if (symbol_control != 11) {
-					message ("Syntax error: atom expected.");
-					root -> drop ();
-					close ();
-					return false;
-				}
+				if (symbol_control != 11) {message ("Syntax error: atom expected."); FAIL;}
 				atom = searchAtomC (symbol); //root -> search (symbol);
-				if (atom == NULL) {
-					message_v ("Unknown atom: ", symbol);
-					root -> drop ();
-					close ();
-					return false;
-				}
-				if (atom -> getMachine () != 0) {
-					message_v ("Atom has already machine code attached: ", symbol);
-					root -> drop ();
-					close ();
-					return false;
-				}
+				if (atom == NULL) {message_v ("Unknown atom: ", symbol); FAIL;}
+				if (atom -> getMachine () != 0) {message_v ("Atom has already machine code attached: ", symbol); FAIL;}
 				get_symbol ();
-				if (symbol_control != 11 || strcmp (root -> if_atom_caption, symbol) != 0) {
-					message ("Syntax error: machine assignment expected.");
-					root -> drop ();
-					close ();
-					return false;
-				}
+				if (symbol_control != 11 || strcmp (root -> if_atom_caption, symbol) != 0) {message ("Syntax error: machine assignment expected."); FAIL;}
 				get_symbol ();
-				if (symbol_control != 8) {
-					message ("Syntax error: machine name expected.");
-					root -> drop ();
-					close ();
-					return false;
-				}
-				if (service_class == NULL) {
-					message ("Service class missing.");
-					root -> drop ();
-					close ();
-					return false;
-				}
+				if (symbol_control != 8) {message ("Syntax error: machine name expected."); FAIL;}
+				if (service_class == NULL) {message ("Service class missing."); FAIL;}
 				native_code = service_class -> getNativeCode (symbol);
-				if (native_code == NULL) {
-					message_v ("Unknown native class: ", symbol);
-					root -> drop ();
-					close ();
-					return false;
-				}
+				if (native_code == NULL) {message_v ("Unknown native class: ", symbol); FAIL;}
 				atom -> setMachine (native_code);
 				get_symbol ();
 				break;
@@ -281,57 +241,53 @@ bool PrologLoader :: LOAD (char * file_name) {
 				clause = NULL;
 				if (symbol_control == 11 && strcmp (root -> if_atom_caption, symbol) == 0) {
 					clause = readElement ();
-					if (clause == NULL) {
-						// suspiciouse drop 1
-						root -> drop ();
-						close ();
-						return false;
-					}
+					if (clause == NULL) {FAIL;}
 					get_symbol ();
 				}
 				if (symbol_control == 21) {
+					PrologString * pa = protected_atoms; while (pa != 0) {root -> Protect (pa -> text); pa = pa -> next;}
+					if (protected_atoms) delete protected_atoms;
+					pa = private_atoms; while (pa != 0) {root -> Private (pa -> text); pa = pa -> next;}
+					if (private_atoms) delete private_atoms;
 					if (echo) message ("");
 					root -> close ();
 					if (clause != 0) instructions = clause;
 					close ();
 					return true;
 				}
-				message ("Syntax error: dot expected.");
-				root -> drop ();
-				close ();
-				return false;
+				message ("Syntax error: dot expected."); FAIL;
+			}
+			if (strcmp (root -> public_caption, symbol) == 0) {
+				public_section = true;
+				get_symbol ();
+				if (symbol_control == 6) {get_symbol (); break;}
+				if (symbol_control != 1) {message ("Syntax error: atome list expected."); FAIL;}
+				get_symbol ();
+				while (symbol_control != 2) {
+					if (symbol_control != 11) {message ("Syntax error: atom expected."); FAIL;}
+					root -> createAtom (symbol); search_context -> firstAtom = root -> root -> firstAtom;
+					get_symbol ();
+					if (strlen (root -> separator_caption) > 0) {
+						if (symbol_control != 23 && symbol_control != 2) {message ("Syntax error: separator missing."); FAIL;}
+						if (symbol_control == 23) get_symbol ();
+					}
+				}
+				get_symbol ();
+				break;
 			}
 			if (strcmp (root -> protect_caption, symbol) == 0) {
 				get_symbol ();
 				if (symbol_control == 6) {get_symbol (); break;}
-				if (symbol_control != 1) {
-					message ("Syntax error: atome list expected.");
-					root -> drop ();
-					close ();
-					return false;
-				}
+				if (symbol_control != 1) {message ("Syntax error: atome list expected."); FAIL;}
 				get_symbol ();
 				while (symbol_control != 2) {
-					if (symbol_control != 11) {
-						message ("Syntax error: atom expected.");
-						root -> drop ();
-						close ();
-						return false;
-					}
-					if (! root -> Protect (symbol)) {
-						root -> message ("Can not protect unknown atom:", symbol);
-						root -> drop ();
-						close ();
-						return false;
-					}
+					if (symbol_control != 11) {message ("Syntax error: atom expected."); FAIL;}
+					if (public_section) {
+						if (! root -> Protect (symbol)) {root -> createAtom (symbol); search_context -> firstAtom = root -> root -> firstAtom; protected_atoms = new PrologString (symbol, protected_atoms);}
+					} else if (! root -> Protect (symbol)) {root -> message ("Can not protect unknown atom:", symbol); FAIL;}
 					get_symbol ();
 					if (strlen (root -> separator_caption) > 0) {
-						if (symbol_control != 23 && symbol_control != 2) {
-							message ("Syntax error: separator missing.");
-							root -> drop ();
-							close ();
-							return false;
-						}
+						if (symbol_control != 23 && symbol_control != 2) {message ("Syntax error: separator missing."); FAIL;}
 						if (symbol_control == 23) get_symbol ();
 					}
 				}
@@ -341,34 +297,16 @@ bool PrologLoader :: LOAD (char * file_name) {
 			if (strcmp (root -> private_caption, symbol) == 0) {
 				get_symbol ();
 				if (symbol_control == 6) {get_symbol (); break;}
-				if (symbol_control != 1) {
-					message ("Syntax error: atome list expected.");
-					root -> drop ();
-					close ();
-					return false;
-				}
+				if (symbol_control != 1) {message ("Syntax error: atome list expected."); FAIL;}
 				get_symbol ();
 				while (symbol_control != 2) {
-					if (symbol_control != 11) {
-						message ("Syntax error: atom expected.");
-						root -> drop ();
-						close ();
-						return false;
-					}
-					if (! root -> Private (symbol)) {
-						root -> message ("Can not lock unknown atom as private:", symbol);
-						root -> drop ();
-						close ();
-						return false;
-					}
+					if (symbol_control != 11) {message ("Syntax error: atom expected."); FAIL;}
+					if (public_section) {
+						if (! root -> Private (symbol)) {root -> createAtom (symbol); search_context -> firstAtom = root -> root -> firstAtom; private_atoms = new PrologString (symbol, private_atoms);}
+					} else if (! root -> Private (symbol)) {root -> message ("Can not lock unknown atom as private:", symbol); FAIL;}
 					get_symbol ();
 					if (strlen (root -> separator_caption) > 0) {
-						if (symbol_control != 23 && symbol_control != 2) {
-							message ("Syntax error: separator missing.");
-							root -> drop ();
-							close ();
-							return false;
-						}
+						if (symbol_control != 23 && symbol_control != 2) {message ("Syntax error: separator missing."); FAIL;}
 						if (symbol_control == 23) get_symbol ();
 					}
 				}
@@ -377,12 +315,7 @@ bool PrologLoader :: LOAD (char * file_name) {
 			}
 			if (strcmp (root -> preprocessor_caption, symbol) == 0) {
 				get_symbol ();
-				if (symbol_control != 11 && strcmp (root -> if_atom_caption, symbol) != 0) {
-					message ("Syntax error: preprocessor assignment expected.");
-					root -> drop ();
-					close ();
-					return false;
-				}
+				if (symbol_control != 11 && strcmp (root -> if_atom_caption, symbol) != 0) {message ("Syntax error: preprocessor assignment expected."); FAIL;}
 				get_symbol ();
 				if (symbol_control == 6) {
 //					directory -> setPreprocessor (NULL);
@@ -393,49 +326,19 @@ bool PrologLoader :: LOAD (char * file_name) {
 				if (symbol_control != 11) {
 					if (symbol_control == 22) {
 						get_symbol ();
-						if (symbol_control != 11) {
-							message ("Syntax error: directory name expected in qualified preprocessor name.");
-							root -> drop ();
-							close ();
-							return false;
-						}
+						if (symbol_control != 11) {message ("Syntax error: directory name expected in qualified preprocessor name."); FAIL;}
 						preprocessor_directory = root -> searchDirectory (symbol);
-						if (preprocessor_directory == NULL) {
-							message_v ("Directory not found in qualified preprocessor name:", symbol);
-							root -> drop ();
-							close ();
-							return false;
-						}
+						if (preprocessor_directory == NULL) {message_v ("Directory not found in qualified preprocessor name:", symbol); FAIL;}
 						get_symbol ();
-						if (symbol_control != 21) {
-							message ("Syntax error: dot expected in qualified preprocessor name.");
-							root -> drop ();
-							close ();
-							return false;
-						}
+						if (symbol_control != 21) {message ("Syntax error: dot expected in qualified preprocessor name."); FAIL;}
 						get_symbol ();
-						if (symbol_control != 11) {
-							message ("Syntax error: qualified preprocessor name expected.");
-							root -> drop ();
-							close ();
-							return false;
-						}
+						if (symbol_control != 11) {message ("Syntax error: qualified preprocessor name expected."); FAIL;}
 						atom = preprocessor_directory -> searchAtom (symbol);
-					} else {
-						message ("Syntax error: atom expected.");
-						root -> drop ();
-						close ();
-						return false;
-					}
+					} else {message ("Syntax error: atom expected."); FAIL;}
 				} else {
 					atom = searchAtom (symbol); //root -> search (symbol);
 				}
-				if (atom == NULL) {
-					message_v ("Unknown atom: ", symbol);
-					root -> drop ();
-					close ();
-					return false;
-				}
+				if (atom == NULL) {message_v ("Unknown atom: ", symbol); FAIL;}
 //				directory -> setPreprocessor (atom);
 				preprocessor = atom;
 				get_symbol ();
@@ -443,15 +346,10 @@ bool PrologLoader :: LOAD (char * file_name) {
 			}
 			if (strcmp (root -> auto_caption, symbol) == 0) {
 				get_symbol ();
-				if (symbol_control != 11 && strcmp (root -> if_atom_caption, symbol) != 0) {
-					message ("Syntax error: auto assignment expected.");
-					root -> drop ();
-					close ();
-					return false;
-				}
+				if (symbol_control != 11 && strcmp (root -> if_atom_caption, symbol) != 0) {message ("Syntax error: auto assignment expected."); FAIL;}
 				clause = readElement ();
 				// suspicious drop 2
-				if (clause == NULL) {root -> drop (); close (); return false;}
+				if (clause == NULL) {FAIL;}
 				clause = root -> pair (root -> head (NULL), clause);
 				//root -> resolution (clause);
 				resolution = new PrologResolution (root);
@@ -465,9 +363,9 @@ bool PrologLoader :: LOAD (char * file_name) {
 //			atom = root -> getPreprocessor ();
 			if (preprocessor != NULL) {
 				clause = readElement ();
-				if (clause == NULL) {root -> drop (); close (); return false;}
+				if (clause == NULL) {FAIL;}
 				clause = readRightSide (clause, false);
-				if (clause == NULL) {root -> drop (); close (); return false;}
+				if (clause == NULL) {FAIL;}
 				get_symbol ();
 				clause = root -> pair (root -> var (0), root -> pair (root -> pair (root -> atom (preprocessor), root -> pair (clause, root -> earth ())), root -> earth ()));
 				resolution = new PrologResolution (root);
@@ -479,13 +377,15 @@ bool PrologLoader :: LOAD (char * file_name) {
 			clause = readClause ();
 			get_symbol ();
 			// suspicious drop 3
-			if (clause == NULL) {root -> drop (); close (); return false;}
+			if (clause == NULL) {message ("Clause was null."); FAIL;}
 			if (root -> attachClause (clause) == 0) break;
 			// suspicious drop 4
-			root -> drop ();
-			close ();
-			return false;
-		default: message ("Syntax error: at least clause expected."); root -> drop (); close (); return false;
+			AREA area;
+			root -> getValue (clause, area, 0);
+			message_v ("Can not add clause", area);
+			delete clause;
+			FAIL;
+		default: message ("Syntax error: at least clause expected."); FAIL;
 		}
 	}
 }

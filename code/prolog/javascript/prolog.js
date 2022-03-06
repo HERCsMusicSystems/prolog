@@ -180,6 +180,7 @@ var Root = function () {
 	this . assignment_caption = ':=';
 	this . machine_caption = '#machine';
 	this . auto_caption = 'auto';
+	this . public_caption = 'public';
 	this . private_caption = 'private';
 	this . protect_caption = 'protect';
 	this . auto_atoms = false;

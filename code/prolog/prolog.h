@@ -304,6 +304,7 @@ public:
 	PROLOG_STRING auto_atoms_caption;
 	PROLOG_STRING auto_caption;
 	PROLOG_STRING preprocessor_caption;
+	PROLOG_STRING public_caption;
 	PROLOG_STRING protect_caption;
 	PROLOG_STRING private_caption;
 	PROLOG_STRING end_caption;
