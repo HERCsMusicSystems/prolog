@@ -266,6 +266,7 @@ class PrologRoot TRACK {
 public:
 	PrologString * search_directories;
 	PrologString * args;
+	int * ARGS; char * * * ARGV;
 	PrologDirectory * root;
 	PrologCommand * command;
 	PrologResourceLoader * resource_loader;

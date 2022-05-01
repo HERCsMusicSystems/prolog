@@ -128,6 +128,7 @@ int main (int args, char * argv []) {
 	root -> setResourceLoader (& resource_loader);
 	root -> setServiceClassLoader (& service_class_loader);
 	root -> set_uap32_captions ();
+	root -> ARGS = & args; root -> ARGV = & argv;
 	char * name = 0;
 	for (int ind = 1; ind < args; ind++) {
 		if (name == 0) name = argv [ind];

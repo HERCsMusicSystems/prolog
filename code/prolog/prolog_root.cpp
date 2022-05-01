@@ -34,7 +34,7 @@ PrologRoot :: PrologRoot (void) TRACKING (5) {
 	strcpy (serial_number, "");
 	strcpy (key, "");
 	search_directories = NULL;
-	args = NULL;
+	args = NULL; ARGS = 0; ARGV = 0;
 	volume_id = 0;
 	serial_shift = 0;
 	current_foreground = 0xffff00;
