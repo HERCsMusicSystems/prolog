@@ -4385,7 +4385,7 @@ public:
 		char serial_number [64];
 		encoder e;
 		e . volumise_serial (serial_number, root -> serial_number, root -> volume_id);
-		parameters -> setPair (root -> text (serial_number), root -> earth ());
+		parameters -> setText (serial_number);
 		return true;
 	}
 	get_volume_serial_number (PrologRoot * root) {this -> root = root;}
