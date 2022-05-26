@@ -39,7 +39,7 @@ program studio #machine := "prolog.studio"
 		rnd rnd_control grnd series random grandom
 		crack wait timeout enter signal semaphore msemaphore mutex accept select critical_section monitor task
 		background foreground open_editor close_editor screen_coordinates
-		get_volume_serial_number security_check encoder
+		get_volume_serial_number security_check encoder SerialNumber VolumeSerialNumber SerialKey VolumeID SerialShift
 
 		. computer-do-this define-this show
 	]
@@ -230,6 +230,11 @@ program studio #machine := "prolog.studio"
 #machine get_volume_serial_number := "get_volume_serial_number"
 #machine security_check := "security_check"
 #machine encoder := "encoder"
+#machine SerialNumber := "SerialNumber"
+#machine VolumeSerialNumber := "get_volume_serial_number"
+#machine SerialKey := "SerialKey"
+#machine VolumeID := "VolumeID"
+#machine SerialShift := "SerialShift"
 
 [[grnd : *parameters] [rnd : *parameters]]
 [[grnd : *parameters] / [grnd : *parameters]]

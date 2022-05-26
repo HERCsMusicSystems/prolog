@@ -4321,10 +4321,67 @@ public:
 
 #include "encoder.h"
 
+class SerialNumber : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (parameters -> isText ()) strcpy (root -> serial_number, parameters -> getText ());
+		else parameters -> setText (root -> serial_number);
+		return true;
+	};
+	SerialNumber (PrologRoot * root) {this -> root = root;};
+};
+
+class SerialKey : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (parameters -> isText ()) strcpy (root -> key, parameters -> getText ());
+		else parameters -> setText (root -> key);
+		return true;
+	};
+	SerialKey (PrologRoot * root) {this -> root = root;};
+};
+
+class SerialShift : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (parameters -> isInteger ()) root -> serial_shift = parameters -> getInteger ();
+		else root -> serial_shift = parameters -> getInteger ();
+		return true;
+	};
+	SerialShift (PrologRoot * root) {this -> root = root;};
+};
+
+class VolumeID : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (parameters -> isText ()) {
+			char * cp;
+			root -> volume_id = strtoul (parameters -> getText (), & cp, 16);
+		} else if (parameters -> isInteger ()) {
+			root -> volume_id = parameters -> getInteger ();
+		} else {
+			char command [64];
+			sprintf (command, "%lX", root -> volume_id);
+			parameters -> setText (command);
+		}
+		return true;
+	};
+	VolumeID (PrologRoot * root) {this -> root = root;};
+};
+
 class get_volume_serial_number : public PrologNativeCode {
 public:
 	PrologRoot * root;
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
 		char serial_number [64];
 		encoder e;
 		e . volumise_serial (serial_number, root -> serial_number, root -> volume_id);
@@ -4339,6 +4396,12 @@ public:
 	PrologRoot * root;
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
 		encoder e;
+		char serial_number [64];
+		e . volumise_serial (serial_number, root -> serial_number, root -> volume_id);
+		printf ("VOLUME ID [%lX].\n", root -> volume_id);
+		printf ("SERIAL SHIFT [%i].\n", root -> serial_shift);
+		printf ("SERIAL NUMBER [%s => %s].\n", root -> serial_number, serial_number);
+		printf ("KEY [%s].\n", root -> key);
 		return e . check_serial (root -> serial_number, root -> volume_id, root -> key, root -> serial_shift);
 	}
 	security_check (PrologRoot * root) {this -> root = root;}
@@ -4571,6 +4634,10 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "get_volume_serial_number") == 0) return new get_volume_serial_number (root);
 	if (strcmp (name, "security_check") == 0) return new security_check (root);
 	if (strcmp (name, "encoder") == 0) return new encoder_class (root);
+	if (strcmp (name, "SerialNumber") == 0) return new SerialNumber (root);
+	if (strcmp (name, "SerialKey") == 0) return new SerialKey (root);
+	if (strcmp (name, "VolumeID") == 0) return new VolumeID (root);
+	if (strcmp (name, "SerialShift") == 0) return new SerialShift (root);
 
 	return NULL;
 }
