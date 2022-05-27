@@ -199,10 +199,15 @@
             <a href="#predicate_screen_coordinates">screen_coordinates</a>
             <a href="#predicate_search_directories">search_directories</a>
             <a href="#predicate_security_check">security_check</a>
+            <a href="#predicate_SerialKey">SerialKey</a>
+            <a href="#predicate_SerialNumber">SerialNumber</a>
+            <a href="#predicate_SerialShift">SerialShift</a>
             <a href="#predicate_set_captions">set_...._captions</a>
             <a href="#predicate_set_machine">set_machine</a>
             <a href="#predicate_shebang_reader">shebang_reader</a>
             <a href="#predicate_show">show</a>
+            <a href="#predicate_VolumeID">VolumeID</a>
+            <a href="#predicate_get_volume_serial_number">VolumeSerialNumber</a>
             <a href="#predicate_write">write</a>
         </li>
         <li><a href="#clause_atome">Clause and Atome manipulation</a>
@@ -1532,10 +1537,11 @@
 <div class="doc_predicate">
     <a id="predicate_get_volume_serial_number">
         <div class="doc_predicate_header">
-            [get_volume_serial_number *text]
+            [get_volume_serial_number *text] [get_volume_serial_number : *text]<br/>
+            [VolumeSerialNumber *text] [VolumeSerialNumber : *text]
         </div>
         <div class="doc_predicate_body">
-            Retrieves serial number of embedded platform (if exist).
+            Retrieves serial number of embedded platform (if exist). The original serial number is merged with platform's volume ID.
         </div>
     </a>
 </div>
@@ -2030,6 +2036,42 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_SerialKey">
+        <div class="doc_predicate_header">
+            [SerialKey "ABC123456789"]<br/>
+            [SerialKey *] [SerialKey : *]
+        </div>
+        <div class="doc_predicate_body">
+            Sets or retrieves Key for unlocking Serial Number.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_SerialNumber">
+        <div class="doc_predicate_header">
+            [SerialNumber "AB-123456-??"]<br/>
+            [SerialNumber *] [SerialNumber : *]
+        </div>
+        <div class="doc_predicate_body">
+            Sets or retrieves Serial Number.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_SerialShift">
+        <div class="doc_predicate_header">
+            [SerialShift 123]<br/>
+            [SerialShift *] [SerialShift : *]
+        </div>
+        <div class="doc_predicate_body">
+            Sets or retrieves Serial Shift for unlocking Serial Number.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_set_captions">
         <div class="doc_predicate_header">
             [set_uap32_captions] [set_standard_captions]<br />
@@ -2090,6 +2132,19 @@
             [[show] [nl] /]<br />
             [[show *text : *show] [is_text *text] [write *text] / [show : *show]]<br />
             [[show *x : *show] [pp *x] / [show : *show]]<br />
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_VolumeID">
+        <div class="doc_predicate_header">
+            [VolumeID "HEX Number"] [VolumeID integer]<br/>
+            [VolumeID : "HEX Number"] [VolumeID : integer]<br/>
+            [VolumeID *] [VolumeID : *]
+        </div>
+        <div class="doc_predicate_body">
+            Sets or retrieves Volume ID in the form of a HEX text. It can also set Volume ID using an integer number.
         </div>
     </a>
 </div>
