@@ -86,7 +86,8 @@ unsigned long int encoder :: extract_volume (char * serial) {
 	if (strlen (serial) < 1) return 0;
 	unsigned long int ret = 0;
 	int ch;
-	for (int ind = 3; ind < 9; ind++) {
+	int size = strlen (serial) - 3;
+	for (int ind = 3; ind < size; ind++) {
 		ret <<= 4;
 		ch = serial [ind];
 		if (ch >= 'A') ch -= 'A' - 10;
@@ -110,15 +111,16 @@ bool encoder :: check_serial (char * serial, unsigned long int volume, char * ke
 }
 
 bool encoder :: validate_serial (char * serial) {
-	if (strlen (serial) != 12) return false;
+	// if (strlen (serial) != 12) return false;
 	int check = 0;
 	int ind = 0;
-	for (ind = 0; ind < 10; ind++) check += serial [ind];
+	int size = strlen (serial) - 2;
+	for (ind = 0; ind < size; ind++) check += serial [ind];
 	check &= 0xff;
-	int msb = serial [10];
+	int msb = serial [size];
 	if (msb >= 'A') msb -= 'A' - 10;
 	else msb -= '0';
-	int lsb = serial [11];
+	int lsb = serial [size + 1];
 	if (lsb >= 'A') lsb -= 'A' - 10;
 	else lsb -= '0';
 	ind = (msb << 4) + lsb;
@@ -128,21 +130,24 @@ bool encoder :: validate_serial (char * serial) {
 bool encoder :: validate_key (char * key) {return check_character (key) == '-';}
 
 void encoder :: create_serial_number (char * out, char * header, unsigned long int serial) {
-	serial &= 0xffffff;
-	sprintf (out, "%s-%06X-", header, (unsigned int) serial);
+	// serial &= 0xffffff;
+	char * ctrl1 = "%s-%06X-", * ctrl2 = "%s-%06X-%02X";
+	if (serial > 0xffffff) {ctrl1 = "%s-%016X-", ctrl2 = "%s-%016X-%02X";}
+	sprintf (out, ctrl1, header, (unsigned int) serial);
 	int checksum = 0;
 	char * ch = out;
 	while (* ch != '\0') checksum += * (ch++);
 	checksum &= 0xff;
-	sprintf (out, "%s-%06X-%02X", header, (unsigned int) serial, checksum);
+	sprintf (out, ctrl2, header, (unsigned int) serial, checksum);
 }
 
 void encoder :: normalise_serial (char * out, char * serial) {
 	strcpy (out, serial);
-	if (strlen (serial) != 12) return;
+	if (strlen (serial) < 3) return;
 	int checksum = 0;
 	char ch;
-	for (int ind = 0; ind < 10; ind++) {
+	int size = strlen (serial) - 2;
+	for (int ind = 0; ind < size; ind++) {
 		ch = serial [ind];
 		checksum += ch;
 		* (out++) = ch;
@@ -159,7 +164,7 @@ void encoder :: normalise_serial (char * out, char * serial) {
 
 void encoder :: volumise_serial (char * out, char * serial, unsigned long int volume) {
 	strcpy (out, serial);
-	if (strlen (serial) != 12) return;
+	if (strlen (serial) < 3) return;
 	char header [4];
 	header [0] = serial [0];
 	header [1] = serial [1];
