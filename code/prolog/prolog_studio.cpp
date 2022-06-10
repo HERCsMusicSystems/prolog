@@ -4366,7 +4366,7 @@ public:
 		if (! fr) {parameters -> setText (""); return true;}
 		char command [1025];
 		int ind = 0, ch;
-		while ((ch = fgetc (fr)) >= 32 && ind < 1025) command [ind ++] = (char) ch; command [ind] = '\0';
+		while ((ch = fgetc (fr)) >= 32 && ind < 1024) command [ind ++] = (char) ch; command [ind] = '\0';
 		parameters -> setText (command);
 		fclose (fr);
 		return true;
