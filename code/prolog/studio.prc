@@ -39,8 +39,8 @@ program studio #machine := "prolog.studio"
 		rnd rnd_control grnd series random grandom
 		crack wait timeout enter signal semaphore msemaphore mutex accept select critical_section monitor task
 		background foreground open_editor close_editor screen_coordinates
-		get_volume_serial_number security_check encoder SerialNumber VolumeSerialNumber SerialKey VolumeID SerialShift
-
+		get_volume_serial_number security_check encoder
+		SerialNumber VolumeSerialNumber SerialKey VolumeID SerialShift GenerateSerial
 		. computer-do-this define-this show
 	]
 
@@ -555,6 +555,15 @@ auto := [[var QueryPrompt ReplyPrompt [FailPrompt "Doesn't work"]]]
     [add *varv *extension *path]
     [add_search_directory *path]
     [expand_search_directory *var : *extensions]
+]
+
+[[GenerateSerial *head *serial *key] [GenerateSerial *head 16 *serial *key]]
+[[GenerateSerial *head 0 *serial *key] [+ *head '-??' *number] [encoder *number *serial *key]]
+[[GenerateSerial *head *ind *serial *key]
+	[series [0 1 2 3 4 5 6 7 8 9 'A' 'B' 'C' 'D' 'E' 'F'] [*A : *]]
+	[+ *head *A *new]
+	[-- *ind *next]
+	/ [GenerateSerial *new *next *serial *key]
 ]
 
 [[:= *x *x] [is_number *x] /]
