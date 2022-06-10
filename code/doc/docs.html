@@ -163,6 +163,7 @@
             <a href="#predicate_file_reader">file_reader</a>
             <a href="#predicate_file_writer">file_writer</a>
             <a href="#predicate_foreground">foreground</a>
+            <a href="#predicate_GenerateSerial">GenerateSerial</a>
             <a href="#predicate_get_volume_serial_number">get_volume_serial_number</a>
             <a href="#predicate_halt">halt</a>
             <a href="#predicate_import">import</a>
@@ -187,6 +188,7 @@
             <a href="#predicate_query_stack">query_stack</a>
             <a href="#predicate_QueryPrompt">QueryPrompt</a>
             <a href="#predicate_read">read</a>
+            <a href="#predicate_ReadMachineVolumeID">ReadMachineVolumeID</a>
             <a href="#predicate_ReplyPrompt">ReplyPrompt</a>
             <a href="#predicate_root">root</a>
             <a href="#predicate_run">run</a>
@@ -1535,6 +1537,17 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_GenerateSerial">
+        <div class="doc_predicate_header">
+            [GenerateSerial header serial key] [GenerateSerial header size serial key]
+        </div>
+        <div class="doc_predicate_body">
+            Generates a serial number and key. The size parameter is optional (default = 16).
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_get_volume_serial_number">
         <div class="doc_predicate_header">
             [get_volume_serial_number *text] [get_volume_serial_number : *text]<br/>
@@ -1851,6 +1864,17 @@
         </div>
         <div class="doc_predicate_body">
             Skips whitespaces and then reads the input text from the console, until a whitespace is detected.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_ReadMachineVolumeID">
+        <div class="doc_predicate_header">
+            [ReadMachineVolumeID *text] [ReadMachineVolumeID : *text]
+        </div>
+        <div class="doc_predicate_body">
+            Retrieves unique ID of the machine.
         </div>
     </a>
 </div>
