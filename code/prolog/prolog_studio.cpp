@@ -4357,14 +4357,35 @@ public:
 	SerialShift (PrologRoot * root) {this -> root = root;};
 };
 
+class ReadMachineVolumeID : public PrologNativeCode {
+public:
+	PrologRoot * root;
+	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		FILE * fr = fopen ("/etc/machine-id", "rb");
+		if (! fr) {parameters -> setText (""); return true;}
+		char command [1025];
+		int ind = 0, ch;
+		while ((ch = fgetc (fr)) >= 32 && ind < 1025) command [ind ++] = (char) ch; command [ind] = '\0';
+		parameters -> setText (command);
+		fclose (fr);
+		return true;
+	};
+};
+
 class VolumeID : public PrologNativeCode {
 public:
 	PrologRoot * root;
 	virtual bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
 		if (parameters -> isText ()) {
-			char * cp;
-			root -> volume_id = strtoul (parameters -> getText (), & cp, 16);
+			char * cp = parameters -> getText ();
+			root -> volume_id = 0;
+			while (* cp != '\0') {
+				if (* cp >= 'a') root -> volume_id = root -> volume_id * 16 + 10 + * cp ++ - 'a';
+				else if (* cp >= 'A') root -> volume_id = root -> volume_id * 16 + 10 + * cp ++ - 'A';
+				else root -> volume_id = root -> volume_id * 16 + * cp ++ - '0';
+			}
 		} else if (parameters -> isInteger ()) {
 			root -> volume_id = parameters -> getInteger ();
 		} else {
@@ -4638,6 +4659,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "SerialKey") == 0) return new SerialKey (root);
 	if (strcmp (name, "VolumeID") == 0) return new VolumeID (root);
 	if (strcmp (name, "SerialShift") == 0) return new SerialShift (root);
+	if (strcmp (name, "ReadMachineVolumeID") == 0) return new ReadMachineVolumeID ();
 
 	return NULL;
 }
