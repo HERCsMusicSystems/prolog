@@ -34,10 +34,12 @@ PrologResolution :: PrologResolution (PrologRoot * root) TRACKING (7) {
 	next = this;
 	this -> timeout = 0;
 	this -> timeout_query = NULL;
+	parameters = root -> earth ();
 }
 
 PrologResolution :: ~ PrologResolution (void) {
 	if (timeout_query) delete timeout_query;
+	if (parameters) delete parameters;
 }
 
 PrologVariable * PrologResolution :: newVariable (void) {

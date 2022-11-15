@@ -257,6 +257,7 @@
             <a href="#predicate_root">root</a>
             <a href="#predicate_semaphore">semaphore</a>
             <a href="#predicate_task">task</a>
+            <a href="#predicate_ThreadParameters">ThreadParameters</a>
             <a href="#predicate_timeout">timeout</a>
             <a href="#predicate_timestamp">timestamp</a>
             <a href="#predicate_wait">wait</a>
@@ -2830,6 +2831,22 @@
             &emsp;&emsp;&emsp;[addcl [[*atom]        [delallcl *atom]]  ]                ; remove all task definitions<br />
             &emsp;&emsp;&emsp;[crack : *commands]<br />
             ]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="predicate_ThreadParameters">
+        <div class="doc_predicate_header">
+            [ThreadParameters *]<br/>
+            [ThreadParameters [parameter .....]]<br/>
+            [ThreadParameters parameter]
+        </div>
+        <div class="doc_predicate_body">
+            Each thread can have its own parameters set and read.
+            Essentially there is only one thread parameter, which can obviously be a list of parameters.<br/>
+            Version with variable reads thread parameters.
+            Version with parameters or list of parameters sets thread parameters.
         </div>
     </a>
 </div>

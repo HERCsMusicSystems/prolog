@@ -499,6 +499,7 @@ class PrologResolution TRACK {
 public:
 	PrologRoot * root;
 	PrologQuery * q_root;
+	PrologElement * parameters;
 	PrologElement * external_query_pointer;
 	PrologMatch * root_actual;
 	PrologMatch * root_formal;

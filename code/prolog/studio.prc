@@ -37,7 +37,7 @@ program studio #machine := "prolog.studio"
 		WHILE FOR FOREVER forever REPEAT IF
 		CONSTANT VARIABLE ACCUMULATOR STACK QUEUE ARRAY INDEX var inc dec ALL all ISALL isall isallr isallq
 		rnd rnd_control grnd series random grandom
-		crack wait timeout enter signal semaphore msemaphore mutex accept select critical_section monitor task
+		crack wait timeout enter signal semaphore msemaphore mutex accept select critical_section monitor task ThreadParameters
 		background foreground open_editor close_editor screen_coordinates
 		get_volume_serial_number security_check encoder
 		SerialNumber VolumeSerialNumber SerialKey VolumeID SerialShift GenerateSerial ReadMachineVolumeID
@@ -167,6 +167,7 @@ program studio #machine := "prolog.studio"
 #machine query_stack := "query_stack"
 #machine object_counter := "object_counter"
 #machine crack := "crack"
+#machine ThreadParameters := "ThreadParameters"
 #machine wait := "wait"
 #machine timeout := "timeout"
 #machine semaphore := "semaphore"

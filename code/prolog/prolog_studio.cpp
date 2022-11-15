@@ -4047,6 +4047,16 @@ public:
 	crack (PrologRoot * root) {this -> root = root;}
 };
 
+class ThreadParameters : public PrologNativeCode {
+public:
+	bool code (PrologElement * parameters, PrologResolution * resolution) {
+		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
+		if (parameters -> isVar ()) parameters -> duplicate (resolution -> parameters);
+		else resolution -> parameters -> duplicate (parameters);
+		return true;
+	}
+};
+
 #include <semaphore.h>
 
 class semaphore_posix : public PrologNativeCode {
@@ -4592,6 +4602,7 @@ PrologNativeCode * PrologStudio :: getNativeCode (char * name) {
 	if (strcmp (name, "query_stack") == 0) return new query_stack (root);
 	if (strcmp (name, "object_counter") == 0) return new object_counter_class ();
 	if (strcmp (name, "crack") == 0) return new crack (root);
+	if (strcmp (name, "ThreadParameters") == 0) return new ThreadParameters ();
 	if (strcmp (name, "wait") == 0) return new wait_code (root);
 	if (strcmp (name, "timeout") == 0) return new timeout_class (root);
 	if (strcmp (name, "semaphore") == 0) return new semaphore_maker (directory);
