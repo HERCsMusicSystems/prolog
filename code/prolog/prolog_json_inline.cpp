@@ -6,7 +6,7 @@ public:
 	bool NeedSeparator;
 	FILE * tc;
 	PrologAtom * ufo, * grlt, * assign;
-	void DropSeparator (void) {if (NeedSeparator && tc) fprintf (tc, ", ");};
+	void DropSeparator (void) {if (NeedSeparator && tc) fprintf (tc, ", "); NeedSeparator = true;};
 	void DropNull (void) {if (tc) fprintf (tc, "null");};
 	void DropAtom (PrologAtom * atom) {
 		if (tc) fprintf (tc, "%s", atom -> name ());
@@ -27,12 +27,30 @@ public:
 		}
 		fprintf (tc, "\"");
 	};
+	void DropPair (PrologElement * json) {
+		if (! tc) return;
+		PrologElement * ControlAtom = json -> getLeft ();
+		if (! ControlAtom -> isAtom ()) return;
+		if (ControlAtom -> getAtom () == ufo || ControlAtom -> getAtom () == grlt) {
+			fprintf (tc, "[\n");
+			json = json -> getRight ();
+			while (json -> isPair ()) {
+				DropSeparator ();
+				DropJson (json -> getLeft ());
+				json = json -> getRight ();
+			}
+			fprintf (tc, "]");
+		} else {
+			printf ("Object.\n");
+		}
+	};
 	void DropJson (PrologElement * json) {
 		if (json -> isEarth ()) DropNull ();
 		else if (json -> isAtom ()) DropAtom (json -> getAtom ());
 		else if (json -> isText ()) DropText (json -> getText ());
 		else if (json -> isInteger ()) DropInteger (json -> getInteger ());
 		else if (json -> isDouble ()) DropDouble (json -> getDouble ());
+		else if (json -> isPair ()) DropPair (json);
 	};
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
