@@ -5,6 +5,7 @@ class json : public PrologNativeCode {
 public:
 	bool NeedSeparator;
 	FILE * tc;
+	PrologAtom * ufo, * grlt, * assign;
 	void DropSeparator (void) {if (NeedSeparator && tc) fprintf (tc, ", ");};
 	void DropNull (void) {if (tc) fprintf (tc, "null");};
 	void DropAtom (PrologAtom * atom) {
@@ -44,11 +45,18 @@ public:
 		}
 		return true;
 	};
-	json (void) {NeedSeparator = false; tc = 0;};
+	json (PrologRoot * root) {
+		NeedSeparator = false; tc = 0;
+		ufo = root -> search ("<=>");
+		grlt = root -> search ("<>");
+		assign = root -> search (":=");
+	};
 };
 
 class PrologJSONInlineServiceClass : public PrologServiceClass {
 public:
-	PrologNativeCode * getNativeCode (char * name) {if (strcmp (name, "json") == 0) return new json (); return 0;};
+	PrologRoot * root;
+	void init (PrologRoot * root, PrologDirectory * directory) {this -> root = root;};
+	PrologNativeCode * getNativeCode (char * name) {if (strcmp (name, "json") == 0) return new json (root); return 0;};
 };
 
