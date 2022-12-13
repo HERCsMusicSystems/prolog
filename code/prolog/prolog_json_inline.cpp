@@ -10,6 +10,25 @@ public:
 	void DropAtom (PrologAtom * atom) {
 		if (tc) fprintf (tc, "%s", atom -> name ());
 	};
+	void DropText (char * text) {
+		if (! tc) return;
+		char * ch = text;
+		fprintf (tc, "\"");
+		while (* ch > 0) {
+			switch (* ch) {
+			case '\\': fprintf (tc, "\\\\"); break;
+			case '"': fprintf (tc, "\\\""); break;
+			default: fprintf (tc, "%c", * ch); break;
+			}
+			ch ++;
+		}
+		fprintf (tc, "\"");
+	};
+	void DropJson (PrologElement * json) {
+		if (json -> isEarth ()) DropNull ();
+		else if (json -> isAtom ()) DropAtom (json -> getAtom ());
+		else if (json -> isText ()) DropText (json -> getText ());
+	};
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
 		PrologElement * json = parameters -> getLeft (); parameters = parameters -> getRight ();
@@ -19,8 +38,7 @@ public:
 			if (! parameters -> isText ()) return false;
 			tc = fopen (parameters -> getText (), "wb");
 			if (tc) {
-				if (json -> isEarth ()) DropNull ();
-				else if (json -> isAtom ()) DropAtom (json -> getAtom ());
+				DropJson (json);
 				fclose (tc);
 			}
 		}
