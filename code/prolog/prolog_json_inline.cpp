@@ -11,6 +11,8 @@ public:
 	void DropAtom (PrologAtom * atom) {
 		if (tc) fprintf (tc, "%s", atom -> name ());
 	};
+	void DropInteger (int value) {if (tc) fprintf (tc, "%i", value);};
+	void DropDouble (double value) {if (tc) fprintf (tc, "%g", value);};
 	void DropText (char * text) {
 		if (! tc) return;
 		char * ch = text;
@@ -29,6 +31,8 @@ public:
 		if (json -> isEarth ()) DropNull ();
 		else if (json -> isAtom ()) DropAtom (json -> getAtom ());
 		else if (json -> isText ()) DropText (json -> getText ());
+		else if (json -> isInteger ()) DropInteger (json -> getInteger ());
+		else if (json -> isDouble ()) DropDouble (json -> getDouble ());
 	};
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
