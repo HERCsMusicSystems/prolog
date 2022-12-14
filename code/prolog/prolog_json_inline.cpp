@@ -4,9 +4,14 @@ char * inline_json_resource = "import studio program json #machine := 'json' [js
 class json : public PrologNativeCode {
 public:
 	bool NeedSeparator;
+	int SeparatorLevel;
 	FILE * tc;
 	PrologAtom * ufo, * grlt, * assign;
-	void DropSeparator (void) {if (NeedSeparator && tc) fprintf (tc, ", "); NeedSeparator = true;};
+	PrologAtom * TrueAtom, * FalseAtom, * NullAtom;
+	void DropSeparator (void) {
+		if (NeedSeparator && tc) {fprintf (tc, ",\n"); int sl = SeparatorLevel; while (sl -- > 0 && tc) fprintf (tc, " ");}
+		NeedSeparator = true;
+	};
 	void DropNull (void) {if (tc) fprintf (tc, "null");};
 	void DropAtom (PrologAtom * atom) {
 		if (tc) fprintf (tc, "%s", atom -> name ());
@@ -32,14 +37,15 @@ public:
 		PrologElement * ControlAtom = json -> getLeft ();
 		if (! ControlAtom -> isAtom ()) return;
 		if (ControlAtom -> getAtom () == ufo || ControlAtom -> getAtom () == grlt) {
-			fprintf (tc, "[\n");
+			fprintf (tc, "[\n"); NeedSeparator = false; SeparatorLevel ++; int sl = SeparatorLevel; while (tc && sl -- > 0) fprintf (tc, " ");
 			json = json -> getRight ();
 			while (json -> isPair ()) {
 				DropSeparator ();
 				DropJson (json -> getLeft ());
 				json = json -> getRight ();
 			}
-			fprintf (tc, "]");
+			SeparatorLevel --; fprintf (tc, "\n"); sl = SeparatorLevel; while (tc && sl -- > 0) fprintf (tc, " ");
+			fprintf (tc, "]"); NeedSeparator = true;
 		} else {
 			printf ("Object.\n");
 		}
@@ -68,10 +74,13 @@ public:
 		return true;
 	};
 	json (PrologRoot * root) {
-		NeedSeparator = false; tc = 0;
+		NeedSeparator = false; SeparatorLevel = 0; tc = 0;
 		ufo = root -> search ("<=>");
 		grlt = root -> search ("<>");
 		assign = root -> search (":=");
+		TrueAtom = root -> search ("true");
+		FalseAtom = root -> search ("false");
+		NullAtom = root -> search ("null");
 	};
 };
 
