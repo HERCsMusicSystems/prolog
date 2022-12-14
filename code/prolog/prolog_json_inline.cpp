@@ -13,11 +13,6 @@ public:
 		NeedSeparator = true;
 	};
 	void DropNull (void) {if (tc) fprintf (tc, "null");};
-	void DropAtom (PrologAtom * atom) {
-		if (tc) fprintf (tc, "%s", atom -> name ());
-	};
-	void DropInteger (int value) {if (tc) fprintf (tc, "%i", value);};
-	void DropDouble (double value) {if (tc) fprintf (tc, "%g", value);};
 	void DropText (char * text) {
 		if (! tc) return;
 		char * ch = text;
@@ -32,19 +27,32 @@ public:
 		}
 		fprintf (tc, "\"");
 	};
+	void DropAtom (PrologAtom * atom) {
+		if (tc) {
+			if (SeparatorLevel < 1 || atom == TrueAtom || atom == FalseAtom || atom == NullAtom) fprintf (tc, "%s", atom -> name ());
+			else DropText (atom -> name ());
+		}
+	};
+	void DropInteger (int value) {if (tc) fprintf (tc, "%i", value);};
+	void DropDouble (double value) {if (tc) fprintf (tc, "%g", value);};
 	void DropPair (PrologElement * json) {
 		if (! tc) return;
 		PrologElement * ControlAtom = json -> getLeft ();
 		if (! ControlAtom -> isAtom ()) return;
 		if (ControlAtom -> getAtom () == ufo || ControlAtom -> getAtom () == grlt) {
-			fprintf (tc, "[\n"); NeedSeparator = false; SeparatorLevel ++; int sl = SeparatorLevel; while (tc && sl -- > 0) fprintf (tc, " ");
+			fprintf (tc, "[\n");
+			NeedSeparator = false;
 			json = json -> getRight ();
+			SeparatorLevel ++;
 			while (json -> isPair ()) {
-				DropSeparator ();
+				if (NeedSeparator) fprintf (tc, ",\n"); NeedSeparator = true;
+				int sl = SeparatorLevel; while (sl -- > 0) fprintf (tc, " ");
 				DropJson (json -> getLeft ());
 				json = json -> getRight ();
 			}
-			SeparatorLevel --; fprintf (tc, "\n"); sl = SeparatorLevel; while (tc && sl -- > 0) fprintf (tc, " ");
+			SeparatorLevel --;
+			if (NeedSeparator) fprintf (tc, "\n");
+			int sl = SeparatorLevel; while (tc && sl -- > 0) fprintf (tc, " ");
 			fprintf (tc, "]"); NeedSeparator = true;
 		} else {
 			printf ("Object.\n");
