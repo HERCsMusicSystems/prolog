@@ -9,7 +9,7 @@ public:
 	PrologAtom * ufo, * grlt, * assign;
 	PrologAtom * TrueAtom, * FalseAtom, * NullAtom;
 	void DropSeparator (void) {
-		if (NeedSeparator && tc) {fprintf (tc, ",\n"); int sl = SeparatorLevel; while (sl -- > 0 && tc) fprintf (tc, " ");}
+		if (NeedSeparator && tc) {fprintf (tc, ",\n"); int sl = SeparatorLevel; while (sl -- > 0 && tc) fprintf (tc, "	");}
 		NeedSeparator = true;
 	};
 	void DropNull (void) {if (tc) fprintf (tc, "null");};
@@ -35,6 +35,11 @@ public:
 	};
 	void DropInteger (int value) {if (tc) fprintf (tc, "%i", value);};
 	void DropDouble (double value) {if (tc) fprintf (tc, "%g", value);};
+	void DropKeyValuePair (PrologElement * json) {
+		if (! json -> isPair ()) return;
+		PrologElement * key = json -> getLeft (), * value = json -> getRight ();
+		DropJson (key); fprintf (tc, ": "); DropJson (value);
+	};
 	void DropPair (PrologElement * json) {
 		if (! tc) return;
 		PrologElement * ControlAtom = json -> getLeft ();
@@ -46,16 +51,29 @@ public:
 			SeparatorLevel ++;
 			while (json -> isPair ()) {
 				if (NeedSeparator) fprintf (tc, ",\n"); NeedSeparator = true;
-				int sl = SeparatorLevel; while (sl -- > 0) fprintf (tc, " ");
+				int sl = SeparatorLevel; while (sl -- > 0) fprintf (tc, "	");
 				DropJson (json -> getLeft ());
 				json = json -> getRight ();
 			}
 			SeparatorLevel --;
 			if (NeedSeparator) fprintf (tc, "\n");
-			int sl = SeparatorLevel; while (tc && sl -- > 0) fprintf (tc, " ");
+			int sl = SeparatorLevel; while (tc && sl -- > 0) fprintf (tc, "	");
 			fprintf (tc, "]"); NeedSeparator = true;
 		} else {
-			printf ("Object.\n");
+			fprintf (tc, "{\n");
+			NeedSeparator = false;
+			json = json -> getRight ();
+			SeparatorLevel ++;
+			while (json -> isPair ()) {
+				if (NeedSeparator) fprintf (tc, ",\n"); NeedSeparator = true;
+				int sl = SeparatorLevel; while (sl -- > 0) fprintf (tc, "	");
+				DropKeyValuePair (json -> getLeft ());
+				json = json -> getRight ();
+			}
+			SeparatorLevel --;
+			if (NeedSeparator) fprintf (tc, "\n");
+			int sl = SeparatorLevel; while (tc && sl -- > 0) fprintf (tc, "	");
+			fprintf (tc, "}"); NeedSeparator = true;
 		}
 	};
 	void DropJson (PrologElement * json) {
@@ -76,6 +94,7 @@ public:
 			tc = fopen (parameters -> getText (), "wb");
 			if (tc) {
 				DropJson (json);
+				fprintf (tc, "\n");
 				fclose (tc);
 			}
 		}
