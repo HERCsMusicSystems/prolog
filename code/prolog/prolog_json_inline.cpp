@@ -6,36 +6,37 @@ char * inline_json_resource = "import studio program json #machine := 'json' [js
 class JSONReader {
 public:
 	FILE * fr;
+	int act;
 	AREA symbol;
 	double double_symbol;
 	int SkipWhitespaces (void) {
-		if (! fr) return -1;
-		int ch = fgetc (fr);
-		while (ch <= ' ' && ch >= 0) ch = fgetc (fr);
-		return ch;
+		if (! fr) {act = -1; return -1;}
+//		act = fgetc (fr);
+		while (act <= ' ' && act >= 0) act = fgetc (fr);
+		return act;
 	};
 	int SkipWhitespacesAndSeparators (void) {
-		int ch = SkipWhitespaces ();
-		while (ch == ',') ch = SkipWhitespaces ();
-		return ch;
+		if (! fr) {act = -1; return -1;}
+		while ((act <= ' ' && act >= 0) || act == ',') act = fgetc (fr);
+		return act;
 	};
 	int GetSymbol (void) {
 		if (! fr) return -1;
-		int ch = SkipWhitespacesAndSeparators ();
+		SkipWhitespacesAndSeparators ();
 		symbol [0] = '\0';
-		if (strchr ("[]{}:", ch) != 0) {symbol [0] = (char) ch; symbol [1] = '\0'; return 1;}
-		if (strchr ("-0123456789", ch) != 0) {
+		if (strchr ("[]{}:", act) != 0) {symbol [0] = (char) act; symbol [1] = '\0'; act = fgetc (fr); return 1;}
+		if (strchr ("-0123456789", act) != 0) {
 			int ac = 0;
-			while (strchr ("-+0123456789.eE", ch) != 0) {ac = area_cat (symbol, ac, (char) ch); ch = fgetc (fr);}
+			while (strchr ("-+0123456789.eE", act) != 0) {ac = area_cat (symbol, ac, (char) act); act = fgetc (fr);}
 			double_symbol = atof (symbol);
 			return 2;
 		}
-		if (ch == '"') {
-			ch = fgetc (fr);
+		if (act == '"') {
+			act = fgetc (fr);
 			int ac = 0;
-			while (ch >= 0 && ch != '"') {
-				if (ch == '\\') {
-					ch = fgetc (fr);
+			while (act >= 0 && act != '"') {
+				if (act == '\\') {
+					int ch = act = fgetc (fr);
 					switch (ch) {
 					case 'b': ch = 8; break;
 					case 'f': ch = 12; break;
@@ -45,24 +46,25 @@ public:
 					default: break;
 					}
 					if (ch >= 0) ac = area_cat (symbol, ac, (char) ch);
-				} else ac = area_cat (symbol, ac, (char) ch);
-				ch = fgetc (fr);
+				} else ac = area_cat (symbol, ac, (char) act);
+				act = fgetc (fr);
 			}
-			if (ch == '"') fgetc (fr);
+			if (act == '"') act = fgetc (fr);
 			return 3;
 		}
-		if (ch != '"' && ch > ' ') {
-			int ac = 0; while (ch != '"' && ch > ' ') {ac = area_cat (symbol, ac, (char) ch); ch = fgetc (fr);}
+		if (act != '"' && act != ',' && act > ' ') {
+			int ac = 0; while (act != '"' && act != ',' && act > ' ') {ac = area_cat (symbol, ac, (char) act); act = fgetc (fr);}
 			return 4;
 		}
 		return 0;
 	};
 	JSONReader (char * file_name) {
-		symbol [0] = '\0'; double_symbol = 0.0;
+		act = -1; symbol [0] = '\0'; double_symbol = 0.0;
 		fr = fopen (file_name, "rb");
 		if (! fr) return;
-		// int ch; while ((ch = SkipWhitespacesAndSeparators ()) > 0) printf ("%c", ch);
-		int ch; while ((ch = GetSymbol ()) > 0) printf ("%i => %s : %e\n", ch, symbol, double_symbol);
+		act = fgetc (fr);
+//		int ch; while ((ch = GetSymbol ()) > 0) printf ("%i => [%s] = %e <%c>\n", ch, symbol, double_symbol, act);
+		int ch; while ((ch = GetSymbol ()) > 0) printf ("%i => [%s] = %e\n", ch, symbol, double_symbol);
 	};
 	~ JSONReader (void) {if (fr) fclose (fr); fr = 0; printf ("File closed.\n");};
 };
@@ -156,11 +158,6 @@ public:
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
 		if (json -> isVar ()) {
 			if (! parameters -> isText ()) return false;
-//			fr = fopen (parameters -> getText (), "rb");
-//			if (! fr) return false;
-//			char ch;
-//			while ((ch = fgetc (fr)) > 0) printf ("%c", ch);
-//			fclose (fr);
 			JSONReader (parameters -> getText ());
 			return true;
 		} else {
