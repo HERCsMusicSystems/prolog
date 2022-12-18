@@ -7,6 +7,17 @@ public:
 	int act;
 	AREA symbol;
 	double double_symbol;
+	int SkipWhitespaces (void) {
+		if (! fr) {act = -1; return -1;}
+		int ch = fgetc (fr);
+		while (ch <= ' ' && ch >= 0) ch = fgetc (fr);
+		return ch;
+	};
+	int SkipWhitespacesAndSeparators (void) {
+		int ch = SkipWhitespaces ();
+		while (ch == ',') ch = SkipWhitespaces ();
+		return ch;
+	};
 	int GetSymbol (void) {
 		if (! fr) return -1;
 		int ch = SkipWhitespacesAndSeparators ();
@@ -29,17 +40,6 @@ public:
 			return 4;
 		}
 		return 0;
-	};
-	int SkipWhitespaces (void) {
-		if (! fr) {act = -1; return -1;}
-		int ch = fgetc (fr);
-		while (ch <= ' ' && ch >= 0) ch = fgetc (fr);
-		return ch;
-	};
-	int SkipWhitespacesAndSeparators (void) {
-		int ch = SkipWhitespaces ();
-		while (ch == ',') ch = SkipWhitespaces ();
-		return ch;
 	};
 	JSONReader (char * file_name) {
 		act = -1; symbol [0] = '\0'; double_symbol = 0.0;
