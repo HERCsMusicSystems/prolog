@@ -1,6 +1,56 @@
 
 char * inline_json_resource = "import studio program json #machine := 'json' [json] #machine json := 'json' end := [[command]] .";
 
+class JSONReader {
+public:
+	FILE * fr;
+	int act;
+	AREA symbol;
+	double double_symbol;
+	int GetSymbol (void) {
+		if (! fr) return -1;
+		int ch = SkipWhitespacesAndSeparators ();
+		symbol [0] = '\0';
+		if (strchr ("[]{}:", ch) != 0) {symbol [0] = (char) ch; symbol [1] = '\0'; return 1;}
+		if (strchr ("-0123456789", ch) != 0) {
+			int ac = 0;
+			while (strchr ("-+0123456789.eE", ch) != 0) {ac = area_cat (symbol, ac, (char) ch); ch = fgetc (fr);} area_cat (symbol, ac, '\0');
+			return 2;
+		}
+		if (ch == '"') {
+			ch = fgetc (fr);
+			int ac = 0;
+			while (ch >= 0 && ch != '"') {ac = area_cat (symbol, ac, (char) ch); ch = fgetc (fr);} area_cat (symbol, ac, '\0');
+			if (ch == '"') fgetc (fr);
+			return 3;
+		}
+		if (ch != '"' && ch > ' ') {
+			int ac = 0; while (ch != '"' && ch > ' ') {ac = area_cat (symbol, ac, (char) ch); ch = fgetc (fr);} area_cat (symbol, ac, '\0');
+			return 4;
+		}
+		return 0;
+	};
+	int SkipWhitespaces (void) {
+		if (! fr) {act = -1; return -1;}
+		int ch = fgetc (fr);
+		while (ch <= ' ' && ch >= 0) ch = fgetc (fr);
+		return ch;
+	};
+	int SkipWhitespacesAndSeparators (void) {
+		int ch = SkipWhitespaces ();
+		while (ch == ',') ch = SkipWhitespaces ();
+		return ch;
+	};
+	JSONReader (char * file_name) {
+		act = -1; symbol [0] = '\0'; double_symbol = 0.0;
+		fr = fopen (file_name, "rb");
+		if (! fr) return;
+		// int ch; while ((ch = SkipWhitespacesAndSeparators ()) > 0) printf ("%c", ch);
+		int ch; while ((ch = GetSymbol ()) > 0) printf ("%i => %s\n", ch, symbol);
+	};
+	~ JSONReader (void) {if (fr) fclose (fr); fr = 0; printf ("File closed.\n");};
+};
+
 class json : public PrologNativeCode {
 public:
 	bool NeedSeparator;
@@ -89,6 +139,14 @@ public:
 		PrologElement * json = parameters -> getLeft (); parameters = parameters -> getRight ();
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
 		if (json -> isVar ()) {
+			if (! parameters -> isText ()) return false;
+//			fr = fopen (parameters -> getText (), "rb");
+//			if (! fr) return false;
+//			char ch;
+//			while ((ch = fgetc (fr)) > 0) printf ("%c", ch);
+//			fclose (fr);
+			JSONReader (parameters -> getText ());
+			return true;
 		} else {
 			if (! parameters -> isText ()) return false;
 			tc = fopen (parameters -> getText (), "wb");
