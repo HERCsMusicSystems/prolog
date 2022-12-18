@@ -1,14 +1,15 @@
 
 char * inline_json_resource = "import studio program json #machine := 'json' [json] #machine json := 'json' end := [[command]] .";
 
+#include <stdlib.h>
+
 class JSONReader {
 public:
 	FILE * fr;
-	int act;
 	AREA symbol;
 	double double_symbol;
 	int SkipWhitespaces (void) {
-		if (! fr) {act = -1; return -1;}
+		if (! fr) return -1;
 		int ch = fgetc (fr);
 		while (ch <= ' ' && ch >= 0) ch = fgetc (fr);
 		return ch;
@@ -25,28 +26,43 @@ public:
 		if (strchr ("[]{}:", ch) != 0) {symbol [0] = (char) ch; symbol [1] = '\0'; return 1;}
 		if (strchr ("-0123456789", ch) != 0) {
 			int ac = 0;
-			while (strchr ("-+0123456789.eE", ch) != 0) {ac = area_cat (symbol, ac, (char) ch); ch = fgetc (fr);} area_cat (symbol, ac, '\0');
+			while (strchr ("-+0123456789.eE", ch) != 0) {ac = area_cat (symbol, ac, (char) ch); ch = fgetc (fr);}
+			double_symbol = atof (symbol);
 			return 2;
 		}
 		if (ch == '"') {
 			ch = fgetc (fr);
 			int ac = 0;
-			while (ch >= 0 && ch != '"') {ac = area_cat (symbol, ac, (char) ch); ch = fgetc (fr);} area_cat (symbol, ac, '\0');
+			while (ch >= 0 && ch != '"') {
+				if (ch == '\\') {
+					ch = fgetc (fr);
+					switch (ch) {
+					case 'b': ch = 8; break;
+					case 'f': ch = 12; break;
+					case 'n': ch = 10; break;
+					case 'r': ch = 13; break;
+					case 't': ch = 9; break;
+					default: break;
+					}
+					if (ch >= 0) ac = area_cat (symbol, ac, (char) ch);
+				} else ac = area_cat (symbol, ac, (char) ch);
+				ch = fgetc (fr);
+			}
 			if (ch == '"') fgetc (fr);
 			return 3;
 		}
 		if (ch != '"' && ch > ' ') {
-			int ac = 0; while (ch != '"' && ch > ' ') {ac = area_cat (symbol, ac, (char) ch); ch = fgetc (fr);} area_cat (symbol, ac, '\0');
+			int ac = 0; while (ch != '"' && ch > ' ') {ac = area_cat (symbol, ac, (char) ch); ch = fgetc (fr);}
 			return 4;
 		}
 		return 0;
 	};
 	JSONReader (char * file_name) {
-		act = -1; symbol [0] = '\0'; double_symbol = 0.0;
+		symbol [0] = '\0'; double_symbol = 0.0;
 		fr = fopen (file_name, "rb");
 		if (! fr) return;
 		// int ch; while ((ch = SkipWhitespacesAndSeparators ()) > 0) printf ("%c", ch);
-		int ch; while ((ch = GetSymbol ()) > 0) printf ("%i => %s\n", ch, symbol);
+		int ch; while ((ch = GetSymbol ()) > 0) printf ("%i => %s : %e\n", ch, symbol, double_symbol);
 	};
 	~ JSONReader (void) {if (fr) fclose (fr); fr = 0; printf ("File closed.\n");};
 };
