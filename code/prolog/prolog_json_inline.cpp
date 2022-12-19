@@ -8,7 +8,6 @@ public:
 	FILE * fr;
 	int act;
 	AREA symbol;
-	double double_symbol;
 	int SkipWhitespaces (void) {
 		if (! fr) {act = -1; return -1;}
 //		act = fgetc (fr);
@@ -28,7 +27,6 @@ public:
 		if (strchr ("-0123456789", act) != 0) {
 			int ac = 0;
 			while (strchr ("-+0123456789.eE", act) != 0) {ac = area_cat (symbol, ac, (char) act); act = fgetc (fr);}
-			double_symbol = atof (symbol);
 			return 2;
 		}
 		if (act == '"') {
@@ -52,19 +50,19 @@ public:
 			if (act == '"') act = fgetc (fr);
 			return 3;
 		}
-		if (act != '"' && act != ',' && act > ' ') {
-			int ac = 0; while (act != '"' && act != ',' && act > ' ') {ac = area_cat (symbol, ac, (char) act); act = fgetc (fr);}
+		if (act > ' ' && strchr ("[]{}:,\"", act) == 0) {
+			int ac = 0; while (act > ' ' && strchr ("[]{}:,\"", act) == 0) {ac = area_cat (symbol, ac, (char) act); act = fgetc (fr);}
 			return 4;
 		}
 		return 0;
 	};
 	JSONReader (char * file_name) {
-		act = -1; symbol [0] = '\0'; double_symbol = 0.0;
+		act = -1; symbol [0] = '\0';
 		fr = fopen (file_name, "rb");
 		if (! fr) return;
 		act = fgetc (fr);
 //		int ch; while ((ch = GetSymbol ()) > 0) printf ("%i => [%s] = %e <%c>\n", ch, symbol, double_symbol, act);
-		int ch; while ((ch = GetSymbol ()) > 0) printf ("%i => [%s] = %e\n", ch, symbol, double_symbol);
+//		int ch; while ((ch = GetSymbol ()) > 0) printf ("%i => [%s] = %e\n", ch, symbol, double_symbol);
 	};
 	~ JSONReader (void) {if (fr) fclose (fr); fr = 0; printf ("File closed.\n");};
 };
@@ -73,9 +71,11 @@ class json : public PrologNativeCode {
 public:
 	bool NeedSeparator;
 	int SeparatorLevel;
+	PrologRoot * root;
 	FILE * tc;
-	PrologAtom * ufo, * grlt, * assign;
+	PrologAtom * ufo, * grlt, * equal, * assign;
 	PrologAtom * TrueAtom, * FalseAtom, * NullAtom;
+	int act;
 	void DropSeparator (void) {
 		if (NeedSeparator && tc) {fprintf (tc, ",\n"); int sl = SeparatorLevel; while (sl -- > 0 && tc) fprintf (tc, "	");}
 		NeedSeparator = true;
@@ -152,13 +152,56 @@ public:
 		else if (json -> isDouble ()) DropDouble (json -> getDouble ());
 		else if (json -> isPair ()) DropPair (json);
 	};
+	PrologAtom * atomC (char * name) {
+		PrologAtom * atom = root -> search (name);
+		if (atom == 0) atom = root -> createAtom (name);
+		return atom;
+	};
+	void ReadJSON (PrologElement * json, JSONReader * reader) {
+		printf ("Symbol [%i] [%s].\n", act, reader -> symbol);
+		switch (act) {
+		case 1:
+			switch (reader -> symbol [0]) {
+			case '[':
+				json -> setPair ();
+				json -> getLeft () -> setAtom (ufo); json = json -> getRight ();
+				act = reader -> GetSymbol ();
+				while (act > 0 && reader -> symbol [0]  != ']') {
+//				while (act != 1 && reader -> symbol [0] != ']' && act > 0) {
+					json -> setPair ();
+					ReadJSON (json -> getLeft (), reader);
+					json = json -> getRight ();
+					act = reader -> GetSymbol ();
+					printf ("ACT [%i] <%s>.\n", act, reader -> symbol);
+				}
+				break;
+			default: break;
+			}
+			break;
+		case 2:
+			if (strchr (reader -> symbol, '.') != 0) json -> setDouble (atof (reader -> symbol));
+			else json -> setInteger (atoi (reader -> symbol));
+			break;
+		case 3: case 4:
+			if (strcmp (reader -> symbol, "true") == 0) json -> setAtom (TrueAtom);
+			else if (strcmp (reader -> symbol, "false") == 0) json -> setAtom (FalseAtom);
+			else if (strcmp (reader -> symbol, "null") == 0) json -> setEarth ();
+			else json -> setAtom (atomC (reader -> symbol));
+			break;
+		default: break;
+		}
+	};
 	bool code (PrologElement * parameters, PrologResolution * resolution) {
 		if (! parameters -> isPair ()) return false;
 		PrologElement * json = parameters -> getLeft (); parameters = parameters -> getRight ();
 		if (parameters -> isPair ()) parameters = parameters -> getLeft ();
 		if (json -> isVar ()) {
 			if (! parameters -> isText ()) return false;
-			JSONReader (parameters -> getText ());
+			JSONReader reader (parameters -> getText  ());
+			act = reader . GetSymbol ();
+			ReadJSON (json, & reader);
+//			int ch = reader . GetSymbol ();
+//			printf ("Symbol [%i] [%s].\n", ch, reader . symbol);			
 			return true;
 		} else {
 			if (! parameters -> isText ()) return false;
@@ -172,9 +215,11 @@ public:
 		return true;
 	};
 	json (PrologRoot * root) {
-		NeedSeparator = false; SeparatorLevel = 0; tc = 0;
+		this -> root = root;
+		NeedSeparator = false; SeparatorLevel = 0; tc = 0; act = -1;
 		ufo = root -> search ("<=>");
 		grlt = root -> search ("<>");
+		equal = root -> search ("=");
 		assign = root -> search (":=");
 		TrueAtom = root -> search ("true");
 		FalseAtom = root -> search ("false");
