@@ -95,7 +95,15 @@ public:
 	void DropAtom (PrologAtom * atom) {
 		if (tc) {
 			if (SeparatorLevel < 1 || atom == TrueAtom || atom == FalseAtom || atom == NullAtom) fprintf (tc, "%s", atom -> name ());
-			else DropText (atom -> name ());
+			else {
+				bool IsAtom = true;
+				char * name = atom -> name ();
+				while (* name != '\0') {
+					if (strchr ("QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm?|1234567890-=~!@#$%^&*", * name) == 0) IsAtom = false;
+					name ++;
+				}
+				if (IsAtom) fprintf (tc, "%s", atom -> name ()); else DropText (atom -> name ());
+			}
 		}
 	};
 	void DropInteger (int value) {if (tc) fprintf (tc, "%i", value);};
