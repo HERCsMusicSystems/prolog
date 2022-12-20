@@ -10,7 +10,6 @@ public:
 	AREA symbol;
 	int SkipWhitespaces (void) {
 		if (! fr) {act = -1; return -1;}
-//		act = fgetc (fr);
 		while (act <= ' ' && act >= 0) act = fgetc (fr);
 		return act;
 	};
@@ -61,10 +60,8 @@ public:
 		fr = fopen (file_name, "rb");
 		if (! fr) return;
 		act = fgetc (fr);
-//		int ch; while ((ch = GetSymbol ()) > 0) printf ("%i => [%s] = %e <%c>\n", ch, symbol, double_symbol, act);
-//		int ch; while ((ch = GetSymbol ()) > 0) printf ("%i => [%s] = %e\n", ch, symbol, double_symbol);
 	};
-	~ JSONReader (void) {if (fr) fclose (fr); fr = 0; printf ("File closed.\n");};
+	~ JSONReader (void) {if (fr) fclose (fr); fr = 0;};
 };
 
 class json : public PrologNativeCode {
@@ -158,7 +155,6 @@ public:
 		return atom;
 	};
 	void ReadJSON (PrologElement * json, JSONReader * reader) {
-		printf ("Symbol [%i] [%s].\n", act, reader -> symbol);
 		switch (act) {
 		case 1:
 			switch (reader -> symbol [0]) {
@@ -167,12 +163,10 @@ public:
 				json -> getLeft () -> setAtom (ufo); json = json -> getRight ();
 				act = reader -> GetSymbol ();
 				while (act > 0 && (reader -> symbol [0] != ']' || act != 1)) {
-//				while (act != 1 && reader -> symbol [0] != ']' && act > 0) {
 					json -> setPair ();
 					ReadJSON (json -> getLeft (), reader);
 					json = json -> getRight ();
 					act = reader -> GetSymbol ();
-					printf ("ACT [%i] <%s>.\n", act, reader -> symbol);
 				}
 				break;
 			case '{':
@@ -190,7 +184,6 @@ public:
 						json = json -> getRight ();
 					} else act = reader -> GetSymbol ();
 					act = reader -> GetSymbol ();
-					printf ("ACT [%i] <%s>.\n", act, reader -> symbol);
 				}
 				break;
 			default: break;
@@ -218,8 +211,6 @@ public:
 			JSONReader reader (parameters -> getText  ());
 			act = reader . GetSymbol ();
 			ReadJSON (json, & reader);
-//			int ch = reader . GetSymbol ();
-//			printf ("Symbol [%i] [%s].\n", ch, reader . symbol);			
 			return true;
 		} else {
 			if (! parameters -> isText ()) return false;
