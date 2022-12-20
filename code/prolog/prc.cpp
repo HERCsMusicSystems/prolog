@@ -65,6 +65,7 @@ public:
 #endif
 
 #ifdef LINUX_OPERATING_SYSTEM
+#include "prolog_json_inline.cpp"
 #include "prolog_linux_console.h"
 extern char resource_studio;
 extern char resource_conductor;
@@ -102,6 +103,7 @@ public:
 		// if (strcmp (name, "distribution.prc") == 0) ret = & resource_distribution;
 		if (strcmp (name, "control.prc") == 0) ret = & resource_control;
 		// if (strcmp (name, "json.prc") == 0) ret = & resource_json;
+		if (strcmp (name, "json.prc") == 0) ret = inline_json_resource;
 		return ret;
 	}
 } resource_loader;
@@ -118,6 +120,7 @@ public:
 		// if (strcmp (name, "prolog.distribution") == 0) return new PrologDistributionServiceClass ();
 		if (strcmp (name, "prolog.control") == 0) return new PrologControlServiceClass ();
 		// if (strcmp (name, "prolog.json") == 0) return new PrologJSONServiceClass ();
+		if (strcmp (name, "json") == 0) return new PrologJSONInlineServiceClass ();
 		return NULL;
 	}
 } service_class_loader;
