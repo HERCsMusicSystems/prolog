@@ -166,11 +166,29 @@ public:
 				json -> setPair ();
 				json -> getLeft () -> setAtom (ufo); json = json -> getRight ();
 				act = reader -> GetSymbol ();
-				while (act > 0 && reader -> symbol [0]  != ']') {
+				while (act > 0 && (reader -> symbol [0] != ']' || act != 1)) {
 //				while (act != 1 && reader -> symbol [0] != ']' && act > 0) {
 					json -> setPair ();
 					ReadJSON (json -> getLeft (), reader);
 					json = json -> getRight ();
+					act = reader -> GetSymbol ();
+					printf ("ACT [%i] <%s>.\n", act, reader -> symbol);
+				}
+				break;
+			case '{':
+				json -> setPair ();
+				json -> getLeft () -> setAtom (assign); json = json -> getRight ();
+				act = reader -> GetSymbol ();
+				while (act > 0 && (reader -> symbol [0] != '}' || act != 1)) {
+					json -> setPair ();
+					json -> getLeft () -> setPair ();
+					ReadJSON (json -> getLeft () -> getLeft (), reader);
+					act = reader -> GetSymbol ();
+					if (act == 1 && reader -> symbol [0] == ':') {
+						act = reader -> GetSymbol ();
+						ReadJSON (json -> getLeft () -> getRight (), reader);
+						json = json -> getRight ();
+					} else act = reader -> GetSymbol ();
 					act = reader -> GetSymbol ();
 					printf ("ACT [%i] <%s>.\n", act, reader -> symbol);
 				}
