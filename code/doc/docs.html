@@ -473,8 +473,10 @@
 <div class="doc_predicate">
     <a id="predicate_and">
         <div class="doc_predicate_header">
-            [and a b *x]<br />
-            [and a b : *x]
+            [and a b *x]
+            [and a b : *x]<br />
+            [& a b *x]
+            [& a b : *x]<br />
         </div>
         <div class="doc_predicate_body">
             Bitwise AND: *x = a AND b.<br />
@@ -551,8 +553,10 @@
 <div class="doc_predicate">
     <a id="predicate_div">
         <div class="doc_predicate_header">
-            [div a b *x]<br />
-            [div a b : *x]
+            [div a b *x]
+            [div a b : *x]<br />
+            [~~ a b *x]
+            [~~ a b : *x]<br />
         </div>
         <div class="doc_predicate_body">
             Division: *x = a / b.<br />
@@ -747,12 +751,12 @@
 <div class="doc_predicate">
     <a id="predicate_mac">
         <div class="doc_predicate_header">
-            [mac a b c d]<br/>
-            [mac a b c : d]
+            [mac a b c d] [mac a b c : d]<br/>
+            [~+ a b c d] [~+ a b c : d]
         </div>
         <div class="doc_predicate_body">
             Establishes the following relation: a * b + c = d.
-            Only one o the arguments can be a variable.
+            Only one of the arguments can be a variable.
             If three arguments are integers then the result will be integer.
             If any of the arguments is double then the result will be double as well.
             If used for tests with all four arguments being numbers, then they be either integer or double.
@@ -791,10 +795,14 @@
 <div class="doc_predicate">
     <a id="predicate_mod">
         <div class="doc_predicate_header">
-            [mod a b *x]<br />
-            [mod a b : *x]<br />
-            [mod a b *x *y]<br />
-            [mod a b *x : *y]
+            [mod a b *x]
+            [mod a b : *x]
+            [mod a b *x *y]
+            [mod a b *x : *y]<br />
+            [% a b *x]
+            [% a b : *x]
+            [% a b *x *y]
+            [% a b *x : *y]<br />
         </div>
         <div class="doc_predicate_body">
             Modulo (or division remainder): *x = a % b.<br />
@@ -811,9 +819,15 @@
 <div class="doc_predicate">
     <a id="predicate_mult">
         <div class="doc_predicate_header">
-            [mult *x arg-1 arg-2 .... arg-n]<br />
-            [mult arg-1 arg-2 .... arg-n *x]<br />
-            [mult arg-1 arg-2 .... arg-n : *x]
+            [mult *x arg-1 arg-2 .... arg-n]
+            [mult arg-1 arg-2 .... arg-n *x]
+            [mult arg-1 arg-2 .... arg-n : *x]<br/>
+            [~ *x arg-1 arg-2 .... arg-n]
+            [~ arg-1 arg-2 .... arg-n *x]
+            [~ arg-1 arg-2 .... arg-n : *x]<br/>
+            [`*` *x arg-1 arg-2 .... arg-n]
+            [`*` arg-1 arg-2 .... arg-n *x]
+            [`*` arg-1 arg-2 .... arg-n : *x]<br/>
         </div>
         <div class="doc_predicate_body">
             Multiplies all arguments: *x = arg-1 * arg-2 * .... * arg-n.<br />
@@ -830,8 +844,10 @@
 <div class="doc_predicate">
     <a id="predicate_or">
         <div class="doc_predicate_header">
-            [or a b *x]<br />
-            [or a b : *x]
+            [or a b *x]
+            [or a b : *x]<br />
+            [| a b *x]
+            [| a b : *x]<br />
         </div>
         <div class="doc_predicate_body">
             Bitwise OR: *x = a OR b.<br />
@@ -942,7 +958,8 @@
 <div class="doc_predicate">
     <a id="predicate_shiftl">
         <div class="doc_predicate_header">
-            [shiftl x shift *v] [lshift x shiftl : *v]<br />
+            [shiftl x shift *v] [shiftl x shiftl : *v]<br />
+            [<< x shift *v] [<< x shiftl : *v]<br />
         </div>
         <div class="doc_predicate_body">
             Left shift.<br />
@@ -956,6 +973,7 @@
     <a id="predicate_shiftr">
         <div class="doc_predicate_header">
             [shiftr x shift *v] [shiftr x shift : *v]<br />
+            [>> x shift *v] [>> x shift : *v]<br />
         </div>
         <div class="doc_predicate_body">
             Right shift.<br />
@@ -1074,8 +1092,10 @@
 <div class="doc_predicate">
     <a id="predicate_xor">
         <div class="doc_predicate_header">
-            [xor a b *x]<br />
-            [xor a b : *x]
+            [xor a b *x]
+            [xor a b : *x]<br />
+            [^ a b *x]
+            [^ a b : *x]<br />
         </div>
         <div class="doc_predicate_body">
             Bitwise XOR: *x = a XOR b.<br />
