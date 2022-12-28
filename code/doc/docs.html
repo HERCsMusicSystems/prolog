@@ -15,6 +15,7 @@
 <ul>
     <li><a href="#introduction">Introduction</a></li>
     <li><a href="#syntax">Syntax</a></li>
+    <li><a href="#searching rules">Searching Rules</a></li>
     <li><a href="#libraries">Libraries</a></li>
     <ul>
         <li><a href="#studio">studio</a></li>
@@ -27,6 +28,7 @@
             <li><a href="#multithreading">Multi-threading</a></li>
             <li><a href="#metalogical">Metalogical</a></li>
         </ul>
+        <li><a href="#Von Forman">Von Forman</a></li>
         <li><a href="#conductor">conductor</a></li>
         <li><a href="#midi">midi</a></li>
         <li><a href="#neural">neural</a></li>
@@ -64,6 +66,28 @@
     <tr><td>&lt;machine&gt;</td><td>::=</td><td>#machine &lt;atom&gt; := &lt;text&gt;</td></tr>
     <tr><td>&lt;preprocessor&gt;</td><td>::=</td><td>preprocessor := ( &lt;atom&gt; | "[]" )</td></tr>
 </table>
+
+<br />
+
+<div class="doc_header"><a id="searching rules">SEARCHING RULES</a></div>
+<table><tr><td style="background: #eeeeee;"><font face="arial">
+There are four types: batch files, text modules, binary modules and embedded modules.<br/><br/>
+
+If no name is specified then studio is loaded and [command] started.<br/>
+If name has .prc extension then the module is loaded and the tail instructions are performed.<br/>
+Otherwise the system bootstraps the name: the system assumes the name specifies a batch file, it tries to load it skipping the first shebang line.<br/>
+If the file was not found then the .prc extension is added at the end of the name, the module is loaded and the tail instructions are performed.<br/><br/>
+
+Modules are searched in the following order:<br/>
+1. The system tries to load an embedded module.<br/>
+2. The system tries to load a text module from present working directory.<br/>
+3. The system tries to load a text module from locations specified by search_directories array.<br/>
+4. The system tries to load a binary module.<br/><br/>
+
+Batch files are searched in the following order:<br/>
+1. The system tries to load a batch file from present working directory.<br/>
+2. The system tries to load a batch file from locations specified by search_directories array.<br/>
+</font></td></tr></table>
 
 <br />
 
@@ -314,6 +338,7 @@
             <a href="#predicate_WHILE">WHILE</a>
         </li>
     </ul>
+    <li><a href="#Von Forman">Von Forman</a></li>
     <li><a href="#conductor">conductor</a></li>
     <li><a href="#midi">midi</a></li>
     <ul>
@@ -3830,6 +3855,8 @@
         </div>
     </a>
 </div>
+
+<div class="doc_library"><a id="Von Forman">LIBRARY: <b>Von Forman</b></a></div>
 
 <div class="doc_library"><a id="conductor">LIBRARY: <b>conductor</b></a></div>
 
