@@ -31,7 +31,7 @@ program studio #machine := "prolog.studio"
 		atom? int? integer? double? number? var? head? text? machine?
 		text_list text_term e32 query_stack object_counter
 		exit halt command save_history load_history inner inner_addcl inner_call minimise maximise
-		res not eq rres ures lazy random_cl explode
+		res not eq not_eq rres ures lazy random_cl explode
 		TRY ONE PROBE SELECT APPEND LENGTH REVERSE AT ONLIST INLIST NODUP MAP MEMBER REPLACE
 		sort divide
 		WHILE FOR FOREVER forever REPEAT IF
@@ -244,6 +244,8 @@ program studio #machine := "prolog.studio"
 [[grandom : *parameters] / [grandom : *parameters]]
 [[eq *x *x]]
 [[= *x *x]]
+[[not_eq *x *x] / fail]
+[[not_eq * *]]
 [[<> *x *x] / fail]
 [[<> * *]]
 [[! : *x] *x / fail]

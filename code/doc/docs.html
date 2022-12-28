@@ -87,46 +87,48 @@
             <br />
             <a href="#predicate_arithmetic">:=</a>
             <a href="#predicate_abs">abs</a>
-            <a href="#predicate_add">add</a>
-            <a href="#predicate_add1">add1</a>
-            <a href="#predicate_and">and</a>
+            <a href="#predicate_add">add (+)</a>
+            <a href="#predicate_add1">add1 (++)</a>
+            <a href="#predicate_and">and (&)</a>
             <a href="#predicate_cos">cos</a>
             <a href="#predicate_degrad">degrad</a>
             <a href="#predicate_DFT">DFT</a>
-            <a href="#predicate_div">div</a>
+            <a href="#predicate_div">div (~~)</a>
             <a href="#predicate_e">e</a>
+            <a href="#predicate_eq">eq (=)</a>
             <a href="#predicate_exp">exp</a>
             <a href="#predicate_FFT">FFT</a>
             <a href="#predicate_grandom">grandom</a>
-            <a href="#predicate_greater">greater</a>
-            <a href="#predicate_greater_eq">greater_eq</a>
+            <a href="#predicate_greater">greater (>)</a>
+            <a href="#predicate_greater_eq">greater_eq (>= =>)</a>
             <a href="#predicate_grnd">grnd</a>
-            <a href="#predicate_less">less</a>
-            <a href="#predicate_less_eq">less_eq</a>
+            <a href="#predicate_less">less (<)</a>
+            <a href="#predicate_less_eq">less_eq (<= =<)</a>
             <a href="#predicate_log2">log2</a>
             <a href="#predicate_log10">log10</a>
             <a href="#predicate_ln">ln</a>
-            <a href="#predicate_mac">mac</a>
+            <a href="#predicate_mac">mac (~+)</a>
             <a href="#predicate_max">max</a>
             <a href="#predicate_min">min</a>
-            <a href="#predicate_mod">mod</a>
-            <a href="#predicate_mult">mult</a>
-            <a href="#predicate_or">or</a>
+            <a href="#predicate_mod">mod (%)</a>
+            <a href="#predicate_mult">mult (~ `*`)</a>
+            <a href="#predicate_or">or (|)</a>
+            <a href="#predicate_not_eq">not_eq (<>)</a>
             <a href="#predicate_pi">pi</a>
             <a href="#predicate_pow">pow</a>
             <a href="#predicate_random">random</a>
             <a href="#predicate_rnd">rnd</a>
             <a href="#predicate_rnd_control">rnd_control</a>
             <a href="#predicate_series">series</a>
-            <a href="#predicate_shiftl">shiftl</a>
-            <a href="#predicate_shiftr">shiftr</a>
+            <a href="#predicate_shiftl">shiftl (<<)</a>
+            <a href="#predicate_shiftr">shiftr (>>)</a>
             <a href="#predicate_sin">sin</a>
-            <a href="#predicate_sub">sub</a>
-            <a href="#predicate_sub1">sub1</a>
+            <a href="#predicate_sub">sub (-)</a>
+            <a href="#predicate_sub1">sub1 (--)</a>
             <a href="#predicate_sum">sum</a>
             <a href="#predicate_times">times</a>
             <a href="#predicate_trunc">trunc</a>
-            <a href="#predicate_xor">xor</a>
+            <a href="#predicate_xor">xor (^)</a>
         </li>
         <li><a href="#string_manipulation">String Manipulation</a>
             <br />
@@ -236,14 +238,14 @@
         <li><a href="#term">Term manipulation</a>
             <br />
             <a href="#predicate_e32">e32</a>
-            <a href="#predicate_has_machine">has_machine</a>
-            <a href="#predicate_is_atom">is_atom</a>
-            <a href="#predicate_is_double">is_double</a>
-            <a href="#predicate_is_head">is_head</a>
-            <a href="#predicate_is_integer">is_integer</a>
-            <a href="#predicate_is_number">is_number</a>
-            <a href="#predicate_is_text">is_text</a>
-            <a href="#predicate_is_var">is_var</a>
+            <a href="#predicate_has_machine">has_machine (machine?)</a>
+            <a href="#predicate_is_atom">is_atom (atom?)</a>
+            <a href="#predicate_is_double">is_double (double?)</a>
+            <a href="#predicate_is_head">is_head (head?)</a>
+            <a href="#predicate_is_integer">is_integer (int? integer?)</a>
+            <a href="#predicate_is_number">is_number (number?)</a>
+            <a href="#predicate_is_text">is_text (text?)</a>
+            <a href="#predicate_is_var">is_var (var?)</a>
             <a href="#predicate_text_list">text_list</a>
             <a href="#predicate_text_term">text_term</a>
         </li>
@@ -273,7 +275,7 @@
             <a href="#predicate_CONSTANT">CONSTANT</a>
             <a href="#predicate_dec">dec</a>
             <a href="#predicate_define-this">define-this</a>
-            <a href="#predicate_eq">eq</a>
+            <a href="#predicate_eq">eq (=)</a>
             <a href="#predicate_FOR">FOR</a>
             <a href="#predicate_forever">forever</a>
             <a href="#predicate_FOREVER">FOREVER</a>
@@ -293,7 +295,7 @@
             <a href="#predicate_MEMBER">MEMBER</a>
             <a href="#predicate_minimise">minimise</a>
             <a href="#predicate_NODUP">NODUP</a>
-            <a href="#predicate_not">not</a>
+            <a href="#predicate_not">not (!)</a>
             <a href="#predicate_ONE">ONE</a>
             <a href="#predicate_ONLIST">ONLIST</a>
             <a href="#predicate_PROBE">PROBE</a>
@@ -441,11 +443,15 @@
 <div class="doc_predicate">
     <a id="predicate_add">
         <div class="doc_predicate_header">
-            [add *x arg-1 arg-2 .... arg-n]<br />
-            [add arg-1 arg-2 .... arg-n *x]<br />
-            [add arg-1 arg-2 .... arg-n : *x]
+            [add *x arg-1 arg-2 .... arg-n]
+            [add arg-1 arg-2 .... arg-n *x]
+            [add arg-1 arg-2 .... arg-n : *x]<br />
+            [+ *x arg-1 arg-2 .... arg-n]
+            [+ arg-1 arg-2 .... arg-n *x]
+            [+ arg-1 arg-2 .... arg-n : *x]<br />
         </div>
         <div class="doc_predicate_body">
+            In effect this is an elaborate MAC procedure.<br />
             Adds all arguments: *x = arg-1 + arg-2 + .... + arg-n.<br />
             Without arguments: *x = 0.<br />
             Arguments can be integers, doubles, lists of numbers, texts or symbols.
@@ -461,8 +467,9 @@
 <div class="doc_predicate">
     <a id="predicate_add1">
         <div class="doc_predicate_header">
-            [add1 x y]<br />
-            [add1 x : y]
+            [add1 x y]
+            [add1 x : y]<br />
+            [++ x y] [++ x : y]
         </div>
         <div class="doc_predicate_body">
             Adds 1 or 1.0 to x depending on the type of x. Can be used as a test.
@@ -630,6 +637,7 @@
     <a id="predicate_greater">
         <div class="doc_predicate_header">
             [greater arg-1 arg-2 .... arg-n]
+            [> arg-1 arg-2 .... arg-n]
         </div>
         <div class="doc_predicate_body">
             Checks if the arguments are ordered in descending order without duplicates.
@@ -645,6 +653,8 @@
     <a id="predicate_greater_eq">
         <div class="doc_predicate_header">
             [greater_eq arg-1 arg-2 .... arg-n]
+            [>= arg-1 arg-2 .... arg-n]
+            [=> arg-1 arg-2 .... arg-n]
         </div>
         <div class="doc_predicate_body">
             Checks if the arguments are ordered in ascending order.
@@ -673,6 +683,7 @@
     <a id="predicate_less">
         <div class="doc_predicate_header">
             [less arg-1 arg-2 .... arg-n]
+            [< arg-1 arg-2 .... arg-n]
         </div>
         <div class="doc_predicate_body">
             Checks if the arguments are ordered in ascending order without duplicates.
@@ -688,6 +699,8 @@
     <a id="predicate_less_eq">
         <div class="doc_predicate_header">
             [less_eq arg-1 arg-2 .... arg-n]
+            [<= arg-1 arg-2 .... arg-n]
+            [=< arg-1 arg-2 .... arg-n]
         </div>
         <div class="doc_predicate_body">
             Checks if the arguments are ordered in ascending order.
@@ -858,6 +871,18 @@
 </div>
 
 <div class="doc_predicate">
+    <a id="predicate_not_eq">
+        <div class="doc_predicate_header">
+            [not_eq *x *y] [<> *x *y]
+        </div>
+        <div class="doc_predicate_body">
+            Checks if the arguments are different.
+            Used for tests.
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
     <a id="predicate_pi">
         <div class="doc_predicate_header">
             [pi *pi] [pi : *pi]
@@ -1007,10 +1032,14 @@
 <div class="doc_predicate">
     <a id="predicate_sub">
         <div class="doc_predicate_header">
-            [sub a b *x]<br />
-            [sub a b : *x]<br />
-            [sub a -a]<br />
-            [sub a : -a]
+            [sub a b *x]
+            [sub a b : *x]
+            [sub a -a]
+            [sub a : -a]<br />
+            [- a b *x]
+            [- a b : *x]
+            [- a -a]
+            [- a : -a]<br />
         </div>
         <div class="doc_predicate_body">
             Subtraction: *x = a - b.<br />
@@ -1026,8 +1055,9 @@
 <div class="doc_predicate">
     <a id="predicate_sub1">
         <div class="doc_predicate_header">
-            [sub1 x y]<br />
-            [sub1 x : y]
+            [sub1 x y]
+            [sub1 x : y]<br />
+            [-- x y] [-- x : y]
         </div>
         <div class="doc_predicate_body">
             Subtracts 1 or 1.0 from x depending on the type of x. Can be used as a test.
@@ -2539,8 +2569,10 @@
 <div class="doc_predicate">
     <a id="predicate_has_machine">
         <div class="doc_predicate_header">
-            [has_machine atom]<br />
-            [has_machine "module"]
+            [has_machine atom]
+            [has_machine "module"]<br />
+            [machine? atom]
+            [machine? "module"]<br />
         </div>
         <div class="doc_predicate_body">
             Checks if a symbol has clauses attached or if a module has a service class attached.
@@ -2552,6 +2584,7 @@
     <a id="predicate_is_atom">
         <div class="doc_predicate_header">
             [is_atom atom]
+            [atom? atom]
         </div>
         <div class="doc_predicate_body">
             Checks if the supplied parameter is a symbol (atom).
@@ -2563,6 +2596,7 @@
     <a id="predicate_is_double">
         <div class="doc_predicate_header">
             [is_double 127.0]
+            [double? 127.0]
         </div>
         <div class="doc_predicate_body">
             Checks if the supplied parameter is a number with fractional part.
@@ -2574,6 +2608,7 @@
     <a id="predicate_is_head">
         <div class="doc_predicate_header">
             [is_head head]
+            [head? head]
         </div>
         <div class="doc_predicate_body">
             Checks if the supplied parameter is a pointer to a location in memory.
@@ -2587,6 +2622,8 @@
     <a id="predicate_is_integer">
         <div class="doc_predicate_header">
             [is_integer 127]
+            [int? 127]
+            [integer? 127]
         </div>
         <div class="doc_predicate_body">
             Checks if the supplied parameter is a integer number.
@@ -2598,6 +2635,7 @@
     <a id="predicate_is_number">
         <div class="doc_predicate_header">
             [is_number value]
+            [number? value]
         </div>
         <div class="doc_predicate_body">
             Checks if the supplied parameter is either an integer of fractional number.
@@ -2609,6 +2647,7 @@
     <a id="predicate_is_text">
         <div class="doc_predicate_header">
             [is_text "text"]
+            [text? "text"]
         </div>
         <div class="doc_predicate_body">
             Checks if the supplied parameters is textual.
@@ -2620,6 +2659,7 @@
     <a id="predicate_is_var">
         <div class="doc_predicate_header">
             [is_var *variable]
+            [var? *variable]
         </div>
         <div class="doc_predicate_body">
             Checks if the supplied parameter is a variable.
@@ -3078,7 +3118,7 @@
 <div class="doc_predicate">
     <a id="predicate_eq">
         <div class="doc_predicate_header">
-            [eq *x *y]
+            [eq *x *y] [= *x *y]
         </div>
         <div class="doc_predicate_body">
             Checks if the two parameters are equal and assigns them to each other.<br />
