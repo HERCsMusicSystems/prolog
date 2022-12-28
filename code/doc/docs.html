@@ -28,7 +28,7 @@
             <li><a href="#multithreading">Multi-threading</a></li>
             <li><a href="#metalogical">Metalogical</a></li>
         </ul>
-        <li><a href="#Von Forman">Von Forman</a></li>
+        <li><a href="">Von Forman</a></li>
         <li><a href="#conductor">conductor</a></li>
         <li><a href="#midi">midi</a></li>
         <li><a href="#neural">neural</a></li>
@@ -339,6 +339,12 @@ Batch files are searched in the following order:<br/>
         </li>
     </ul>
     <li><a href="#Von Forman">Von Forman</a></li>
+    <ul>
+    	<li><a href="#Von Forman notes">Notes</a></li>
+		<li><a href="#Von Forman MIDI commands">MIDI Commands</a></li>
+		<li><a href="#Von Forman predefined controllers">Predefined Controllers</a></li>
+		<li><a href="#Von Forman 16-bit controllers">16-bit Controllers</a></li>
+    </ul>
     <li><a href="#conductor">conductor</a></li>
     <li><a href="#midi">midi</a></li>
     <ul>
@@ -3857,6 +3863,32 @@ Batch files are searched in the following order:<br/>
 </div>
 
 <div class="doc_library"><a id="Von Forman">LIBRARY: <b>Von Forman</b></a></div>
+
+<div class="doc_library_section"><a id="Von Forman notes">Notes</a></div>
+
+<div class="doc_predicate">
+    <a id="predicate_arithmetic">
+        <div class="doc_predicate_header">
+        	A A# Ax Ab Abb<br/>
+        	B H (H = B) B# Bx Bb Bbb<br/>
+        	C C# Cx Cb Cbb<br/>
+        	D D# Dx Db Dbb<br/>
+        	E E# Ex Eb Ebb<br/>
+        	F F# Fx Fb Fbb<br/>
+        	G G# Gx Gb Gbb<br/>
+        	[keyon *channel [C# 1] *velocity] is an equivalent of [keyon *channel 61 *velocity]
+        </div>
+        <div class="doc_predicate_body">
+        	Above are the predefined atoms representing note names. Please, note, there is note H defined, which is equal to B.<br/>
+        	Those names are to be used combined with octave number, where:<br/>
+        	[C -5] = 0, [E -5] = 4, [E -4] = 16, [E -2] = 28, [E -1] = 40, [E 0] = 52, [E 1] = 64, [E 2] = 76, [E 3] = 88, [E 4] = 100, [E 5] = 112, [E 6] = 124 and [G 6] = 127.<br/>
+        </div>
+    </a>
+</div>
+
+
+
+
 
 <div class="doc_library"><a id="conductor">LIBRARY: <b>conductor</b></a></div>
 
