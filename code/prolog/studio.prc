@@ -616,7 +616,7 @@ auto := [[var QueryPrompt ReplyPrompt [FailPrompt "Doesn't work"]]]
 
 protect [
 	+ - ++ -- ~ ~~ ~+ `*` % < = > <=> <= =< >= => <> ! & | ^
-	eq grnd grandom
+	eq not_eq grnd grandom
 	not res ONE ALL TRY PROBE SELECT APPEND LENGTH REVERSE ONLIST INLIST NODUP MAP MEMBER REPLACE
 	exit command inner inner_addcl inner_call random_cl explode
 	sort divide
