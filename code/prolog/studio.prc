@@ -30,7 +30,7 @@ program studio #machine := "prolog.studio"
 		is_atom is_integer is_double is_number is_var is_head is_text has_machine
 		atom? int? integer? double? number? var? head? text? machine?
 		text_list text_term e32 query_stack object_counter
-		exit halt command save_history load_history inner inner_addcl inner_call minimise maximise
+		exit halt command StartInteractiveSession save_history load_history inner inner_addcl inner_call minimise maximise
 		res not eq not_eq rres ures lazy random_cl explode
 		TRY ONE PROBE SELECT APPEND LENGTH REVERSE AT ONLIST INLIST NODUP MAP MEMBER REPLACE
 		sort divide
@@ -518,6 +518,8 @@ program studio #machine := "prolog.studio"
 [[command [*x : *y] []] / [inner_call [*x : *y]] [ReplyPrompt : *prompt] [write *prompt] [show [*x : *y]]]
 [[command *x *y] [inner_call [*x : *y]]]
 
+[[StartInteractiveSession] / [command]]
+
 auto := [[var QueryPrompt ReplyPrompt [FailPrompt "Doesn't work"]]]
 
 [[bootstrap *command] [shebang_reader *atom *command] / [batch [batch] *atom]]
@@ -618,7 +620,7 @@ protect [
 	+ - ++ -- ~ ~~ ~+ `*` % < = > <=> <= =< >= => <> ! & | ^
 	eq not_eq grnd grandom
 	not res ONE ALL TRY PROBE SELECT APPEND LENGTH REVERSE ONLIST INLIST NODUP MAP MEMBER REPLACE
-	exit command inner inner_addcl inner_call random_cl explode
+	exit command StartInteractiveSession inner inner_addcl inner_call random_cl explode
 	sort divide
 	expand_search_directory
 	toSymbolicForm sortSymbolicForm addSymbolicForm multiplySymbolicForm := ::=
