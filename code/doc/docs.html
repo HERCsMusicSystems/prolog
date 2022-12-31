@@ -342,7 +342,33 @@ Batch files are searched in the following order:<br/>
     <li><a href="#Von Forman">Von Forman</a></li>
     <ul>
     	<li><a href="#Von Forman notes">Notes</a></li>
-		<li><a href="#Von Forman MIDI commands">MIDI Commands</a></li>
+		<li><a href="#Von Forman MIDI commands">MIDI Commands</a><br/>
+			<a href="#VF predicate_keyoff">keyoff</a>
+			<a href="#VF predicate_keyon">keyon</a>
+			<a href="#VF predicate_polyaftertouch">polyaftertouch</a>
+			<a href="#VF predicate_control">control</a>
+			<a href="#VF predicate_programchange">programchange</a>
+			<a href="#VF predicate_store">store</a>
+			<a href="#VF predicate_aftertouch">aftertouch</a>
+			<a href="#VF predicate_pitch">pitch</a>
+			<a href="#VF predicate_sysex">sysex</a>
+			<a href="#VF predicate_Sysex">Sysex</a>
+			<a href="#VF predicate_quarterframe">quarterframe</a>
+			<a href="#VF predicate_songpositionpointer">songpositionpointer</a>
+			<a href="#VF predicate_songselect">songselect</a>
+			<a href="#VF predicate_uF4">uF4</a>
+			<a href="#VF predicate_uF5">uF5</a>
+			<a href="#VF predicate_tunerequest">tunerequest</a>
+			<a href="#VF predicate_timingclock">timingclock</a>
+			<a href="#VF predicate_uF9">uF9</a>
+			<a href="#VF predicate_START">START</a>
+			<a href="#VF predicate_CONTINUE">CONTINUE</a>
+			<a href="#VF predicate_STOP">STOP</a>
+			<a href="#VF predicate_uFD">uFD</a>
+			<a href="#VF predicate_PAUSE">PAUSE</a>
+			<a href="#VF predicate_activesensing">activesensing</a>
+			<a href="#VF predicate_systemreset">systemreset</a>
+		</li>
 		<li><a href="#Von Forman predefined controllers">Predefined Controllers</a></li>
 		<li><a href="#Von Forman 16-bit controllers">16-bit Controllers</a></li>
     </ul>
@@ -3879,19 +3905,142 @@ Batch files are searched in the following order:<br/>
         	E E# Ex Eb Ebb<br/>
         	F F# Fx Fb Fbb<br/>
         	G G# Gx Gb Gbb<br/>
-        	[keyon *channel [C# 1] *velocity] is an equivalent of [keyon *channel 61 *velocity]
+        	[keyon *channel [C# 1] *velocity] is an equivalent of [keyon *channel 61 *velocity]<br/>
+        	C = B# = Dbb<br/>
+        	C# = Bx = Db<br/>
+        	D = Cx = Ebb<br/>
+        	D# = Eb = Fbb<br/>
+        	E = Dx = Fb<br/>
+        	F = E# = Gbb<br/>
+        	F# = Ex = Gb<br/>
+        	G = Fx = Abb<br/>
+        	G# = Ab<br/>
+        	A = Gx = Bbb<br/>
+        	A# = Bb = Cbb<br/>
+        	B = Ax = Cb<br/>
         </div>
         <div class="doc_predicate_body">
         	Above are the predefined atoms representing note names. Please, note, there is note H defined, which is equal to B.<br/>
-        	Those names are to be used combined with octave number, where:<br/>
+        	Those names are to be used combined with octave number, where the range of all available MIDI notes is from [C -5] = 0 to [G 6] = 127:<br/>
         	[C -5] = 0, [E -5] = 4, [E -4] = 16, [E -2] = 28, [E -1] = 40, [E 0] = 52, [E 1] = 64, [E 2] = 76, [E 3] = 88, [E 4] = 100, [E 5] = 112, [E 6] = 124 and [G 6] = 127.<br/>
+        	Please note, every note has 3 different names, except G# / Ab, which has only two names:<br/>
         </div>
     </a>
 </div>
 
+<div class="doc_library_section"><a id="Von Forman MIDI commands">MIDI Commands</a></div>
 
+<div class="doc_predicate">
+	<a id="VF predicate_keyoff">
+		<div class="doc_predicate_header">
+			[keyoff ch kk vv]<br/>
+			[keyoff ch kk]<br/>
+			[keyoff ch]<br/>
+			[keyoff]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>keyoff</b> message <b>= 0x8ch kk vv</b> or <b>all-keys-off</b> MIDI control message <b>= 0xBch 123 0</b>.<br/>
+			Default velocity = 100. Key can be either number (i.e. 61) or description (i.e. [C# 1]).<br/>
+			If key is not specified then <b>all-keys-off</b> message is transmitted.<br/>
+			If no parameters are present then <b>all-keys-off</b> message is transmitted in all MIDI channels.
+		</div>
+	</a>
+</div>
 
+<div class="doc_predicate">
+	<a id="VF predicate_keyon">
+		<div class="doc_predicate_header">
+			[keyon ch kk vv]<br/>
+			[keyon ch kk]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>keyon</b> message <b>= 0x9ch kk vv</b>.<br/>
+			Default velocity = 100. Key can be either number (i.e. 61) or description (i.e. [C# 1]).<br/>
+		</div>
+	</a>
+</div>
 
+<div class="doc_predicate">
+	<a id="VF predicate_polyaftertouch">
+		<div class="doc_predicate_header">
+			[polyaftertouch ch kk vv]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>polyaftertouch</b> message <b>= 0xAch kk vv</b>. Default velocity = 100.<br/>
+			The kk value can be either number (i.e. 61) or description (i.e. [C# 1]).<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_control">
+		<div class="doc_predicate_header">
+			[control ch cc vv]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control</b> message <b>= 0xBch cc vv</b>. Default vv = 100.<br/>
+			The cc value can be either number (i.e. 61) or description (i.e. [C# 1]).<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_programchange">
+		<div class="doc_predicate_header">
+			[programchange ch pp]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>programchange</b> message <b>= 0xCch pp</b>.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_store">
+		<div class="doc_predicate_header">
+			[store ch pp]<br/>
+			[store dv ch pp]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Artificial command. Sends MIDI <b>sysex</b> message <b>F0 mmm dv f1 7ch pp F7</b> specific to Von Forman only for storing voices,
+			where <b>mmm = Manufacturer's ID</b> and <b>f1 = Family Code's first byte</b>.
+			If no device specified then the <b>device = MIDI channel</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_aftertouch">
+		<div class="doc_predicate_header">
+			[aftertouch ch vv]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>aftertouch</b> message <b>= 0xDch vv</b>.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_pitch">
+		<div class="doc_predicate_header">
+			[pitch ch hh]<br/>
+			[pitch ch hh ll]<br/>
+			[pitch ch 128] => [pitch ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>pitch</b> message <b>= 0xEch ll hh</b>. Default ll = 0.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_library_section"><a id="Von Forman predefined controllers">Predefined Controllers</a></div>
+
+<div class="doc_library_section"><a id="Von Forman 16-bit controllers">16-bit Controllers</a></div>
+<!--
+		<li><a href="#Von Forman MIDI commands">MIDI Commands</a></li>
+		<li><a href="#Von Forman predefined controllers">Predefined Controllers</a></li>
+		<li><a href="#Von Forman 16-bit controllers">16-bit Controllers</a></li>
+-->
 
 <div class="doc_library"><a id="conductor">LIBRARY: <b>conductor</b></a></div>
 
