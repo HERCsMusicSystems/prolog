@@ -3939,7 +3939,7 @@ Batch files are searched in the following order:<br/>
 			[keyoff]
 		</div>
 		<div class="doc_predicate_body">
-			Sends MIDI <b>keyoff</b> message <b>= 0x8ch kk vv</b> or <b>all-keys-off</b> MIDI control message <b>= 0xBch 123 0</b>.<br/>
+			Sends MIDI <b>keyoff</b> message <b>= 8ch kk vv</b> or <b>all-keys-off</b> MIDI control message <b>= 0xBch 123 0</b>.<br/>
 			Default velocity = 100. Key can be either number (i.e. 61) or description (i.e. [C# 1]).<br/>
 			If key is not specified then <b>all-keys-off</b> message is transmitted.<br/>
 			If no parameters are present then <b>all-keys-off</b> message is transmitted in all MIDI channels.
@@ -3954,7 +3954,7 @@ Batch files are searched in the following order:<br/>
 			[keyon ch kk]<br/>
 		</div>
 		<div class="doc_predicate_body">
-			Sends MIDI <b>keyon</b> message <b>= 0x9ch kk vv</b>.<br/>
+			Sends MIDI <b>keyon</b> message <b>= 9ch kk vv</b>.<br/>
 			Default velocity = 100. Key can be either number (i.e. 61) or description (i.e. [C# 1]).<br/>
 		</div>
 	</a>
@@ -3966,7 +3966,7 @@ Batch files are searched in the following order:<br/>
 			[polyaftertouch ch kk vv]<br/>
 		</div>
 		<div class="doc_predicate_body">
-			Sends MIDI <b>polyaftertouch</b> message <b>= 0xAch kk vv</b>. Default velocity = 100.<br/>
+			Sends MIDI <b>polyaftertouch</b> message <b>= Ach kk vv</b>. Default velocity = 100.<br/>
 			The kk value can be either number (i.e. 61) or description (i.e. [C# 1]).<br/>
 		</div>
 	</a>
@@ -3978,7 +3978,7 @@ Batch files are searched in the following order:<br/>
 			[control ch cc vv]<br/>
 		</div>
 		<div class="doc_predicate_body">
-			Sends MIDI <b>control</b> message <b>= 0xBch cc vv</b>. Default vv = 100.<br/>
+			Sends MIDI <b>control</b> message <b>= Bch cc vv</b>. Default vv = 100.<br/>
 			The cc value can be either number (i.e. 61) or description (i.e. [C# 1]).<br/>
 		</div>
 	</a>
@@ -3990,7 +3990,7 @@ Batch files are searched in the following order:<br/>
 			[programchange ch pp]<br/>
 		</div>
 		<div class="doc_predicate_body">
-			Sends MIDI <b>programchange</b> message <b>= 0xCch pp</b>.<br/>
+			Sends MIDI <b>programchange</b> message <b>= Cch pp</b>.<br/>
 		</div>
 	</a>
 </div>
@@ -4015,7 +4015,7 @@ Batch files are searched in the following order:<br/>
 			[aftertouch ch vv]<br/>
 		</div>
 		<div class="doc_predicate_body">
-			Sends MIDI <b>aftertouch</b> message <b>= 0xDch vv</b>.<br/>
+			Sends MIDI <b>aftertouch</b> message <b>= Dch vv</b>.<br/>
 		</div>
 	</a>
 </div>
@@ -4028,7 +4028,65 @@ Batch files are searched in the following order:<br/>
 			[pitch ch 128] => [pitch ch 127 127]
 		</div>
 		<div class="doc_predicate_body">
-			Sends MIDI <b>pitch</b> message <b>= 0xEch ll hh</b>. Default ll = 0.<br/>
+			Sends MIDI <b>pitch</b> message <b>= Ech ll hh</b>. Default ll = 0.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_sysex">
+		<div class="doc_predicate_header">
+			[sysex mm ....] => sends [F0 mm .... F7]<br/>
+			[sysex 00 mm1 mm2 ....] => sends [F0 00 mm1 mm2 .... F7]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>sysex</b> message, where mm, mm1 and mm2 are the Manufacturer's IDs (either singly byte or two).<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Sysex">
+		<div class="doc_predicate_header">
+			[Sysex ....] => sends Von Forman's specific sysex [F0 mmm dv f1 .... F7] where:<br/>
+			* mmm is the Manufacturer's ID (either [mm] or [00 mm1 mm2])<br/>
+			* dv is Device ID<br/>
+			* f1 is the first byte of Family Code<br/>
+			====================================<br/>
+			[F0 7E 7F F7] => FACTORY IDENTITY REPLY<br/>
+			[F0 7E dv 06 02 mmm f1 f2 p1 p2 v1 v2 v3 v4 F7] => IDENTITY REPLY where:<br/>
+			* mmm is one or two byte Manufacturer's ID ([mm] or [00 mm1 mm2])<br/>
+			* f1 f2 is Family Code<br/>
+			* p1 p2 is Product Code<br/>
+			* v1 v2 v3 v4 is Version<br/>
+			* dv is Device ID<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends Von Forman's specific MIDI <b>sysex</b> message, where Manufacturer's ID, Device ID and the first byte of Family Code
+			are automatically inserted.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_quarterframe">
+		<div class="doc_predicate_header">
+			[quarterframe vv]<br/>
+			[F0 00 mm1 mm2 .... F7]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>quarterframe</b> message <b>= F1 vv</b>.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_songpositionpointer">
+		<div class="doc_predicate_header">
+			[songpositionpointer ll hh]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>songpositionpointer</b> message <b>= F2 ll hh</b>.<br/>
 		</div>
 	</a>
 </div>
