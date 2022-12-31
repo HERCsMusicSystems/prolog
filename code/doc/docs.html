@@ -355,6 +355,8 @@ Batch files are searched in the following order:<br/>
 			<a href="#VF predicate_Sysex">Sysex</a>
 			<a href="#VF predicate_quarterframe">quarterframe</a>
 			<a href="#VF predicate_songpositionpointer">songpositionpointer</a>
+			<a href="#VF predicate_tempo">tempo</a>
+			<a href="#VF predicate_TEMPO">TEMPO</a>
 			<a href="#VF predicate_songselect">songselect</a>
 			<a href="#VF predicate_uF4">uF4</a>
 			<a href="#VF predicate_uF5">uF5</a>
@@ -4087,6 +4089,41 @@ Batch files are searched in the following order:<br/>
 		</div>
 		<div class="doc_predicate_body">
 			Sends MIDI <b>songpositionpointer</b> message <b>= F2 ll hh</b>.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_tempo">
+		<div class="doc_predicate_header">
+			[tempo hh ll]<br/>
+			[tempo hh] => Default ll = 0<br/>
+			=======================================<br/>
+			[tempo 60] [tempo 60 0]           => 120 beats per minute (uses songpositionpointer)<br/>
+			[tempo 127]                       => 254 beats per minute<br/>
+			[tempo 1]                         => 2 beats per minute<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Artificial command for controlling Global Clock's tempo.
+			Sends MIDI <b>songpositionpointer</b> message <b>= F2 ll hh</b>.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_TEMPO">
+		<div class="doc_predicate_header">
+			[TEMPO 16-bit-vv]<br/>
+			=======================================<br/>
+			[TEMPO 7680]                      => 120 beats per minute (uses songpositionpointer)
+			[TEMPO 16383]                     => 255.984375 beats per minute
+			[TEMPO 1]                         => 0.015625 beats per minute
+		</div>
+		<div class="doc_predicate_body">
+			Artificial command for controlling Global Clock's tempo.
+			Sends MIDI <b>songpositionpointer</b> message <b>= F2 ll hh</b>, where:<br/>
+			* hh = 16-bit-vv >> 7<br/>
+			* ll = 16-bit-vv & 15
 		</div>
 	</a>
 </div>
