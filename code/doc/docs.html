@@ -4670,6 +4670,231 @@ Batch files are searched in the following order:<br/>
 	</a>
 </div>
 
+<div class="doc_predicate">
+	<a id="VF predicate_Freq">
+		<div class="doc_predicate_header">
+			[Freq ch msb]<br/>
+			[Freq ch msb lsb]<br/>
+			[Freq ch 128] => [Freq ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control brightness</b> one or two messages
+			<b>= Bch 4A msb</b> or <b>= Bch 6A lsb Bch 4A msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 6A 127 Bch 4A 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Resonance">
+		<div class="doc_predicate_header">
+			[Resonance ch msb]<br/>
+			[Resonance ch msb lsb]<br/>
+			[Resonance ch 128] => [Resonance ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control timbre / harmonic intensity</b> one or two messages
+			<b>= Bch 47 msb</b> or <b>= Bch 67 lsb Bch 47 msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 67 127 Bch 47 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Chorus">
+		<div class="doc_predicate_header">
+			[Chorus ch msb]<br/>
+			[Chorus ch msb lsb]<br/>
+			[Chorus ch 128] => [Chorus ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control general purpose</b> one or two messages
+			<b>= Bch 51 msb</b> or <b>= Bch 71 lsb Bch 51 msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 71 127 Bch 51 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Delay">
+		<div class="doc_predicate_header">
+			[Delay ch msb]<br/>
+			[Delay ch msb lsb]<br/>
+			[Delay ch 128] => [Delay ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control general purpose</b> one or two messages
+			<b>= Bch 52 msb</b> or <b>= Bch 72 lsb Bch 52 msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 72 127 Bch 52 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Freeverb">
+		<div class="doc_predicate_header">
+			[Freeverb ch msb]<br/>
+			[Freeverb ch msb lsb]<br/>
+			[Freeverb ch 128] => [Freeverb ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control general purpose</b> one or two messages
+			<b>= Bch 53 msb</b> or <b>= Bch 73 lsb Bch 53 msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 73 127 Bch 53 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Portamento">
+		<div class="doc_predicate_header">
+			[Portamento ch msb]<br/>
+			[Portamento ch msb lsb]<br/>
+			[Portamento ch 128] => [Portamento ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control portamento time</b> one or two messages
+			<b>= Bch 05 msb</b> or <b>= Bch 25 lsb Bch 05 msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 25 127 Bch 05 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_PortaOn">
+		<div class="doc_predicate_header">
+			[PortaOn ch]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control portamento on/off</b> message
+			<b>= Bch 41 7f</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_PortaOff">
+		<div class="doc_predicate_header">
+			[PortaOff ch]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control portamento on/off</b> message
+			<b>= Bch 41 00</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_LegatoOn">
+		<div class="doc_predicate_header">
+			[LegatoOn ch]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control legato on/off</b> message
+			<b>= Bch 44 7f</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_LegatoOff">
+		<div class="doc_predicate_header">
+			[LegatoOff ch]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control legato on/off</b> message
+			<b>= Bch 44 00</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_ArpeggiatorOn">
+		<div class="doc_predicate_header">
+			[ArpeggiatorOn ch]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control sostenuto on/off</b> message
+			<b>= Bch 42 7f</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_ArpeggiatorOff">
+		<div class="doc_predicate_header">
+			[ArpeggiatorOff ch]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control sostenuto on/off</b> message
+			<b>= Bch 42 00</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_ArpeggiatorHoldOn">
+		<div class="doc_predicate_header">
+			[ArpeggiatorHoldOn ch]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control hold 2 on/off</b> message
+			<b>= Bch 45 7f</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_ArpeggiatorHoldOff">
+		<div class="doc_predicate_header">
+			[ArpeggiatorHoldOff ch]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control hold 2 on/off</b> message
+			<b>= Bch 45 00</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Transpose">
+		<div class="doc_predicate_header">
+			[Transpose ch msb]<br/>
+			[Transpose ch msb lsb]<br/>
+			[Transpose ch 128] => [Transpose ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control undefined</b> one or two messages
+			<b>= Bch 55 msb</b> or <b>= Bch 75 lsb Bch 55 msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 75 127 Bch 55 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Automation">
+		<div class="doc_predicate_header">
+			[Automation ch vv]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control undefined</b> message <b>= Bch 57 vv</b>.
+			Controls Von Forman's Vector automation.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Mode">
+		<div class="doc_predicate_header">
+			[Mode ch vv]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control undefined</b> message <b>= Bch 56 vv</b>.
+			Selects arranger's 12-note transfer array.
+		</div>
+	</a>
+</div>
+
 <div class="doc_library_section"><a id="Von Forman 16-bit controllers">16-bit Controllers</a></div>
 <!--
 		<li><a href="#Von Forman MIDI commands">MIDI Commands</a></li>
