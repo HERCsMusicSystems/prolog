@@ -4374,6 +4374,302 @@ Batch files are searched in the following order:<br/>
 
 <div class="doc_library_section"><a id="Von Forman predefined controllers">Predefined Controllers</a></div>
 
+<div class="doc_predicate">
+	<a id="VF predicate_rpn">
+		<div class="doc_predicate_header">
+			[rpn ch msb lsb] => Select parameter for data.<br/>
+			[rpn ch msb lsb 8-bit-data] => Select parameter and send 8-bit data.<br/>
+			[rpn ch msb lsb hh ll] => Select parameter and send 16-bit hhll data.<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>rpn</b> message consisting of up to 4 MIDI control messages <b>= Bch 65 msb Bch 64 lsb Bch 26 ll Bch 06 hh</b>
+			or appropriately shorter version.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_nrpn">
+		<div class="doc_predicate_header">
+			[nrpn ch msb lsb] => Select parameter for data.<br/>
+			[nrpn ch msb lsb 8-bit-data] => Select parameter and send 8-bit data.<br/>
+			[nrpn ch msb lsb hh ll] => Select parameter and send 16-bit hhll data.<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>nrpn</b> message consisting of up to 4 MIDI control messages <b>= Bch 63 msb Bch 62 lsb Bch 26 ll Bch 06 hh</b>
+			or appropriately shorter version.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_data">
+		<div class="doc_predicate_header">
+			[data ch 8-bit-data] => Sends 8-bit data for selected rpn/nrpn parameter.<br/>
+			[data ch hh ll] => Sends 16-bit data for selected rnpn/nrpn parameter.<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>data</b> message consisting of up to 2 MIDI control messages <b>= Bch 26 ll Bch 06 hh</b> or shorter version.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_delta">
+		<div class="doc_predicate_header">
+			[delta ch 8-bit-delta] => Sends 8-bit increment / decrement for selected rpn/nrpn parameter. Range -64 .. 63.<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>increment</b> message <b>= Bch 60 delta</b>
+			or <b>decrement</b> message <b>= Bch 61 -delta</b>.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_poly">
+		<div class="doc_predicate_header">
+			[poly ch]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control poly</b> message <b>= Bch 7F --</b> where data is byte is not applicable.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_mono">
+		<div class="doc_predicate_header">
+			[mono ch]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control mono</b> message <b>= Bch 7E --</b> where data is byte is not applicable.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Bank">
+		<div class="doc_predicate_header">
+			[Bank ch msb]<br/>
+			[Bank ch msb lsb]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control bank select</b> one or two messages <b>= Bch 00 msb</b> or <b>= Bch 20 lsb Bch 00 msb</b>.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_BankLSB">
+		<div class="doc_predicate_header">
+			[BankLSB ch lsb]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control bank lsb select</b> message only <b>= Bch 20 lsb</b>.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Modulation">
+		<div class="doc_predicate_header">
+			[Modulation ch msb]<br/>
+			[Modulation ch msb lsb]<br/>
+			[Modulation ch 128] => [Modulation ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control modulation</b> one or two messages
+			<b>= Bch 01 msb</b> or <b>= Bch 21 lsb Bch 01 msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 21 127 Bch 01 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Pan">
+		<div class="doc_predicate_header">
+			[Pan ch msb]<br/>
+			[Pan ch msb lsb]<br/>
+			[Pan ch 128] => [Pan ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control pan</b> one or two messages
+			<b>= Bch 0A msb</b> or <b>= Bch 2A lsb Bch 01 msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 2A 127 Bch 0A 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Volume">
+		<div class="doc_predicate_header">
+			[Volume ch msb]<br/>
+			[Volume ch msb lsb]<br/>
+			[Volume ch 128] => [Volume ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control volume</b> one or two messages
+			<b>= Bch 07 msb</b> or <b>= Bch 27 lsb Bch 07 msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 27 127 Bch 07 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Expression">
+		<div class="doc_predicate_header">
+			[Expression ch msb]<br/>
+			[Expression ch msb lsb]<br/>
+			[Expression ch 128] => [Expression ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control expression</b> one or two messages
+			<b>= Bch 0B msb</b> or <b>= Bch 2B lsb Bch 0B msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 2B 127 Bch 0B 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_HoldOn">
+		<div class="doc_predicate_header">
+			[HoldOn ch]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control sustain</b> message <b>= Bch 40 7F</b>.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_HoldOff">
+		<div class="doc_predicate_header">
+			[HoldOff ch]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control sustain</b> message <b>= Bch 40 00</b>.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_VectorX">
+		<div class="doc_predicate_header">
+			[VectorX ch msb]<br/>
+			[VectorX ch msb lsb]<br/>
+			[VectorX ch 128] => [VectorX ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control general purpose</b> one or two messages
+			<b>= Bch 10 msb</b> or <b>= Bch 30 lsb Bch 10 msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 30 127 Bch 10 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_VectorY">
+		<div class="doc_predicate_header">
+			[VectorY ch msb]<br/>
+			[VectorY ch msb lsb]<br/>
+			[VectorY ch 128] => [VectorY ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control general purpose</b> one or two messages
+			<b>= Bch 11 msb</b> or <b>= Bch 31 lsb Bch 11 msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 31 127 Bch 11 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Vector">
+		<div class="doc_predicate_header">
+			[Vector ch xx yy] => [VectorX ch xx] [VectorY ch yy]<br/>
+			[Vector ch hx lx hy ly] => [VectorX ch hx lx] [VectorY ch hy ly]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends two Vector messages for both X and Y.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Attack">
+		<div class="doc_predicate_header">
+			[Attack ch msb]<br/>
+			[Attack ch msb lsb]<br/>
+			[Attack ch 128] => [Attack ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control attack</b> one or two messages
+			<b>= Bch 49 msb</b> or <b>= Bch 69 lsb Bch 49 msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 69 127 Bch 49 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Decay">
+		<div class="doc_predicate_header">
+			[Decay ch msb]<br/>
+			[Decay ch msb lsb]<br/>
+			[Decay ch 128] => [Decay ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control decay</b> one or two messages
+			<b>= Bch 4B msb</b> or <b>= Bch 6B lsb Bch 4B msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 6B 127 Bch 4B 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Sustain">
+		<div class="doc_predicate_header">
+			[Sustain ch msb]<br/>
+			[Sustain ch msb lsb]<br/>
+			[Sustain ch 128] => [Sustain ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control general purpose</b> one or two messages
+			<b>= Bch 50 msb</b> or <b>= Bch 70 lsb Bch 50 msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 70 127 Bch 50 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Release">
+		<div class="doc_predicate_header">
+			[Release ch msb]<br/>
+			[Release ch msb lsb]<br/>
+			[Release ch 128] => [Attack ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control release</b> one or two messages
+			<b>= Bch 48 msb</b> or <b>= Bch 68 lsb Bch 48 msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 68 127 Bch 48 127</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_Speed">
+		<div class="doc_predicate_header">
+			[Speed ch msb]<br/>
+			[Speed ch msb lsb]<br/>
+			[Speed ch 128] => [Speed ch 127 127]
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control vibrato rate</b> one or two messages
+			<b>= Bch 4C msb</b> or <b>= Bch 6C lsb Bch 4C msb</b>.<br/>
+			If data = 128 then maximum value is transmitted <b>= Bch 6C 127 Bch 4C 127</b>.
+		</div>
+	</a>
+</div>
+
 <div class="doc_library_section"><a id="Von Forman 16-bit controllers">16-bit Controllers</a></div>
 <!--
 		<li><a href="#Von Forman MIDI commands">MIDI Commands</a></li>
