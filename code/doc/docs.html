@@ -4896,6 +4896,139 @@ Batch files are searched in the following order:<br/>
 </div>
 
 <div class="doc_library_section"><a id="Von Forman 16-bit controllers">16-bit Controllers</a></div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_RPN">
+		<div class="doc_predicate_header">
+			[RPN ch msb lsb 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>rpn</b> message <b>= Bch 65 msb Bch 64 lsb Bch 26 ll Bch 06 hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_NRPN">
+		<div class="doc_predicate_header">
+			[NRPN ch msb lsb 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>nrpn</b> message <b>= Bch 63 msb Bch 62 lsb Bch 26 ll Bch 06 hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_DATA">
+		<div class="doc_predicate_header">
+			[DATA ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>data</b> message <b>= Bch 26 ll Bch 06 hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_CONTROL">
+		<div class="doc_predicate_header">
+			[CONTROL ch ctrl 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI two <b>control</b> message <b>= Bch (ctrl + 20) ll Bch ctrl hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_PITCH">
+		<div class="doc_predicate_header">
+			[PITCH ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>pitch</b> message <b>= Ech ll hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_MODULATION">
+		<div class="doc_predicate_header">
+			[MODULATION ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control modulation</b> message <b>= Bch 21 ll Bch 01 hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_PAN">
+		<div class="doc_predicate_header">
+			[PAN ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control pan</b> message <b>= Bch 2A ll Bch 0A hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_VOLUME">
+		<div class="doc_predicate_header">
+			[VOLUME ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control volume</b> message <b>= Bch 27 ll Bch 07 hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_EXPRESSION">
+		<div class="doc_predicate_header">
+			[EXPRESSION ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control expression</b> message <b>= Bch 2B ll Bch 0Bs hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_VECTORX">
+		<div class="doc_predicate_header">
+			[VECTORX ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control general purpose</b> message <b>= Bch 30 ll Bch 10 hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_VECTORY">
+		<div class="doc_predicate_header">
+			[VECTORY ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control general purpose</b> message <b>= Bch 30 ll Bch 10 hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_VECTOR">
+		<div class="doc_predicate_header">
+			[VECTOR ch 16-bit-xhxl 16-bit-yhyl] => [VECTORX ch 16-bit-xhxl] [VECTORY ch 16-bit-yhyl]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends combined VECTORX VECTORY message.
+		</div>
+	</a>
+</div>
+
 <!--
 		<li><a href="#Von Forman MIDI commands">MIDI Commands</a></li>
 		<li><a href="#Von Forman predefined controllers">Predefined Controllers</a></li>
