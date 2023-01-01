@@ -358,9 +358,11 @@ Batch files are searched in the following order:<br/>
 			<a href="#VF predicate_tempo">tempo</a>
 			<a href="#VF predicate_TEMPO">TEMPO</a>
 			<a href="#VF predicate_songselect">songselect</a>
+			<a href="#VF predicate_accel">accel</a>
 			<a href="#VF predicate_uF4">uF4</a>
 			<a href="#VF predicate_uF5">uF5</a>
 			<a href="#VF predicate_tunerequest">tunerequest</a>
+			<a href="#VF predicate_end_of_sysex">End of Sysex</a>
 			<a href="#VF predicate_timingclock">timingclock</a>
 			<a href="#VF predicate_uF9">uF9</a>
 			<a href="#VF predicate_START">START</a>
@@ -4124,6 +4126,180 @@ Batch files are searched in the following order:<br/>
 			Sends MIDI <b>songpositionpointer</b> message <b>= F2 ll hh</b>, where:<br/>
 			* hh = 16-bit-vv >> 7<br/>
 			* ll = 16-bit-vv & 15
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_songselect">
+		<div class="doc_predicate_header">
+			[songselect vv]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>songselect</b> message <b>= F3 vv</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_accel">
+		<div class="doc_predicate_header">
+			[accel beats]<br/>
+			=======================================<br/>
+			[accel beats] => followed by [tempo ....] or [TEMPO ....]
+		</div>
+		<div class="doc_predicate_body">
+			Artificial command for controlling Global Clock's accelerando.
+			Sends MIDI <b>songselect</b> message <b>= F3 beats</b>,
+			followed by [tempo ....] or [TEMPO ....] command.
+			The new tempo is achieved after the number of beats
+			specified by <b>accel</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_uF4">
+		<div class="doc_predicate_header">
+			[uF4]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>undefined / reserved</b> message <b>= F4</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_uF5">
+		<div class="doc_predicate_header">
+			[uF5]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>undefined / reserved</b> message <b>= F5</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_tunerequest">
+		<div class="doc_predicate_header">
+			[tunerequest]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>tunerequest</b> message <b>= F6</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_end_of_sysex">
+		<div class="doc_predicate_header">
+			[F7]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends automatically at the end of MIDI <b>sysex</b> message [F0 mmm .... <b>F7</b>].<br/>
+			Don't use it!
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_timingclock">
+		<div class="doc_predicate_header">
+			[timingclock]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>timingclock</b> message <b>= F8</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_uF9">
+		<div class="doc_predicate_header">
+			[uF9]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>undefined / reserved</b> message <b>= F9</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_START">
+		<div class="doc_predicate_header">
+			[START]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>START</b> message <b>= FA</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_CONTINUE">
+		<div class="doc_predicate_header">
+			[CONTINUE]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>CONTINUE</b> message <b>= FB</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_STOP">
+		<div class="doc_predicate_header">
+			[STOP]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>STOP</b> message <b>= FC</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_uFD">
+		<div class="doc_predicate_header">
+			[uF9]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>undefined / reserved</b> message <b>= FD</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_PAUSE">
+		<div class="doc_predicate_header">
+			[PAUSE]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Artificial command for use with Von Forman.
+			Sends MIDI <b>undefined / resereved</b> message <b>= FD</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_activesensing">
+		<div class="doc_predicate_header">
+			[activesensing]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>activesensing</b> message <b>= FE</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_systemreset">
+		<div class="doc_predicate_header">
+			[systemreset]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>systemreset</b> message <b>= FF</b>.<br/>
+			Von Forman's power-up reset.
 		</div>
 	</a>
 </div>
