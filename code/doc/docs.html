@@ -461,6 +461,15 @@ Batch files are searched in the following order:<br/>
 			<a href="#Global Conductor pause">pause</a>
 			<a href="#Global Conductor continue">continue</a>
 			<a href="#Global Conductor stop">stop</a>
+			<a href="#VF predicate_note_value">note_value</a>
+			<a href="#VF predicate_note_step">note_step</a>
+			<a href="#VF predicate_octave">octave</a>
+			<a href="#VF predicate_note">note</a>
+			<a href="#VF predicate_interval">interval</a>
+			<a href="#VF predicate_incom_midi">income_midi</a>
+			<a href="#VF predicate_VF">VF</a>
+			<a href="#VF predicate_JC">JC</a>
+			<a href="#VF predicate_JName">JName</a>
 		</li>
     </ul>
     <li><a href="#Global Conductor">Global Conductor</a></li>
@@ -4002,7 +4011,7 @@ Batch files are searched in the following order:<br/>
 <div class="doc_library_section"><a id="Von Forman notes">Notes</a></div>
 
 <div class="doc_predicate">
-    <a id="predicate_arithmetic">
+    <a>
         <div class="doc_predicate_header">
         	A A# Ax Ab Abb<br/>
         	B H (H = B) B# Bx Bb Bbb<br/>
@@ -4026,10 +4035,10 @@ Batch files are searched in the following order:<br/>
         	B = Ax = Cb<br/>
         </div>
         <div class="doc_predicate_body">
-        	Above are the predefined atoms representing note names. Please, note, there is note H defined, which is equal to B.<br/>
-        	Those names are to be used combined with octave number, where the range of all available MIDI notes is from [C -5] = 0 to [G 6] = 127:<br/>
-        	[C -5] = 0, [E -5] = 4, [E -4] = 16, [E -2] = 28, [E -1] = 40, [E 0] = 52, [E 1] = 64, [E 2] = 76, [E 3] = 88, [E 4] = 100, [E 5] = 112, [E 6] = 124 and [G 6] = 127.<br/>
-        	Please note, every note has 3 different names, except G# / Ab, which has only two names:<br/>
+			Above are the predefined atoms representing note names. Please, note, there is note H defined, which is equal to B.<br/>
+			Those names are to be used combined with octave number, where the range of all available MIDI notes is from [C -4] = 0 to [G 6] = 127:<br/>
+			[C -4] = 0, [E -4] = 4, [E -3] = 16, [E -2] = 28, [E -1] = 40, [E 0] = 52, [E 1] = 64, [E 2] = 76, [E 3] = 88, [E 4] = 100, [E 5] = 112, [E 6] = 124 and [G 6] = 127.<br/>
+			Please note, every note has 3 different names, except G# / Ab, which has only two names:<br/>
         </div>
     </a>
 </div>
@@ -5299,6 +5308,40 @@ Batch files are searched in the following order:<br/>
 			The <b>tempo</b>, <b>TEMPO</b> and <b>accel</b> commands control Global Clock.
 			The <b>accel</b> command should be used just before <b>tempo</b> or <b>TEMPO</b>
 			and it specifies the number of beats after each the target tempo is achieved.<br/>
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_note_value">
+		<div class="doc_predicate_header">
+			[note_value note value]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Lists all the chromatic note values from -2 (for Cbb) to 13 (for Bx).
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_note_step">
+		<div class="doc_predicate_header">
+			[note_step note step]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Lists all the diatonic note values from 0 (for C C# Cx Cb Cbb) to 6 (for B B# Bx Bb Bbb H).
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_octave">
+		<div class="doc_predicate_header">
+			[octave value diatonic_value chromatic_value]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Lists all the octave numbers from -4 to 6 together with diatonic and chromatic values of the first note.
+			The available range of notes with octaves is from [C -4] = 0 to [G 6] = 127.
 		</div>
 	</a>
 </div>
