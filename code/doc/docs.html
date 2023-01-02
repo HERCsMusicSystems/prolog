@@ -466,7 +466,7 @@ Batch files are searched in the following order:<br/>
 			<a href="#VF predicate_octave">octave</a>
 			<a href="#VF predicate_note">note</a>
 			<a href="#VF predicate_interval">interval</a>
-			<a href="#VF predicate_incom_midi">income_midi</a>
+			<a href="#VF predicate_income_midi">income_midi</a>
 			<a href="#VF predicate_VF">VF</a>
 			<a href="#VF predicate_JC">JC</a>
 			<a href="#VF predicate_JName">JName</a>
@@ -5342,6 +5342,79 @@ Batch files are searched in the following order:<br/>
 		<div class="doc_predicate_body">
 			Lists all the octave numbers from -4 to 6 together with diatonic and chromatic values of the first note.
 			The available range of notes with octaves is from [C -4] = 0 to [G 6] = 127.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_note">
+		<div class="doc_predicate_header">
+			[note [note octave] diatonic_value chromatic_value]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Calculates either note, diatonic value or chromatic value.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_interval">
+		<div class="doc_predicate_header">
+			[interval [n1 o1] [n2 o2] diatonic_interval chromatic_interval]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Calculates either note or diatonic or chromatic interval.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_income_midi">
+		<div class="doc_predicate_header">
+			[income_midi : midi_command]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Callback command to be implemented / overwritten by the user for custom response to incomming MIDI commands.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_VF">
+		<div class="doc_predicate_header">
+			[VF array_id nrpn_msb nrpn_lsb value] => Sets the value of Von Forman's parameter specified by nrpn msb / lsb.<br/>
+			[VF array_id nrpn_msb nrpn_lsb *value] => Reads the value of Von Forman's parameter specified by nrpn msb / lsb.<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sets or reads values of Von Forman's parameters.
+			The array_id identifies the instrument within the multitimbral context.
+			This command is used internally by HTML editor.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_JC">
+		<div class="doc_predicate_header">
+			[JC from to] => Connects two JACK ports.<br/>
+			[JC] => Lists all JACK ports.
+		</div>
+		<div class="doc_predicate_body">
+			Lists all JACK ports or connects two JACK ports.
+			Ports are specified by text values representing their names.
+			Use [JC] to see what those names are.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_JName">
+		<div class="doc_predicate_header">
+			[JName *name] => Reads the JACK client's name.<br/>
+			[JName name] => Sets the JACK client's name.
+		</div>
+		<div class="doc_predicate_body">
+			Reads or sets the JACK client's name. However, setting does not seem to work, so don't use it for setting.
 		</div>
 	</a>
 </div>
