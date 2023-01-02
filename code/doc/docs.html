@@ -28,7 +28,8 @@
             <li><a href="#multithreading">Multi-threading</a></li>
             <li><a href="#metalogical">Metalogical</a></li>
         </ul>
-        <li><a href="">Von Forman</a></li>
+        <li><a href="#Von Forman">Von Forman</a></li>
+        <li><a href="#Global Conductor">Global Conductor</a></li>
         <li><a href="#conductor">conductor</a></li>
         <li><a href="#midi">midi</a></li>
         <li><a href="#neural">neural</a></li>
@@ -378,6 +379,7 @@ Batch files are searched in the following order:<br/>
 			<a href="#VF predicate_nrpn">nrpn</a>
 			<a href="#VF predicate_data">data</a>
 			<a href="#VF predicate_delta">delta</a>
+			<a href="#VF predicate_chord">chord</a>
 			<a href="#VF predicate_poly">poly</a>
 			<a href="#VF predicate_mono">mono</a>
 			<a href="#VF predicate_Bank">Bank</a>
@@ -443,6 +445,28 @@ Batch files are searched in the following order:<br/>
 			<a href="#VF predicate_PORTAMENTO">PORTAMENTO</a>
 			<a href="#VF predicate_TRANSPOSE">TRANSPOSE</a>
 		</li>
+		<li><a href="#Von Forman commands">Von Forman Commands</a><br/>
+			<a href="#VF predicate_sequencer">sequencer</a>
+			<a href="#VF predicate_conductor">conductor</a>
+			<a href="#VF predicate_bar">bar</a>
+			<a href="#VF predicate_beat">beat</a>
+			<a href="#VF predicate_tick">tick</a>
+			<a href="#VF predicate_half">half</a>
+			<a href="#VF predicate_division">division</a>
+			<a href="#VF predicate_subdivision">subdivision</a>
+			<a href="#VF predicate_metrum">metrum</a>
+			<a href="#VF predicate_tempo">tempo</a>
+			<a href="#VF predicate_TEMPO">TEMPO</a>
+			<a href="#VF predicate_accel">accel</a>
+			<a href="#VF predicate_repeat">repeat</a>
+			<a href="#VF predicate_start">start</a>
+			<a href="#VF predicate_pause">pause</a>
+			<a href="#VF predicate_continue">continue</a>
+			<a href="#VF predicate_stop">stop</a>
+		</li>
+    </ul>
+    <li><a href="#Global Conductor">Global Conductor</a></li>
+    <ul>
     </ul>
     <li><a href="#conductor">conductor</a></li>
     <li><a href="#midi">midi</a></li>
@@ -4427,6 +4451,20 @@ Batch files are searched in the following order:<br/>
 </div>
 
 <div class="doc_predicate">
+	<a id="VF predicate_chord">
+		<div class="doc_predicate_header">
+			[chord ch velocity key-1 key-2 .... key-n]
+			=> [keyon ch key-1 velocity] [keyon ch key-2 velocity] .... [keyon ch key-n velocity]<br/>
+			[chord ch velocity]
+		</div>
+		<div class="doc_predicate_body">
+			Sends a number of keyon messages. Makes it easy to play many notes at the same time in one command.
+			Can be used without any notes, but then nothing happens.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
 	<a id="VF predicate_poly">
 		<div class="doc_predicate_header">
 			[poly ch]
@@ -4603,7 +4641,7 @@ Batch files are searched in the following order:<br/>
 			[Attack ch 128] => [Attack ch 127 127]
 		</div>
 		<div class="doc_predicate_body">
-			Sends MIDI <b>control attack</b> one or two messages
+			Sends MIDI <b>control attack time</b> one or two messages
 			<b>= Bch 49 msb</b> or <b>= Bch 69 lsb Bch 49 msb</b>.<br/>
 			If data = 128 then maximum value is transmitted <b>= Bch 69 127 Bch 49 127</b>.
 		</div>
@@ -4618,7 +4656,7 @@ Batch files are searched in the following order:<br/>
 			[Decay ch 128] => [Decay ch 127 127]
 		</div>
 		<div class="doc_predicate_body">
-			Sends MIDI <b>control decay</b> one or two messages
+			Sends MIDI <b>control decay time</b> one or two messages
 			<b>= Bch 4B msb</b> or <b>= Bch 6B lsb Bch 4B msb</b>.<br/>
 			If data = 128 then maximum value is transmitted <b>= Bch 6B 127 Bch 4B 127</b>.
 		</div>
@@ -4648,7 +4686,7 @@ Batch files are searched in the following order:<br/>
 			[Release ch 128] => [Attack ch 127 127]
 		</div>
 		<div class="doc_predicate_body">
-			Sends MIDI <b>control release</b> one or two messages
+			Sends MIDI <b>control release time</b> one or two messages
 			<b>= Bch 48 msb</b> or <b>= Bch 68 lsb Bch 48 msb</b>.<br/>
 			If data = 128 then maximum value is transmitted <b>= Bch 68 127 Bch 48 127</b>.
 		</div>
@@ -5025,6 +5063,232 @@ Batch files are searched in the following order:<br/>
 		</div>
 		<div class="doc_predicate_body">
 			Sends combined VECTORX VECTORY message.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_ATTACK">
+		<div class="doc_predicate_header">
+			[ATTACK ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control attack time</b> message <b>= Bch 69 ll Bch 49 hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_DECAY">
+		<div class="doc_predicate_header">
+			[DECAY ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control decay time</b> message <b>= Bch 6B ll Bch 4B hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_SUSTAIN">
+		<div class="doc_predicate_header">
+			[SUSTAIN ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control general purpose</b> message <b>= Bch 70 ll Bch 50 hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_RELEASE">
+		<div class="doc_predicate_header">
+			[RELEASE ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control release time</b> message <b>= Bch 68 ll Bch 48 hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_SPEED">
+		<div class="doc_predicate_header">
+			[SPEED ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control vibrato rate</b> message <b>= Bch 6C ll Bch 4C hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_FREQ">
+		<div class="doc_predicate_header">
+			[FREQ ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control brightness</b> message <b>= Bch 6A ll Bch 4A hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_RESONANCE">
+		<div class="doc_predicate_header">
+			[RESONANCE ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control timbre / harmonic intensity</b> message <b>= Bch 67 ll Bch 47 hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_CHORUS">
+		<div class="doc_predicate_header">
+			[CHORUS ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control general purpose</b> message <b>= Bch 71 ll Bch 51 hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_DELAY">
+		<div class="doc_predicate_header">
+			[DELAY ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control general purpose</b> message <b>= Bch 72 ll Bch 52 hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_FREEVERB">
+		<div class="doc_predicate_header">
+			[FREEVERB ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control general purpose</b> message <b>= Bch 73 ll Bch 53 hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_PORTAMENTO">
+		<div class="doc_predicate_header">
+			[PORTAMENTO ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control portamento time</b> message <b>= Bch 25 ll Bch 05 hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_TRANSPOSE">
+		<div class="doc_predicate_header">
+			[TRANSPOSE ch 16-bit-hhll]<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Sends MIDI <b>control undefined</b> message <b>= Bch 75 ll Bch 55 hh</b>.
+		</div>
+	</a>
+</div>
+
+<div class="doc_library_section"><a id="Von Forman commands">Von Forman Commands</a></div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_sequencer">
+		<div class="doc_predicate_header">
+			[sequencer] => Lists all polysequencers.<br/>
+			[sequencer : *] => Returns a list of all atoms with polysequencer attached.<br/>
+			[sequencer seq-1 seq-2 .... seq-n] => Creates a number of polysequencers.<br/>
+			[sequencer * * .... *] => Creates atoms and creates and attaches polysequencers.<br/>
+			================================================<br/>
+			[seq channel commands ....]<br/>
+			[seq] => Closes and deletes polysequencer.<br/>
+			[seq timingclock] => Moves polysequencer one tick.<br/>
+			[seq start] => Starts polysequencer.<br/>
+			[seq stop] => Stops polysequencer.<br/>
+			[seq continue] => Continue playback (after stop).<br/>
+			================================================<br/>
+			Commands:<br/>
+			bar [bar n] beat [beat n] tick [tick n]<br/>
+			half => wait 0.5 beat, then keyoff and wait the rest of 1 beat<br/>
+			keyoff [keyoff key] [keyoff [note octave]]<br/>
+			[keyon key (velocity)] [keyon [note octave] (velocity)] => velocity optional, default = 100<br/>
+			[control ctrl 8-bit-value] [CONTROL ctrl 16-bit-value] => ([control ctrl 128] = [CONTROL ctrl 16383])<br/>
+			[pitch msb] [pitch msb lsb] [PITCH 16-bit-value] => ([pitch 128] = [pitch 127 127] = [PITCH 16383])<br/>
+			[division beats] [division beats ticks] [subdivision ticks] [metrum 6 8]<br/>
+			repeat<br/>
+			[ [prolog command] : prolog commands]<br/>
+			[CustomCommand velocity] => translates to [keyon key velocity] if CustomCommand is defined as [[CustomCommand] : key]<br/>
+			CustomCommand => translates to [keyoff key] if CustomCommand is defined as [[CustomCommand] : key]<br/>
+			[tempo msb] [tempo msb lsb] [TEMPO 16-bit-value] [accel beats]<br/>
+		</div>
+			Creates or lists polysequencers.<br/>
+			Once created a polysequencer can be loaded with commands.
+			The first parameter specifies MIDI channel and the rest of the parameters is the track to be played.
+			Every subsequent loading call appends more commands at the end of the current track.<br/>
+			Calling a polysequencer without any parameters closes and deletes this polysequencer.<br/>
+			Commands:<br/>
+			Commands without parameters are written as an atom rather than a list.<br/>
+			The <b>control</b> and <b>pitch</b> commands can have value of 128. In such case the maximum 16383 value is used.<br/>
+			Prolog commands are written as a list of commands ( [ [command-1 ....] [command-2 ....] .... [command-n ....] ] ).<br/>
+			If the sequence is to be repeated then the <b>repeat</b> instruction needs to be used explicitly.<br/>
+			Custom commands can be defined as: [[CustomCommand] : key] => example = [[Maracas] : 70].<br/>
+			A sequence should not start with either <b>tick</b>, <b>beat</b> or <b>bar</b>.<br/>
+			Polysequencers receive <b>timingclock</b> in the same order as the order in which they were created.<br/>
+			If a polysequencer starts another polysequencer then it needs to be defined before the one to be started.
+			Otherwise and extra <b>tick</b> has to be transmitted to the polysequencer, which was just started.<br/>
+			Polysequencers do not have any internal clock.
+			Instead they rely on <b>timingclock</b> messages transmitted by Global Clock.<br/>
+			The <b>tempo</b>, <b>TEMPO</b> and <b>accel</b> commands control Global Clock.
+			The <b>accel</b> command should be used just before <b>tempo</b> or <b>TEMPO</b>
+			and it specifies the number of beats after each the target tempo is achieved.<br/>
+		<div class="predicate_body">
+		</div>
+	</a>
+</div>
+
+<div class="doc_predicate">
+	<a id="VF predicate_conductor">
+		<div class="doc_predicate_header">
+			[conductor] => Lists all conductors.<br/>
+			[conductor : *] => Returns a list of all atoms with conductors attached.<br/>
+			[conductor con-1 con-2 .... con-n] => Creates a number of conductors.<br/>
+			[conductor * * .... *] => Creates atoms and creates and attaches conductors.<br/>
+			================================================<br/>
+			[con] => Closes and deletes conductor.<br/>
+			[con timingclock] => Moves conductor one tick.<br/>
+			[con tick] [con tick n] => Wait one or n ticks.<br/>
+			[con beat] [con beat n] [con beat n.m] => Wait one or n beats. Number of beats can be a floating point number.<br/>
+			[con bar] [con bar n] => Wait one or n bars.<br/>
+			[con metrum 6 8] => Sets conductor's division and subdivision using musical time signature.<br/>
+			[con division 4] => Sets conductor's division.<br/>
+			[con division 4 24] => Sets conductor's division and subdivision.<br/>
+			[con subdivision 24] => Sets conductor's subdivision.<br/>
+			[con start] => Starts conductor.<br/>
+			[con pause] => Pauses conductor.<br/>
+			[con stop] => Stops conductor.<br/>
+			[con continue] => Continues conductor.<br/>
+		</div>
+		<div class="doc_predicate_body">
+			Creates or lists conductors.<br/>
+			Calling a conductor without any parameters closes and deletes this conductor.<br/>
+			The sequence needs to start with either <b>tick</b>, <b>beat</b> or <b>bar</b>.
+			Conductors receive <b>timingclock</b> in the same order as the order in which they were created.<br/>
+			If the sequence start another conductor then the conductor for this sequence needs to be defined before the conductor to be started.
+			Otherwise an extra <b>timingclock</b> needs to be transmitted to the conductor, which was just started.<br/>
+			Conductors do not have any internal clock.
+			Instead they rely on <b>timingclock</b> messages transmitted by Global Clock.<br/>
+			The <b>tempo</b>, <b>TEMPO</b> and <b>accel</b> commands control Global Clock.
+			The <b>accel</b> command should be used just before <b>tempo</b> or <b>TEMPO</b>
+			and it specifies the number of beats after each the target tempo is achieved.<br/>
 		</div>
 	</a>
 </div>
