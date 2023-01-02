@@ -331,7 +331,7 @@ Batch files are searched in the following order:<br/>
             <a href="#predicate_REVERSE">REVERSE</a>
             <a href="#predicate_rres">rres</a>
             <a href="#predicate_SELECT">SELECT</a>
-            <a href="#predicate_sort">sort</a>
+            <a href="#predicate_sort">sort (<=>)</a>
             <a href="#predicate_STACK">STACK</a>
             <a href="#predicate_TRY">TRY</a>
             <a href="#predicate_ures">ures</a>
@@ -3857,8 +3857,8 @@ Batch files are searched in the following order:<br/>
 <div class="doc_predicate">
     <a id="predicate_sort">
         <div class="doc_predicate_header">
-            [sort less in out tail]<br />
-            [sort in out]
+            [sort less in out tail] [<=> less in out tail]<br />
+            [sort in out] [<=> less in out]
         </div>
         <div class="doc_predicate_body">
             Sorts the input list producing the output list.
