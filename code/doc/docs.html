@@ -448,25 +448,35 @@ Batch files are searched in the following order:<br/>
 		<li><a href="#Von Forman commands">Von Forman Commands</a><br/>
 			<a href="#VF predicate_sequencer">sequencer</a>
 			<a href="#VF predicate_conductor">conductor</a>
-			<a href="#VF predicate_bar">bar</a>
-			<a href="#VF predicate_beat">beat</a>
-			<a href="#VF predicate_tick">tick</a>
-			<a href="#VF predicate_half">half</a>
-			<a href="#VF predicate_division">division</a>
-			<a href="#VF predicate_subdivision">subdivision</a>
-			<a href="#VF predicate_metrum">metrum</a>
+			<a href="#Global Conductor bar">bar</a>
+			<a href="#Global Conductor beat">beat</a>
+			<a href="#Global Conductor tick">tick</a>
+			<a href="#Global Conductor division">division</a>
+			<a href="#Global Conductor subdivision">subdivision</a>
+			<a href="#Global Conductor metrum">metrum</a>
 			<a href="#VF predicate_tempo">tempo</a>
 			<a href="#VF predicate_TEMPO">TEMPO</a>
 			<a href="#VF predicate_accel">accel</a>
-			<a href="#VF predicate_repeat">repeat</a>
-			<a href="#VF predicate_start">start</a>
-			<a href="#VF predicate_pause">pause</a>
-			<a href="#VF predicate_continue">continue</a>
-			<a href="#VF predicate_stop">stop</a>
+			<a href="#Global Conductor start">start</a>
+			<a href="#Global Conductor pause">pause</a>
+			<a href="#Global Conductor continue">continue</a>
+			<a href="#Global Conductor stop">stop</a>
 		</li>
     </ul>
     <li><a href="#Global Conductor">Global Conductor</a></li>
     <ul>
+		<li>
+			<a href="#Global Conductor beat">beat</a>
+			<a href="#Global Conductor bar">bar</a>
+			<a href="#Global Conductor tick">tick</a>
+			<a href="#Global Conductor metrum">metrum</a>
+			<a href="#Global Conductor division">division</a>
+			<a href="#Global Conductor subdivision">subdivision</a>
+			<a href="#Global Conductor start">start</a>
+			<a href="#Global Conductor stop">stop</a>
+			<a href="#Global Conductor pause">pause</a>
+			<a href="#Global Conductor continue">continue</a>
+		</li>
     </ul>
     <li><a href="#conductor">conductor</a></li>
     <li><a href="#midi">midi</a></li>
@@ -5291,6 +5301,158 @@ Batch files are searched in the following order:<br/>
 			and it specifies the number of beats after each the target tempo is achieved.<br/>
 		</div>
 	</a>
+</div>
+
+<div class="doc_library"><a id="Global Conductor">LIBRARY: <b>Global Conductor</b></a></div>
+
+<div class="doc_predicate">
+    <a id="Global Conductor beat">
+        <div class="doc_predicate_header">
+            [beat : *parameters] => translates to [GlobaConductor beat : *parameters]<br />
+        </div>
+        <div class="doc_predicate_body">
+        	Defined in Global Conductor, which needs to be loaded.<br/>
+        	Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[beat : *x] [GlobalConductor beat : *x]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="Global Conductor bar">
+        <div class="doc_predicate_header">
+            [bar : *parameters] => translates to [GlobaConductor bar : *parameters]<br />
+        </div>
+        <div class="doc_predicate_body">
+        	Defined in Global Conductor, which needs to be loaded.<br/>
+        	Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[bar : *x] [GlobalConductor bar : *x]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="Global Conductor tick">
+        <div class="doc_predicate_header">
+            [tick : *parameters] => translates to [GlobaConductor tick : *parameters]<br />
+        </div>
+        <div class="doc_predicate_body">
+        	Defined in Global Conductor, which needs to be loaded.<br/>
+        	Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[tick : *x] [GlobalConductor tick : *x]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="Global Conductor metrum">
+        <div class="doc_predicate_header">
+            [metrum : *parameters] => translates to [GlobaConductor metrum : *parameters]<br />
+        </div>
+        <div class="doc_predicate_body">
+        	Defined in Global Conductor, which needs to be loaded.<br/>
+        	Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[metrum : *x] [GlobalConductor metrum : *x]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="Global Conductor division">
+        <div class="doc_predicate_header">
+            [division : *parameters] => translates to [GlobaConductor division : *parameters]<br />
+        </div>
+        <div class="doc_predicate_body">
+        	Defined in Global Conductor, which needs to be loaded.<br/>
+        	Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[division : *x] [GlobalConductor division : *x]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="Global Conductor subdivision">
+        <div class="doc_predicate_header">
+            [subdivision : *parameters] => translates to [GlobaConductor subdivision : *parameters]<br />
+        </div>
+        <div class="doc_predicate_body">
+        	Defined in Global Conductor, which needs to be loaded.<br/>
+        	Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[subdivision : *x] [GlobalConductor subdivision : *x]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="Global Conductor start">
+        <div class="doc_predicate_header">
+            [start : *parameters] => translates to [GlobaConductor start : *parameters]<br />
+        </div>
+        <div class="doc_predicate_body">
+        	Defined in Global Conductor, which needs to be loaded.<br/>
+        	Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[start : *x] [GlobalConductor start : *x]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="Global Conductor stop">
+        <div class="doc_predicate_header">
+            [stop : *parameters] => translates to [GlobaConductor stop : *parameters]<br />
+        </div>
+        <div class="doc_predicate_body">
+        	Defined in Global Conductor, which needs to be loaded.<br/>
+        	Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[stop : *x] [GlobalConductor stop : *x]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="Global Conductor pause">
+        <div class="doc_predicate_header">
+            [pause : *parameters] => translates to [GlobaConductor pause : *parameters]<br />
+        </div>
+        <div class="doc_predicate_body">
+        	Defined in Global Conductor, which needs to be loaded.<br/>
+        	Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[pause : *x] [GlobalConductor pause : *x]]
+        </div>
+    </a>
+</div>
+
+<div class="doc_predicate">
+    <a id="Global Conductor continue">
+        <div class="doc_predicate_header">
+            [continue : *parameters] => translates to [GlobaConductor continue : *parameters]<br />
+        </div>
+        <div class="doc_predicate_body">
+        	Defined in Global Conductor, which needs to be loaded.<br/>
+        	Macrodefinition:
+        </div>
+        <div class="doc_predicate_code">
+            [[continue : *x] [GlobalConductor continue : *x]]
+        </div>
+    </a>
 </div>
 
 <!--
