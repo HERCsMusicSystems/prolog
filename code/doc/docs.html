@@ -4187,10 +4187,12 @@ Batch files are searched in the following order:<br/>
 	<a id="VF predicate_quarterframe">
 		<div class="doc_predicate_header">
 			[quarterframe vv]<br/>
-			[F0 00 mm1 mm2 .... F7]<br/>
 		</div>
 		<div class="doc_predicate_body">
-			Sends MIDI <b>quarterframe</b> message <b>= F1 vv</b>.<br/>
+			Sends MIDI <b>quarterframe</b> message <b>= F1 vv</b> where:<br/>
+			vv = nnnbbbb.<br/>
+			nnn = Message Type<br/>
+			bbbb = Values
 		</div>
 	</a>
 </div>
