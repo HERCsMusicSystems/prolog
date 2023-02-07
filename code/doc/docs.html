@@ -4163,10 +4163,12 @@ Batch files are searched in the following order:<br/>
 <div class="doc_predicate">
 	<a id="VF predicate_Sysex">
 		<div class="doc_predicate_header">
-			[Sysex ....] => sends Von Forman's specific sysex [F0 mmm dv f1 .... F7] where:<br/>
+			[Sysex dv ....] => sends Von Forman's specific sysex [F0 mmm dv f1 .... F7] where:<br/>
 			* mmm is the Manufacturer's ID (either [mm] or [00 mm1 mm2])<br/>
 			* dv is Device ID<br/>
 			* f1 is the first byte of Family Code<br/>
+			[sysex mm dv f1 1 2 3 4] = [Sysex dv 1 2 3 4]<br/>
+			[sysex 0 mm1 mm2 dv f1 1 2 3 4] = [Sysex dv 1 2 3 4]<br/>
 			====================================<br/>
 			[F0 7E 7F F7] => FACTORY IDENTITY REPLY<br/>
 			[F0 7E dv 06 02 mmm f1 f2 p1 p2 v1 v2 v3 v4 F7] => IDENTITY REPLY where:<br/>
@@ -4177,8 +4179,9 @@ Batch files are searched in the following order:<br/>
 			* dv is Device ID<br/>
 		</div>
 		<div class="doc_predicate_body">
-			Sends Von Forman's specific MIDI <b>sysex</b> message, where Manufacturer's ID, Device ID and the first byte of Family Code
+			Sends Von Forman's specific MIDI <b>sysex</b> message, where Manufacturer's ID and the first byte of Family Code
 			are automatically inserted.
+			The Device ID needs to be specified.
 		</div>
 	</a>
 </div>
